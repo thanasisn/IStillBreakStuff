@@ -1,0 +1,11 @@
+#
+#  Lists of urls paths for host files in zip format.
+#
+#  Add or comment lines to choose which are used.
+#  Should be able to unzip with piping to zcat  
+#
+
+
+http://winhelp2002.mvps.org/hosts.zip
+https://hosts-file.net/download/hosts.zip
+

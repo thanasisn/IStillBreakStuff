@@ -1,0 +1,45 @@
+#
+#  Lists of urls paths for host files in text format.
+#
+#  Add or comment lines to choose which are used.
+#  Probably will work for list in hosts file format and simple list or urls. 
+#
+
+## Some option to consider
+## corporation lists  https://github.com/jmdugan/blocklists/blob/master/corporations
+
+
+## List I use
+
+http://sysctl.org/cameleon/hosts
+http://winhelp2002.mvps.org/hosts.txt
+https://github.com/StevenBlack/hosts/blob/master/alternates/fakenews-gambling/hosts
+https://hosts.ubuntu101.co.za/hosts
+https://mirror.cedia.org.ec/malwaredomains/immortal_domains.txt
+https://mirror.cedia.org.ec/malwaredomains/justdomains
+https://mirror1.malwaredomains.com/files/justdomains
+https://pgl.yoyo.org/adservers/serverlist.php?hostformat=nohtml&showintro=1
+https://ransomwaretracker.abuse.ch/downloads/RW_DOMBL.txt
+https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+https://raw.githubusercontent.com/XionKzn/PiHole-Lists/master/Blocklist.txt
+https://raw.githubusercontent.com/XionKzn/PiHole-Lists/master/Quad9.txt
+https://raw.githubusercontent.com/austinheap/sophos-xg-block-lists/master/easylist.txt
+https://raw.githubusercontent.com/austinheap/sophos-xg-block-lists/master/nocoin.txt
+https://raw.githubusercontent.com/deathbybandaid/piholeparser/master/Subscribable-Lists/ParsedBlacklists/AdAway-Default-Blocklist.txt
+https://raw.githubusercontent.com/deathbybandaid/piholeparser/master/Subscribable-Lists/ParsedBlacklists/Fanboy-Annoyances-List.txt
+https://raw.githubusercontent.com/mitchellkrogza/Phishing.Database/master/phishing-domains-ACTIVE.txt
+https://raw.githubusercontent.com/notracking/hosts-blocklists/master/dnscrypt-proxy/dnscrypt-proxy.blacklist.txt
+https://raw.githubusercontent.com/ookangzheng/blahdns/master/hosts/blacklist.txt
+https://someonewhocares.org/hosts/hosts
+https://someonewhocares.org/hosts/zero/hosts
+https://v.firebog.net/hosts/Easyprivacy.txt
+https://v.firebog.net/hosts/Prigent-Ads.txt
+https://winhelp2002.mvps.org/hosts.txt
+https://www.malwaredomainlist.com/hostslist/hosts.txt
+
+
+## test; https://github.com/jerryn70/GoodbyeAds
+https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Hosts/GoodbyeAds.txt
+https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Extension/GoodbyeAds-YouTube-AdBlock.txt
+
+
