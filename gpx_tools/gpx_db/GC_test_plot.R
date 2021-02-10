@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-#### Golden Cheetah plot shoes usage duration
+#### Golden Cheetah test plot shoes
 ## Used inside Golden Cheetah software
 ## Plot a line for each shoe usage
 
