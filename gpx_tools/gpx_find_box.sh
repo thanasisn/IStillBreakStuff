@@ -1,7 +1,7 @@
 #!/bin/bash
 ## created on 2013-07-30
 
-#### search gpx files and based on coordinate box
+#### Search gpx files and based on coordinate box
 ## apparently this is slow
 
 ## This script is superseded by another, but it should work.
