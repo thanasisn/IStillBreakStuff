@@ -1,7 +1,7 @@
 #!/bin/bash
 ## created on 2015-09-10
 
-#### convert gdb to gpx
+#### Convert gdb to gpx
 
 folderIN="$1"
 folderOUT="$2"
