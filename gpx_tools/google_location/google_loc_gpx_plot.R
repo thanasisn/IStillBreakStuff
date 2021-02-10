@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 #'
-#' Plot tracks from google, polar and other gps files
+#' #### Plot tracks from google, polar and other gps files
 #' - Google data have been exported with google_loc_export.R
 #' - Monthly pdf file with one plot per day
 #' - Depending on the data map servers may get angry with you

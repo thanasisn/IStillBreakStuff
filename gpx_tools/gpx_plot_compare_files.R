@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 
+#### Compare multiple gpx files
 
 ####_ Set environment _####
 rm(list = (ls()[ls() != ""]))

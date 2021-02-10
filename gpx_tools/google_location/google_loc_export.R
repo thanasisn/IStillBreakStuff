@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 #'
-#' Export google location history to RDS
+#' #### Export google location history to RDS
 #' - Try to characterize points by main activity
 #'
 

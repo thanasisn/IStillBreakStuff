@@ -29,8 +29,11 @@ Things they can do:
 	- Create gridded aggregated data from all points for use in qgis
 
 - Parse google location data (google_location)
-    - Create Rds R data files of data points and activity for further uses
-    - Plot maps with data from google locations and gpx files
+    - **google_loc_export.R   :**   Export google location history to RDS
+    - **google_loc_gpx_plot.R :**   Plot tracks from google, polar and other gps files
+    - **google_loc_split.R    :**   Split google location history to smaller manageable files
+
+
 
 
 *Suggestions and improvements are always welcome.*
