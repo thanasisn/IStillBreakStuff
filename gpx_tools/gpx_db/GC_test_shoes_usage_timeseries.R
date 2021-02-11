@@ -52,7 +52,7 @@ for (as in unique(ddd$Shoes)) {
     text <- extra[extra$Shoes==as,]
     if (nrow(temp)>1) {
         ## insert extra data
-        if (nrow(text)>1) {
+        if (nrow(text)>0) {
             text$date[is.na(text$date)] <- min(temp$date,text$date,na.rm = T)
             temp <- plyr::rbind.fill(text,temp)
             temp <- temp[order(temp$date), ]

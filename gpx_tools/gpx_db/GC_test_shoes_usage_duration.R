@@ -30,6 +30,8 @@ cat(paste(sort(unique(metrics$Shoes)), colapse = "\n"),
     "~/LOGs/Shoes.list")
 
 
+gsub("^.*-[ ]+"," ",unique(metrics$Shoes))
+
 ## exclude non meaning
 ddd <- metrics[metrics$Shoes != "Multi", ]
 ddd <- ddd[ddd$Shoes != "?", ]
@@ -50,7 +52,7 @@ for (as in unique(ddd$Shoes)) {
     text <- extra[extra$Shoes==as,]
     if (nrow(temp)>1) {
         ## insert extra data
-        if (nrow(text)>1) {
+        if (nrow(text)>0) {
             text$date[is.na(text$date)] <- min(temp$date,text$date,na.rm = T)
             temp <- plyr::rbind.fill(text,temp)
             temp <- temp[order(temp$date), ]
@@ -63,7 +65,7 @@ for (as in unique(ddd$Shoes)) {
         temp$total[temp$Status == "End"] <- 0
         ## test shoe line
         temp[ , c("date", "total", "Distance")]
-        plot(temp$date, temp$total)
+        # plot(temp$date, temp$total)
         ## gather for plotting
         gather <- plyr::rbind.fill(gather, temp)
     }
@@ -92,7 +94,10 @@ cc <- 1
 for (as in sort(unique(gather$Shoes))) {
     temp <- gather[gather$Shoes==as,]
     lines(temp$nday, temp$total, col = cols[cc], lwd = 4, type = "s" )
-    text(temp$nday[which.max(temp$total)], max(temp$total), labels = round(max(temp$total),0),pos = 3, cex = cex  )
+    model<-gsub("^.*-[ ]+","",as)
+    text(temp$nday[which.max(temp$total)], max(temp$total),
+         labels = paste(model, round(max(temp$total),0)),
+         pos = 3, cex = cex * 0.8  )
     sn <- c(sn, paste0(as," (",round(max(temp$total),0),"km)" ) )
     sc <- c(sc,cols[cc])
     cc <- cc+1
