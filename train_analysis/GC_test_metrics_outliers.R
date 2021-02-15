@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-#### Golden Cheetah detect outliers in metrics
+#### Golden Cheetah detect outliers in metrics data
 
 
 ####_ Set environment _####
