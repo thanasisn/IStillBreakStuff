@@ -30,7 +30,7 @@ cat(paste(sort(unique(metrics$Shoes)), colapse = "\n"),
 library(data.table)
 library(randomcoloR)
 
-cex <- 0.8
+cex <- 0.7
 
 ## exclude non meaning
 ddd <- metrics[metrics$Shoes != "Multi", ]
@@ -50,7 +50,7 @@ gather <- data.frame()
 for (as in unique(ddd$Shoes)) {
     temp <-   ddd[ddd$Shoes==as,]
     text <- extra[extra$Shoes==as,]
-    if (nrow(temp)>1) {
+    if (nrow(temp)>0) {
         ## insert extra data
         if (nrow(text)>0) {
             text$date[is.na(text$date)] <- min(temp$date,text$date,na.rm = T)
@@ -107,7 +107,7 @@ cc <- 1
 for (as in sort(unique(gath$Shoes))) {
     temp <- gath[gath$Shoes==as,]
     lines(temp$date, temp$total, col = cols[cc], lwd = 4, type = "s" )
-    text(temp$date[which.max(temp$total)], max(temp$total), labels = round(max(temp$total),0),pos = 3, cex = cex  )
+    text(temp$date[which.max(temp$total)], max(temp$total), labels = paste(as,"\n" ,round(max(temp$total),0)),pos = 3, cex = cex  )
     sn <- c(sn, paste0(as," (",round(max(temp$total),0),"km)" ) )
     sc <- c(sc,cols[cc])
     cc <- cc+1

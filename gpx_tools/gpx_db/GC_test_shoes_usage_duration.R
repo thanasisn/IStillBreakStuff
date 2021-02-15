@@ -72,7 +72,7 @@ for (as in unique(ddd$Shoes)) {
 }
 
 ## plot params
-cex <- 1
+cex <- 0.7
 
 
 xlim <- range(gather$nday, na.rm = T)
@@ -96,7 +96,7 @@ for (as in sort(unique(gather$Shoes))) {
     lines(temp$nday, temp$total, col = cols[cc], lwd = 4, type = "s" )
     model<-gsub("^.*-[ ]+","",as)
     text(temp$nday[which.max(temp$total)], max(temp$total),
-         labels = paste(model, round(max(temp$total),0)),
+         labels = paste(model,"\n", round(max(temp$total),0)),
          pos = 3, cex = cex * 0.8  )
     sn <- c(sn, paste0(as," (",round(max(temp$total),0),"km)" ) )
     sc <- c(sc,cols[cc])
