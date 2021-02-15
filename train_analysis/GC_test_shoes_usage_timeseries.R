@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-#### Golden Cheetah plot shoes usage total duration vs total distance
+#### Golden Cheetah plot shoes usage total distance vs time
 ## Used inside Golden Cheetah software
 ## Plot a line for each shoe usage
 
@@ -16,25 +16,31 @@ if(!interactive()) {
     sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
 }
 
-# metrics <- GC.metrics(all=TRUE)
-# saveRDS(metrics, "~/LOGs/GCmetrics.Rds")
-
 
 metrics <- readRDS("~/LOGs/GCmetrics.Rds")
+sort(unique(metrics$Shoes))
 
 
-
-####  Copy for GC below  ####################################################
+####  Copy from GC below  ####################################################
 
 cat(paste(sort(unique(metrics$Shoes)), colapse = "\n"),
     "~/LOGs/Shoes.list")
 
 
-gsub("^.*-[ ]+"," ",unique(metrics$Shoes))
+library(data.table)
+library(randomcoloR)
+
+cex <- 0.7
+
 
 ## exclude non meaning
-ddd <- metrics[metrics$Shoes != "Multi", ]
-ddd <- ddd[ddd$Shoes != "?", ]
+ddd   <- metrics[metrics$Shoes != "Multi", ]
+empty <- ddd[ ddd$Shoes == "?" | ddd$Shoes == ""  , ]
+ddd   <- ddd[ddd$Shoes != "?", ]
+ddd   <- ddd[ddd$Shoes != "", ]
+
+empty  <- empty[empty$Sport == "Run",]
+emtpyD <- sum(empty$Distance,na.rm = T)
 
 ## get external data
 extra <- read.delim("~/TRAIN/Shoes.csv",
@@ -50,61 +56,71 @@ gather <- data.frame()
 for (as in unique(ddd$Shoes)) {
     temp <-   ddd[ddd$Shoes==as,]
     text <- extra[extra$Shoes==as,]
-    if (nrow(temp)>1) {
+    if (nrow(temp)>0) {
         ## insert extra data
         if (nrow(text)>0) {
             text$date[is.na(text$date)] <- min(temp$date,text$date,na.rm = T)
             temp <- plyr::rbind.fill(text,temp)
             temp <- temp[order(temp$date), ]
         }
-        ## aa day
-        temp$nday <- temp$date - min(temp$date)
-        ## cumsum
-        temp$total <- cumsum( temp$Distance )
-        ## retired
-        temp$total[temp$Status == "End"] <- 0
-        ## test shoe line
-        temp[ , c("date", "total", "Distance")]
-        # plot(temp$date, temp$total)
-        ## gather for plotting
         gather <- plyr::rbind.fill(gather, temp)
     }
 }
 
-## plot params
-cex <- 0.7
+
+## agreggate
+gather <- data.table(gather)
 
 
-xlim <- range(gather$nday, na.rm = T)
-ylim <- range(0,gather$total, na.rm = T)
-
-
-#par(mar=c(2.5,2,0.3,0.3))
-plot(1, type="n",
-     xlab = "Days of usage", ylab = "km",
-     xlim = xlim, ylim = ylim,
-     cex.axis = cex)
-
-library(randomcoloR)
-sn   <- c()
-sc   <- c()
+agg  <- gather[, .(Distance = sum(Distance)), by = .(year(date), month(date), Shoes)]
 n    <- length(unique(gather$Shoes))
 cols <- distinctColorPalette(n)
+
+agg$date <- as.Date(paste(agg$year,agg$month, "1"), format = "%Y %m %d" )
+
+
+
+
+
+
+gath <- data.table()
+for (as in unique(agg$Shoes)) {
+    temp <- agg[Shoes == as]
+    setorder(temp,date)
+    temp[,total := cumsum(Distance) ]
+    gath <- rbind(gath,temp)
+}
+
+gath$total <- round( gath$total, 0)
+
+xlim <- range(gath$date, na.rm = T)
+ylim <- range(0,gath$total, na.rm = T)
+
+
+plot(1, type="n",
+     xlab = "", ylab = "km",
+     xlim = xlim, ylim = ylim,
+     xaxt='n',
+     cex.axis = cex)
+axis.Date(1,agg$date)
+axis.Date(1,at = seq(min(agg$date), max(agg$date)+1, "months"),
+          labels = FALSE, tcl = -0.2)
+
+
+sn <- c()
+sc <- c()
 cc <- 1
-for (as in sort(unique(gather$Shoes))) {
-    temp <- gather[gather$Shoes==as,]
-    lines(temp$nday, temp$total, col = cols[cc], lwd = 4, type = "s" )
-    model<-gsub("^.*-[ ]+","",as)
-    text(temp$nday[which.max(temp$total)], max(temp$total),
-         labels = paste(model,"\n", round(max(temp$total),0)),
-         pos = 3, cex = cex * 0.8  )
+for (as in sort(unique(gath$Shoes))) {
+    temp <- gath[gath$Shoes==as,]
+    lines(temp$date, temp$total, col = cols[cc], lwd = 4, type = "s" )
+    text(temp$date[which.max(temp$total)], max(temp$total), labels = paste(as,"\n" ,round(max(temp$total),0)),pos = 3, cex = cex  )
     sn <- c(sn, paste0(as," (",round(max(temp$total),0),"km)" ) )
     sc <- c(sc,cols[cc])
     cc <- cc+1
 }
+sn <- c(sn, paste0("NO ENTRY (", round(emtpyD,0),"km)"))
+sc <- c(sc, NA)
 legend("topleft", legend = sn, col = sc, bty = "n", pch = 19, cex = cex)
-
-
 
 
 
