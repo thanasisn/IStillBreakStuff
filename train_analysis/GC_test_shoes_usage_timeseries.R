@@ -13,7 +13,7 @@ tic = Sys.time()
 Script.Name = funr::sys.script()
 if(!interactive()) {
     pdf(file=sub("\\.R$",".pdf",Script.Name))
-    sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
+    sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
 }
 
 
