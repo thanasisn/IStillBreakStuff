@@ -18,6 +18,8 @@ Bash image manipulation tools.
 ## pdf_tools
 Bash tools to manipulate pdf files.
 
+## system_tools
+General system and file tools for linux systems.
 
 ## train_analysis
 Tools for processing my training data.
