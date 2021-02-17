@@ -173,8 +173,95 @@ data[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(time
 # data[dist<0]
 
 
+## new binned approach
+if (FALSE) {
+    rsls <- unique(c(
+        5000,
+        1000 ))
+
+    ## exclude some data paths not mine
+    data <- data[ grep("/Plans/",   file, invert = T ), ]
+    data <- data[ grep("/E_paths/", file, invert = T ), ]
+    data <- data[ grep("/ROUT/",    file, invert = T ), ]
+
+    ## get unique points
+    setkey( data, time, X, Y )
+
+    ## remove duplicate points
+    Ddata <- unique( data[list(time, X, Y), nomatch = 0]  )
+
+    ## keep only existing coordinates
+    Ddata <- Ddata[ !is.na(X) ]
+    Ddata <- Ddata[ !is.na(Y) ]
 
 
+    ## break data in two categories
+    Dtrain <- rbind(
+        Ddata[ grep("/TRAIN/", file ), ],
+        Ddata[ grep("/Running/Polar/", file ), ]
+    )
+    Dtrain <- unique(Dtrain)
+
+    Drest <- Ddata[ ! grep("/Running/Polar/", file ), ]
+    Drest <- Drest[ ! grep("/TRAIN/", file ), ]
+    Drest <- unique(Drest)
+
+    # unique(dirname( Dtrain$file))
+    # unique(dirname( Drest$file))
+
+    ## One file for each resolution
+    for (res in rsls) {
+        traindb <- paste0("~/GISdata/Layers/Grid_",sprintf("%08d",res),"m.gpkg")
+
+        ## one column for each year and type and aggregator
+        ## after that totals are computed
+
+        yearstodo <- unique(year(Ddata$time))
+        yearstodo <- sort(na.exclude(yearstodo))
+
+        for (ay in yearstodo) {
+            ## create all columns
+            TRcnt <- copy(Dtrain[year(time)==ay])
+            REcnt <- copy(Drest[year(time)==ay])
+            TRcnt[ , X :=  (X %/% res * res) + (res/2) ]
+            TRcnt[ , Y :=  (Y %/% res * res) + (res/2) ]
+            REcnt[ , X :=  (X %/% res * res) + (res/2) ]
+            REcnt[ , Y :=  (Y %/% res * res) + (res/2) ]
+
+            TRpnts <- TRcnt[ , .(.N ), by = .(X,Y) ]
+            TRdays <- TRcnt[ , .(N = length(unique(as.Date(time))) ), by = .(X,Y) ]
+
+            paste(ay,"Train","Points")
+            paste(ay,"Train","Hours")
+            paste(ay,"Train","Days")
+
+            # ## count point in cells
+            # temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
+            # temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+            # layr <- sprintf("%s %5sm %s", ay, res, "point cnt")
+            # st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+            #
+            # ## count days in each cell
+            # temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
+            # temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+            # layr <- sprintf("%s %5sm %s", ay, res, "days cnt")
+            # st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+            #
+            # ## count hours in each cell
+            # temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
+            # temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+            # layr <- sprintf("%s %5sm %s", ay, res, "hour cnt")
+            # st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+
+        }
+    }
+
+
+
+}
+
+
+##
 
 ####   Binned data output   ####
 cat(paste("\nBin points by location\n"))
@@ -386,6 +473,8 @@ for (res in rsls) {
 ####  Stats on non training data only  #########################################
 
 ddaa <- data[ ! grep("/Running/Polar/", file ), ]
+ddaa <- ddaa[ ! grep("/TRAIN/", file ), ]
+
 
 cat(paste( length(unique( ddaa$file )), "files to bin\n" ))
 cat(paste( nrow( ddaa ), "points to bin\n" ))
