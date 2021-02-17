@@ -99,7 +99,7 @@ cc <- 1
 for (as in sort(unique(gather$Shoes))) {
     temp <- gather[gather$Shoes==as,]
     lines(temp$nday, temp$total, col = cols[cc], lwd = 4, type = "s" )
-    model<-gsub("^.*-[ ]+","",as)
+    model <- gsub("^.*-[ ]+", "", as)
     text(temp$nday[which.max(temp$total)], max(temp$total),
          labels = paste(model,"\n", round(max(temp$total),0)),
          pos = 3, cex = cex * 0.8  )
