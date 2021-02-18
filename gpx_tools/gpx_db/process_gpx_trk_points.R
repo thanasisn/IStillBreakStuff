@@ -23,6 +23,7 @@ library(sf)
 EPSG           <- 3857
 trackpoints_fl <- paste0( "~/GISdata/Count_sl2_",EPSG,".Rds")
 baseoutput     <- "~/GISdata/"
+layers_out     <- "~/GISdata/Layers/Auto/"
 
 
 ## load data
@@ -34,6 +35,8 @@ data[ time < "1971-01-01", time := NA ]
 
 
 hist(data$time , breaks = 100)
+
+typenames <- c("Points","Days","Hours")
 
 
 cat(paste( length(unique( data$file )), "total files parsed\n" ))
@@ -173,90 +176,144 @@ data[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(time
 # data[dist<0]
 
 
-## new binned approach
-if (FALSE) {
-    rsls <- unique(c(
-        5000,
-        1000 ))
 
-    ## exclude some data paths not mine
-    data <- data[ grep("/Plans/",   file, invert = T ), ]
-    data <- data[ grep("/E_paths/", file, invert = T ), ]
-    data <- data[ grep("/ROUT/",    file, invert = T ), ]
+#### Bin points in grids ####
+rsls <- unique(c(
+    5,
+    10,
+    20,
+    50,
+    100,
+    500,
+    1000,
+    5000,
+    10000,
+    20000,
+    50000 ))
 
-    ## get unique points
-    setkey( data, time, X, Y )
+## exclude some data paths not mine
+data <- data[ grep("/Plans/",   file, invert = T ), ]
+data <- data[ grep("/E_paths/", file, invert = T ), ]
+data <- data[ grep("/ROUT/",    file, invert = T ), ]
 
-    ## remove duplicate points
-    Ddata <- unique( data[list(time, X, Y), nomatch = 0]  )
+## get unique points
+setkey( data, time, X, Y )
 
-    ## keep only existing coordinates
-    Ddata <- Ddata[ !is.na(X) ]
-    Ddata <- Ddata[ !is.na(Y) ]
+## remove duplicate points
+Ddata <- unique( data[list(time, X, Y), nomatch = 0]  )
 
-
-    ## break data in two categories
-    Dtrain <- rbind(
-        Ddata[ grep("/TRAIN/", file ), ],
-        Ddata[ grep("/Running/Polar/", file ), ]
-    )
-    Dtrain <- unique(Dtrain)
-
-    Drest <- Ddata[ ! grep("/Running/Polar/", file ), ]
-    Drest <- Drest[ ! grep("/TRAIN/", file ), ]
-    Drest <- unique(Drest)
-
-    # unique(dirname( Dtrain$file))
-    # unique(dirname( Drest$file))
-
-    ## One file for each resolution
-    ## OR one file with one layer per resolution
-    for (res in rsls) {
-        traindb <- paste0("~/GISdata/Layers/Grid_",sprintf("%08d",res),"m.gpkg")
-
-        ## one column for each year and type and aggregator
-        ## after that totals are computed
-
-        yearstodo <- unique(year(Ddata$time))
-        yearstodo <- sort(na.exclude(yearstodo))
-
-        aagg <- data.table()
-        for (ay in yearstodo) {
-            ## create all columns
-            TRcnt <- copy(Dtrain[year(time)==ay])
-            REcnt <- copy(Drest[year(time)==ay])
-            TRcnt[ , X :=  (X %/% res * res) + (res/2) ]
-            TRcnt[ , Y :=  (Y %/% res * res) + (res/2) ]
-            REcnt[ , X :=  (X %/% res * res) + (res/2) ]
-            REcnt[ , Y :=  (Y %/% res * res) + (res/2) ]
-
-            TRpnts  <- TRcnt[ , .(.N ), by = .(X,Y) ]
-            TRdays  <- TRcnt[ , .(N = length(unique(as.Date(time))) ), by = .(X,Y) ]
-            TRhours <- TRcnt[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )) ), by = .(X,Y) ]
-
-            ## jusst to init
-            dummy <- unique(rbind( TRcnt[, .(X,Y)] , REcnt[, .(X,Y)] ))
-            ## nice names
-            names(TRpnts )[names(TRpnts )=="N"] <- paste(ay,"Train","Points")
-            names(TRdays )[names(TRdays )=="N"] <- paste(ay,"Train","Days")
-            names(TRhours)[names(TRhours)=="N"] <- paste(ay,"Train","Hours")
-
-            aagg <- merge(dummy, TRpnts,  all = T )
-            aagg <- merge(aagg,  TRdays,  all = T )
-            aagg <- merge(aagg,  TRhours, all = T )
+## keep only existing coordinates
+Ddata <- Ddata[ !is.na(X) ]
+Ddata <- Ddata[ !is.na(Y) ]
 
 
+## break data in two categories
+Dtrain <- rbind(
+    Ddata[ grep("/TRAIN/", file ), ],
+    Ddata[ grep("/Running/Polar/", file ), ]
+)
+Dtrain <- unique(Dtrain)
 
-            # aagg <- st_as_sf(aagg, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-            # st_write(aagg, traindb, layer = "test", append = FALSE, delete_layer= TRUE)
+Drest <- Ddata[ ! grep("/Running/Polar/", file ), ]
+Drest <- Drest[ ! grep("/TRAIN/", file ), ]
+Drest <- unique(Drest)
 
+# unique(dirname( Dtrain$file))
+# unique(dirname( Drest$file))
 
+## choose one
+## One file for each resolution
+## OR one file with one layer per resolution
+onefile <-  paste0(layers_out,"/Grid_mega.gpkg")
+for (res in rsls) {
+    traindb   <- paste0(layers_out,"/Grid_",sprintf("%08d",res),"m.gpkg")
+    resolname <- sprintf("Res %8d m",res)
+
+    ## one column for each year and type and aggregator
+    ## after that totals are computed
+
+    yearstodo <- unique(year(Ddata$time))
+    yearstodo <- sort(na.exclude(yearstodo))
+
+    gather <- data.table()
+    for (ay in yearstodo) {
+        ## create all columns
+        TRcnt <- copy(Dtrain[year(time)==ay])
+        REcnt <- copy(Drest[year(time)==ay])
+        TRcnt[ , X :=  (X %/% res * res) + (res/2) ]
+        TRcnt[ , Y :=  (Y %/% res * res) + (res/2) ]
+        REcnt[ , X :=  (X %/% res * res) + (res/2) ]
+        REcnt[ , Y :=  (Y %/% res * res) + (res/2) ]
+
+        TRpnts  <- TRcnt[ , .(.N ), by = .(X,Y) ]
+        TRdays  <- TRcnt[ , .(N = length(unique(as.Date(time))) ), by = .(X,Y) ]
+        TRhours <- TRcnt[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )) ), by = .(X,Y) ]
+
+        REpnts  <- REcnt[ , .(.N ), by = .(X,Y) ]
+        REdays  <- REcnt[ , .(N = length(unique(as.Date(time))) ), by = .(X,Y) ]
+        REhours <- REcnt[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )) ), by = .(X,Y) ]
+
+        ## just to init data frame for merging
+        dummy <- unique(rbind( TRcnt[, .(X,Y)] , REcnt[, .(X,Y)] ))
+
+        ## nice names
+        names(TRpnts )[names(TRpnts )=="N"] <- paste(ay,"Train","Points")
+        names(TRdays )[names(TRdays )=="N"] <- paste(ay,"Train","Days")
+        names(TRhours)[names(TRhours)=="N"] <- paste(ay,"Train","Hours")
+        names(REpnts )[names(REpnts )=="N"] <- paste(ay,"Rest","Points")
+        names(REdays )[names(REdays )=="N"] <- paste(ay,"Rest","Days")
+        names(REhours)[names(REhours)=="N"] <- paste(ay,"Rest","Hours")
+
+        ## gather all to a data frame for a year
+        aagg <- merge(dummy, TRpnts,  all = T )
+        aagg <- merge(aagg,  TRdays,  all = T )
+        aagg <- merge(aagg,  TRhours, all = T )
+        aagg <- merge(aagg,  REpnts,  all = T )
+        aagg <- merge(aagg,  REdays,  all = T )
+        aagg <- merge(aagg,  REhours, all = T )
+
+        ## gather columns for all years
+        if (nrow(gather) == 0) {
+            gather <- aagg
+        } else {
+            gather <- merge(gather,aagg, all = T )
         }
     }
 
+    ## create total columns
+    categs <- grep("geometry|X|Y" , unique(sub("[0-9]+ ","", names(gather))), invert = T, value = T)
+    for (ac in categs) {
+        wecare <- grep(ac, names(gather), value = T)
 
+        ncat           <- paste("Total", ac)
+        gather[[ncat]] <- rowSums( gather[, ..wecare ], na.rm = T)
+        gather[[ncat]][gather[[ncat]]==0] <- NA
+    }
 
+    cols <- grep( "Total" , names(gather), value = T)
+    for (at in typenames) {
+        wecare <- grep(at, cols, value = T)
+        ncat <- paste("Total All", at)
+        gather[[ncat]] <- rowSums( gather[, ..wecare ], na.rm = T)
+        gather[[ncat]][gather[[ncat]]==0] <- NA
+    }
+
+    ## add info for qgis plotting functions
+    gather$Resolution <- res
+
+    ## store spatial data
+    gather <- st_as_sf(gather, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+    st_write(gather, traindb, layer = NULL, append = FALSE, delete_layer= TRUE)
+
+    ## store data as one layer in one file one layer per resolution
+    st_write(gather, onefile, layer = resolname, append = FALSE, delete_layer= TRUE)
 }
+
+
+
+
+
+
 
 
 ##
@@ -310,67 +367,67 @@ cat(paste( length(unique( ddaa$file )), "unique files sorted\n" ))
 cat(paste( nrow( ddaa ), "unique points to bin\n" ))
 
 
-####  export for each year  ####
-traindb <- "~/GISdata/Layers/Grid_ALL_yearly.gpkg"
-years   <- unique(year(data$time))
-for (ay in years) {
-  for (res in rsls) {
-    ## get year data and simplify coordinates
-    counts <- copy(ddaa[year(time)==ay])
-    counts[ , X :=  (X %/% res * res) + (res/2) ]
-    counts[ , Y :=  (Y %/% res * res) + (res/2) ]
+# ####  export for each year  ####
+# traindb <- "~/GISdata/Layers/Grid_ALL_yearly.gpkg"
+# years   <- unique(year(data$time))
+# for (ay in years) {
+#   for (res in rsls) {
+#     ## get year data and simplify coordinates
+#     counts <- copy(ddaa[year(time)==ay])
+#     counts[ , X :=  (X %/% res * res) + (res/2) ]
+#     counts[ , Y :=  (Y %/% res * res) + (res/2) ]
+#
+#     cat(paste(nrow(counts[, .N ,by = .(X,Y) ]), "bins at", res/1000, "km for", ay ),"\n")
+#
+#     ## count point in cells
+#     temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
+#     temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#     layr <- sprintf("%s %5sm %s", ay, res, "point cnt")
+#     st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#     ## count days in each cell
+#     temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
+#     temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#     layr <- sprintf("%s %5sm %s", ay, res, "days cnt")
+#     st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#     ## count hours in each cell
+#     temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
+#     temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#     layr <- sprintf("%s %5sm %s", ay, res, "hour cnt")
+#     st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#   }
+# }
 
-    cat(paste(nrow(counts[, .N ,by = .(X,Y) ]), "bins at", res/1000, "km for", ay ),"\n")
-
-    ## count point in cells
-    temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
-    temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    layr <- sprintf("%s %5sm %s", ay, res, "point cnt")
-    st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-    ## count days in each cell
-    temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
-    temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    layr <- sprintf("%s %5sm %s", ay, res, "days cnt")
-    st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-    ## count hours in each cell
-    temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
-    temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    layr <- sprintf("%s %5sm %s", ay, res, "hour cnt")
-    st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-  }
-}
-
-####  export all data  ####
-traindb <- "~/GISdata/Layers/Grid_ALL_all.gpkg"
-for (res in rsls) {
-  ## get year data and simplify coordinates
-  counts <- copy(ddaa)
-  counts[ , X :=  (X %/% res * res) + (res/2) ]
-  counts[ , Y :=  (Y %/% res * res) + (res/2) ]
-
-  cat(paste(nrow(counts[, .N ,by = .(X,Y) ]), "bins at", res/1000, "km for all" ),"\n")
-
-  ## count point in cells
-  temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
-  temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-  layr <- sprintf("%5sm %s", res, "point cnt")
-  st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-  ## count days in each cell
-  temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
-  temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-  layr <- sprintf("%5sm %s", res, "days cnt")
-  st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-  ## count hours in each cell
-  temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
-  temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-  layr <- sprintf("%5sm %s", res, "hour cnt")
-  st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-}
+# ####  export all data  ####
+# traindb <- "~/GISdata/Layers/Grid_ALL_all.gpkg"
+# for (res in rsls) {
+#   ## get year data and simplify coordinates
+#   counts <- copy(ddaa)
+#   counts[ , X :=  (X %/% res * res) + (res/2) ]
+#   counts[ , Y :=  (Y %/% res * res) + (res/2) ]
+#
+#   cat(paste(nrow(counts[, .N ,by = .(X,Y) ]), "bins at", res/1000, "km for all" ),"\n")
+#
+#   ## count point in cells
+#   temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
+#   temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#   layr <- sprintf("%5sm %s", res, "point cnt")
+#   st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#   ## count days in each cell
+#   temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
+#   temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#   layr <- sprintf("%5sm %s", res, "days cnt")
+#   st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#   ## count hours in each cell
+#   temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
+#   temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#   layr <- sprintf("%5sm %s", res, "hour cnt")
+#   st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+# }
 
 
 
@@ -403,65 +460,65 @@ cat(paste( nrow( ddaa ), "unique points to bin\n" ))
 ####  export for each year training data  ####
 traindb <- "~/GISdata/Layers/Grid_train_yearly.gpkg"
 years   <- unique(year(data$time))
-for (ay in years) {
-    for (res in rsls) {
-        ## get year data and simplify coordinates
-        counts <- copy(ddaa[year(time)==ay])
-        counts[ , X :=  (X %/% res * res) + (res/2) ]
-        counts[ , Y :=  (Y %/% res * res) + (res/2) ]
+# for (ay in years) {
+#     for (res in rsls) {
+#         ## get year data and simplify coordinates
+#         counts <- copy(ddaa[year(time)==ay])
+#         counts[ , X :=  (X %/% res * res) + (res/2) ]
+#         counts[ , Y :=  (Y %/% res * res) + (res/2) ]
+#
+#         cat(paste(nrow(counts[, .N ,by = .(X,Y) ]), "bins at", res/1000, "km for", ay ),"\n")
+#
+#         ## count point in cells
+#         temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
+#         temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#         layr <- sprintf("%s %5sm %s", ay, res, "point cnt")
+#         st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#         ## count days in each cell
+#         temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
+#         temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#         layr <- sprintf("%s %5sm %s", ay, res, "days cnt")
+#         st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#         ## count hours in each cell
+#         temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
+#         temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#         layr <- sprintf("%s %5sm %s", ay, res, "hour cnt")
+#         st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#     }
+# }
 
-        cat(paste(nrow(counts[, .N ,by = .(X,Y) ]), "bins at", res/1000, "km for", ay ),"\n")
 
-        ## count point in cells
-        temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
-        temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-        layr <- sprintf("%s %5sm %s", ay, res, "point cnt")
-        st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-        ## count days in each cell
-        temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
-        temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-        layr <- sprintf("%s %5sm %s", ay, res, "days cnt")
-        st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-        ## count hours in each cell
-        temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
-        temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-        layr <- sprintf("%s %5sm %s", ay, res, "hour cnt")
-        st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-    }
-}
-
-
-####  export all training data ####
-traindb <- "~/GISdata/Layers/Grid_train_all.gpkg"
-for (res in rsls) {
-    ## get year data and simplify coordinates
-    counts <- copy(ddaa)
-    counts[ , X :=  (X %/% res * res) + (res/2) ]
-    counts[ , Y :=  (Y %/% res * res) + (res/2) ]
-
-    cat(paste(nrow(counts[, .N ,by = .(X,Y) ]), "bins at", res/1000, "km for all" ),"\n")
-
-    ## count point in cells
-    temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
-    temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    layr <- sprintf("%5sm %s", res, "point cnt")
-    st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-    ## count days in each cell
-    temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
-    temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    layr <- sprintf("%5sm %s", res, "days cnt")
-    st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-    ## count hours in each cell
-    temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
-    temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    layr <- sprintf("%5sm %s", res, "hour cnt")
-    st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-}
+# ####  export all training data ####
+# traindb <- "~/GISdata/Layers/Grid_train_all.gpkg"
+# for (res in rsls) {
+#     ## get year data and simplify coordinates
+#     counts <- copy(ddaa)
+#     counts[ , X :=  (X %/% res * res) + (res/2) ]
+#     counts[ , Y :=  (Y %/% res * res) + (res/2) ]
+#
+#     cat(paste(nrow(counts[, .N ,by = .(X,Y) ]), "bins at", res/1000, "km for all" ),"\n")
+#
+#     ## count point in cells
+#     temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
+#     temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#     layr <- sprintf("%5sm %s", res, "point cnt")
+#     st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#     ## count days in each cell
+#     temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
+#     temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#     layr <- sprintf("%5sm %s", res, "days cnt")
+#     st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#     ## count hours in each cell
+#     temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
+#     temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#     layr <- sprintf("%5sm %s", res, "hour cnt")
+#     st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+# }
 
 
 
@@ -492,67 +549,67 @@ cat(paste( nrow( ddaa ), "unique points to bin\n" ))
 
 
 ####  export each year non training data  ####
-traindb <- "~/GISdata/Layers/Grid_rest_yearly.gpkg"
-years   <- unique(year(data$time))
-for (ay in years) {
-  for (res in rsls) {
-    ## get year data and simplify coordinates
-    counts <- copy(ddaa[year(time)==ay])
-    counts[ , X :=  (X %/% res * res) + (res/2) ]
-    counts[ , Y :=  (Y %/% res * res) + (res/2) ]
-
-    cat(paste(nrow(counts[, .N ,by = .(X,Y) ]), "bins at", res/1000, "km for", ay ),"\n")
-
-    ## count point in cells
-    temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
-    temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    layr <- sprintf("%s %5sm %s", ay, res, "point cnt")
-    st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-    ## count days in each cell
-    temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
-    temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    layr <- sprintf("%s %5sm %s", ay, res, "days cnt")
-    st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-    ## count hours in each cell
-    temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
-    temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    layr <- sprintf("%s %5sm %s", ay, res, "hour cnt")
-    st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-  }
-}
+# traindb <- "~/GISdata/Layers/Grid_rest_yearly.gpkg"
+# years   <- unique(year(data$time))
+# for (ay in years) {
+#   for (res in rsls) {
+#     ## get year data and simplify coordinates
+#     counts <- copy(ddaa[year(time)==ay])
+#     counts[ , X :=  (X %/% res * res) + (res/2) ]
+#     counts[ , Y :=  (Y %/% res * res) + (res/2) ]
+#
+#     cat(paste(nrow(counts[, .N ,by = .(X,Y) ]), "bins at", res/1000, "km for", ay ),"\n")
+#
+#     ## count point in cells
+#     temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
+#     temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#     layr <- sprintf("%s %5sm %s", ay, res, "point cnt")
+#     st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#     ## count days in each cell
+#     temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
+#     temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#     layr <- sprintf("%s %5sm %s", ay, res, "days cnt")
+#     st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#     ## count hours in each cell
+#     temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
+#     temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#     layr <- sprintf("%s %5sm %s", ay, res, "hour cnt")
+#     st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#   }
+# }
 
 
 ####  export all non training data  ####
-traindb <- "~/GISdata/Layers/Grid_rest_all.gpkg"
-for (res in rsls) {
-  ## get year data and simplify coordinates
-  counts <- copy(ddaa)
-  counts[ , X :=  (X %/% res * res) + (res/2) ]
-  counts[ , Y :=  (Y %/% res * res) + (res/2) ]
-
-  cat(paste(nrow(counts[, .N ,by = .(X,Y) ]), "bins at", res/1000, "km for all" ),"\n")
-
-  ## count point in cells
-  temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
-  temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-  layr <- sprintf("%5sm %s", res, "point cnt")
-  st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-  ## count days in each cell
-  temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
-  temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-  layr <- sprintf("%5sm %s", res, "days cnt")
-  st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-
-  ## count hours in each cell
-  temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
-  temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-  layr <- sprintf("%5sm %s", res, "hour cnt")
-  st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
-}
+# traindb <- "~/GISdata/Layers/Grid_rest_all.gpkg"
+# for (res in rsls) {
+#   ## get year data and simplify coordinates
+#   counts <- copy(ddaa)
+#   counts[ , X :=  (X %/% res * res) + (res/2) ]
+#   counts[ , Y :=  (Y %/% res * res) + (res/2) ]
+#
+#   cat(paste(nrow(counts[, .N ,by = .(X,Y) ]), "bins at", res/1000, "km for all" ),"\n")
+#
+#   ## count point in cells
+#   temp <- counts[ , .(.N, res = res, data = ay), by = .(X,Y) ]
+#   temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#   layr <- sprintf("%5sm %s", res, "point cnt")
+#   st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#   ## count days in each cell
+#   temp <- counts[ , .(N = length(unique(as.Date(time))), res = res, data = ay), by = .(X,Y)]
+#   temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#   layr <- sprintf("%5sm %s", res, "days cnt")
+#   st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+#
+#   ## count hours in each cell
+#   temp <- counts[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )), res = res, data = ay), by = .(X,Y)]
+#   temp <- st_as_sf(temp, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+#   layr <- sprintf("%5sm %s", res, "hour cnt")
+#   st_write(temp, traindb, layer = layr, append = FALSE, delete_layer= TRUE)
+# }
 
 
 
