@@ -220,7 +220,7 @@ if (FALSE) {
         yearstodo <- unique(year(Ddata$time))
         yearstodo <- sort(na.exclude(yearstodo))
 
-        gather <- data.table()
+        aagg <- data.table()
         for (ay in yearstodo) {
             ## create all columns
             TRcnt <- copy(Dtrain[year(time)==ay])
@@ -234,47 +234,24 @@ if (FALSE) {
             TRdays  <- TRcnt[ , .(N = length(unique(as.Date(time))) ), by = .(X,Y) ]
             TRhours <- TRcnt[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )) ), by = .(X,Y) ]
 
-            REpnts  <- REcnt[ , .(.N ), by = .(X,Y) ]
-            REdays  <- REcnt[ , .(N = length(unique(as.Date(time))) ), by = .(X,Y) ]
-            REhours <- REcnt[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )) ), by = .(X,Y) ]
-
-
-
-            ## just to init data frame for merging
+            ## jusst to init
             dummy <- unique(rbind( TRcnt[, .(X,Y)] , REcnt[, .(X,Y)] ))
             ## nice names
             names(TRpnts )[names(TRpnts )=="N"] <- paste(ay,"Train","Points")
             names(TRdays )[names(TRdays )=="N"] <- paste(ay,"Train","Days")
             names(TRhours)[names(TRhours)=="N"] <- paste(ay,"Train","Hours")
-            names(REpnts )[names(REpnts )=="N"] <- paste(ay,"Rest","Points")
-            names(REdays )[names(REdays )=="N"] <- paste(ay,"Rest","Days")
-            names(REhours)[names(REhours)=="N"] <- paste(ay,"Rest","Hours")
 
-            ## gather all to a data frame for a year
             aagg <- merge(dummy, TRpnts,  all = T )
             aagg <- merge(aagg,  TRdays,  all = T )
             aagg <- merge(aagg,  TRhours, all = T )
-            aagg <- merge(aagg,  REpnts,  all = T )
-            aagg <- merge(aagg,  REdays,  all = T )
-            aagg <- merge(aagg,  REhours, all = T )
 
-            ## gather columns for all years
-            if (nrow(gather) == 0) {
-                gather <- aagg
-            } else {
-                gather <- merge(gather,aagg, all = T )
-            }
+
+
+            # aagg <- st_as_sf(aagg, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+            # st_write(aagg, traindb, layer = "test", append = FALSE, delete_layer= TRUE)
+
+
         }
-
-        ## create total columns
-        names(gather)
-
-
-        ## store spatial data
-        gather <- st_as_sf(gather, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-        st_write(gather, traindb, layer = "test", append = FALSE, delete_layer= TRUE)
-
-
     }
 
 
