@@ -210,7 +210,7 @@ cat(paste( length(unique( data$file )), "files to bin\n" ))
 cat(paste( nrow( data ), "points to bin\n" ))
 
 
-
+# unique(dirname( data$file))
 
 ## break data in two categories
 Dtrain <- rbind(
@@ -237,14 +237,14 @@ for (res in rsls) {
     ## one column for each year and type and aggregator
     ## after that totals are computed
 
-    yearstodo <- unique(year(Ddata$time))
+    yearstodo <- unique(year(data$time))
     yearstodo <- sort(na.exclude(yearstodo))
 
     gather <- data.table()
     for (ay in yearstodo) {
         ## create all columns
         TRcnt <- copy(Dtrain[year(time)==ay])
-        REcnt <- copy(Drest[year(time)==ay])
+        REcnt <- copy(Drest[ year(time)==ay])
         TRcnt[ , X :=  (X %/% res * res) + (res/2) ]
         TRcnt[ , Y :=  (Y %/% res * res) + (res/2) ]
         REcnt[ , X :=  (X %/% res * res) + (res/2) ]
@@ -285,7 +285,7 @@ for (res in rsls) {
         }
     }
 
-    ## create total columns
+    ## create total columns for all years
     categs <- grep("geometry|X|Y" , unique(sub("[0-9]+ ","", names(gather))), invert = T, value = T)
     for (ac in categs) {
         wecare <- grep(ac, names(gather), value = T)
@@ -295,6 +295,7 @@ for (res in rsls) {
         gather[[ncat]][gather[[ncat]]==0] <- NA
     }
 
+    ## create total column for all years and all types
     cols <- grep( "Total" , names(gather), value = T)
     for (at in typenames) {
         wecare <- grep(at, cols, value = T)
@@ -306,9 +307,10 @@ for (res in rsls) {
     ## add info for qgis plotting functions
     gather$Resolution <- res
 
-    ## store spatial data
-    gather <- st_as_sf(gather, coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    st_write(gather, traindb, layer = NULL, append = FALSE, delete_layer= TRUE)
+    ## store spatial data one layer per file
+    # gather <- st_as_sf(gather, coords = c("X", "Y"), crs = EPSG, agr = "constant")
+    # st_write(gather, traindb, layer = NULL, append = FALSE, delete_layer= TRUE)
+
 
     ## store data as one layer in one file one layer per resolution
     st_write(gather, onefile, layer = resolname, append = FALSE, delete_layer= TRUE)

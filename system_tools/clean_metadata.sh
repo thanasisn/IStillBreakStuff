@@ -1,6 +1,10 @@
 #!/bin/bash
 
-## Remove metadata from file using exiftool
+#### Remove metadata from any file using exiftool
+
+## Try to remove metadata from any given file...
+## Not fool proof of course. Test the results
+
 
 FILE="$1"
 
