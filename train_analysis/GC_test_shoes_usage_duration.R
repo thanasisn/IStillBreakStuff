@@ -20,7 +20,7 @@ if(!interactive()) {
 # metrics <- GC.metrics(all=TRUE)
 # saveRDS(metrics, "~/LOGs/GCmetrics.Rds")
 
-## load ouside goldencheetah
+## load outside goldencheetah
 metrics <- readRDS("~/LOGs/GCmetrics.Rds")
 
 
