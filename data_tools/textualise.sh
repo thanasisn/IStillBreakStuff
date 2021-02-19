@@ -1,7 +1,7 @@
 #!/bin/bash
 ## created on 2019-03-04
 
-#### Extract text from pdf, doc, djv, and text files, for analysis
+#### Extract text from pdf, doc, djv, and text files, for analysis and fingerprinting with other tools
 ## The text is intentional simplified
 ## First why try a specific method for each file and last a general method
 

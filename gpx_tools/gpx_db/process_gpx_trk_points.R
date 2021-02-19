@@ -306,11 +306,11 @@ for (res in rsls) {
 
     ## add info for qgis plotting functions
     gather$Resolution <- res
+    ## convert to spatial data objects
+    gather <- st_as_sf(gather, coords = c("X", "Y"), crs = EPSG, agr = "constant")
 
     ## store spatial data one layer per file
-    # gather <- st_as_sf(gather, coords = c("X", "Y"), crs = EPSG, agr = "constant")
     # st_write(gather, traindb, layer = NULL, append = FALSE, delete_layer= TRUE)
-
 
     ## store data as one layer in one file one layer per resolution
     st_write(gather, onefile, layer = resolname, append = FALSE, delete_layer= TRUE)
