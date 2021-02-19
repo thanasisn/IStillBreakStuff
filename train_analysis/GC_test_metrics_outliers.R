@@ -16,7 +16,7 @@ if(!interactive()) {
 
 
 library(data.table)
-source("FUNCTIONS/R/data.R")
+source("~/FUNCTIONS/R/data.R")
 
 
 

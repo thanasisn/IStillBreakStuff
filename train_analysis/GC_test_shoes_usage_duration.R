@@ -13,13 +13,14 @@ tic = Sys.time()
 Script.Name = funr::sys.script()
 if(!interactive()) {
     pdf(file=sub("\\.R$",".pdf",Script.Name))
-    sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
+    sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
 }
 
+## save in goldencheetah
 # metrics <- GC.metrics(all=TRUE)
 # saveRDS(metrics, "~/LOGs/GCmetrics.Rds")
 
-
+## load ouside goldencheetah
 metrics <- readRDS("~/LOGs/GCmetrics.Rds")
 
 
@@ -27,8 +28,14 @@ metrics <- readRDS("~/LOGs/GCmetrics.Rds")
 ####  Copy for GC below  ####################################################
 
 cat(paste(sort(unique(metrics$Shoes)), colapse = "\n"),
-    "~/LOGs/Shoes.list")
+    "~/TRAIN/Shoes.list")
 
+
+library(data.table)
+library(randomcoloR)
+
+## plot params
+cex <- 0.7
 
 
 ## exclude non meaning
@@ -39,7 +46,6 @@ ddd   <- ddd[ddd$Shoes != "", ]
 
 empty  <- empty[empty$Sport == "Run",]
 emtpyD <- sum(empty$Distance,na.rm = T)
-
 
 ## get external data
 extra <- read.delim("~/TRAIN/Shoes.csv",
@@ -55,10 +61,18 @@ gather <- data.frame()
 for (as in unique(ddd$Shoes)) {
     temp <-   ddd[ddd$Shoes==as,]
     text <- extra[extra$Shoes==as,]
-    if (nrow(temp)>1) {
+    if (nrow(temp)>0) {
         ## insert extra data
         if (nrow(text)>0) {
             text$date[is.na(text$date)] <- min(temp$date,text$date,na.rm = T)
+            ## is retired
+            if (any(text$Status == "End")) {
+                ## sanity checks
+                stopifnot( text$Status[which.max(text$date)] == "End" )
+                stopifnot(max(text$date) >= max(temp$date))
+                ## move End day after last usage
+                text$date[which.max(text$date)] <- temp$date[which.max(temp$date)] + 1
+            }
             temp <- plyr::rbind.fill(text,temp)
             temp <- temp[order(temp$date), ]
         }
@@ -76,25 +90,24 @@ for (as in unique(ddd$Shoes)) {
     }
 }
 
-## plot params
-cex <- 0.7
 
 
-xlim <- range(gather$nday, na.rm = T)
-ylim <- range(0,gather$total, na.rm = T)
-
-
-#par(mar=c(2.5,2,0.3,0.3))
+## init empty plot
+xlim <- range(gather$nday, max(gather$nday) + 7 , na.rm = T)
+ylim <- range(0,gather$total * 1.05, na.rm = T)
 plot(1, type="n",
-     xlab = "Days of usage", ylab = "km",
+     xlab = "Days of usage",
+     ylab = "km",
      xlim = xlim, ylim = ylim,
      cex.axis = cex)
 
-library(randomcoloR)
+## create color palete
+n      <- length(unique(gather$Shoes))
+cols   <- distinctColorPalette(n)
+
+## add lines to plot
 sn   <- c()
 sc   <- c()
-n    <- length(unique(gather$Shoes))
-cols <- distinctColorPalette(n)
 cc <- 1
 for (as in sort(unique(gather$Shoes))) {
     temp <- gather[gather$Shoes==as,]
@@ -107,6 +120,8 @@ for (as in sort(unique(gather$Shoes))) {
     sc <- c(sc,cols[cc])
     cc <- cc+1
 }
+
+## add legend
 sn <- c(sn, paste0("NO ENTRY (", round(emtpyD,0),"km)"))
 sc <- c(sc, NA)
 legend("topleft", legend = sn, col = sc, bty = "n", pch = 19, cex = cex)
