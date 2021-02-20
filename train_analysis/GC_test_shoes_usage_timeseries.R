@@ -27,12 +27,18 @@ metrics <- readRDS("~/LOGs/GCmetrics.Rds")
 
 ####  Copy for GC below  ####################################################
 
-cat(paste(sort(unique(metrics$Shoes)), colapse = "\n"),
-    "~/TRAIN/Shoes.list")
-
 
 library(data.table)
 library(randomcoloR)
+
+metrics <- data.table(metrics)
+gdata::write.fwf(metrics[, .(Dist = round(sum(Distance),1),
+                             From = min(date),
+                             To   = max(date),
+                             Active = difftime(max(date),min(date))), by = Shoes],
+                 file = "~/TRAIN/Shoes.list", colnames = F)
+
+
 
 ## plot params
 cex <- 0.7
@@ -72,6 +78,7 @@ for (as in unique(ddd$Shoes)) {
                 stopifnot(max(text$date) >= max(temp$date))
                 ## move End day after last usage
                 text$date[which.max(text$date)] <- temp$date[which.max(temp$date)] + 1
+
             }
             temp <- plyr::rbind.fill(text,temp)
             temp <- temp[order(temp$date), ]
@@ -83,15 +90,14 @@ for (as in unique(ddd$Shoes)) {
 
 
 ## aggregate for plot
-gather <- data.table(gather)
+gather    <- data.table(gather)
 
 agg       <- gather[, .(Distance = sum(Distance)), by = .(year(date), month(date), Shoes)]
 agg$date  <- as.Date(paste(agg$year,agg$month, "1"), format = "%Y %m %d" )
-aggD      <- gather[, .(Distance = sum(Distance)), by = .(date = as.Date(date), Shoes)]
 
 ## for daily steps
+# aggD      <- gather[, .(Distance = sum(Distance)), by = .(date = as.Date(date), Shoes)]
 # agg <- aggD
-
 
 
 
@@ -133,6 +139,11 @@ for (as in sort(unique(gath$Shoes))) {
     temp <- gath[gath$Shoes==as,]
     lines(temp$date, temp$total, col = cols[cc], lwd = 4, type = "s" )
     model <- gsub("^.*-[ ]+", "", as)
+
+    segments(x0 = min(temp$date), y0 = 0, x1 = min(temp$date), y1 = temp$total[which.min(temp$date)],lty = 2, col = cols[cc] )
+    segments(x0 = max(temp$date), y0 = 0, x1 = max(temp$date), y1 = temp$total[which.max(temp$date)],lty = 2, col = cols[cc] )
+
+
     text(temp$date[which.max(temp$total)], max(temp$total),
          labels = paste(model,"\n", round(max(temp$total),0)),
          pos = 3, cex = cex * 0.8  )

@@ -27,12 +27,15 @@ metrics <- readRDS("~/LOGs/GCmetrics.Rds")
 
 ####  Copy for GC below  ####################################################
 
-cat(paste(sort(unique(metrics$Shoes)), colapse = "\n"),
-    "~/TRAIN/Shoes.list")
-
-
 library(data.table)
 library(randomcoloR)
+
+metrics <- data.table(metrics)
+gdata::write.fwf(metrics[, .(Dist = round(sum(Distance),1),
+                             From = min(date),
+                             To   = max(date),
+                             Active = difftime(max(date),min(date))), by = Shoes],
+                 file = "~/TRAIN/Shoes.list", colnames = F)
 
 ## plot params
 cex <- 0.7
