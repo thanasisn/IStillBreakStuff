@@ -5,7 +5,7 @@
 
 ## VARS
 #confile="$HOME/BASH/CONKY/conky.conf.d/conky_crane_1680x1050_new.conf"
-confile="$HOME/BASH/CONKY/conky.conf.d/conky_crane_1366x768.conf"
+confile="$HOME/CODE/conky/conf.d/conky_1366x768.conf"
 conpause="0"
 confont="Liberation Mono"
 conalig="top_left"  # we have done all configs with that in mind
@@ -56,6 +56,8 @@ conky -p "$conpause"  \
       -c "$confile"   &
 export LC_ALL=en_US.UTF-8
 
+
+## running second conky makes the display unstable, although it is suported
 
 #    if [[  $(xrandr | grep " connected .*1366x768") ]] ; then
 #        echo "LVDS1 connected 1366x768"
