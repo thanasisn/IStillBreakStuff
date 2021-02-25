@@ -3,7 +3,8 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 
-#### Gather current weather from OpenWeatherMAP for the current location
+## OpenWeatherMAP api key 66dcbe4ad697153afa84d7312a097016
+## gather weather from OpenWeatherMAP APIs
 
 ## other APIs
 # https://darksky.net/dev
@@ -11,10 +12,12 @@ Sys.setenv(TZ = "UTC")
 
 library(owmr)
 library(plyr)
+Sys.setenv(OWM_API_KEY = "66dcbe4ad697153afa84d7312a097016")
 
 dir.create(  "/dev/shm/WHEATHER/", recursive = T, showWarnings = F)
 CURRENT_FL = "/dev/shm/WHEATHER/Current_OpenWeather.Rds"
 LOCATIO_FL = "/dev/shm/CONKY/last_location.dat"
+# LAST_WEATH = "/dev/shm/WHEATHER/last.dat"
 KEEP_MAX   = 1000
 
 
@@ -34,6 +37,7 @@ stopifnot(length(res_cr) > 10) ## should be 12
 
 ## parse and format data
 currW             <- as.data.frame(res_cr)
+
 currW$dt          <- strptime( currW$dt,          format = "%s" )
 currW$sys.sunrise <- strptime( currW$sys.sunrise, format = "%s" )
 currW$sys.sunset  <- strptime( currW$sys.sunset,  format = "%s" )
@@ -47,9 +51,9 @@ currW  <- data.frame(currW[wecare])
 ## use common names
 currW <- remove_prefix(currW, c("main","sys","coord","weather"))
 
-colnames(currW)[colnames(currW) == "all"  ] <- "cloud_cover"
+colnames(currW)[colnames(currW) == "all"]   <- "cloud_cover"
 colnames(currW)[colnames(currW) == "speed"] <- "wind_speed"
-colnames(currW)[colnames(currW) == "deg"  ] <- "wind_direction"
+colnames(currW)[colnames(currW) == "deg"]   <- "wind_direction"
 
 
 ## load previous data
@@ -60,14 +64,21 @@ if (file.exists(CURRENT_FL)) {
 }
 
 
-## store data for later
+## store data for later use
 Current_data <- rbind.fill(Current_data, currW)
 Current_data <- Current_data[order(Current_data$dt),]
 Current_data <- unique(Current_data)
 Current_data <- tail(Current_data, KEEP_MAX)
 
+
 ## store last weather conditions
 saveRDS( Current_data, CURRENT_FL )
+
+## export most resent output from all sources
+# last    <- tail(Current_data,100)
+# last$dt <- as.POSIXlt( last$dt, tz = "Europe/Athens" )
+# write.csv(x    = last,
+#           file = LAST_WEATH, quote = F, row.names = F )
 
 ## to terminal
 print(tail(Current_data,5))
@@ -112,4 +123,4 @@ print(tail(Current_data,5))
 ##  name City name
 ##  cod Internal parameter
 ##
-##########################################################################################
+###########################################################################################3

@@ -29,11 +29,7 @@ metrics <- readRDS("~/LOGs/GCmetrics.Rds")
 
 
 library(data.table)
-
-# This crushes version 3.6-DRV2006 of goldenchretah
-# library(randomcoloR)
-
-cols <- c("#f22e2e", "#d9b629", "#30ff83", "#3083ff", "#f22ee5", "#33161e", "#e6a89e", "#bbbf84", "#1d995f", "#324473", "#cc8dc8", "#59111b", "#b25c22", "#b1f22e", "#9ee6d7", "#482ef2", "#66465b", "#33200a", "#385911", "#24a0bf", "#270f4d", "#731647", "#664a13", "#414d35", "#22444d", "#6b1880", "#ff70a9")
+library(randomcoloR)
 
 metrics <- data.table(metrics)
 gdata::write.fwf(metrics[, .(Dist = round(sum(Distance),1),
@@ -131,9 +127,9 @@ axis.Date(1,agg$date)
 axis.Date(1,at = seq(min(agg$date), max(agg$date)+1, "months"),
           labels = FALSE, tcl = -0.2)
 
-## create color palette
+## create color palete
 n      <- length(unique(gather$Shoes))
-# cols   <- randomcoloR::distinctColorPalette(n)
+cols   <- distinctColorPalette(n)
 
 ## add lines to plot
 sn <- c()
