@@ -6,6 +6,9 @@ My small projects are collected here.
 Each folder has a README file.
 
 
+## conky
+WYSIWYG
+
 ## data_tools
 Tools and methods of data analysis for different purposes.
 

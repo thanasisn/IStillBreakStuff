@@ -3,16 +3,10 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 
-## OpenWeatherMAP api key 66dcbe4ad697153afa84d7312a097016
-## gather weather from OpenWeatherMAP APIs
-
-## other APIs
-# https://darksky.net/dev
-# https://www.apixu.com/
+#### Get weather forecast from OpenWeatherMAP for current location
 
 library(owmr)
 
-Sys.setenv(OWM_API_KEY = "66dcbe4ad697153afa84d7312a097016")
 
 dir.create(  "/dev/shm/WHEATHER/", recursive = T, showWarnings = F)
 CURRENT_FL = "/dev/shm/WHEATHER/Forecast_OpenWeather.Rds"
@@ -49,10 +43,10 @@ currFR        <- currFR[wecare]
 currFR$name   <- res_fr$city$name
 currFR$source <- "OpenWeatherMAP"
 
-colnames(currFR)[colnames(currFR) == "all"]   <- "cloud_cover"
+colnames(currFR)[colnames(currFR) == "all"  ] <- "cloud_cover"
 colnames(currFR)[colnames(currFR) == "speed"] <- "wind_speed"
-colnames(currFR)[colnames(currFR) == "deg"]   <- "wind_diredtion"
-colnames(currFR)[colnames(currFR) == "pop"]   <- "Precip_Proba"
+colnames(currFR)[colnames(currFR) == "deg"  ] <- "wind_diredtion"
+colnames(currFR)[colnames(currFR) == "pop"  ] <- "Precip_Proba"
 
 saveRDS( currFR, CURRENT_FL )
 
