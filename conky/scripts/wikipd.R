@@ -8,7 +8,7 @@ Sys.setenv(TZ = "UTC")
 library(rvest)
 library(data.table)
 
-coro <- read.csv("https://raw.githubusercontent.com/RamiKrispin/coronavirus/master/csv/coronavirus.csv",  stringsAsFactors = FALSE)
+coro <- fread("https://raw.githubusercontent.com/RamiKrispin/coronavirus/master/csv/coronavirus.csv",  stringsAsFactors = FALSE)
 
 coro      <- data.table(coro)
 coro$date <- as.POSIXct(coro$date)

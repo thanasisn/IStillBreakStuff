@@ -11,7 +11,6 @@
 import os.path
 import csv
 import ephem
-#import sun
 import calendar
 from datetime import datetime, timedelta
 
