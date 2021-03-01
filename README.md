@@ -21,6 +21,9 @@ A simple bash script to create and update /etc/hosts list file in order to block
 ## img_tools
 Bash image manipulation tools.
 
+## libradtran
+Some examples of running LibRadTran in parallel on linux machines using the shell.
+
 ## pdf_tools
 Bash tools to manipulate pdf files.
 
