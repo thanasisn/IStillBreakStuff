@@ -43,7 +43,6 @@ echo
 if   [[ $cont != "y" ]]; then
     echo "EXIT"
     exit
-
 fi
 
 mkdir -p "$OFOLDER"
