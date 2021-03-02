@@ -28,8 +28,6 @@ set +e
 #"${BASEPATH}Cnk_amazfit_bip.R"  &
 #"${BASEPATH}Cnk_Body_meas.R"    &
 
-## weather get
-"${SCRIPTS}meteoblue_get.sh" &
 
 ## corona virus plot
 "${SCRIPTS}wikipd.R"    &
