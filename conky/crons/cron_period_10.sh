@@ -28,11 +28,10 @@ set +e
 # "${SCRIPTS}Cnk_gcal_reader.sh"  &
 
 ## get image from meteoblue
-"${SCRIPTS}meteoblue_get.sh"    &
+"$HOME/CODE/conky/scripts/meteoblue_get.sh" &
 
 ## plot weather
-"${SCRIPTS}plot_weather.R"      &
-"${SCRIPTS}plot_weather2.R"     &
+"$HOME/CODE/conky/scripts/plot_weather2.R" &
 
 ## output backup status
 "${SCRIPTS}status_logs_parse.R" &
@@ -44,7 +43,7 @@ set +e
 "${SCRIPTS}ext_ip_watch.sh"     &
 
 
-wait; wait; wait; wait; wait; wait;
+wait; wait; wait; wait; wait;
 
 ## don't ignore errors
 set -e
