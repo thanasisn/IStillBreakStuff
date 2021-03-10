@@ -5,6 +5,7 @@
 
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
+readRenviron("~/.Renviron")
 
 
 dir.create(  "/dev/shm/WHEATHER/", recursive = T, showWarnings = F)

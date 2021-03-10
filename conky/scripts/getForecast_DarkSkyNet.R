@@ -12,6 +12,7 @@ Sys.setenv(TZ = "UTC")
 # https://www.apixu.com/
 
 library(darksky)
+readRenviron("~/.Renviron")
 
 
 dir.create(  "/dev/shm/WHEATHER/", recursive = T, showWarnings = F)

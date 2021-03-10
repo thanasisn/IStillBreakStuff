@@ -6,6 +6,7 @@
 LOCATION_FILE="/dev/shm/CONKY/last_location.dat"
 METEOGRAM_IMG="/dev/shm/WHEATHER/meteoblue.png"
 METEOGRAM_DAT="/dev/shm/WHEATHER/meteoblue.json"
+source "$HOME/.shell_variables"
 
 set +e
 

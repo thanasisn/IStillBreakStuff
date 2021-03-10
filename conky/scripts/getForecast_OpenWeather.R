@@ -6,7 +6,7 @@ Sys.setenv(TZ = "UTC")
 #### Get weather forecast from OpenWeatherMAP for current location
 
 library(owmr)
-
+readRenviron("~/.Renviron")
 
 dir.create(  "/dev/shm/WHEATHER/", recursive = T, showWarnings = F)
 CURRENT_FL = "/dev/shm/WHEATHER/Forecast_OpenWeather.Rds"

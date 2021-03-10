@@ -11,6 +11,9 @@ Sys.setenv(TZ = "UTC")
 
 library(owmr)
 library(plyr)
+readRenviron("~/.Renviron")
+
+
 
 dir.create(  "/dev/shm/WHEATHER/", recursive = T, showWarnings = F)
 CURRENT_FL = "/dev/shm/WHEATHER/Current_OpenWeather.Rds"
