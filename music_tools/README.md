@@ -4,6 +4,7 @@
 Music library management tools.
 
 
+- **transcode_library.sh  :**   Transcode music library image from FLAC to mp3
 
 
 *Suggestions and improvements are always welcome.*

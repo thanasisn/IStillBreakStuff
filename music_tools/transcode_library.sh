@@ -2,77 +2,83 @@
 ## created on 2013-09-14
 
 #### Transcode music library image from FLAC to mp3
-## This is not perfect
 ## The intentions is to make music available to other machines and mp3 devices
+## We keep the folder structure to share playlist easily
 
 
+## Original library
 IN="/home/folder/Music/"
+## Trascoded library
+OUT="/media/barel/Music_img"
+
+## Transcode quality target
+QQ=1
+## mp3 transcode threshold
+BIT=240
+
+
+
+
 if [ ! -d "$IN" ]; then
     echo "$IN is not a directory"
     exit 1
 fi
+mkdir -p "$OUT"
 
-OUT="/media/barel/Music_img"
-if [ ! -d "$OUT" ]; then
-    mkdir "$OUT"
-fi
-
-# set +e
-
-## transcode quality target
-QQ=1
-
-## mp3 threshold
-BIT=240
 
 
 ## to transcode
+nflac="$(
+( find "$IN" -iname "*.flac"
+  find "$IN" -iname "*.wma") | wc -l)"
 echo
-echo "Transcode candidates flac and wma:"
-(
-    find "$IN" -iname "*.flac"
-    find "$IN" -iname "*.wma"
-) | wc -l
+echo "Transcode candidates flac and wma: $nflac"
 
-echo "Copy candidates mp3:"
-(
-    find "$IN" -iname "*.mp3"
-) | wc -l
+nmp3="$(
+(  find "$IN" -iname "*.mp3"
+) | wc -l)"
+echo "Copy candidates mp3:               $nmp3"
+echo
 
-
-
-## do transcode
+## transcode lossless
+cc=0
 (
 find "$IN" -iname "*.flac"
 find "$IN" -iname "*.wma"
 ) | while read mfile; do
 
-    OF="$(echo "$mfile" | sed 's@.flac$@.mp3@g' | sed 's@.wma$@.mp3@g' | sed 's,'"$IN","$OUT\/"',g' )"
+    OF="$(echo "$mfile" |\
+          sed 's@.flac$@.mp3@g' |\
+          sed 's@.wma$@.mp3@g'  |\
+          sed 's,'"$IN","$OUT\/"',g' )"
     dir="$(dirname "$OF")"
 
     mkdir -p "$dir"
 
-    ## skip existing
+    ## skip existing files
     if [ ! -e "$OF" ]; then
-        echo
-        echo ":: $(basename "$dir") :: $(basename "$OF") "
-        echo "$mfile -> $OF"
+        echo "$cc/$nflac :: $(basename "$dir") :: $(basename "$OF") "
+        # echo "$mfile -> $OF"
         #avconv -nostats -loglevel info  -i "$mfile" -codec:a libmp3lame -qscale:a $QQ  "$OF"
-        ffmpeg -loglevel error -i "$mfile" -aq "$QQ" -map_metadata 0 -id3v2_version 3 "$OF" 2>/dev/null
-        wait
+        ffmpeg -nostdin         \
+               -loglevel error  \
+               -i "$mfile"      \
+               -aq "$QQ"        \
+               -map_metadata 0  \
+               -id3v2_version 3 \
+               -write_id3v1 1   \
+               "$OF" 2>/dev/null
     else
         echo "EXIST: $OF"
-
     fi
+    cc=$((cc+1))
 done
 
-exit
 
-## do mp3s
+
+## transcode mp3s
+cc=0
 echo
-echo "Reduce large mp3 or copy:"
-find "$IN" -iname "*.mp3" | wc -l
-
 find "$IN" -iname "*.mp3" | while read mfile; do
 
     OF="$(echo "$mfile" | sed 's,'"$IN","$OUT\/"',g'  | sed 's@FLAC@MUSIC@' | sed 's@!NOFLAC@MUSIC@'  )"
@@ -80,21 +86,29 @@ find "$IN" -iname "*.mp3" | while read mfile; do
 
     mkdir -p "$dir"
 
+    ## get bitrate of original file
     bbt="$(file "$mfile" | sed 's/.*, \(.*\)kbps.*/\1/' | tr -d " ")"
 
     ## check bitrate
     if [[ $bbt -ge $BIT ]]; then
         ## re encode mp3
         if [ ! -e "$OF" ]; then
-            echo ":: $(basename "$dir") :: $(basename "$OF") "
+            echo "$cc/$nmp3 :: $(basename "$dir") :: $(basename "$OF") "
             # avconv -nostats -loglevel info  -i "$mfile" -codec:a libmp3lame -qscale:a $QQ  "$OF"
-            # ffmpeg --quit -hide_banner -loglevel panic -i "$flac" -aq 2 -map_metadata 0 -id3v2_version 3 -write_id3v1 1 "$OF"
+            ffmpeg -nostdin         \
+                   -loglevel error  \
+                   -i "$mfile"      \
+                   -aq "$QQ"        \
+                   -map_metadata 0  \
+                   -id3v2_version 3 \
+                   -write_id3v1 1   \
+                   "$OF" 2>/dev/null
         fi
     else
         ## copy mp3
         cp -v "$mfile" "$OF"
     fi
-
+    cc=$((cc+1))
 done
 
 
@@ -103,7 +117,6 @@ exit 0
 
 
 
-#
 # Switch        Kbit/s        Bitrate range kbit/s
 # -b 320        320           320 CBR
 # -V 0          245           220...260
