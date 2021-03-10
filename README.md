@@ -24,13 +24,16 @@ Bash image manipulation tools.
 ## libradtran
 Some examples of running LibRadTran in parallel on linux machines using the shell.
 
+## music_tools
+Music library management tools.
+
 ## pdf_tools
 Bash tools to manipulate pdf files.
 
 ## system_tools
 General system and file tools for linux systems.
 
-## train_analysis
+## training_analysis
 Tools for processing my training data.
 
 
