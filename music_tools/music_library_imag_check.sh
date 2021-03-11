@@ -89,13 +89,13 @@ cat "$masterfil" | while read original; do
         if [[ "$duplicate" -ot "$original" ]]; then
             echo "Remove old duplicate $duplicate"
             ## remove old dups in order to reencode with newer version
-            # rm -v "$duplicate"
+            rm -v "$duplicate"
         fi
     fi
 done
 
-
-## call playlist conv
+echo
+echo "Convert playlist for image library"
 $HOME/CODE/music_tools/convert_m3u_playlists.sh
 
 

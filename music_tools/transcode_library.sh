@@ -125,7 +125,7 @@ find "$IN" -iname "*.mp3" | while read mfile; do
     else
         ## copy mp3
         printf "$cc/$nmp3 "
-        cp -v "$mfile" "$OF"
+        cp -vu "$mfile" "$OF"
     fi
     cc=$((cc+1))
 done
