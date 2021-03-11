@@ -41,10 +41,10 @@ exec  > >(tee -i "${LOG_FILE}")
 exec 2> >(tee -i "${ERR_FILE}")
 
 
-## to transcode
+## count files to transcode
 nflac="$(
-( find "$IN" -iname "*.flac"
-  find "$IN" -iname "*.wma") | wc -l)"
+( find "$IN" -type f -iname "*.flac"
+  find "$IN" -type f -iname "*.wma") | wc -l)"
 echo
 echo "Transcode candidates flac and wma: $nflac"
 
@@ -54,12 +54,13 @@ nmp3="$(
 echo "Copy candidates mp3:               $nmp3"
 echo
 
-## transcode lossless
-info "Start lossless transcoding"
+
+
+info "Transcode lossless to mp3"
 cc=0
 (
-find "$IN" -iname "*.flac"
-find "$IN" -iname "*.wma"
+find "$IN" -type f -iname "*.flac"
+find "$IN" -type f -iname "*.wma"
 ) | while read mfile; do
 
     OF="$(echo "$mfile" |\
@@ -91,11 +92,10 @@ done
 
 
 
-## transcode mp3s
-info "Transcode mp3"
+info "Transcode or copy mp3"
 cc=0
 echo
-find "$IN" -iname "*.mp3" | while read mfile; do
+find "$IN" -type f -iname "*.mp3" | while read mfile; do
 
     OF="$(echo "$mfile" | sed 's,'"$IN","$OUT\/"',g'  | sed 's@FLAC@MUSIC@' | sed 's@!NOFLAC@MUSIC@'  )"
     dir="$(dirname "$OF")"
@@ -130,6 +130,20 @@ find "$IN" -iname "*.mp3" | while read mfile; do
     cc=$((cc+1))
 done
 
+
+
+info "Copy covers to image library"
+## list all folders with music
+( find "$IN" -type f -iname "*.flac"
+  find "$IN" -type f -iname "*.wma"
+  find "$IN" -type f -iname "*.mp3") | xargs -I {} dirname {} | sort -u | while read adir ; do
+
+  ## list all images
+  find "$adir" -type f -maxdepth 1 -iname "*.jpg" | while read aimg; do
+    target="$(echo "$aimg" | sed 's,'"$IN","$OUT\/"',g')"
+    cp -vu "$aimg" "$target"
+  done
+done
 
 
 exit 0
