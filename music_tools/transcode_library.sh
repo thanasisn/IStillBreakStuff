@@ -16,15 +16,29 @@ QQ=1
 ## mp3 transcode threshold
 BIT=240
 
-
-
-
 if [ ! -d "$IN" ]; then
     echo "$IN is not a directory"
     exit 1
 fi
 mkdir -p "$OUT"
 
+## logging definitions
+ldir="/home/athan/LOGs/SYSTEM_LOGS/"
+mkdir -p "$ldir"
+
+ID="$1"
+: ${ID:=$(hostname)}
+SCRIPT="$(basename "$0")"
+
+fsta="${ldir}/$(basename "$0")_$ID.status"
+info()   { echo "$(date +'%F %T') ::INF::${SCRIPT}::${ID}:: $* ::" >>"$fsta"; }
+status() { echo "$(date +'%F %T') ::STA::${SCRIPT}::${ID}:: $* ::" >>"$fsta"; }
+
+LOG_FILE="/tmp/$(basename $0)_$(date +%F_%R).log"
+ERR_FILE="/tmp/$(basename $0)_$(date +%F_%R).err"
+
+exec  > >(tee -i "${LOG_FILE}")
+exec 2> >(tee -i "${ERR_FILE}")
 
 
 ## to transcode
@@ -41,6 +55,7 @@ echo "Copy candidates mp3:               $nmp3"
 echo
 
 ## transcode lossless
+info "Start lossless transcoding"
 cc=0
 (
 find "$IN" -iname "*.flac"
@@ -77,6 +92,7 @@ done
 
 
 ## transcode mp3s
+info "Transcode mp3"
 cc=0
 echo
 find "$IN" -iname "*.mp3" | while read mfile; do
@@ -103,9 +119,12 @@ find "$IN" -iname "*.mp3" | while read mfile; do
                    -id3v2_version 3 \
                    -write_id3v1 1   \
                    "$OF" 2>/dev/null
+        else
+            echo "EXIST: $OF"
         fi
     else
         ## copy mp3
+        printf "$cc/$nmp3 "
         cp -v "$mfile" "$OF"
     fi
     cc=$((cc+1))
