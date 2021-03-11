@@ -65,21 +65,18 @@ du -sh "$imagedir"
 echo
 
 
-exit
-
 ## remove files in image no longer on original
 if [[ count -gt 0 ]]; then
-    echo "Uncomment code to clean $count files"
+    # echo "Uncomment code to clean $count files"
     cat "$mastermis" | while read line ; do
         echo  "TO RM:  ${imagedir}${line}.mp3"
-        # rm -v "${imagedir}${line}.mp3"
+        rm -v "${imagedir}${line}.mp3"
     done
 fi
 
-exit
+
 
 ## Check if files in image are older than master and remove from image
-
 cat "$masterfil" | while read original; do
     duplicate="${imagedir}${original}"
     duplicate="$(echo "$duplicate" | sed "s/\.flac$/\.mp3/" | sed "s/\.wma$/\.mp3/")"
@@ -92,13 +89,14 @@ cat "$masterfil" | while read original; do
         if [[ "$duplicate" -ot "$original" ]]; then
             echo "Remove old duplicate $duplicate"
             ## remove old dups in order to reencode with newer version
-            rm -v "$duplicate"
+            # rm -v "$duplicate"
         fi
     fi
 done
 
 
-
 ## call playlist conv
+$HOME/CODE/music_tools/convert_m3u_playlists.sh
+
 
 exit 0
