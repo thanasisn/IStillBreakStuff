@@ -6,28 +6,28 @@ My small projects are collected here.
 Each folder has a README file.
 
 
-## conky
+## [conky](https://github.com/thanasisn/IStillBreakStuff/tree/main/conky)
 WYSIWYG
 
-## data_tools
+## [data_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/data_tools)
 Tools and methods of data analysis for different purposes.
 
-## gpx_tools
+## [gpx_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/gpx_tools)
 A collection of tools for gps files. Mainly centered on .gpx files and training data analysis.
 
-## hosts
+## [hosts](https://github.com/thanasisn/IStillBreakStuff/tree/main/hosts)
 A simple bash script to create and update /etc/hosts list file in order to block malware and ad sites.
 
-## img_tools
+## [img_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/img_tools)
 Bash image manipulation tools.
 
-## libradtran
+## [libradtran](https://github.com/thanasisn/IStillBreakStuff/tree/main/libradtran)
 Some examples of running LibRadTran in parallel on linux machines using the shell.
 
-## music_tools
+## [music_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/music_tools)
 Music library management tools.
 
-## pdf_tools
+## [pdf_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/pdf_tools)
 Bash tools to manipulate pdf files.
 
 ## [system_backup_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/system_backup_tools)

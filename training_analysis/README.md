@@ -1,5 +1,5 @@
 
-# train_analysis
+# training_analysis
 
 Tools for processing my training data.
 
