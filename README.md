@@ -30,10 +30,13 @@ Music library management tools.
 ## pdf_tools
 Bash tools to manipulate pdf files.
 
-## system_tools
+## [system_backup_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/system_backup_tools)
+Backup and system setup tools
+
+## [system_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/system_tools)
 General system and file tools for linux systems.
 
-## training_analysis
+## [training_analysis](https://github.com/thanasisn/IStillBreakStuff/tree/main/training_analysis)
 Tools for processing my training data.
 
 
