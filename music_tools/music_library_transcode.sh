@@ -63,54 +63,22 @@ find "$IN" -type f -iname "*.flac"
 find "$IN" -type f -iname "*.wma"
 ) | while read mfile; do
 
-    OF="$(echo "$mfile" |\
-          sed 's@.flac$@.mp3@g' |\
-          sed 's@.wma$@.mp3@g'  |\
-          sed 's,'"$IN","$OUT\/"',g' )"
-    dir="$(dirname "$OF")"
+    ## skip deleted files
+    if [ -e "$mfile" ] ; then
 
-    mkdir -p "$dir"
-
-    ## skip existing files
-    if [ ! -e "$OF" ]; then
-        echo "$cc/$nflac :: $(basename "$dir") :: $(basename "$OF") "
-        # echo "$mfile -> $OF"
-        #avconv -nostats -loglevel info  -i "$mfile" -codec:a libmp3lame -qscale:a $QQ  "$OF"
-        ffmpeg -nostdin         \
-               -loglevel error  \
-               -i "$mfile"      \
-               -aq "$QQ"        \
-               -map_metadata 0  \
-               -id3v2_version 3 \
-               -write_id3v1 1   \
-               "$OF" 2>/dev/null
-    else
-        echo "EXIST: $OF"
-    fi
-    cc=$((cc+1))
-done
-
-
-
-info "Transcode or copy mp3"
-cc=0
-echo
-find "$IN" -type f -iname "*.mp3" | while read mfile; do
-
-    OF="$(echo "$mfile" | sed 's,'"$IN","$OUT\/"',g'  | sed 's@FLAC@MUSIC@' | sed 's@!NOFLAC@MUSIC@'  )"
-    dir="$(dirname "$OF")"
-
-    mkdir -p "$dir"
-
-    ## get bitrate of original file
-    bbt="$(file "$mfile" | sed 's/.*, \(.*\)kbps.*/\1/' | tr -d " ")"
-
-    ## check bitrate
-    if [[ $bbt -ge $BIT ]]; then
-        ## re encode mp3
+        OF="$(echo "$mfile" |\
+              sed 's@.flac$@.mp3@g' |\
+              sed 's@.wma$@.mp3@g'  |\
+              sed 's,'"$IN","$OUT\/"',g' )"
+        dir="$(dirname "$OF")"
+    
+        mkdir -p "$dir"
+    
+        ## skip existing files
         if [ ! -e "$OF" ]; then
-            echo "$cc/$nmp3 :: $(basename "$dir") :: $(basename "$OF") "
-            # avconv -nostats -loglevel info  -i "$mfile" -codec:a libmp3lame -qscale:a $QQ  "$OF"
+            echo "$cc/$nflac :: $(basename "$dir") :: $(basename "$OF") "
+            # echo "$mfile -> $OF"
+            #avconv -nostats -loglevel info  -i "$mfile" -codec:a libmp3lame -qscale:a $QQ  "$OF"
             ffmpeg -nostdin         \
                    -loglevel error  \
                    -i "$mfile"      \
@@ -122,11 +90,57 @@ find "$IN" -type f -iname "*.mp3" | while read mfile; do
         else
             echo "EXIST: $OF"
         fi
-    else
-        ## copy mp3
-        printf "$cc/$nmp3 "
-        cp -vu "$mfile" "$OF"
+    else 
+        echo "Missing source $mfile"
     fi
+
+    cc=$((cc+1))
+done
+
+
+
+info "Transcode or copy mp3"
+cc=0
+echo
+find "$IN" -type f -iname "*.mp3" | while read mfile; do
+
+    ## skip deleted files
+    if [ -e "$mfile" ] ; then
+    
+        OF="$(echo "$mfile" | sed 's,'"$IN","$OUT\/"',g'  | sed 's@FLAC@MUSIC@' | sed 's@!NOFLAC@MUSIC@'  )"
+        dir="$(dirname "$OF")"
+    
+        mkdir -p "$dir"
+    
+        ## get bitrate of original file
+        bbt="$(file "$mfile" | sed 's/.*, \(.*\)kbps.*/\1/' | tr -d " ")"
+    
+        ## check bitrate
+        if [[ $bbt -ge $BIT ]]; then
+            ## re encode mp3
+            if [ ! -e "$OF" ]; then
+                echo "$cc/$nmp3 :: $(basename "$dir") :: $(basename "$OF") "
+                # avconv -nostats -loglevel info  -i "$mfile" -codec:a libmp3lame -qscale:a $QQ  "$OF"
+                ffmpeg -nostdin         \
+                       -loglevel error  \
+                       -i "$mfile"      \
+                       -aq "$QQ"        \
+                       -map_metadata 0  \
+                       -id3v2_version 3 \
+                       -write_id3v1 1   \
+                       "$OF" 2>/dev/null
+            else
+                echo "EXIST: $OF"
+            fi
+        else
+            ## copy mp3
+            printf "$cc/$nmp3 "
+            cp -vu "$mfile" "$OF"
+        fi
+    else
+        echo "Missing source $mdile"
+    fi
+
     cc=$((cc+1))
 done
 
