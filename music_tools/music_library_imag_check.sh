@@ -1,10 +1,10 @@
 #!/bin/bash
 
-####  Music library image maintenance
+#### Music library image maintenance
 
-##  Use picard muzic brains and clementine to tag and organize master.
-##  Check transcoded files from master to image and fix diffs with this.
-##  Re-encode missing files from master to image.
+## Use picard muzic brains and clementine to tag and organize master.
+## Check transcoded files from master to image and fix diffs with this.
+## Re-encode missing files from master to image.
 
 ## Assume lower case for extensions
 ## Assume filenames with no extremely bad characters

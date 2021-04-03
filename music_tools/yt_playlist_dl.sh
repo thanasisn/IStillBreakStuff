@@ -1,7 +1,7 @@
 #!/bin/bash
 ## created on 2021-04-02
 
-#### Download youtube playlists as mp3
+####  Download youtube playlists as mp3
 
 PLAYLISTS="$HOME/CODE/music_tools/playlists.list"
 REPO="$HOME/CODE/music_tools/downloaded.list"
