@@ -21,7 +21,7 @@ feh --fullscreen                                                               \
     --sort filename                                                            \
     --version-sort                                                             \
     --verbose                                                                  \
-    --info     'echo %S %wx%h %P $(ls $(dirname %F) | wc -l ) $(dirname %F) '  \
+    --info     'echo %S %wx%h %P "$(ls $(dirname %F) | wc -l )" $(dirname %F) '  \
     --draw-filename                                                            \
     --action "trash-put %F"                                                    \
     --action8 'trash-put $(dirname %F) '                                       \
