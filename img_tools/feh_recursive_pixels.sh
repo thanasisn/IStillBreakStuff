@@ -11,7 +11,7 @@ if [[ ! -d "$FOLDER" ]];then
     exit
 fi
 
-## create a sorted filelist for faster loading 
+## create a sorted filelist for faster loading
 cachelist="$FOLDER/.pixels.feh_list"
 cachelistrev="$FOLDER/.pixels_rev.feh_list"
 
@@ -33,7 +33,7 @@ if [[ -f "$cachelist" ]]; then
 
     read -p "Delete old list and create new? " -n 1 -r
     echo
-    
+
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "delete list"
         trash "$cachelist"
@@ -58,7 +58,7 @@ feh --fullscreen                                   \
     --info     "echo %S %wx%h %P"                  \
     --draw-filename                                \
     --action  "trash-put %F"                       \
-    --action8 'trash-put $(dirname %F) '           \
+    --action8 '[trash folder]trash-put "$(dirname %F)" '  \
     $OPTIONS                                       \
     "$FOLDER"
 
