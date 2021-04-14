@@ -72,15 +72,15 @@ fi
 
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo " Skipping fingerprinding and matching "
+    echo " Skipping fingerprinting and matching "
     echo
 else
-    echo " Redo fingerprinding and matching"
+    echo " Redo fingerprinting and matching"
 
     ## empty dups file
     truncate -s 0 "$dupsimgs"
 
-    #### create a list of dups and image fingerprinds ####
+    #### create a list of dups and image fingerprints ####
     findimagedupes           \
                 --quiet      \
                 --recurse    \
@@ -108,14 +108,14 @@ if [ -e "$excludef" ]; then
         cat "$excludef" | while read line ; do
             line="${line#\'}"
             line="${line%\'}"
-            
+
             ## special rule case!!!
             line="$(echo "$line" | sed 's/\.art_screensaver/art/g')"
             echo "try remove: $line"
-            
+
             line=$(echo $line | sed 's/\//\\\//g')
             sed -i "/$line/d" "$dupsimgs"
-          
+
         done
     fi
 fi
@@ -147,7 +147,7 @@ done | sort | uniq -c | sort -bg > "$dupsdirs"
 
 cat "$dupsdirs"
 
-## get max monitor dimenstions for better display
+## get max monitor dimensions for better display
 Xaxis=$(xrandr --current | grep '*' | uniq | awk '{print $1}' | cut -d 'x' -f1 | sort -n | tail -1)
 Yaxis=$(xrandr --current | grep '*' | uniq | awk '{print $1}' | cut -d 'x' -f2 | sort -n | tail -1)
 
