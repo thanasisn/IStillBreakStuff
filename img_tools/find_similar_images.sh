@@ -179,6 +179,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         nset="$(echo "$line" | sed 's@" "@"\n"@g' | wc -l)"
         nrows="$((  ( nset + ncols - 1 )  / ncols))"
 
+        echo
         echo "SET: $((cnt++))/$sets  $ncols x $nrows = $nset "
 
         if [[ $nset -gt $TOMANY ]]; then

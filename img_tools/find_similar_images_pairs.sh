@@ -9,7 +9,7 @@ TOMANY="$3"
 
 ## default threshold and max group size to display
 THRESH="${THRESH:-90}"
-TOMANY="${TOMANY:-10}"
+TOMANY="${TOMANY:-40}"
 
 
 if [[ ! -d "$FOLDER" ]];then
@@ -170,6 +170,11 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 
         echo
         echo "SET: $((cnt++))/$sets  $ncols x $nrows = $nset "
+
+        if [[ $nset -gt $TOMANY ]]; then
+            echo "Too many matches ($nset), SKIP!"
+            continue
+        fi
 
         ## get a sorted by dim list of images in a set to process
         eval "a=($line)"
