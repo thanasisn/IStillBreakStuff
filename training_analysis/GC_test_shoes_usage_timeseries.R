@@ -82,7 +82,6 @@ for (as in unique(ddd$Shoes)) {
                 stopifnot(max(text$date) >= max(temp$date))
                 ## move End day after last usage
                 text$date[which.max(text$date)] <- temp$date[which.max(temp$date)] + 1
-
             }
             temp <- plyr::rbind.fill(text,temp)
             temp <- temp[order(temp$date), ]
@@ -116,7 +115,7 @@ for (as in unique(agg$Shoes)) {
 
 ## pretty numbers
 gath$total <- round( gath$total, 0)
-
+unique(gath$Shoes)
 
 ## init empty plot
 xlim <- range(gath$date, Sys.Date() + 7 , na.rm = T)
@@ -130,6 +129,10 @@ plot(1, type="n",
 axis.Date(1,agg$date)
 axis.Date(1,at = seq(min(agg$date), max(agg$date)+1, "months"),
           labels = FALSE, tcl = -0.2)
+
+## missing data
+lines(empty$date, cumsum(empty$Distance), col = "grey", lwd = 4, type = "s" )
+
 
 ## create color palette
 n      <- length(unique(gather$Shoes))
@@ -155,6 +158,7 @@ for (as in sort(unique(gath$Shoes))) {
     sc <- c(sc,cols[cc])
     cc <- cc+1
 }
+
 
 ## add legend
 sn <- c(sn, paste0("NO ENTRY (", round(emtpyD,0),"km)"))
