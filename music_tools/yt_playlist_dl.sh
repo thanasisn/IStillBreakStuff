@@ -25,6 +25,4 @@ cat "$PLAYLISTS" | sed '/^$/d' | sed '/^[ \t]*#/d'  | while read line; do
 
 done
 
-
-
 exit 0
