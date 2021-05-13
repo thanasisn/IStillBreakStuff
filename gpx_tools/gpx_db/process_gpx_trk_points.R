@@ -27,27 +27,28 @@ layers_out     <- "~/GISdata/Layers/Auto/"
 
 
 ## load data
-data           <- readRDS(trackpoints_fl)
-data[, F_mtime:=NULL]
+DT           <- readRDS(trackpoints_fl)
+## drop files dates
+DT[, F_mtime:=NULL]
 
 ## remove fake dates
-data[ time < "1971-01-01", time := NA ]
+DT[ time < "1971-01-01", time := NA ]
 
 
-hist(data$time , breaks = 100)
+hist(DT$time , breaks = 100)
 
 typenames <- c("Points","Days","Hours")
 
 
-cat(paste( length(unique( data$file )), "total files parsed\n" ))
-cat(paste( nrow( data ), "points parsed\n" ))
+cat(paste( length(unique( DT$file )), "total files parsed\n" ))
+cat(paste( nrow( DT ), "points parsed\n" ))
 
 ## create speed
-data$kph <- (data$dist / 1000) / (data$timediff / 3600)
+DT$kph <- (DT$dist / 1000) / (DT$timediff / 3600)
 
 
 #### clean problematic data ####
-if ( nrow(data[ is.na(X) |
+if ( nrow(DT[ is.na(X) |
                 is.na(Y) |
                 is.infinite(X) |
                 is.infinite(Y) |
@@ -57,10 +58,10 @@ if ( nrow(data[ is.na(X) |
     cat("Add some code to fix!!\n")
 }
 
-if ( nrow( data[ is.na(time)] ) > 0 ) {
-    cat(paste(nrow(data[is.na(time)]), "Points missing times\n"))
+if ( nrow( DT[ is.na(time)] ) > 0 ) {
+    cat(paste(nrow(DT[is.na(time)]), "Points missing times\n"))
 
-    mistime <- data[ is.na(time), .N, by = file]
+    mistime <- DT[ is.na(time), .N, by = file]
     cat(paste(nrow(mistime), "Files with missing times\n"))
 
     ## show on terminal
@@ -70,7 +71,7 @@ if ( nrow( data[ is.na(time)] ) > 0 ) {
                      sep = " ; ",
                      file = paste0(baseoutput,"Files_points_no_time.csv") )
     ## clean bad data
-    data <- data[!is.na(time)]
+    DT <- DT[!is.na(time)]
 }
 
 
@@ -83,7 +84,7 @@ if ( nrow( data[ is.na(time)] ) > 0 ) {
 cat(paste("Get possible duplicate files\n"))
 
 ## get files with points in the same date
-file_dates <- data[, .N, by = .(Date = as.Date(time), file)]
+file_dates <- DT[, .N, by = .(Date = as.Date(time), file)]
 same_date  <- list()
 for (ad in unique(file_dates$Date)) {
     ad   <- as.Date(ad, origin = "1970-01-01")
@@ -98,7 +99,7 @@ for (ad in unique(file_dates$Date)) {
 dup_points <- data.frame()
 for (il in 1:length(same_date)) {
 
-    temp <- data[ file %in% same_date[[il]]]
+    temp <- DT[ file %in% same_date[[il]]]
 
     ## only when we have time
     temp <- temp[ !is.na(time) ]
@@ -113,7 +114,7 @@ for (il in 1:length(same_date)) {
     countP$TotPnts <- 0
     countP$Set     <- il
     for (af in unique(countP$file)) {
-        countP[file==af, TotPnts := data[file == af, .N] ]
+        countP[file==af, TotPnts := DT[file == af, .N] ]
     }
     dup_points <- rbind(dup_points, countP)
 }
@@ -143,38 +144,40 @@ gdata::write.fwf(dup_points[,.(Set, file, DupPnts, TotPnts, Cover, STime, ETime)
 ####  Filter data by speed  #####
 
 ##TODO
-hist(data$timediff)
-hist(data$dist)
-hist(data$kph)
+hist(DT$timediff)
+hist(DT$dist)
+hist(DT$kph)
 
-table((data$timediff %/% 5) * 5 )
-table((data$dist     %/% 1000) * 1000 )
-table(abs(data$kph   %/% 200) * 200 )
+table((DT$timediff %/% 5) * 5 )
+table((DT$dist     %/% 1000) * 1000 )
+table(abs(DT$kph   %/% 200) * 200 )
 
 cat(paste("\nGreat distances\n"))
-data[dist > 100000, .( .N, MaxDist = max(dist)) , by = file]
+DT[dist > 100000, .( .N, MaxDist = max(dist)) , by = file]
 
 cat(paste("\nGreat speeds\n"))
-data[kph > 500000 & !is.infinite(kph), .(.N, MaxKph = max(kph), time[which.max(kph)]) , by = file ]
+DT[kph > 500000 & !is.infinite(kph), .(.N, MaxKph = max(kph), time[which.max(kph)]) , by = file ]
 
 cat(paste("\nGreat times\n"))
-data[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(timediff)]) , by = file ]
+DT[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(timediff)]) , by = file ]
 
 
-# esss <- data[kph > 200, .(file, kph, timediff, dist ,time) ]
+# esss <- DT[kph > 200, .(file, kph, timediff, dist ,time) ]
 # setorder(esss, kph)
 
-# data[dist > 200, .(max(kph), time[which.max(kph)] ), by = file ]
+# DT[dist > 200, .(max(kph), time[which.max(kph)] ), by = file ]
 
-# data[timediff==0]
+# DT[timediff==0]
 
-# data[dist==0 & timediff==0]
-# data[dist>0 & dist < 10 & timediff==0]
+# DT[dist==0 & timediff==0]
+# DT[dist>0 & dist < 10 & timediff==0]
 
-# data[is.infinite(kph), .(max(dist), time[which.max(dist)]) ,by = file]
+# DT[is.infinite(kph), .(max(dist), time[which.max(dist)]) ,by = file]
 
-# data[dist<0]
+# DT[dist<0]
 
+
+stop()
 
 
 #### Bin points in grids ####
@@ -191,35 +194,43 @@ rsls <- unique(c(
     20000,
     50000 ))
 
+rsltemp <- 180 ## temporal resolution in seconds
+## points inside the sqare counts once every 180 secs
+
+## aggregate times
+DT[ , time :=  (as.numeric(time) %/% rsltemp * rsltemp) + (rsltemp/2)]
+DT[ , time :=  as.POSIXct( time, origin = "1970-01-01") ]
+
+
 ## exclude some data paths not mine
-data <- data[ grep("/Plans/",   file, invert = T ), ]
-data <- data[ grep("/E_paths/", file, invert = T ), ]
-data <- data[ grep("/ROUT/",    file, invert = T ), ]
+DT <- DT[ grep("/Plans/",   file, invert = T ), ]
+DT <- DT[ grep("/E_paths/", file, invert = T ), ]
+DT <- DT[ grep("/ROUT/",    file, invert = T ), ]
 
 ## get unique points
-setkey( data, time, X, Y )
+setkey( DT, time, X, Y )
 
 ## remove duplicate points
-data <- unique( data[list(time, X, Y), nomatch = 0]  )
+DT <- unique( DT[list(time, X, Y), nomatch = 0]  )
 
 ## keep only existing coordinates
-data <- data[ !is.na(X) ]
-data <- data[ !is.na(Y) ]
+DT <- DT[ !is.na(X) ]
+DT <- DT[ !is.na(Y) ]
 
-cat(paste( length(unique( data$file )), "files to bin\n" ))
-cat(paste( nrow( data ), "points to bin\n" ))
+cat(paste( length(unique( DT$file )), "files to bin\n" ))
+cat(paste( nrow( DT ), "points to bin\n" ))
 
 
-# unique(dirname( data$file))
+# unique(dirname( DT$file))
 
 ## break data in two categories
 Dtrain <- rbind(
-    data[ grep("/TRAIN/", file ), ],
-    data[ grep("/Running/Polar/", file ), ]
+    DT[ grep("/TRAIN/", file ), ],
+    DT[ grep("/Running/Polar/", file ), ]
 )
 Dtrain <- unique(Dtrain)
 
-Drest <-  data[ ! grep("/Running/Polar/", file ), ]
+Drest <-  DT[ ! grep("/Running/Polar/", file ), ]
 Drest <- Drest[ ! grep("/TRAIN/", file ), ]
 Drest <- unique(Drest)
 
@@ -237,7 +248,7 @@ for (res in rsls) {
     ## one column for each year and type and aggregator
     ## after that totals are computed
 
-    yearstodo <- unique(year(data$time))
+    yearstodo <- unique(year(DT$time))
     yearstodo <- sort(na.exclude(yearstodo))
 
     gather <- data.table()
