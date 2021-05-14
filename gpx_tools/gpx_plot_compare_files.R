@@ -44,6 +44,7 @@ if (length( files ) == 0) {
 
 library(sf)
 library(data.table)
+library(trip)
 
 ## Read track points
 wecare <- c("ele","time","file")
@@ -56,8 +57,12 @@ for (af in files) {
     tracks      <- tracks[, ..wecare ]
     tracks$X    <- unlist(trkcco[,1])
     tracks$Y    <- unlist(trkcco[,2])
+    tracks$dist <- c(0, trackDistance(trkcco, longlat = TRUE)) * 1000
     gather      <- rbind(gather, tracks)
 }
+
+
+
 
 ## Read waypoints
 wecare <- c("ele","time","file","name")
@@ -109,7 +114,7 @@ if (all(is.na(gather$time))) {
 X11()
 
 if (!NO_TIMES) {
-    layout(matrix(c(1,1,2), 3, 1, byrow = TRUE))
+    layout(matrix(c(1,1,2,3), 4, 1, byrow = TRUE))
 }
 
 xlim <- range( gather$X, gather_wpt$X, na.rm = T )
@@ -142,6 +147,12 @@ if (HAVE_TRACKS) {
            cex = 0.7, ncol = 2, bty="n")
 }
 
+
+
+
+
+
+
 if (HAVE_WPT) {
     cols <- 2
     fnam <- c()
@@ -172,6 +183,7 @@ if (!NO_TIMES) {
     ## A better method to plot files with and without time?
     ## A method to plot files with no times?
 
+    ## plot points in time
     cols <- 2
     comp <- 0.1
 
@@ -195,11 +207,43 @@ if (!NO_TIMES) {
     }
     # legend(min(gather$X),max(gather$Y), legend = fnam, pch=19, col = lcol,
     #        cex = 0.6, ncol = 2, bty="n")
-    legend("bottomleft", legend = fnam, pch=19, col = lcol,
-           cex = 0.6, ncol = 2, bty="n")
+    legend("topleft", legend = fnam, pch=19, col = lcol,
+           cex = 0.6, ncol = 2, bty="n",
+           title = "Points in time")
     axis.POSIXct(1, gather$time, cex.axis = 0.7)
 
+    ## plot distances
+    cols <- 2
+    plot(1, type="n",
+         xaxt = "n", yaxt = "n",
+         xlab = "" , ylab = "" ,
+         xlim = range(gather$time,na.rm = T), ylim = range(0, gather$dist, na.rm = T) )
+
+    fnam <- c()
+    lcol <- c()
+    for (af in unique(gather$file)) {
+        temp <- gather[file==af]
+
+        temp$col <- cols
+        points(temp$time, temp$dist, col = scales::alpha(cols , 0.5))
+
+        lcol <- c(lcol, cols)
+        fnam <- c(fnam, basename(af))
+
+        cols  <- cols+1
+
+    }
+    legend("topleft", legend = fnam, pch=19, col = lcol,
+           cex = 0.6, ncol = 2, bty="n",
+           title = "Distance (m)")
+    axis.POSIXct(1, gather$time, cex.axis = 0.7)
+    axis(2, pretty(gather$dist), cex.axis = 0.7)
+
 }
+
+
+
+
 
 
 
@@ -214,5 +258,4 @@ locator(1)
 
 
 ####_ END _####
-tac = Sys.time()
-cat(sprintf("\n%s H:%s U:%s S:%s T:%f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+

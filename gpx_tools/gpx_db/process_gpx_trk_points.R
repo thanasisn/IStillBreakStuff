@@ -177,8 +177,6 @@ DT[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(timedi
 # DT[dist<0]
 
 
-stop()
-
 
 #### Bin points in grids ####
 rsls <- unique(c(
