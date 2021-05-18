@@ -17,23 +17,19 @@ library(sf)
 library(data.table)
 library(dplyr)
 
+## read vars
+source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
+
 options(warn=1)
 
-regions_fl   <- "~/GISdata/Layers/path_regions.shp"
-regions_fl2  <- "~/GISdata/Layers/path_regions_cnt.shp"
-gpx_repo     <- "~/GISdata/GPX/"
-polar_repo   <- "~/Documents/Running/Polar/"
 
-waypoints_fl <- "~/GISdata/Location_waypoins.Rds"
+gpx_repo     <- "~/GISdata/GPX/"
+
 wpt_seed     <- "~/GISdata/seed2.Rds"
 wpt_seed3    <- "~/GISdata/seed3.Rds"
 
 
-
-EPSG       <- 3857
-close_flag <- 10       ## meters between point to flag as close
 update     <- FALSE
-
 
 #### list GPX files ####
 gpxlist   <- list.files(gpx_repo, ".gpx$",
@@ -41,23 +37,11 @@ gpxlist   <- list.files(gpx_repo, ".gpx$",
                         full.names  = T,
                         ignore.case = T)
 
-polarlist <- list.files(polar_repo, ".gpx$",
-                        recursive   = T,
-                        full.names  = T,
-                        ignore.case = T)
-
-gpxlist <- c(polarlist, gpxlist)
-
-
-## filter out some files
-gpxlist <- gpxlist[grep("orig", basename(gpxlist), ignore.case = TRUE, invert = T)]
-
-
 
 ## check if we need to update data ####
-if (file.exists(waypoints_fl)) {
+if (file.exists(fl_waypoints)) {
     ## load old data
-    gather_wpt <- readRDS(waypoints_fl)
+    gather_wpt <- readRDS(fl_waypoints)
     gather_wpt <- unique(gather_wpt)
 
     ## remove all data from missing files
@@ -88,7 +72,7 @@ if (file.exists(waypoints_fl)) {
 
 
 ####  Read polygons for the regions  ####
-regions <- st_read(regions_fl, stringsAsFactors = FALSE)
+regions <- st_read(fl_regions, stringsAsFactors = FALSE)
 regions <- st_transform(regions, EPSG)
 regions$NFiles  <- 0
 regions$NPoints <- 0
@@ -163,7 +147,7 @@ table( gather_wpt$Region )
 
 ## store for all R
 if (update) {
-    myRtools::write_RDS(gather_wpt, waypoints_fl)
+    myRtools::write_RDS(gather_wpt, fl_waypoints)
 }
 
 ## remove dummy data for analysis ####
@@ -172,14 +156,14 @@ gather_wpt <- gather_wpt[ ! ssel, ]
 
 
 ##TEST for testing ####
-# gather_wpt <- readRDS(waypoints_fl)
+# gather_wpt <- readRDS(fl_waypoints)
 
 ## clean
 gather_wpt <- gather_wpt[ ! lapply(gather_wpt$geometry, length) != 2, ]
 gather_wpt <- gather_wpt[ unique(which(apply(!is.na(st_coordinates(gather_wpt$geometry)),1,all))), ]
 
 ## transform to degrees
-gather_wpt <- st_transform(gather_wpt, 4326)
+gather_wpt <- st_transform(gather_wpt, EPSG_WGS84)
 
 cat(paste("\n", nrow(gather_wpt),"waypoints parsed \n\n" ))
 

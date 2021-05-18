@@ -22,10 +22,8 @@ library(sf)
 ## read vars
 source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 
-baseoutput     <- "~/GISdata/"
-layers_out     <- "~/GISdata/Layers/Auto/"
 
-fl_notimes <- paste0(baseoutput,"/Files_points_no_time.csv")
+
 
 ## load data
 DT           <- readRDS(trackpoints_fl)
@@ -130,15 +128,16 @@ dup_points$ETime <- format( dup_points$ETime, "%FT%R:%S" )
 
 
 ## get sets with big coverage
-gdata::write.fwf(dup_points[ Set %in% unique(dup_points[ Cover >= 0.95, Set]),
+gdata::write.fwf(dup_points[ Set %in% unique(dup_points[ Cover >= cover_threshold, Set]),
                              .(Set, file, DupPnts, TotPnts, Cover, STime, ETime) ],
-                 sep = " ; ", quote = FALSE,
-                 file = paste0(baseoutput,"Dups_point_suspects.csv") )
+                 sep   = " ; ",
+                 quote = FALSE,
+                 file  = fl_suspctpt )
 
 ## get all sets
 gdata::write.fwf(dup_points[,.(Set, file, DupPnts, TotPnts, Cover, STime, ETime)],
                  sep = " ; ", quote = FALSE,
-                 file = paste0(baseoutput,"Dups_point_suspects_all.csv") )
+                 file = fl_suspctpt_all )
 
 
 
@@ -180,26 +179,11 @@ DT[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(timedi
 
 
 #### Bin points in grids ####
-rsls <- unique(c(
-    5,
-    10,
-    20,
-    50,
-    100,
-    500,
-    1000,
-    5000,
-    10000,
-    20000,
-    50000 ))
 
-rsltemp <- 180 ## temporal resolution in seconds
-## points inside the sqare counts once every 180 secs
 
 ## aggregate times
 DT[ , time :=  (as.numeric(time) %/% rsltemp * rsltemp) + (rsltemp/2)]
 DT[ , time :=  as.POSIXct( time, origin = "1970-01-01") ]
-
 
 ## exclude some data paths not mine
 DT <- DT[ grep("/Plans/",   file, invert = T ), ]
@@ -224,13 +208,11 @@ cat(paste( nrow( DT ), "points to bin\n" ))
 
 ## break data in two categories
 Dtrain <- rbind(
-    DT[ grep("/TRAIN/", file ), ],
-    DT[ grep("/Running/Polar/", file ), ]
+    DT[ grep("/TRAIN/", file ), ]
 )
 Dtrain <- unique(Dtrain)
 
-Drest <-  DT[ ! grep("/Running/Polar/", file ), ]
-Drest <- Drest[ ! grep("/TRAIN/", file ), ]
+Drest <- DT[ ! grep("/TRAIN/", file ), ]
 Drest <- unique(Drest)
 
 # unique(dirname( Dtrain$file))
@@ -239,9 +221,9 @@ Drest <- unique(Drest)
 ## choose one
 ## One file for each resolution
 ## OR one file with one layer per resolution
-onefile <-  paste0(layers_out,"/Grid_mega.gpkg")
+
 for (res in rsls) {
-    traindb   <- paste0(layers_out,"/Grid_",sprintf("%08d",res),"m.gpkg")
+    # traindb   <- paste0(layers_out,"/Grid_",sprintf("%08d",res),"m.gpkg")
     resolname <- sprintf("Res %8d m",res)
 
     ## one column for each year and type and aggregator
@@ -323,11 +305,8 @@ for (res in rsls) {
     # st_write(gather, traindb, layer = NULL, append = FALSE, delete_layer= TRUE)
 
     ## store data as one layer in one file one layer per resolution
-    st_write(gather, onefile, layer = resolname, append = FALSE, delete_layer= TRUE)
+    st_write(gather, fl_gis_data, layer = resolname, append = FALSE, delete_layer= TRUE)
 }
-
-
-
 
 
 

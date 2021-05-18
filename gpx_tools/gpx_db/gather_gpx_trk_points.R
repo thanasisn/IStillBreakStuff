@@ -44,7 +44,7 @@ gclist    <- list.files(gc_repo, ".gpx$",
                         ignore.case = T)
 
 ## combine list
-gpxlist <- c(polarlist, gpxlist, gclist)
+gpxlist <- c(gpxlist, gclist)
 ## exclude some files
 # gpxlist <- gpxlist[grep("orig", basename(gpxlist), ignore.case = TRUE, invert = T)]
 

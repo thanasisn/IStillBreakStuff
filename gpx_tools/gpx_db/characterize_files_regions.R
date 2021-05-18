@@ -21,14 +21,9 @@ library(myRtools)
 
 ##TODO create a new shapefile with count in each region
 
-## this is layer with multiple polygons in which the gpx files may be
-regions_fl     <- "~/GISdata/Layers/path_regions.shp"
+## read vars
+source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 
-EPSG           <- 3857
-trackpoints_fl <- paste0("~/GISdata/Count_sl2_",EPSG,".Rds")
-
-## the resolution to simplify data points for localization
-resolution     <- 200
 
 ## prepare data
 data           <- readRDS(trackpoints_fl)
@@ -53,26 +48,24 @@ if ( nrow(data[ is.na(X) |
 }
 
 ## drop resolution of files
-data[ , X :=  (X %/% resolution * resolution) + (resolution/2) ]
-data[ , Y :=  (Y %/% resolution * resolution) + (resolution/2) ]
+data[ , X :=  (X %/% resolution_lcz * resolution_lcz) + (resolution_lcz/2) ]
+data[ , Y :=  (Y %/% resolution_lcz * resolution_lcz) + (resolution_lcz/2) ]
 
 data <- unique(data)
 data[ , N:=.N, by = file]
 
 
-
 #### read polygons for the regions ####
-regions <- st_read(regions_fl, stringsAsFactors = FALSE)
+regions <- st_read(fl_regions, stringsAsFactors = FALSE)
 regions <- st_transform(regions, EPSG)
 
 
 ## characterize all files with all regions
 gather         <- data.table()
 reproj         <- sf_point(data, x = "X", y = "Y")
-st_crs(reproj) <- 3857
+st_crs(reproj) <- EPSG
 
 for (ii in 1:length(regions$Name)) {
-
     cat(paste("Characterize", regions$Name[ii],"\n"))
 
     vec <- apply(st_intersects(regions$geometry[ii], reproj, sparse = FALSE), 2,
@@ -80,9 +73,13 @@ for (ii in 1:length(regions$Name)) {
 
     cat(paste(sum(vec),"points\n"))
 
-    gather <- rbind(gather,
-                    cbind(data[vec, .(FN=.N), by= .(file,N)], Region = regions$Name[ii]))
-
+    temp <- data[vec, .(FN=.N), by= .(file,N)]
+    if (nrow(temp)>0) {
+        gather <- rbind(gather,
+                        cbind(temp, Region = regions$Name[ii]))
+    } else {
+        cat(paste("No data poinrs for: ", regions$Name[ii], "\n"))
+    }
 }
 
 ## characterize rest of files as "Other" location
@@ -92,7 +89,7 @@ gather <- rbind(gather,
                       Region = "Other"), fill = T)
 
 ## list of characterized files
-write_RDS(gather, file = "~/GISdata/Location_list.Rds")
+write_RDS(gather, file = fl_localized )
 
 
 
