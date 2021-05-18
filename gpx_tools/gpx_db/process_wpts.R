@@ -380,7 +380,6 @@ drop_files <- c(
 )
 
 
-
 ## export gpx waypoints by region ####
 for (ar in unique(gather_wpt$Region)) {
 
@@ -397,12 +396,12 @@ for (ar in unique(gather_wpt$Region)) {
     }
 
 
-    ## export all data rot qgis
+    ## export all data fot qgis with all metadata
     if (nrow(temp)<1) { next() }
     write_sf(temp, paste0("~/LOGs/waypoints/wpt_",ar,".gpx"), driver = "GPX", append = F, overwrite = T)
 
 
-    ## remove many data for etrex
+    ## remove a lot of data for gpx devices
     ##TODO you are removing useful info!!
     temp$cmt  <- NA
     temp$desc <- NA
@@ -414,6 +413,8 @@ for (ar in unique(gather_wpt$Region)) {
 ## export all points for qgis
 gather_wpt$Region <- NULL
 write_sf(gather_wpt, '~/GISdata/Layers/Gathered_wpt.gpx', driver = "GPX", append = F, overwrite = T)
+## export all with all metadata
+write_sf(gather_wpt, '~/LOGs/waypoints/WPT_ALL.gpx',      driver = "GPX", append = F, overwrite = T)
 
 
 
