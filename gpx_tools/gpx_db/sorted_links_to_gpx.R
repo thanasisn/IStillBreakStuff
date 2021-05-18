@@ -79,6 +79,10 @@ for (ar in unique(data$Region)) {
 ## copy long plans as is
 file.symlink("~/GISdata/GPX/Plans/LONG",
              "~/ZHOST/Gpx_by_location/LONG")
+## copy all plans as is
+file.symlink("~/GISdata/GPX/Plans",
+             "~/ZHOST/Gpx_by_location/PLANS")
+
 
 
 
