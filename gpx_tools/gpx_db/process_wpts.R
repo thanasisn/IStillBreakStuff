@@ -24,7 +24,6 @@ regions_fl2  <- "~/GISdata/Layers/path_regions_cnt.shp"
 gpx_repo     <- "~/GISdata/GPX/"
 polar_repo   <- "~/Documents/Running/Polar/"
 
-results      <- "~/GISdata/Location_list.Rds"
 waypoints_fl <- "~/GISdata/Location_waypoins.Rds"
 wpt_seed     <- "~/GISdata/seed2.Rds"
 wpt_seed3    <- "~/GISdata/seed3.Rds"

@@ -19,12 +19,13 @@ sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
 library(data.table)
 library(sf)
 
+## read vars
+source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 
-EPSG           <- 3857
-trackpoints_fl <- paste0( "~/GISdata/Count_sl2_",EPSG,".Rds")
 baseoutput     <- "~/GISdata/"
 layers_out     <- "~/GISdata/Layers/Auto/"
 
+fl_notimes <- paste0(baseoutput,"/Files_points_no_time.csv")
 
 ## load data
 DT           <- readRDS(trackpoints_fl)
@@ -68,8 +69,8 @@ if ( nrow( DT[ is.na(time)] ) > 0 ) {
     # print(mistime[,.(N,file)])
     ## write to file
     gdata::write.fwf(mistime[,.(N,file)],
-                     sep = " ; ",
-                     file = paste0(baseoutput,"Files_points_no_time.csv") )
+                     sep  = " ; ",
+                     file = fl_notimes )
     ## clean bad data
     DT <- DT[!is.na(time)]
 }

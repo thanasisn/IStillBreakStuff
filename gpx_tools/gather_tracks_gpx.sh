@@ -24,11 +24,11 @@ done)
 # echo $command
 # echo "${folderin}GATHERED_TRACKS.gpx"
 
-
-gpsbabel -i gpx $command -o gpx -F "${folderin}GATHERED_TRACKS.gpx"
+targetfl="${folderin}/GATHERED_TRACKS.gpx"
+gpsbabel -i gpx $command -o gpx -F "$targetfl"
 
 echo
-echo "Output file: ${folderin}GATHERED_TRACKS.gpx"
+echo "Output file: $targetfl"
 echo
 
 exit 0

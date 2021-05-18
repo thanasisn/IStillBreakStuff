@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 
-#### Characterize gpx files by regions in which they are
+#### Characterize gpx files by regions in which they intersect
 
 
 ####_ Set environment _####
@@ -27,7 +27,8 @@ regions_fl     <- "~/GISdata/Layers/path_regions.shp"
 EPSG           <- 3857
 trackpoints_fl <- paste0("~/GISdata/Count_sl2_",EPSG,".Rds")
 
-resolution     <- 50
+## the resolution to simplify data points for localization
+resolution     <- 200
 
 ## prepare data
 data           <- readRDS(trackpoints_fl)
@@ -84,12 +85,14 @@ for (ii in 1:length(regions$Name)) {
 
 }
 
-## characterize rest of files
+## characterize rest of files as "Other" location
 files  <- unique(data$file)
 gather <- rbind(gather,
-                cbind(file = files[ ! files %in% gather$file], Region = "Other"),fill=T)
+                cbind(file   = files[ ! files %in% gather$file],
+                      Region = "Other"), fill = T)
 
-write_RDS(gather, file = "~/GISdata/Location_list_2.Rds")
+## list of characterized files
+write_RDS(gather, file = "~/GISdata/Location_list.Rds")
 
 
 

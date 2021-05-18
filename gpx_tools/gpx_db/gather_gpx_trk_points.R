@@ -2,6 +2,7 @@
 
 #### Gather and store gpx track points systematically.
 ## Will be processed by other scripts
+## This gather all track points, filenames and mtime
 
 
 ####_ Set environment _####
@@ -19,6 +20,8 @@ library(data.table)
 library(trip)
 library(myRtools)
 
+## read vars
+source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 
 ## You can turn warnings into errors with:
 # options(warn=2)
@@ -26,19 +29,11 @@ options(warn=1)
 
 
 gpx_repo       <- "~/GISdata/GPX/"
-polar_repo     <- "~/Documents/Running/Polar/"
 gc_repo        <- "~/TRAIN/GoldenCheetah/"
-EPSG           <- 3857
-trackpoints_fl <- paste0( "~/GISdata/Count_sl2_",EPSG,".Rds")
 
 
 #### list GPX files ####
 gpxlist   <- list.files(gpx_repo, ".gpx$",
-                        recursive   = T,
-                        full.names  = T,
-                        ignore.case = T)
-
-polarlist <- list.files(polar_repo, ".gpx$",
                         recursive   = T,
                         full.names  = T,
                         ignore.case = T)

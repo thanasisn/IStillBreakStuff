@@ -23,7 +23,7 @@ data <- readRDS(results)
 data[FN<2]
 data[FN/N>0.1]
 
-
+gather_command <- "/home/athan/CODE/gpx_tools/gather_tracks_gpx.sh"
 
 
 
@@ -62,17 +62,24 @@ for (ar in unique(data$Region)) {
         #
         # } else {
 
-            if (file.exists(af)) {
-                target <- paste0(outputrep,"/",Name,"/",basename(af))
-                dir.create(dirname(target), showWarnings = FALSE, recursive = T)
-                ## resolve files with same name
-                if (file.exists(target)) {
-                    target <- paste0(tools::file_path_sans_ext(target),"_c.",tools::file_ext(target) )
-                }
-                file.symlink(af, target )
+        if (file.exists(af)) {
+            target <- paste0(outputrep,"/",Name,"/",basename(af))
+            dir.create(dirname(target), showWarnings = FALSE, recursive = T)
+            ## resolve files with same name
+            if (file.exists(target)) {
+                target <- paste0(tools::file_path_sans_ext(target),"_c.",tools::file_ext(target) )
             }
+            file.symlink(af, target )
+        }
         # }
+
+
+
     }
+
+    ## Create gathered gpx file
+    system(paste(gather_command,dir))
+
 }
 
 
