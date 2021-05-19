@@ -13,6 +13,11 @@ trackpoints_fl  <- paste0("~/GISdata/Count_sl2_",EPSG,".Rds")
 ## Layer with multiple polygons in which the gpx files may be
 fl_regions      <- "~/GISdata/Layers/path_regions.shp"
 
+## Pahts with gpx file to parse
+gpx_repos <- c("~/GISdata/GPX/",
+               "~/TRAIN/GoldenCheetah/")
+
+
 ## Files to evaluate track problems ####
 baseoutput      <- "~/GISdata/"
 ## track points with no times
@@ -57,8 +62,6 @@ resolution_lcz     <- 200
 fl_localized       <- paste0(baseoutput,"/Location_list.Rds")
 ## Command to gather all gpx in folder to one gpx file for osmand easy load
 gather_command <- "~/CODE/gpx_tools/gather_tracks_gpx.sh"
-## Export gpx track files by location
-outputrep     <- "~/ZHOST/Gpx_by_location/"
 
 
 ## Gather and process waypoints ####
@@ -69,4 +72,9 @@ fl_waypoints <- paste0(baseoutput,"/Location_waypoins.Rds")
 ## waypoints proximity flag threshold
 close_flag   <- 10       ## meters between points to flag as close
 
+
+## Sort by location ####
+
+## Export gpx track files by location
+outputrep     <- "~/ZHOST/Gpx_by_location/"
 

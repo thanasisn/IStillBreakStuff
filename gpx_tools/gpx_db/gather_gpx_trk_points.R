@@ -28,23 +28,19 @@ source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 options(warn=1)
 
 
-gpx_repo       <- "~/GISdata/GPX/"
-gc_repo        <- "~/TRAIN/GoldenCheetah/"
+
+## gather all gpx files
+gpxlist <- c()
+for (ar in gpx_repos) {
+    templist  <- list.files(path        = ar,
+                            pattern     = ".gpx$",
+                            recursive   = T,
+                            full.names  = T,
+                            ignore.case = T)
+    gpxlist <- unique(c(gpxlist, templist))
+}
 
 
-#### list GPX files ####
-gpxlist   <- list.files(gpx_repo, ".gpx$",
-                        recursive   = T,
-                        full.names  = T,
-                        ignore.case = T)
-
-gclist    <- list.files(gc_repo, ".gpx$",
-                        recursive   = T,
-                        full.names  = T,
-                        ignore.case = T)
-
-## combine list
-gpxlist <- c(gpxlist, gclist)
 ## exclude some files
 # gpxlist <- gpxlist[grep("orig", basename(gpxlist), ignore.case = TRUE, invert = T)]
 

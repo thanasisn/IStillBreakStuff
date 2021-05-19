@@ -15,9 +15,9 @@ sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
 
 library(data.table)
 
-EPSG            <- 3857
-trackpoints_fl  <- paste0("~/GISdata/Count_sl2_",EPSG,".Rds")
-baseoutput      <- "~/GISdata/"
+## read vars
+source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
+
 resolution_spac <- 50       ## spacial resolution in meters
 resolution_temp <- 5 * 60   ## temporal resolution in seconds
 
