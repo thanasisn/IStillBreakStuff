@@ -1,8 +1,6 @@
 #!/usr/bin/env Rscript
 
-
 #### Create links of the sorted by location gpx files
-
 
 ####_ Set environment _####
 rm(list = (ls()[ls() != ""]))
@@ -10,28 +8,27 @@ Sys.setenv(TZ = "UTC")
 tic = Sys.time()
 Script.Name = funr::sys.script()
 
-
 library(data.table)
 
+## read vars
+source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
+
 outputrep     <- "~/ZHOST/Gpx_by_location/"
-polarrep      <- "~/ZHOST/Gpx_by_location/POLAR"
+# polarrep      <- "~/ZHOST/Gpx_by_location/POLAR"
 
-results       <- "~/GISdata/Location_list_2.Rds"
+fl_localized  <- paste0(baseoutput,"/Location_list.Rds")
 
-data <- readRDS(results)
+data <- readRDS(fl_localized)
 
+##TODO filter out some files
 data[FN<2]
 data[FN/N>0.1]
-
-gather_command <- "/home/athan/CODE/gpx_tools/gather_tracks_gpx.sh"
-
-
 
 ####  Create sorted links of characterized files  ##############################
 
 unlink(outputrep, recursive = TRUE)
 dir.create(path = outputrep)
-dir.create(path = polarrep)
+# dir.create(path = polarrep)
 
 for (ar in unique(data$Region)) {
     cat(paste("Region:", ar,"\n"))
@@ -59,7 +56,6 @@ for (ar in unique(data$Region)) {
         #         }
         #         file.symlink(af, target )
         #     }
-        #
         # } else {
 
         if (file.exists(af)) {
@@ -72,25 +68,19 @@ for (ar in unique(data$Region)) {
             file.symlink(af, target )
         }
         # }
-
-
-
     }
-
     ## Create gathered gpx file
     system(paste(gather_command,dir))
-
 }
-
 
 ## copy long plans as is
 file.symlink("~/GISdata/GPX/Plans/LONG",
              "~/ZHOST/Gpx_by_location/LONG")
+system(paste(gather_command, "~/ZHOST/Gpx_by_location/LONG"))
 ## copy all plans as is
 file.symlink("~/GISdata/GPX/Plans",
              "~/ZHOST/Gpx_by_location/PLANS")
-
-
+system(paste(gather_command, "~/ZHOST/Gpx_by_location/PLANS"))
 
 
 ####_ END _####

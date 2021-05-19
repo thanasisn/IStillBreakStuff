@@ -4,6 +4,7 @@
 
 ## It uses find to get all gpx file under root folder
 
+##FIXME don't work with spaces in filenames
 
 folderin="$1"
 
@@ -18,7 +19,7 @@ fi
 ff=""
 command=$(find "$folderin" -iname "*$pattern*.gpx" | sort | while read line; do
 printf "-"
-printf "f %s  " "$line"
+printf "f %s " "$line"
 done)
 
 # echo $command
