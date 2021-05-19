@@ -19,11 +19,11 @@ fi
 ff=""
 command=$(find "$folderin" -iname "*$pattern*.gpx" | sort | while read line; do
 printf "-"
-printf "f %s " "$line"
+printf "f%s "  "$line"
 done)
 
-# echo $command
-# echo "${folderin}GATHERED_TRACKS.gpx"
+echo $command
+
 
 targetfl="${folderin}/GATHERED_TRACKS.gpx"
 gpsbabel -i gpx $command -o gpx -F "$targetfl"

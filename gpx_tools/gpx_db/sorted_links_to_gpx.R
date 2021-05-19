@@ -14,7 +14,6 @@ library(data.table)
 source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 
 outputrep     <- "~/ZHOST/Gpx_by_location/"
-# polarrep      <- "~/ZHOST/Gpx_by_location/POLAR"
 
 fl_localized  <- paste0(baseoutput,"/Location_list.Rds")
 

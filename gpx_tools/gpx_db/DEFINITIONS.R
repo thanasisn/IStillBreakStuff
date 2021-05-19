@@ -57,6 +57,8 @@ resolution_lcz     <- 200
 fl_localized       <- paste0(baseoutput,"/Location_list.Rds")
 ## Command to gather all gpx in folder to one gpx file for osmand easy load
 gather_command <- "~/CODE/gpx_tools/gather_tracks_gpx.sh"
+## Export gpx track files by location
+outputrep     <- "~/ZHOST/Gpx_by_location/"
 
 
 ## Gather and process waypoints ####
