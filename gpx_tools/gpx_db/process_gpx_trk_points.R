@@ -237,10 +237,13 @@ for (res in rsls) {
         ## create all columns
         TRcnt <- copy(Dtrain[year(time)==ay])
         REcnt <- copy(Drest[ year(time)==ay])
+        ALcnt <- copy(DT[    year(time)==ay])
         TRcnt[ , X :=  (X %/% res * res) + (res/2) ]
         TRcnt[ , Y :=  (Y %/% res * res) + (res/2) ]
         REcnt[ , X :=  (X %/% res * res) + (res/2) ]
         REcnt[ , Y :=  (Y %/% res * res) + (res/2) ]
+        # ALcnt[ , X :=  (X %/% res * res) + (res/2) ]
+        # ALcnt[ , Y :=  (Y %/% res * res) + (res/2) ]
 
         TRpnts  <- TRcnt[ , .(.N ), by = .(X,Y) ]
         TRdays  <- TRcnt[ , .(N = length(unique(as.Date(time))) ), by = .(X,Y) ]
@@ -250,16 +253,23 @@ for (res in rsls) {
         REdays  <- REcnt[ , .(N = length(unique(as.Date(time))) ), by = .(X,Y) ]
         REhours <- REcnt[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )) ), by = .(X,Y) ]
 
+        # ALpnts  <- ALcnt[ , .(.N ), by = .(X,Y) ]
+        # ALdays  <- ALcnt[ , .(N = length(unique(as.Date(time))) ), by = .(X,Y) ]
+        # ALhours <- ALcnt[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )) ), by = .(X,Y) ]
+
         ## just to init data frame for merging
-        dummy <- unique(rbind( TRcnt[, .(X,Y)] , REcnt[, .(X,Y)] ))
+        dummy <- unique(rbind( TRcnt[, .(X,Y)], REcnt[, .(X,Y)], ALcnt[, .(X,Y)] ))
 
         ## nice names
         names(TRpnts )[names(TRpnts )=="N"] <- paste(ay,"Train","Points")
-        names(TRdays )[names(TRdays )=="N"] <- paste(ay,"Train","Days")
-        names(TRhours)[names(TRhours)=="N"] <- paste(ay,"Train","Hours")
-        names(REpnts )[names(REpnts )=="N"] <- paste(ay,"Rest","Points")
-        names(REdays )[names(REdays )=="N"] <- paste(ay,"Rest","Days")
-        names(REhours)[names(REhours)=="N"] <- paste(ay,"Rest","Hours")
+        names(TRdays )[names(TRdays )=="N"] <- paste(ay,"Train","Days"  )
+        names(TRhours)[names(TRhours)=="N"] <- paste(ay,"Train","Hours" )
+        names(REpnts )[names(REpnts )=="N"] <- paste(ay,"Rest", "Points")
+        names(REdays )[names(REdays )=="N"] <- paste(ay,"Rest", "Days"  )
+        names(REhours)[names(REhours)=="N"] <- paste(ay,"Rest", "Hours" )
+        # names(ALpnts )[names(ALpnts )=="N"] <- paste(ay,"ALL",  "Points")
+        # names(ALdays )[names(ALdays )=="N"] <- paste(ay,"ALL",  "Days"  )
+        # names(ALhours)[names(ALhours)=="N"] <- paste(ay,"ALL",  "Hours" )
 
         ## gather all to a data frame for a year
         aagg <- merge(dummy, TRpnts,  all = T )
@@ -268,6 +278,9 @@ for (res in rsls) {
         aagg <- merge(aagg,  REpnts,  all = T )
         aagg <- merge(aagg,  REdays,  all = T )
         aagg <- merge(aagg,  REhours, all = T )
+        # aagg <- merge(aagg,  ALpnts,  all = T )
+        # aagg <- merge(aagg,  ALdays,  all = T )
+        # aagg <- merge(aagg,  ALhours, all = T )
 
         ## gather columns for all years
         if (nrow(gather) == 0) {
@@ -291,7 +304,7 @@ for (res in rsls) {
     cols <- grep( "Total" , names(gather), value = T)
     for (at in typenames) {
         wecare <- grep(at, cols, value = T)
-        ncat <- paste("Total All", at)
+        ncat   <- paste("Total All", at)
         gather[[ncat]] <- rowSums( gather[, ..wecare ], na.rm = T)
         gather[[ncat]][gather[[ncat]]==0] <- NA
     }
