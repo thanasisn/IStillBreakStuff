@@ -28,8 +28,10 @@ gpx_repo     <- "~/GISdata/GPX/"
 wpt_seed     <- "~/GISdata/seed2.Rds"
 wpt_seed3    <- "~/GISdata/seed3.Rds"
 
+DRINKING_WATER <- TRUE
+WATERFALLS     <- TRUE
 
-update     <- FALSE
+update         <- FALSE
 
 #### list GPX files ####
 gpxlist   <- list.files(gpx_repo, ".gpx$",
@@ -130,6 +132,70 @@ if (length(gpxlist)>0) {
 
         }
     }
+}
+
+## Add drinking water from OSM ####
+if (DRINKING_WATER) {
+    ## load drinking water data
+    dw_fl     <- "~/GISdata/Layers/Auto/osm/Drinking_water.gpx"
+    dw        <- read_sf(dw_fl, layer = "waypoints")
+    ## clean data
+    dw$desc   <- gsub("\n"," ",dw$desc)
+    dw$desc   <- gsub("amenity=drinking_water","βρύση OSM",dw$desc)
+    dw$name   <- sub("node/[0-9]+","Βρύση",dw$name)
+    dw$name   <- paste("OSM",dw$name)
+
+    dw$file   <- dw_fl
+    dw$Region <- NA
+    dw$mtime  <- file.mtime(dw_fl)
+
+    dw        <- dw[wecare]
+
+    ## reproject to meters
+    dwm <- st_transform(dw, EPSG) # apply transformation to points sf
+
+    # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T)
+    # distmwt <- round(distmwt, digits = 3)
+
+    ## find close points
+    # dd <- which(distmwt < 5, arr.ind = T)
+
+    gather_wpt <- rbind( gather_wpt, dwm )
+    rm(dw,dwm)
+}
+
+## Add waterfalls from OSM ####
+if (WATERFALLS) {
+
+    ## load water falls data
+    dw_fl     <- "~/GISdata/Layers/Auto/osm/Waterfalls.gpx"
+    dw        <- read_sf(dw_fl, layer = "waypoints")
+    ## clean data
+    dw$desc   <- gsub("\n"," ",dw$desc)
+
+
+
+    dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
+    dw$name   <- sub("node/[0-9]+","Καταρράκτης",dw$name)
+    dw$name   <- paste("OSM",dw$name)
+
+    dw$file   <- dw_fl
+    dw$Region <- NA
+    dw$mtime  <- file.mtime(dw_fl)
+
+    dw        <- dw[wecare]
+
+    ## reproject to meters
+    dwm <- st_transform(dw, EPSG) # apply transformation to points sf
+
+    # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T)
+    # distmwt <- round(distmwt, digits = 3)
+
+    ## find close points
+    # dd <- which(distmwt < 5, arr.ind = T)
+
+    gather_wpt <- rbind( gather_wpt, dwm )
+    rm(dw,dwm)
 }
 
 
@@ -361,6 +427,8 @@ drop_files <- c(
     "WPT_hair_traps_rodopi_2015-06-28.gpx",
     "WPT_stanes_rodopi.gpx"
 )
+
+
 
 
 ## export gpx waypoints by region ####
