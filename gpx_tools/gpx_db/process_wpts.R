@@ -136,25 +136,26 @@ if (length(gpxlist)>0) {
 ## Add drinking water from OSM ####
 if (DRINKING_WATER) {
     ## load drinking water data
-    dw_fl     <- "~/GISdata/Layers/Auto/osm/Drinking_water_springs.gpx"
+    dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs.gpx"
     dw        <- read_sf(dw_fl, layer = "waypoints")
     ## clean data
     dw$desc   <- gsub("\n"," ",dw$desc)
 
+    ## overpass web interface
     ## parse drinking water
-    indx <- grep("amenity=drinking_water",dw$desc)
-    dw$desc[indx]   <- gsub("amenity=drinking_water","βρύση OSM",dw$desc[indx])
-    dw$name[indx]   <- sub("node/[0-9]+","vris",dw$name[indx])
+    # indx <- grep("amenity=drinking_water",dw$desc)
+    # dw$desc[indx]   <- gsub("amenity=drinking_water","βρύση OSM",dw$desc[indx])
+    # dw$name[indx]   <- sub("node/[0-9]+","vris",dw$name[indx])
     ## parse springs
-    indx <- grep("natural=spring",dw$desc)
-    dw$desc[indx]   <- gsub("natural=spring","Πηγή OSM",dw$desc[indx])
-    dw$name[indx]   <- sub("node/[0-9]+","pigi",dw$name[indx])
+    # indx <- grep("natural=spring",dw$desc)
+    # dw$desc[indx]   <- gsub("natural=spring","Πηγή OSM",dw$desc[indx])
+    # dw$name[indx]   <- sub("node/[0-9]+","pigi",dw$name[indx])
 
     # dw$name   <- paste("OSM",dw$name)
     dw$file   <- dw_fl
     dw$Region <- NA
     dw$mtime  <- file.mtime(dw_fl)
-    dw$sym    <- "Drinking Water"
+    # dw$sym    <- "Drinking Water"
 
     dw        <- dw[wecare]
 
