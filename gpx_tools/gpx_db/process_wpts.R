@@ -113,7 +113,6 @@ if (length(gpxlist)>0) {
             wpt$file   <- af
             wpt$Region <- NA
             wpt$mtime  <- file.mtime(af)
-            # gather_wpt <- c(gather_wpt, selc)
 
             gather_wpt <- rbind(gather_wpt,
                                 wpt[,wecare])
@@ -145,16 +144,17 @@ if (DRINKING_WATER) {
     ## parse drinking water
     indx <- grep("amenity=drinking_water",dw$desc)
     dw$desc[indx]   <- gsub("amenity=drinking_water","βρύση OSM",dw$desc[indx])
-    dw$name[indx]   <- sub("node/[0-9]+","Βρύση",dw$name[indx])
+    dw$name[indx]   <- sub("node/[0-9]+","vris",dw$name[indx])
     ## parse springs
     indx <- grep("natural=spring",dw$desc)
     dw$desc[indx]   <- gsub("natural=spring","Πηγή OSM",dw$desc[indx])
-    dw$name[indx]   <- sub("node/[0-9]+","Πηγή",dw$name[indx])
+    dw$name[indx]   <- sub("node/[0-9]+","pigi",dw$name[indx])
 
-    dw$name   <- paste("OSM",dw$name)
+    # dw$name   <- paste("OSM",dw$name)
     dw$file   <- dw_fl
     dw$Region <- NA
     dw$mtime  <- file.mtime(dw_fl)
+    dw$sym    <- "Drinking Water"
 
     dw        <- dw[wecare]
 
@@ -180,15 +180,13 @@ if (WATERFALLS) {
     ## clean data
     dw$desc   <- gsub("\n"," ",dw$desc)
 
-
-
     dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
-    dw$name   <- sub("node/[0-9]+","Καταρράκτης",dw$name)
-    dw$name   <- paste("OSM",dw$name)
+    dw$name   <- sub("node/[0-9]+","falls",dw$name)
 
     dw$file   <- dw_fl
     dw$Region <- NA
     dw$mtime  <- file.mtime(dw_fl)
+    dw$sym    <- "Dam"
 
     dw        <- dw[wecare]
 
