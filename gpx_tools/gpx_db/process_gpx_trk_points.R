@@ -237,7 +237,7 @@ for (res in rsls) {
         ## create all columns
         TRcnt <- copy(Dtrain[year(time)==ay])
         REcnt <- copy(Drest[ year(time)==ay])
-        ALcnt <- copy(DT[    year(time)==ay])
+        # ALcnt <- copy(DT[    year(time)==ay])
         TRcnt[ , X :=  (X %/% res * res) + (res/2) ]
         TRcnt[ , Y :=  (Y %/% res * res) + (res/2) ]
         REcnt[ , X :=  (X %/% res * res) + (res/2) ]
@@ -258,7 +258,8 @@ for (res in rsls) {
         # ALhours <- ALcnt[ , .(N = length(unique( as.numeric(time) %/% 3600 * 3600 )) ), by = .(X,Y) ]
 
         ## just to init data frame for merging
-        dummy <- unique(rbind( TRcnt[, .(X,Y)], REcnt[, .(X,Y)], ALcnt[, .(X,Y)] ))
+        dummy <- unique(rbind( TRcnt[, .(X,Y)], REcnt[, .(X,Y)] ))
+        # dummy <- unique(rbind( TRcnt[, .(X,Y)], REcnt[, .(X,Y)], ALcnt[, .(X,Y)] ))
 
         ## nice names
         names(TRpnts )[names(TRpnts )=="N"] <- paste(ay,"Train","Points")
