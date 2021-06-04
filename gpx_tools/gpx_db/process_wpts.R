@@ -176,18 +176,18 @@ if (DRINKING_WATER) {
 if (WATERFALLS) {
 
     ## load water falls data
-    dw_fl     <- "~/GISdata/Layers/Auto/osm/Waterfalls.gpx"
+    dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Waterfalls.gpx"
     dw        <- read_sf(dw_fl, layer = "waypoints")
     ## clean data
     dw$desc   <- gsub("\n"," ",dw$desc)
 
-    dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
-    dw$name   <- sub("node/[0-9]+","falls",dw$name)
+    # dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
+    # dw$name   <- sub("node/[0-9]+","falls",dw$name)
 
     dw$file   <- dw_fl
     dw$Region <- NA
     dw$mtime  <- file.mtime(dw_fl)
-    dw$sym    <- "Dam"
+    # dw$sym    <- "Dam"
 
     dw        <- dw[wecare]
 

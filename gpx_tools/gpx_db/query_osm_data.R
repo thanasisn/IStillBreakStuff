@@ -1,0 +1,235 @@
+#!/usr/bin/env Rscript
+
+#### Get data points from OSM using Overpass API
+
+
+####_ Set environment _####
+rm(list = (ls()[ls() != ""]))
+Sys.setenv(TZ = "UTC")
+tic = Sys.time()
+Script.Name = funr::sys.script()
+if(!interactive())pdf(file=sub("\\.R$",".pdf",Script.Name))
+sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
+Script.Base = sub("\\.R$","",Script.Name)
+
+
+
+
+
+
+library(osmdata)
+library(sf)
+
+## work around for
+curl::has_internet()
+assign("has_internet_via_proxy", TRUE, environment(curl::has_internet))
+curl::has_internet()
+
+bb_greece <- c(19.5,34.65,28.41,41.81)
+call      <- opq(bb_greece,  timeout = 1000)
+
+## Get drinking water and springs from OSM #####################################
+outfile <- "~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs.gpx"
+
+q1      <- add_osm_feature(call, key = "amenity", value =  "drinking_water")
+q1      <- osmdata_sf(q1)
+q1      <- q1$osm_points
+q1$sym  <-"Drinking Water"
+q1$desc <- "vrisi"
+saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Drinking_water.Rds")
+q2      <- add_osm_feature(call, key = 'natural', value = 'spring'         )
+q2      <- osmdata_sf(q2)
+q2      <- q2$osm_points
+q2$sym  <-"Parachute Area"
+q2$desc <- "pigi"
+saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_Springs.Rds")
+
+wecare <- intersect(names(q1),names(q2))
+
+Q <- rbind( q1[wecare], q2[wecare])
+
+Q$osm_id               <- NULL
+Q$wikipedia            <- NULL
+Q$wikidata             <- NULL
+Q$wheelchair           <- NULL
+Q$addr.city            <- NULL
+Q$created_by           <- NULL
+Q$source               <- NULL
+Q$operator             <- NULL
+Q$historic             <- NULL
+Q$tourism              <- NULL
+Q$access               <- NULL
+Q$bottle               <- NULL
+Q$drinking_water.legal <- NULL
+
+Q <- unique(Q)
+
+## replace na with spaces
+for (an in names(Q)) {
+    Q[as.vector(is.na(Q[,an])),an] <- ""
+}
+
+## create name field
+wenames <- c("alt_name", "int_name", "name.el", "name.en", "old_name")
+wenames <- names(Q)[names(Q) %in% wenames]
+
+for (an in wenames) {
+    Q$name <- paste(Q$name, Q[[an]])
+}
+
+Q$name <- gsub("[ ]+", " ", Q$name)
+Q$name <- gsub("^[ ]",  "", Q$name)
+Q$name <- gsub("[ ]$",  "", Q$name)
+
+## create desc field
+
+Q$cmt <- ""
+Q$cmt <- paste(Q$cmt, paste0(Q$amenity,"=",Q$drinking_water))
+Q$cmt <- paste(Q$cmt, paste0("natural","=",Q$natural))
+Q$cmt <- paste(Q$cmt, paste0("seasonal","=",Q$seasonal))
+Q$cmt <- paste(Q$cmt, paste0("thermal","=",Q$thermal))
+Q$cmt <- paste(Q$cmt, Q$description)
+Q$cmt <- paste(Q$cmt, Q$description.en)
+Q$cmt <- paste(Q$cmt, Q$note)
+
+Q$cmt <- gsub(" = ",             "", Q$cmt)
+Q$cmt <- gsub("drinking_water= ","", Q$cmt)
+Q$cmt <- gsub("natural= ",       "", Q$cmt)
+Q$cmt <- gsub("seasonal= ",      "", Q$cmt)
+Q$cmt <- gsub("thermal= ",       "", Q$cmt)
+
+Q$cmt <- gsub("[ ]+", " ", Q$cmt)
+Q$cmt <- gsub("^[ ]",  "", Q$cmt)
+Q$cmt <- gsub("[ ]$",  "", Q$cmt)
+
+
+## may be better without
+Q$name[Q$name == ""] <- NA
+Q$cmt[Q$cmt   == ""] <- NA
+Q$cmt[Q$desc  == ""] <- NA
+
+ss <- table(Q$name)
+
+EXP <- Q[,c("geometry","name","desc","sym","cmt")]
+write_sf(EXP, outfile, driver = "GPX", append = F, overwrite = T)
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Get waterfalls from OSM #####################################
+outfile <- "~/GISdata/Layers/Auto/osm/OSM_Waterfalls.gpx"
+
+q1      <- add_osm_feature(call, key = "waterway", value =  "waterfall")
+q1      <- osmdata_sf(q1)
+q1      <- q1$osm_points
+q1$sym  <-"Dam"
+q1$desc <- "falls"
+saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Waterfalls.Rds")
+
+
+# q1      <- add_osm_feature(call, key = "name", value =  "waterfall", value_exact = F, match_case = F)
+# q1      <- osmdata_sf(q1)
+# q1      <- q1$osm_points
+# q1$sym  <-"Dam"
+# q1$desc <- "falls"
+# saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Waterfalls.Rds")
+
+
+# wecare <- intersect(names(q1),names(q2))
+
+# Q <- rbind( q1[wecare], q2[wecare])
+Q <- q1
+
+Q$osm_id               <- NULL
+Q$wikipedia            <- NULL
+Q$wikidata             <- NULL
+Q$wheelchair           <- NULL
+Q$addr.city            <- NULL
+Q$created_by           <- NULL
+Q$source               <- NULL
+Q$operator             <- NULL
+Q$historic             <- NULL
+Q$tourism              <- NULL
+Q$access               <- NULL
+Q$bottle               <- NULL
+Q$drinking_water.legal <- NULL
+
+Q <- unique(Q)
+
+## replace na with spaces
+for (an in names(Q)) {
+    Q[as.vector(is.na(Q[,an])),an] <- ""
+}
+
+## create name field
+wenames <- c("alt_name", "int_name", "name.el", "name.en", "old_name")
+wenames <- names(Q)[names(Q) %in% wenames]
+
+for (an in wenames) {
+    Q$name <- paste(Q$name, Q[[an]])
+}
+
+Q$name <- gsub("[ ]+", " ", Q$name)
+Q$name <- gsub("^[ ]",  "", Q$name)
+Q$name <- gsub("[ ]$",  "", Q$name)
+
+## create desc field
+
+Q$cmt <- ""
+# Q$cmt <- paste(Q$cmt, paste0(Q$amenity,"=",Q$drinking_water))
+# Q$cmt <- paste(Q$cmt, paste0("natural","=",Q$natural))
+# Q$cmt <- paste(Q$cmt, paste0("seasonal","=",Q$seasonal))
+# Q$cmt <- paste(Q$cmt, paste0("thermal","=",Q$thermal))
+Q$cmt <- paste(Q$cmt, Q$description)
+Q$cmt <- paste(Q$cmt, Q$description.en)
+Q$cmt <- paste(Q$cmt, Q$note)
+#
+# Q$cmt <- gsub(" = ",             "", Q$cmt)
+# Q$cmt <- gsub("drinking_water= ","", Q$cmt)
+# Q$cmt <- gsub("natural= ",       "", Q$cmt)
+# Q$cmt <- gsub("seasonal= ",      "", Q$cmt)
+# Q$cmt <- gsub("thermal= ",       "", Q$cmt)
+
+Q$cmt <- gsub("[ ]+", " ", Q$cmt)
+Q$cmt <- gsub("^[ ]",  "", Q$cmt)
+Q$cmt <- gsub("[ ]$",  "", Q$cmt)
+
+
+## may be better without
+Q$name[Q$name == ""] <- NA
+Q$cmt[Q$cmt   == ""] <- NA
+Q$cmt[Q$desc  == ""] <- NA
+
+ss <- table(Q$name)
+
+EXP <- Q[,c("geometry","name","desc","sym","cmt")]
+write_sf(EXP, outfile, driver = "GPX", append = F, overwrite = T)
+
+
+
+
+
+
+# jsonfl <- "~/GISdata/Layers/Auto/osm/Drinking_water_springs.json"
+# sss    <- 'https://overpass-api.de/api/interpreter?data=%5Bout%3Ajson%5D%3B%28node%5B%22amenity%22%3D%22drinking%5Fwater%22%5D%2834%2E976001513176%2C18%2E74267578125%2C41%2E557921577804%2C28%2E2568359375%29%3Bnode%5B%22natural%22%3D%22spring%22%5D%2834%2E976001513176%2C18%2E74267578125%2C41%2E557921577804%2C28%2E2568359375%29%3B%29%3Bout%3B%3E%3Bout%20skel%20qt%3B%0A'
+#
+# utils::download.file(url = sss, destfile = jsonfl)
+# data <- fromJSON(file = jsonfl)
+
+
+
+
+
+####_ END _####
+tac = Sys.time(); difftime(tac,tic,units="mins")
+cat(paste("\n  --  ",  Script.Name, " DONE  --  \n\n"))
+cat(sprintf("%s H:%s U:%s S:%s T:%f\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
