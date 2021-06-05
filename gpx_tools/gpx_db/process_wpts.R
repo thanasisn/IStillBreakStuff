@@ -30,6 +30,7 @@ wpt_seed3    <- "~/GISdata/seed3.Rds"
 
 DRINKING_WATER <- TRUE
 WATERFALLS     <- TRUE
+CAVES          <- TRUE
 
 update         <- FALSE
 
@@ -39,6 +40,8 @@ gpxlist   <- list.files(gpx_repo, ".gpx$",
                         full.names  = T,
                         ignore.case = T)
 
+##FIXME duplicates work around
+file.remove(fl_waypoints)
 
 ## check if we need to update data ####
 if (file.exists(fl_waypoints)) {
@@ -133,6 +136,8 @@ if (length(gpxlist)>0) {
     }
 }
 
+
+
 ## Add drinking water from OSM ####
 if (DRINKING_WATER) {
     ## load drinking water data
@@ -155,8 +160,6 @@ if (DRINKING_WATER) {
     dw$file   <- dw_fl
     dw$Region <- NA
     dw$mtime  <- file.mtime(dw_fl)
-    # dw$sym    <- "Drinking Water"
-
     dw        <- dw[wecare]
 
     ## reproject to meters
@@ -171,6 +174,8 @@ if (DRINKING_WATER) {
     gather_wpt <- rbind( gather_wpt, dwm )
     rm(dw,dwm)
 }
+
+
 
 ## Add waterfalls from OSM ####
 if (WATERFALLS) {
@@ -187,15 +192,12 @@ if (WATERFALLS) {
     dw$file   <- dw_fl
     dw$Region <- NA
     dw$mtime  <- file.mtime(dw_fl)
-    # dw$sym    <- "Dam"
-
     dw        <- dw[wecare]
 
     ## reproject to meters
     dwm <- st_transform(dw, EPSG) # apply transformation to points sf
 
-    # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T)
-    # distmwt <- round(distmwt, digits = 3)
+    # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
 
     ## find close points
     # dd <- which(distmwt < 5, arr.ind = T)
@@ -203,6 +205,43 @@ if (WATERFALLS) {
     gather_wpt <- rbind( gather_wpt, dwm )
     rm(dw,dwm)
 }
+
+
+
+## Add caves from OSM ####
+if (WATERFALLS) {
+
+    ## load water falls data
+    dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Caves.gpx"
+    dw        <- read_sf(dw_fl, layer = "waypoints")
+    ## clean data
+    dw$desc   <- gsub("\n"," ",dw$desc)
+
+    # dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
+    # dw$name   <- sub("node/[0-9]+","falls",dw$name)
+
+    dw$file   <- dw_fl
+    dw$Region <- NA
+    dw$mtime  <- file.mtime(dw_fl)
+    dw        <- dw[wecare]
+
+    ## reproject to meters
+    dwm <- st_transform(dw, EPSG) # apply transformation to points sf
+
+    # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
+
+    ## find close points
+    # dd <- which(distmwt < 5, arr.ind = T)
+
+    gather_wpt <- rbind( gather_wpt, dwm )
+    rm(dw,dwm)
+}
+
+
+gather_wpt <- unique(gather_wpt)
+
+
+
 
 
 ## characterize all wpt ####
@@ -219,6 +258,7 @@ table( gather_wpt$Region )
 
 ## store for all R
 if (update) {
+    gather_wpt <- unique(gather_wpt)
     myRtools::write_RDS(gather_wpt, fl_waypoints)
 }
 
@@ -428,6 +468,8 @@ gather_wpt <- gather_wpt[ grep("[[:space:]]*ως εδώ[[:space:]]*",           
 gather_wpt <- gather_wpt[ grep("hotmail.com",                                  gather_wpt$name, invert = T, ignore.case = T), ]
 
 
+gather_wpt <- unique(gather_wpt)
+
 ttt<-table(gather_wpt$name)
 
 cat(paste("\n", nrow(gather_wpt),"waypoints after filtering \n\n" ))
@@ -456,6 +498,7 @@ for (ar in unique(gather_wpt$Region)) {
         sel  <- !grepl(ast, temp$desc)
         temp <- temp[sel,]
     }
+    temp <- unique(temp)
 
 
     ## export all data fot qgis with all metadata

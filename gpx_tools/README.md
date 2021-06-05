@@ -29,6 +29,8 @@ Things they can do:
 	- Clean, analyze, detect possible errors
 	- Create summaries of problems
 	- Create gridded aggregated data from all points for use in qgis
+    - Query POI from openstreetmap.
+    - Collect and categorize POI by region
 
 - Parse google location data (google_location)
     - **google_loc_export.R   :**   Export google location history to RDS

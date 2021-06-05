@@ -28,6 +28,7 @@ curl::has_internet()
 bb_greece <- c(19.5,34.65,28.41,41.81)
 call      <- opq(bb_greece,  timeout = 1000)
 
+
 ## Get drinking water and springs from OSM #####################################
 outfile <- "~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs.gpx"
 cat(paste("Query for drinking water and springs\n"))
@@ -91,13 +92,10 @@ cnames <- unique(c("Вода",           "Drinking water",
                    "Eski Çeşme",     "Soğuksu Pınarı",
                    "Source"))
 for (cn in cnames) {
-    Q$name <- sub(paste0("^",cn,"$"), "", Q$name)
+    Q$name <- sub(paste0("^",cn,"$"), "", Q$name, ignore.case = T)
 }
 
 ss<-table(Q$name)
-
-
-## create desc field
 
 Q$cmt <- ""
 Q$cmt <- paste(Q$cmt, paste0(Q$amenity,"=",Q$drinking_water))
@@ -126,8 +124,10 @@ Q$cmt[Q$desc  == ""] <- NA
 
 ss <- table(Q$name)
 
+## export data
 EXP <- Q[,c("geometry","name","desc","sym","cmt")]
 write_sf(EXP, outfile, driver = "GPX", append = F, overwrite = T)
+
 
 
 
@@ -142,17 +142,7 @@ q1$sym  <-"Dam"
 q1$desc <- "falls"
 saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Waterfalls.Rds")
 
-# q2      <- add_osm_feature(call, key = 'name', value = 'βάθρ', value_exact = F, match_case = F         )
-# q2      <- osmdata_sf(q2)
-# q2      <- q2$osm_points
-# q2$sym  <-"PArea"
-# q2$desc <- "pi"
-# saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_Spris.Rds")
-
-# wecare <- intersect(names(q1),names(q2))
-
-# Q <- rbind( q1[wecare], q2[wecare])
-Q <- q1
+Q <-    q1
 
 Q$osm_id               <- NULL
 Q$wikipedia            <- NULL
@@ -189,16 +179,6 @@ Q$name <- gsub("^[ ]",  "", Q$name)
 Q$name <- gsub("[ ]$",  "", Q$name)
 
 
-# cnames <- unique(c("Вода",           "Drinking water",
-#                    "Source"))
-# for (cn in cnames) {
-#     Q$name <- sub(paste0("^",cn,"$"), "", Q$name)
-# }
-# ss<-table(Q$name)
-
-
-## create desc field
-
 Q$cmt <- ""
 # Q$cmt <- paste(Q$cmt, paste0(Q$amenity,"=",Q$drinking_water))
 # Q$cmt <- paste(Q$cmt, paste0("natural","=",Q$natural))
@@ -226,6 +206,7 @@ Q$cmt[Q$desc  == ""] <- NA
 
 ss <- table(Q$name)
 
+## export data
 EXP <- Q[,c("geometry","name","desc","sym","cmt")]
 write_sf(EXP, outfile, driver = "GPX", append = F, overwrite = T)
 
@@ -233,7 +214,87 @@ write_sf(EXP, outfile, driver = "GPX", append = F, overwrite = T)
 
 
 
+## Get caves #####################################
+outfile <- "~/GISdata/Layers/Auto/osm/OSM_Caves.gpx"
+cat(paste("Query for caves\n"))
 
+# node["natural"="cave"]({{bbox}});
+# node["natural"~"cave"]({{bbox}});
+# node[~"^name(:.*)?$"~"cave",i]({{bbox}});
+
+q1      <- add_osm_feature(call, key = "natural",      value =  "cave",
+                           value_exact = FALSE )
+q1      <- osmdata_sf(q1)
+q1      <- q1$osm_points
+q2      <- add_osm_feature(call,   key = "^name(:.*)?$", value =  "cave",
+                           value_exact = FALSE, key_exact = FALSE, match_case = FALSE  )
+q2      <- osmdata_sf(q2)
+q2      <- q2$osm_points
+
+wecare  <- intersect(names(q1),names(q2))
+Q       <- rbind( q1[wecare], q2[wecare])
+
+Q$sym  <- "Mine"
+Q$desc <- "cave"
+
+saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_Caves.Rds")
+
+
+Q$osm_id               <- NULL
+Q$wikipedia            <- NULL
+Q$wikidata             <- NULL
+
+Q <- unique(Q)
+
+## replace na with spaces
+for (an in names(Q)) {
+    Q[as.vector(is.na(Q[,an])),an] <- ""
+}
+
+grep("name",names(Q), value = T)
+
+## create name field from many
+wenames <- c("alt_name", "int_name", "name.el", "name.en", "old_name")
+wenames <- names(Q)[names(Q) %in% wenames]
+for (an in wenames) {
+    Q$name <- paste(Q$name, Q[[an]])
+}
+
+## clean names
+Q$name <- gsub("[ ]+", " ", Q$name)
+Q$name <- gsub("^[ ]",  "", Q$name)
+Q$name <- gsub("[ ]$",  "", Q$name)
+
+cnames <- unique(c("Cave",   "Shpellë",
+                   "Σπηλιά", "Σπήλαιο"))
+for (cn in cnames) {
+    Q$name <- sub(paste0("^",cn,"$"), "", Q$name, ignore.case = T)
+}
+
+ss<-table(Q$name)
+
+Q$cmt <- ""
+Q$cmt <- paste(Q$cmt, Q$description)
+Q$cmt <- paste(Q$cmt, Q$description.en)
+Q$cmt <- paste(Q$cmt, Q$note)
+
+Q$cmt <- gsub("[ ]+", " ", Q$cmt)
+Q$cmt <- gsub("^[ ]",  "", Q$cmt)
+Q$cmt <- gsub("[ ]$",  "", Q$cmt)
+
+## may be better without
+Q$name[Q$name == ""] <- NA
+Q$cmt[Q$cmt   == ""] <- NA
+Q$cmt[Q$desc  == ""] <- NA
+
+## export data
+EXP <- Q[,c("geometry","name","desc","sym","cmt")]
+write_sf(EXP, outfile, driver = "GPX", append = F, overwrite = T)
+
+
+
+
+## another approach
 # jsonfl <- "~/GISdata/Layers/Auto/osm/Drinking_water_springs.json"
 # sss    <- 'https://overpass-api.de/api/interpreter?data=%5Bout%3Ajson%5D%3B%28node%5B%22amenity%22%3D%22drinking%5Fwater%22%5D%2834%2E976001513176%2C18%2E74267578125%2C41%2E557921577804%2C28%2E2568359375%29%3Bnode%5B%22natural%22%3D%22spring%22%5D%2834%2E976001513176%2C18%2E74267578125%2C41%2E557921577804%2C28%2E2568359375%29%3B%29%3Bout%3B%3E%3Bout%20skel%20qt%3B%0A'
 # utils::download.file(url = sss, destfile = jsonfl)
