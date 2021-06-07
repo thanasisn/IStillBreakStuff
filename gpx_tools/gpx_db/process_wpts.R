@@ -141,7 +141,7 @@ if (length(gpxlist)>0) {
 ## Add drinking water from OSM ####
 if (DRINKING_WATER) {
     ## load drinking water data
-    dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs.gpx"
+    dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs_Gr.gpx"
     dw        <- read_sf(dw_fl, layer = "waypoints")
     ## clean data
     dw$desc   <- gsub("\n"," ",dw$desc)
@@ -181,7 +181,7 @@ if (DRINKING_WATER) {
 if (WATERFALLS) {
 
     ## load water falls data
-    dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Waterfalls.gpx"
+    dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Waterfalls_Gr.gpx"
     dw        <- read_sf(dw_fl, layer = "waypoints")
     ## clean data
     dw$desc   <- gsub("\n"," ",dw$desc)
@@ -212,7 +212,7 @@ if (WATERFALLS) {
 if (WATERFALLS) {
 
     ## load water falls data
-    dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Caves.gpx"
+    dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Caves_Gr.gpx"
     dw        <- read_sf(dw_fl, layer = "waypoints")
     ## clean data
     dw$desc   <- gsub("\n"," ",dw$desc)
