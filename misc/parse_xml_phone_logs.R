@@ -22,90 +22,129 @@ library(myRtools)
 
 data_folder = "~/LOGs/sms/"
 
+# grep -h "<call " ./call/call*.xml | sort -u > Callall.xml
 
 ## parse all xml call logs ##
-old_files <- list.files(path = data_folder,
-                        pattern = "calls.*\\.xml",
-                        full.names = T,
-                        recursive = T)
+# old_files <- list.files(path = data_folder,
+#                         pattern = "calls.*\\.xml",
+#                         full.names = T,
+#                         recursive = T)
+old_files <- c("~/LOGs/sms/Callall.xml")
+
 gather <- data.frame()
-if (length(old_files) > 0) {
-    for ( af in old_files) {
-        cat(paste(af), sep = "\n")
+if (!file.exists(old_files[1])) {
+    cat(paste("NO CALL FILES\n"))
+} else {
+    if (length(old_files) > 0) {
+        for ( af in old_files) {
+            cat(paste(af), sep = "\n")
 
-        ## read a file
-        data  <- xmlParse(af)
-        dd    <- xmlToList(data)
+            ## read a file
+            data  <- xmlParse(af)
+            dd    <- xmlToList(data)
 
-        ##FIXME this is slow
-        ## create dataframe from uneven rows
-        for (aa in dd) {
-            gather <- plyr::rbind.fill(gather, data.frame(t(aa)))
+            ##FIXME this is slow
+            ## create dataframe from uneven rows
+            for (aa in dd) {
+                gather <- plyr::rbind.fill(gather, data.frame(t(aa), stringsAsFactors = FALSE))
+            }
         }
+        ## clean often too many dups
+        gather <- unique( gather )
+
+        ## clean calls logs
+        gather$backup_set  <- NULL
+        gather$backup_date <- NULL
+        gather$post_dial_digits[gather$post_dial_digits == "" ]     <- NA
+        gather$post_dial_digits[gather$post_dial_digits == "null" ] <- NA
+        gather$post_dial_digits[is.null(gather$post_dial_digits)]   <- NA
+
+        gather$subscription_component_name[ gather$subscription_component_name == "null" ] <- NA
+        gather$subscription_component_name[ gather$subscription_component_name == "com.android.phone/com.android.services.telephony.TelephonyConnectionService" ] <- NA
+
+        unique( gather$post_dial_digits )
+
+        gather <- gather[ !(is.na(gather$date) & is.na(gather$number)), ]
+        vec    <- vapply(gather, function(x) length(unique(x)) > 1, logical(1L))
+        gather <- gather[ , vec ]
+
+        gather <- unique( gather )
+        ## untested
+        # gather <- gather[!duplicated(gather[,!(names(gather) %in% c("readable_date"))]),]
+
+        # as.POSIXct(as.numeric(gather$date), origin = "1970-01-01")
+
+        ## store xml data
+        exp_fl <- paste0(data_folder,"/Calls_xml_",format(Sys.time(),"%F_%T"))
+        write_dat(gather, exp_fl)
+        write_RDS(gather, exp_fl)
+
+        cat(paste("\nRemove CALLs xml files and move", exp_fl, "to data storage\n"))
     }
-    ## clean often too many dups
-    gather <- unique( gather )
-
-    ## clean calls logs
-    gather$backup_set  <- NULL
-    gather$backup_date <- NULL
-    gather <- gather[ !(is.na(gather$date) & is.na(gather$number)), ]
-    vec    <- vapply(gather, function(x) length(unique(x)) > 1, logical(1L))
-    gather <- gather[ , vec ]
-
-    ## store xml data
-    exp_fl <- paste0(data_folder,"/Calls_xml_",format(Sys.time(),"%F_%T"))
-    write_dat(gather, exp_fl)
-    write_RDS(gather, exp_fl)
-
-    cat(paste("\nRemove CALLs xml files and move", exp_fl, "to data storage\n"))
 }
 
 
-stop()
+
+# grep -h "<sms " ./sms/sms*.xml | sort -u > SMSall.xml
+
+
 
 ## parse all xml sms logs ##
 
-old_files <- list.files(path = data_folder,
-                        pattern = "sms.*\\.xml",
-                        full.names = T,
-                        recursive = T)
+# old_files <- list.files(path = data_folder,
+#                         pattern = "sms.*\\.xml",
+#                         full.names = T,
+#                         recursive = T)
+
+old_files <- c("~/LOGs/sms/SMSall.xml")
 
 gather <- data.frame()
-if (length(old_files) > 0) {
-    for ( af in old_files) {
-        cat(paste(af), sep = "\n")
+if (!file.exists(old_files[1])) {
+    cat(paste("NO CALL FILES\n"))
+} else {
+    if (length(old_files) > 0) {
+        for ( af in old_files) {
+            cat(paste(af), sep = "\n")
 
-        ## read a file
-        data  <- xmlParse(af)
-        dd    <- xmlToList(data)
+            ## read a file
+            data  <- xmlParse(af)
+            dd    <- xmlToList(data)
 
-        ## create dataframe from uneven rows
-        for (aa in dd) {
-            gather <- plyr::rbind.fill(gather, data.frame(t(aa)))
+            ##FIXME this is slow
+            ## create dataframe from uneven rows
+            for (aa in dd) {
+                gather <- plyr::rbind.fill(gather, data.frame(t(aa), stringsAsFactors = FALSE))
+            }
         }
+        ## clean often too many dups
+        gather <- unique( gather )
+
+        ## clean calls logs
+        gather$backup_set  <- NULL
+        gather$backup_date <- NULL
+        gather$read        <- NULL
+        gather$sub_id      <- NULL
+
+        gather <- gather[ !is.na(gather$date) , ]
+        vec    <- vapply(gather, function(x) length(unique(x)) > 1, logical(1L))
+        gather <- gather[ , vec ]
+
+        gather <- unique( gather )
+        gather <- gather[!duplicated(gather[,!(names(gather) %in% c("readable_date"))]),]
+
+        # as.POSIXct(as.numeric(gather$date), origin = "1970-01-01")
+
+        ## store xml data
+        exp_fl <- paste0(data_folder,"/SMS_xml_",format(Sys.time(),"%F_%T"))
+        write_dat(gather, exp_fl)
+        write_RDS(gather, exp_fl)
+
+        # cat(paste("\nRemove CALLs xml files and move", exp_fl, "to data storage\n"))
     }
-    ## clean often too many dups
-    gather <- unique( gather )
-
-    stop()
-    ## clean calls logs
-    gather$backup_set  <- NULL
-    gather$backup_date <- NULL
-    gather <- gather[ !(is.na(gather$date) & is.na(gather$number)), ]
-    vec    <- vapply(gather, function(x) length(unique(x)) > 1, logical(1L))
-    gather <- gather[ , vec ]
-
-    ## store xml data
-    exp_fl <- paste0(data_folder,"/SMS_xml_",format(Sys.time(),"%F_%T"))
-    write_dat(gather, exp_fl)
-    write_RDS(gather, exp_fl)
-
-    cat(paste("\nRemove SMSs xml files and move", exp_fl, "to data storage\n"))
 }
 
-
-
+## remove sms keep mms
+# find . -name "*" -type f | xargs sed -i  -e '/ <sms pr/d'
 
 
 ####_ END _####
