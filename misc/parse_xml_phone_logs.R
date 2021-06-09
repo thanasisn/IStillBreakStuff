@@ -1,8 +1,7 @@
 #!/usr/bin/env Rscript
 
-
 #### Parse xml logs from phone
-## Data created by "SMS Backup & Restore" app
+## Data in xml files created by "SMS Backup & Restore" app
 
 ####_ Set environment _####
 closeAllConnections()
@@ -14,17 +13,20 @@ tic = Sys.time()
 # sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
 
 
-
 library(XML)
 library(myRtools)
 
 
-
+## root of all xml files
 data_folder = "~/LOGs/sms/"
 
+
+
+## Parse all xml call logs #####################################################
+
+## Better use bash tools to merge files before parsing
 # grep -h "<call " ./call/call*.xml | sort -u > Callall.xml
 
-## parse all xml call logs ##
 # old_files <- list.files(path = data_folder,
 #                         pattern = "calls.*\\.xml",
 #                         full.names = T,
@@ -69,7 +71,8 @@ if (!file.exists(old_files[1])) {
         gather <- gather[ , vec ]
 
         gather <- unique( gather )
-        ## untested
+
+        ## untested ignore different formating of readable date
         # gather <- gather[!duplicated(gather[,!(names(gather) %in% c("readable_date"))]),]
 
         # as.POSIXct(as.numeric(gather$date), origin = "1970-01-01")
@@ -84,12 +87,14 @@ if (!file.exists(old_files[1])) {
 }
 
 
+## Parse all xml sms logs ######################################################
 
+## Better use bash tools to merge files before parsing
 # grep -h "<sms " ./sms/sms*.xml | sort -u > SMSall.xml
 
+##FIXME remove sms and keel mms entries in files
+# find . -name "*" -type f | xargs sed -i -e '/ <sms pr/d'
 
-
-## parse all xml sms logs ##
 
 # old_files <- list.files(path = data_folder,
 #                         pattern = "sms.*\\.xml",
@@ -130,6 +135,7 @@ if (!file.exists(old_files[1])) {
         gather <- gather[ , vec ]
 
         gather <- unique( gather )
+        ## ignore different formatting of readable date
         gather <- gather[!duplicated(gather[,!(names(gather) %in% c("readable_date"))]),]
 
         # as.POSIXct(as.numeric(gather$date), origin = "1970-01-01")
@@ -142,9 +148,6 @@ if (!file.exists(old_files[1])) {
         # cat(paste("\nRemove CALLs xml files and move", exp_fl, "to data storage\n"))
     }
 }
-
-## remove sms keep mms
-# find . -name "*" -type f | xargs sed -i  -e '/ <sms pr/d'
 
 
 ####_ END _####
