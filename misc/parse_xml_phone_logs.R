@@ -92,7 +92,7 @@ if (!file.exists(old_files[1])) {
 ## Better use bash tools to merge files before parsing
 # grep -h "<sms " ./sms/sms*.xml | sort -u > SMSall.xml
 
-##FIXME remove sms and keel mms entries in files
+##FIXME remove sms and keep mms entries in files
 # find . -name "*" -type f | xargs sed -i -e '/ <sms pr/d'
 
 
