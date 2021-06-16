@@ -6,6 +6,8 @@ A collection of tools for gps files. Mainly centered on .gpx files.
 I use a lot of them to process data from garmin etrex device.
 
 Things they can do:
+
+
 - **etrex_sync.sh                :**   Get all gpx files from etrex, update maps and some other files
 - **gather_tracks_gpx.sh         :**   Gather multiple gpx files to a single gpx file
 - **gdb_to_gpx.sh                :**   Convert gdb to gpx
@@ -13,6 +15,7 @@ Things they can do:
 - **gpx_plot_compare_files.R     :**   Compare multiple gpx files
 - **gpx_remove_spaces.sh         :**   Reduce xml file size by removing spaces tabs and newlines.
 - **gpx_simplify_crosstrack.sh   :**   Simplify track within an error limit.
+- **gpx_split_track_wpt_route.sh :**   Split a gpx file to tracks, waypoints and routes files
 - **gpx_to_csv.sh                :**   Convert track gpx to csv
 - **gpx_to_gdb.sh                :**   Convert gpx to gdb
 - **gpx_to_gpx.sh                :**   Convert gpx to gpx
