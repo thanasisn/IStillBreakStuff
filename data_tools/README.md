@@ -6,8 +6,9 @@ Tools and methods of data analysis for different purposes.
 
 
 
-- **textualise.sh :**   Extract text from pdf, doc, djv, and text files, for analysis
 
+- **parse_xml_phone_logs.R :**   Parse xml logs from phone
+- **textualise.sh          :**   Extract text from pdf, doc, djv, and text files, for analysis and fingerprinting with other tools
 
 
 
