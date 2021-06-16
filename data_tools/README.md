@@ -2,7 +2,7 @@
 
 # data_tools
 
-Tools and methods of data analysis for different purposes.
+Tools and methods for data analysis and parsing  for different purposes.
 
 
 
