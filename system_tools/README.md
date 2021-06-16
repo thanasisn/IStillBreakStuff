@@ -9,7 +9,7 @@ They are just convenient tools for the terminal.
 Things they do:
 
 
-
+- **auto_commit_push_git.sh     :**   Auto commit and push all git repos
 - **clean_metadata.sh           :**   Remove metadata from any file using exiftool
 - **compression_tests.sh        :**   Compress something with multiple algorithms and compression levels
 - **count_word_frequency.sh     :**   Count word frequency
@@ -29,6 +29,7 @@ Things they do:
 - **speedup_clock.sh            :**   Speed up the time of a linux machine by adding a fixed amount of time at every interval
 - **throttle_by_temp.sh         :**   Throttle a process cpu usage according to cpu temperature
 - **touch_random.sh             :**   Randomize files and folders dates
+
 
 
 *Suggestions and improvements are always welcome.*
