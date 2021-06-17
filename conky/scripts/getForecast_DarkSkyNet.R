@@ -12,6 +12,7 @@ Sys.setenv(TZ = "UTC")
 # https://www.apixu.com/
 
 library(darksky)
+library(data.table)
 readRenviron("~/.Renviron")
 
 
@@ -45,8 +46,9 @@ if (file.exists(CURRENT_FL)) {
 } else {
     curr <- data.frame()
 }
-curr <- rbind(curr,
-              res_fr$currently)
+curr <- rbind(data.table( curr ),
+              data.table( res_fr$currently),
+              fill = T)
 saveRDS(curr, CURRENT_FL)
 print(curr)
 
