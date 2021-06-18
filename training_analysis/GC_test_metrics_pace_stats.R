@@ -41,32 +41,35 @@ hist( train$TPace )
 hist( train$`60_min_Peak_Pace` )
 
 
+VAR <- "Pace"
 
 
 layout(matrix(c(1,2), 2, 1, byrow = TRUE))
 par(mar = c(4,4,1,1))
 
-if (nrow(train > 0)) {
-## pace by distance class for training
-breakby <- 5 # km
-bb <- train[, .(MeanPace = mean(Pace), N = .N), by = .( DistClass = breakby*( (breakby/2 + Distance) %/% breakby )) ]
-bb <- bb[ DistClass > 0 ]
-setorder(bb, DistClass)
+if ( nrow(train) > 0 ) {
+    ## pace by distance class for training
+    breakby <- 5 # km
+    bb <- train[, .(MeanPace = mean(Pace), N = .N),
+                by = .( DistClass = breakby*( (breakby/2 + Distance) %/% breakby )) ]
+    bb <- bb[ DistClass > 0 ]
+    setorder(bb, DistClass)
 
-barplot(bb$MeanPace,names.arg = bb$DistClass, density = bb$N,
-        xlab = "Distance class", ylab = "Pace min/km")
+    barplot(bb$MeanPace,names.arg = bb$DistClass, density = bb$N,
+            xlab = "Distance class", ylab = "Pace min/km")
 }
 
 
-if (nrow(race > 0)){
-## pace by distance class for race
-breakby <- 20 # km
-bb <- race[, .(MeanPace = mean(Pace), N = .N), by = .( DistClass = breakby*( (breakby/2 + Distance) %/% breakby )) ]
-bb <- bb[ DistClass > 0 ]
-setorder(bb, DistClass)
+if ( nrow(race) > 0 ){
+    ## pace by distance class for race
+    breakby <- 20 # km
+    bb <- race[, .(MeanPace = mean(Pace), N = .N),
+               by = .( DistClass = breakby*( (breakby/2 + Distance) %/% breakby )) ]
+    bb <- bb[ DistClass > 0 ]
+    setorder(bb, DistClass)
 
-barplot(bb$MeanPace,names.arg = bb$DistClass, density = bb$N,
-        xlab = "Distance class", ylab = "Pace min/km")
+    barplot(bb$MeanPace,names.arg = bb$DistClass, density = bb$N,
+            xlab = "Distance class", ylab = "Pace min/km")
 }
 
 
