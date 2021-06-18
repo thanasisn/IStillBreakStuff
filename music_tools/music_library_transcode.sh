@@ -34,8 +34,10 @@ fsta="${ldir}/$(basename "$0")_$ID.status"
 info()   { echo "$(date +'%F %T') ::INF::${SCRIPT}::${ID}:: $* ::" >>"$fsta"; }
 status() { echo "$(date +'%F %T') ::STA::${SCRIPT}::${ID}:: $* ::" >>"$fsta"; }
 
-LOG_FILE="/tmp/$(basename $0)_$(date +%F_%R).log"
-ERR_FILE="/tmp/$(basename $0)_$(date +%F_%R).err"
+mkdir -p "$(dirname "$0")/LOGs/"
+LOG_FILE="$(dirname "$0")/LOGs/$(basename "$0")_$(date +%F_%T).log"
+ERR_FILE="$(dirname "$0")/LOGs/$(basename "$0")_$(date +%F_%T).err"
+touch "$LOG_FILE" "$ERR_FILE"
 
 exec  > >(tee -i "${LOG_FILE}")
 exec 2> >(tee -i "${ERR_FILE}")
@@ -71,9 +73,9 @@ find "$IN" -type f -iname "*.wma"
               sed 's@.wma$@.mp3@g'  |\
               sed 's,'"$IN","$OUT\/"',g' )"
         dir="$(dirname "$OF")"
-    
+
         mkdir -p "$dir"
-    
+
         ## skip existing files
         if [ ! -e "$OF" ]; then
             echo "$cc/$nflac :: $(basename "$dir") :: $(basename "$OF") "
@@ -90,7 +92,7 @@ find "$IN" -type f -iname "*.wma"
         else
             echo "EXIST: $OF"
         fi
-    else 
+    else
         echo "Missing source $mfile"
     fi
 
@@ -106,15 +108,15 @@ find "$IN" -type f -iname "*.mp3" | while read mfile; do
 
     ## skip deleted files
     if [ -e "$mfile" ] ; then
-    
+
         OF="$(echo "$mfile" | sed 's,'"$IN","$OUT\/"',g'  | sed 's@FLAC@MUSIC@' | sed 's@!NOFLAC@MUSIC@'  )"
         dir="$(dirname "$OF")"
-    
+
         mkdir -p "$dir"
-    
+
         ## get bitrate of original file
         bbt="$(file "$mfile" | sed 's/.*, \(.*\)kbps.*/\1/' | tr -d " ")"
-    
+
         ## check bitrate
         if [[ $bbt -ge $BIT ]]; then
             ## re encode mp3
