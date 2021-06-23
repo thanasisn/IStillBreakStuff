@@ -13,8 +13,19 @@ for pp in {1..20}; do
     echo "PAGE $pp"
 
     ## search term
-    url="https://www.car.gr/classifieds/cars/?fs=1&condition=used&price-from=%3E4000&price-to=%3C15000&mileage-to=%3C175000&fuel_type=2&drive_type=4x4&euroclass=6&euroclass=7&euroclass=9&pg=$pp"
+    url="https://www.car.gr/classifieds/cars/?fs=1&condition=used&offer_type=sale&price-from=%3E4000&price-to=%3C17000&mileage-to=%3C200000&drive_type=4x4&engine_size-to=2000&euroclass=5&euroclass=6&euroclass=7&euroclass=9&pg=$pp"
 
+    ## Diesel: &fuel_type=2
+
+
+    echo 
+    echo "$url"
+    echo
+   
+
+    #                  -display_charset=utf-8  \
+    #                  -assume_charset=utf-8   \ 
+    
     ## get search results
     downlist="$(lynx -read_timeout=30        \
                      -connect_timeout=30     \
@@ -32,23 +43,25 @@ for pp in {1..20}; do
 
     ## get all search results
     echo "$downlist" | while read line; do
-        echo "Reading $line"
 
         targetfile="$(basename $line)"
-        newfile="${REPO}/${targetfile}_$(date +%F)"
+        newfile="${REPO}/${targetfile}_$(date +%F).txt"
 
         ## skip existing
         if [[ -e "$newfile" ]]; then
             echo "SKIP $newfile exist "
             continue
         fi
+        
+        echo "GET  $line $targetfile"
 
         ## get post
         POST="$(lynx -read_timeout=30        \
-             -connect_timeout=30     \
-             -dump -width 1000000    \
-             -nolist                 \
-             "$line")"
+                     -connect_timeout=30     \
+                     -dump -width 1000000    \
+                     -nolist                 \
+                     "$line")"
+
 
         ## store data for later
         (
@@ -56,8 +69,9 @@ for pp in {1..20}; do
         echo "CAPTURE DATE::$(date +%F_%T)"
         echo ""
         echo "$POST" |\
+            sed '1,/  Σύνδεση Δωρεάν Καταχώρηση/d' |\
             sed '/Παρόμοιες αναζητήσεις/,$d'
-        ) > "$newfile"
+        ) | iconv -c -f utf-8 -t utf-8 > "$newfile"
 
         ## be nice
         sleep 10s
