@@ -1,7 +1,7 @@
 #!/bin/bash
 ## created on 2021-06-23
 
-#### Scrap data data from car.gr for processing
+#### Scrap data from car.gr for processing
 
 
 REPO="$HOME/LOGs/car_gr_repo"
