@@ -25,6 +25,8 @@ echo "--------------------------"
 
 
 
+(
+    ## get all library(*) declarations
     find "$FOLDER" -type f  \
                 -not -path "*/old/*"         \
                 -iname "*.R" -or             \
@@ -32,60 +34,58 @@ echo "--------------------------"
                 xargs grep -h "library("     |\
                 sed '/[ ]*#/d'               |\
                 tr -d \"                     |\
-                tr -d \'
+                tr -d \'                     |\
+                sed 's/.*(\([^]]*\)).*/\1/g' |\
+                sed 's/[, ].*//g'            |\
+                sed '/"/d'                   |\
+                sort -u
+
+    ## get all require(*) declarations
+    find "$FOLDER" -type f  \
+                -not -path "*/old/*"         \
+                -iname "*.R" -or             \
+                -iname "*.Rmd"               |\
+                xargs grep -h "require("     |\
+                sed '/[ ]*#/d'               |\
+                tr -d \"                     |\
+                tr -d \'                     |\
+                sed 's/.*(\([^]]*\)).*/\1/g' |\
+                sed 's/[, ].*//g'            |\
+                sed '/"/d'                   |\
+                sort -u
 
 
-# (
-#     ## get all library(*) declarations
-#     find "$FOLDER" -type f  \
-#                 -not -path "*/old/*"         \
-#                 -iname "*.R" -or             \
-#                 -iname "*.Rmd"               |\
-#                 xargs grep -h "library"      |\
-#                 sed 's/#.*$//g'              |\
-#                 tr -d \"                     |\
-#                 tr -d \'                     |\
-#                 sed 's/.*(\([^]]*\)).*/\1/g' |\
-#                 sed '/"/d'                   |\
-#                 sort -u
-#
-#     ## get all require(*) declarations
-#     find "$FOLDER" -type f  \
-#                 -not -path "*/old/*"         \
-#                 -iname "*.R" -or             \
-#                 -iname "*.Rmd"               |\
-#                 xargs grep -h "require"      |\
-#                 sed 's/#.*$//g'              |\
-#                 tr -d \"                     |\
-#                 tr -d \'                     |\
-#                 sed 's/.*(\([^]]*\)).*/\1/g' |\
-#                 sed '/"/d'                   |\
-#                 sort -u
-#
-#
-#     ## get all *:: declarations
-#     find "$FOLDER" -type f  \
-#                 -not -path "*/old/*"    \
-#                 -iname "*.R" -or        \
-#                 -iname "*.Rmd"          |\
-#                 xargs grep -h "::"      |\
-#                 sed 's@\(.*\)::.*@\1@g' |\
-#                 grep -oE '[^ ({=]+$'    |\
-#                 sed '/"/d'              |\
-#                 sort -u
-# ) | sort -u | tee "$librariesfile"
-#
-# echo ""
-# echo "Output written >> $librariesfile"
-# echo ""
-#
-# ## export for R installation
-# ## remove some of my packages
-# \cat "$librariesfile"                         |\
-#     grep -v "RAerosols\|RlibRadtran\|myRtools\|AEROSOL" |\
-#     sed '/^[[:space:]]*$/d'                   |\
-#     paste -sd "," -                           |\
-#     sed 's@,@","@g ; s@\(.*\)@install.packages(c("\1"),repos="https://cran.rstudio.com")@'
+
+
+   ## get all *:: declarations
+   find "$FOLDER" -type f  \
+               -not -path "*/old/*"    \
+               -iname "*.R" -or        \
+               -iname "*.Rmd"                           |\
+               xargs grep -h "[[:alnum:]]::[[:alnum:]]" |\
+               sed 's@\(.*\)::.*@\1@g'                  |\
+               sed '/[)(-<]/d'                          |\
+               sed 's/^[ ]*//'                          |\
+               sed 's/[ ]*$//'                          |\
+               sed '/ /d'                               |\
+               grep -oE '[^ ({=]+$'                     |\
+               sed '/"/d'                               |\
+               sort -u
+
+
+) | sort -u | tee "$librariesfile"
+
+echo ""
+echo "Output written >> $librariesfile"
+echo ""
+
+## export for R installation
+## remove some of my packages
+\cat "$librariesfile"                         |\
+    grep -v "RAerosols\|RlibRadtran\|myRtools\|AEROSOL" |\
+    sed '/^[[:space:]]*$/d'                   |\
+    paste -sd "," -                           |\
+    sed 's@,@","@g ; s@\(.*\)@install.packages(c("\1"),repos="https://cran.rstudio.com")@'
 
 
 
