@@ -18,14 +18,14 @@ for pp in {1..20}; do
     ## Diesel: &fuel_type=2
 
 
-    echo 
+    echo
     echo "$url"
     echo
-   
+
 
     #                  -display_charset=utf-8  \
-    #                  -assume_charset=utf-8   \ 
-    
+    #                  -assume_charset=utf-8   \
+
     ## get search results
     downlist="$(lynx -read_timeout=30        \
                      -connect_timeout=30     \
@@ -52,7 +52,7 @@ for pp in {1..20}; do
             echo "SKIP $newfile exist "
             continue
         fi
-        
+
         echo "GET  $line $targetfile"
 
         ## get post
@@ -65,12 +65,16 @@ for pp in {1..20}; do
 
         ## store data for later
         (
-        echo ""
         echo "CAPTURE DATE::$(date +%F_%T)"
-        echo ""
         echo "$POST" |\
-            sed '1,/  Σύνδεση Δωρεάν Καταχώρηση/d' |\
-            sed '/Παρόμοιες αναζητήσεις/,$d'
+            sed '1,/  Σύνδεση Δωρεάν Καταχώρηση/d'        |\
+            sed '/Παρόμοιες αναζητήσεις/,$d'              |\
+            sed '/^$/d'                                   |\
+            sed '/(BUTTON)/d'                             |\
+            sed '/\[svg+xml.*/d'                          |\
+            sed 's/[_]\+/_/g'                             |\
+            sed '/[ ]\+[A-Za-z0-9]\+=]/d'                 |\
+            sed '/Μη στέλνετε προκαταβολή αν δεν έχετε/d' 
         ) | iconv -c -f utf-8 -t utf-8 > "$newfile"
 
         ## be nice
