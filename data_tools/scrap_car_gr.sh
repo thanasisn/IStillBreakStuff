@@ -9,7 +9,7 @@ mkdir -p "$REPO"
 
 
 ## assume no more than 20 pages of results
-for pp in {1..20}; do
+for pp in {1..30}; do
     echo "PAGE $pp"
 
     ## search term
@@ -74,7 +74,8 @@ for pp in {1..20}; do
             sed '/\[svg+xml.*/d'                          |\
             sed 's/[_]\+/_/g'                             |\
             sed '/[ ]\+[A-Za-z0-9]\+=]/d'                 |\
-            sed '/Μη στέλνετε προκαταβολή αν δεν έχετε/d' 
+            sed '/Μη στέλνετε προκαταβολή αν δεν έχετε/d' |\
+            sed '/-thumb-[0-9]\+/d'
         ) | iconv -c -f utf-8 -t utf-8 > "$newfile"
 
         ## be nice
