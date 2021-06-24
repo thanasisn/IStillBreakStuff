@@ -83,5 +83,8 @@ for pp in {1..30}; do
     done
 done
 
+echo "Run file parsing"
+"$HOME/CODE/data_tools/parse_car_gr.R"
+
 ## end coding
 exit 0
