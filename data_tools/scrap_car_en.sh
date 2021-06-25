@@ -1,7 +1,7 @@
 #!/bin/bash
 ## created on 2021-06-23
 
-#### Scrap data from car.gr for processing
+#### Scrap data from car.gr for processing in english
 
 
 REPO="$HOME/LOGs/car_en_remp"
@@ -17,14 +17,10 @@ for pp in {1..30}; do
 
     ## Diesel: &fuel_type=2
 
-
     echo
     echo "$url"
     echo
 
-
-    #                  -display_charset=utf-8  \
-    #                  -assume_charset=utf-8   \
 
     ## get search results
     downlist="$(lynx -read_timeout=30        \
@@ -40,6 +36,8 @@ for pp in {1..30}; do
         echo "No results"
         continue
     fi
+
+    sleep 5s
 
     ## get all search results
     echo "$downlist" | while read line; do
