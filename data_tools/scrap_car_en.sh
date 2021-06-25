@@ -4,7 +4,7 @@
 #### Scrap data from car.gr for processing in english
 
 
-REPO="$HOME/LOGs/car_en_remp"
+REPO="$HOME/LOGs/car_en_repo"
 mkdir -p "$REPO"
 
 
@@ -21,6 +21,8 @@ for pp in {1..30}; do
     echo "$url"
     echo
 
+    #                  -display_charset=utf-8  \
+    #                  -assume_charset=utf-8   \
 
     ## get search results
     downlist="$(lynx -read_timeout=30        \
