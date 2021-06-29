@@ -27,38 +27,38 @@ regions <- c("Gr")
 for (ar in regions) {
 
     ## Region Definitions
-    if (ar == "Gr") {
-        abbox <- c(19.5,34.65,28.41,41.81)
+    if ( ar == "Gr") {
+        abbox <- c(19.34, 34.79, 28.25, 41.77)
         call  <- opq(abbox,  timeout = 1000)
     } else {
         stop(paste("Unknow region",ar))
     }
 
 
-
-
-
-    ## Get drinking water and springs from OSM #####################################
+    ## Get drinking water and springs from OSM #################################
     outfile <- paste0("~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs_",ar,".gpx")
     cat(paste("Query for drinking water and springs",ar,"\n"))
 
     q1      <- add_osm_feature(call, key = "amenity", value =  "drinking_water")
     q1      <- osmdata_sf(q1)
+    Sys.sleep(20) ## be polite to server
     q1      <- q1$osm_points
     q1$sym  <-"Drinking Water"
     q1$desc <- "vrisi"
     # saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Drinking_water.Rds")
     q2      <- add_osm_feature(call, key = 'natural', value = 'spring'         )
     q2      <- osmdata_sf(q2)
+    Sys.sleep(20) ## be polite to server
     q2      <- q2$osm_points
     q2$sym  <-"Parachute Area"
     q2$desc <- "pigi"
     # saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_Springs.Rds")
 
+    ## combine available water
     wecare <- intersect(names(q1),names(q2))
+    Q      <- rbind( q1[wecare], q2[wecare])
 
-    Q <- rbind( q1[wecare], q2[wecare])
-
+    ## drop fields
     Q$osm_id               <- NULL
     Q$wikipedia            <- NULL
     Q$wikidata             <- NULL
@@ -104,8 +104,14 @@ for (ar in regions) {
         Q$name <- sub(paste0("^",cn,"$"), "", Q$name, ignore.case = T)
     }
 
-    ss<-table(Q$name)
+    ## test output
+    ss <- data.frame( table(Q$name) )
 
+    ## use desc for empty names
+    Q$name[ Q$name == "" ] <- Q$desc[ Q$name == "" ]
+
+
+    ## create comments field
     Q$cmt <- ""
     Q$cmt <- paste(Q$cmt, paste0(Q$amenity,"=",Q$drinking_water))
     Q$cmt <- paste(Q$cmt, paste0("natural","=",Q$natural))
@@ -131,6 +137,7 @@ for (ar in regions) {
     Q$cmt[Q$cmt   == ""] <- NA
     Q$cmt[Q$desc  == ""] <- NA
 
+    ## test output
     ss <- table(Q$name)
 
     ## export data
@@ -140,12 +147,13 @@ for (ar in regions) {
 
 
 
-    ## Get waterfalls from OSM #####################################
+    ## Get waterfalls from OSM #################################################
     outfile <- paste0("~/GISdata/Layers/Auto/osm/OSM_Waterfalls_",ar,".gpx")
     cat(paste("Query for waterfalls",ar,"\n"))
 
     q1      <- add_osm_feature(call, key = "waterway", value =  "waterfall")
     q1      <- osmdata_sf(q1)
+    Sys.sleep(20) ## be polite to server
     q1      <- q1$osm_points
     q1$sym  <-"Dam"
     q1$desc <- "falls"
@@ -187,21 +195,18 @@ for (ar in regions) {
     Q$name <- gsub("^[ ]",  "", Q$name)
     Q$name <- gsub("[ ]$",  "", Q$name)
 
+    ## use desc for empty names
+    Q$name[ Q$name == "" ] <- Q$desc[ Q$name == "" ]
 
     Q$cmt <- ""
     # Q$cmt <- paste(Q$cmt, paste0(Q$amenity,"=",Q$drinking_water))
     # Q$cmt <- paste(Q$cmt, paste0("natural","=",Q$natural))
     # Q$cmt <- paste(Q$cmt, paste0("seasonal","=",Q$seasonal))
     # Q$cmt <- paste(Q$cmt, paste0("thermal","=",Q$thermal))
-    Q$cmt <- paste(Q$cmt, Q$description)
-    Q$cmt <- paste(Q$cmt, Q$description.en)
-    Q$cmt <- paste(Q$cmt, Q$note)
-    #
-    # Q$cmt <- gsub(" = ",             "", Q$cmt)
-    # Q$cmt <- gsub("drinking_water= ","", Q$cmt)
-    # Q$cmt <- gsub("natural= ",       "", Q$cmt)
-    # Q$cmt <- gsub("seasonal= ",      "", Q$cmt)
-    # Q$cmt <- gsub("thermal= ",       "", Q$cmt)
+    Q$cmt <- paste(Q$cmt, Q$description    )
+    Q$cmt <- paste(Q$cmt, Q$description.en )
+    Q$cmt <- paste(Q$cmt, Q$note           )
+
 
     Q$cmt <- gsub("[ ]+", " ", Q$cmt)
     Q$cmt <- gsub("^[ ]",  "", Q$cmt)
@@ -234,10 +239,12 @@ for (ar in regions) {
     q1      <- add_osm_feature(call, key = "natural",      value =  "cave",
                                value_exact = FALSE )
     q1      <- osmdata_sf(q1)
+    Sys.sleep(20) ## be polite to server
     q1      <- q1$osm_points
     q2      <- add_osm_feature(call,   key = "^name(:.*)?$", value =  "cave",
                                value_exact = FALSE, key_exact = FALSE, match_case = FALSE  )
     q2      <- osmdata_sf(q2)
+    Sys.sleep(20) ## be polite to server
     q2      <- q2$osm_points
 
     wecare  <- intersect(names(q1),names(q2))
@@ -279,6 +286,9 @@ for (ar in regions) {
     for (cn in cnames) {
         Q$name <- sub(paste0("^",cn,"$"), "", Q$name, ignore.case = T)
     }
+
+    ## use desc for empty names
+    Q$name[ Q$name == "" ] <- Q$desc[ Q$name == "" ]
 
     ss<-table(Q$name)
 

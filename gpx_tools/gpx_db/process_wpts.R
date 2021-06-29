@@ -137,7 +137,6 @@ if (length(gpxlist)>0) {
 }
 
 
-
 ## Add drinking water from OSM ####
 if (DRINKING_WATER) {
     ## load drinking water data
