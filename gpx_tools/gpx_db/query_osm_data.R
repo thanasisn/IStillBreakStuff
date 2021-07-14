@@ -141,7 +141,6 @@ for (ar in regions) {
 
 
 
-    stop()
 
     ## Get drinking water and springs from OSM #################################
     outfile <- paste0("~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs_",ar,".gpx")
@@ -153,14 +152,14 @@ for (ar in regions) {
     q1      <- q1$osm_points
     q1$sym  <-"Drinking Water"
     q1$desc <- "vrisi"
-    # saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Drinking_water.Rds")
+    saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Drinking_water.Rds")
     q2      <- add_osm_feature(call, key = 'natural', value = 'spring'         )
     q2      <- osmdata_sf(q2)
     Sys.sleep(20) ## be polite to server
     q2      <- q2$osm_points
     q2$sym  <-"Parachute Area"
     q2$desc <- "pigi"
-    # saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_Springs.Rds")
+    saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_Springs.Rds")
 
     ## combine available water
     wecare <- intersect(names(q1),names(q2))
@@ -265,7 +264,7 @@ for (ar in regions) {
     q1      <- q1$osm_points
     q1$sym  <-"Dam"
     q1$desc <- "falls"
-    # saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Waterfalls.Rds")
+    saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Waterfalls.Rds")
 
     Q <-    q1
 
@@ -361,7 +360,7 @@ for (ar in regions) {
     Q$sym  <- "Mine"
     Q$desc <- "cave"
 
-    # saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_Caves.Rds")
+    saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_Caves.Rds")
 
 
     Q$osm_id               <- NULL
