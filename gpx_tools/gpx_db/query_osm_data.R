@@ -35,6 +35,114 @@ for (ar in regions) {
     }
 
 
+    ## Get camp sites from OSM #################################################
+    outfile <- paste0("~/GISdata/Layers/Auto/osm/OSM_Camp_sites_",ar,".gpx")
+    cat(paste("Query for camp sites",ar,"\n"))
+
+
+    q1      <- add_osm_feature(call, key = "tourism", value =  "camp_site")
+    q1      <- osmdata_sf(q1)
+    Sys.sleep(20) ## be polite to server
+    q1      <- q1$osm_points
+    q1$sym  <- "Campground"
+    q1$desc <- "camp"
+    saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Camp_sites.Rds")
+    q2      <- add_osm_feature(call, key = '^name(:.*)?$', value = 'camping',
+                               value_exact = FALSE, key_exact = FALSE, match_case = FALSE)
+    q2      <- osmdata_sf(q2)
+    Sys.sleep(20) ## be polite to server
+    q2      <- q2$osm_points
+    q2$sym  <- "Campground"
+    q2$desc <- "camp"
+    saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_Camping.Rds")
+
+    wecare <- intersect(names(q1),names(q2))
+    Q      <- rbind( q1[wecare], q2[wecare])
+
+    ## drop fields
+    Q$osm_id               <- NULL
+    Q$wikipedia            <- NULL
+    Q$wikidata             <- NULL
+    Q$wheelchair           <- NULL
+    Q$addr.city            <- NULL
+    Q$created_by           <- NULL
+    Q$source               <- NULL
+    Q$operator             <- NULL
+    Q$historic             <- NULL
+    Q$tourism              <- NULL
+    Q$access               <- NULL
+    Q$bottle               <- NULL
+    Q$drinking_water.legal <- NULL
+    Q$capacity             <- NULL
+
+    Q <- unique(Q)
+
+    ## replace na with spaces
+    for (an in names(Q)) {
+        Q[as.vector(is.na(Q[,an])),an] <- ""
+    }
+
+    ## create name field from many
+    wenames <- c("alt_name", "int_name", "name.el", "name.en", "old_name")
+    wenames <- names(Q)[names(Q) %in% wenames]
+    for (an in wenames) {
+        Q$name <- paste(Q$name, Q[[an]])
+    }
+
+    ## clean names
+    Q$name <- gsub("[ ]+", " ", Q$name)
+    Q$name <- gsub("^[ ]",  "", Q$name)
+    Q$name <- gsub("[ ]$",  "", Q$name)
+
+    cnames <- unique(c("..."))
+    for (cn in cnames) {
+        Q$name <- sub(paste0("^",cn,"$"), "", Q$name, ignore.case = T)
+    }
+
+    ## test output
+    ss <- data.frame( table(Q$name) )
+
+    ## use desc for empty names
+    Q$name[ Q$name == "" ] <- Q$desc[ Q$name == "" ]
+
+    # ## create comments field
+    Q$cmt <- ""
+    # Q$cmt <- paste(Q$cmt, paste0(Q$amenity,"=",Q$drinking_water))
+    # Q$cmt <- paste(Q$cmt, paste0("natural","=",Q$natural))
+    # Q$cmt <- paste(Q$cmt, paste0("seasonal","=",Q$seasonal))
+    # Q$cmt <- paste(Q$cmt, paste0("thermal","=",Q$thermal))
+    # Q$cmt <- paste(Q$cmt, Q$description)
+    # Q$cmt <- paste(Q$cmt, Q$description.en)
+    # Q$cmt <- paste(Q$cmt, Q$note)
+    #
+    # Q$cmt <- gsub(" = ",             "", Q$cmt)
+    # Q$cmt <- gsub("drinking_water= ","", Q$cmt)
+    # Q$cmt <- gsub("natural= ",       "", Q$cmt)
+    # Q$cmt <- gsub("seasonal= ",      "", Q$cmt)
+    # Q$cmt <- gsub("thermal= ",       "", Q$cmt)
+    #
+    # Q$cmt <- gsub("[ ]+", " ", Q$cmt)
+    # Q$cmt <- gsub("^[ ]",  "", Q$cmt)
+    # Q$cmt <- gsub("[ ]$",  "", Q$cmt)
+
+
+    ## may be better without
+    Q$name[Q$name == ""] <- NA
+    Q$cmt[Q$cmt   == ""] <- NA
+    Q$cmt[Q$desc  == ""] <- NA
+
+    ## test output
+    ss <- table(Q$name)
+
+    ## export data
+    EXP <- Q[,c("geometry","name","desc","sym","cmt")]
+    write_sf(EXP, outfile, driver = "GPX", append = F, overwrite = T)
+
+
+
+
+    stop()
+
     ## Get drinking water and springs from OSM #################################
     outfile <- paste0("~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs_",ar,".gpx")
     cat(paste("Query for drinking water and springs",ar,"\n"))
