@@ -13,7 +13,7 @@ for pp in {1..30}; do
     echo "PAGE $pp"
 
     ## search term
-    url="https://www.car.gr/classifieds/cars/?lang=en&fs=1&condition=used&offer_type=sale&price-from=%3E4000&price-to=%3C18000&mileage-to=%3C220000&drive_type=4x4&engine_size-to=2000&euroclass=5&euroclass=6&euroclass=7&euroclass=9&pg=$pp"
+    url="https://www.car.gr/classifieds/cars/?lang=en&fs=1&condition=used&offer_type=sale&price-from=%3E4000&price-to=%3C18000&mileage-to=%3C220000&drive_type=4x4&engine_size-to=2000&euroclass=5&euroclass=6&euroclass=7&euroclass=8&euroclass=9&pg=$pp"
 
     ## Diesel: &fuel_type=2
 
