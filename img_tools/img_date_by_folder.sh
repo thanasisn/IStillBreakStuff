@@ -12,9 +12,10 @@ else
 fi
 
 
+
 ## Folder pattern YYYY-MM-DD
 
-pattern="[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}$"
+pattern="/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}$"
 
 echo "Ignoring:"
 echo "---------"
@@ -41,11 +42,10 @@ if [[ $REPLY =~ ^[YyυY]$ ]]; then
 
             ## create date command to use
             ndate="$(echo "$date" | sed 's/-/:/g')"
-            comm="-AllDates=\"$ndate 12:00:00\""
+            comm="-AllDates=\"${ndate} 12:00:00\""
             # echo "$comm"
 
             exiftool -r -v -P "$comm" "$img"
-
         done
     done
 else
@@ -56,8 +56,87 @@ fi
 
 ## Folder pattern YYYY-MM
 
+pattern="/[0-9]\{4\}-[0-9]\{2\}$"
+
+echo "Ignoring:"
+echo "---------"
+find "$FOLDER" -type d | grep -v "$pattern"
+echo "---------"
+
+echo "Will process YYYY-MM :"
+find "$FOLDER" -type d | grep "$pattern"
+echo "---------"
+
+
+read -p "Are you sure? " -n 1 -r
+echo    # (optional) move to a new line
+if [[ $REPLY =~ ^[YyυY]$ ]]; then
+    echo "Continuing"
+    find "$FOLDER" -type d | grep "$pattern" | while read line; do
+        echo "$line"
+        date="$(echo "$line" | grep -o "$pattern")"
+
+        echo "$date"
+
+        find "$line" -type f | while read img; do
+            # echo "$img"
+
+            ## create date command to use
+            ndate="$(echo "$date" | sed 's/-/:/g')"
+            comm="-AllDates=\"${ndate}:01 12:00:00\""
+            ## echo "$comm"
+
+            exiftool -r -v -P "$comm" "$img"
+        done
+    done
+else
+    echo "SKIP"
+fi
+
+
 
 ## Folder pattern YYYY-MM
+
+pattern="/[0-9]\{4\}$"
+
+echo "Ignoring:"
+echo "---------"
+find "$FOLDER" -type d | grep -v "$pattern"
+echo "---------"
+
+echo "Will process YYYY :"
+find "$FOLDER" -type d | grep "$pattern"
+echo "---------"
+
+
+read -p "Are you sure? " -n 1 -r
+echo    # (optional) move to a new line
+if [[ $REPLY =~ ^[YyυY]$ ]]; then
+    echo "Continuing"
+    find "$FOLDER" -type d | grep "$pattern" | while read line; do
+        echo "$line"
+        date="$(echo "$line" | grep -o "$pattern")"
+
+        echo "$date"
+
+        find "$line" -type f | while read img; do
+            # echo "$img"
+
+            ## create date command to use
+            ndate="$(echo "$date" | sed 's/-/:/g')"
+            comm="-AllDates=\"${ndate}:01:01 12:00:00\""
+            ## echo "$comm"
+
+            exiftool -r -v -P "$comm" "$img"
+        done
+    done
+else
+    echo "SKIP"
+fi
+
+
+
+find "$FOLDER" -type f -name "*_original"
 
 
 
