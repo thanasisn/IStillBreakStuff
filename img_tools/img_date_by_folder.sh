@@ -1,7 +1,7 @@
 #!/bin/bash
 ## created on 2021-08-17
 
-#### enter description here
+#### Set all dates in metadata from folder name
 
 FOLDER="$1"
 
