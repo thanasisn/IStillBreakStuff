@@ -17,11 +17,13 @@ fi
 
 pattern="/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}$"
 
+echo
 echo "Ignoring:"
 echo "---------"
 find "$FOLDER" -type d | grep -v "$pattern"
 echo "---------"
 
+echo
 echo "Will process YYYY-MM-DD :"
 find "$FOLDER" -type d | grep "$pattern"
 echo "---------"
@@ -58,11 +60,13 @@ fi
 
 pattern="/[0-9]\{4\}-[0-9]\{2\}$"
 
+echo
 echo "Ignoring:"
 echo "---------"
 find "$FOLDER" -type d | grep -v "$pattern"
 echo "---------"
 
+echo
 echo "Will process YYYY-MM :"
 find "$FOLDER" -type d | grep "$pattern"
 echo "---------"
@@ -99,11 +103,13 @@ fi
 
 pattern="/[0-9]\{4\}$"
 
+echo
 echo "Ignoring:"
 echo "---------"
 find "$FOLDER" -type d | grep -v "$pattern"
 echo "---------"
 
+echo
 echo "Will process YYYY :"
 find "$FOLDER" -type d | grep "$pattern"
 echo "---------"
@@ -136,6 +142,7 @@ fi
 
 
 
+echo
 find "$FOLDER" -type f -name "*_original"
 
 
