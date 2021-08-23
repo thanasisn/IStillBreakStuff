@@ -143,8 +143,15 @@ fi
 
 
 echo
-find "$FOLDER" -type f -name "*_original"
 
+command="find "$FOLDER" -type f -name \"*_original\""
+
+echo "${command}"
+${command}
+
+echo
+echo "${command} -delete"
+echo
 
 
 exit 0
