@@ -99,8 +99,9 @@ for (af in gpxlist) {
         temp$timediff[i] <- difftime( temp$time[i], temp$time[i-1] )
     }
 
+    # st_crs(EPSG)
     ## parse coordinates for process in meters
-    temp   <- st_transform(temp, EPSG)
+    temp   <- st_transform(temp, crs = EPSG)
     trkcco <- st_coordinates(temp)
     temp   <- data.table(temp)
     temp$X <- unlist(trkcco[,1])
