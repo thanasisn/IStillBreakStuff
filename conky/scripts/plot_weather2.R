@@ -294,7 +294,7 @@ png( OUTPUT_01, bg = "transparent", family = "Liberation Sans",
     segments(x0 = blue$From, x1 = blue$Until,
              y0 = blue$temperature_min,     col = "cyan" , lwd = 2 )
     segments(x0 = blue$From, x1 = blue$Until,
-             y0 = blue$felttemperature_min, col = "cyan" , lwd = 2 , lty = 3 )
+             y0 = blue$temperature_mean, col = "cyan" , lwd = 2 , lty = 3 )
 
 
     ## plot temperature lines
