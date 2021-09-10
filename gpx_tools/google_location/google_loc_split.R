@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 #'
-#' #### Split google location history to smaller manageable files
+#' #### Split Google location history to smaller manageable files
 #' Probably we don't this.
 #' The output may need some manual adjustment
 #'
@@ -18,7 +18,7 @@ Script.Name = funr::sys.script()
 ## break every n data points
 breaks <- 10000
 
-## input file
+## input file path
 file  <- "~/LOGs/Takeout/Location History/Location History.json"
 
 ## output base
@@ -90,15 +90,18 @@ for ( ii in 1:(length(spltlin)-1) ) {
     }
 
     ## inspect output
+    cat("HEAD:......\n")
     cat(head(temp),sep = "\n")
-    cat("......\n")
+    cat("TAIL:......\n")
     cat(tail(temp),sep = "\n")
+    cat("......\n")
 
-    ## write splited files
+    ## write splitted files
     writeLines( temp, paste0(outdir,"GLH_part_", sprintf("%04d",ii), ".json"))
 }
 # file.remove(nfile)
 
+cat(paste("May need to do manual corrections"),"\n")
 
 ####_ END _####
 tac = Sys.time()
