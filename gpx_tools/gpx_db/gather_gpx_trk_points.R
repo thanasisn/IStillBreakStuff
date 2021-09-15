@@ -116,9 +116,9 @@ for (af in gpxlist) {
     data <- rbind(data,temp)
 
     ## partial write
-    if (cnt %% 40 == 0) {
-        write_RDS(data, trackpoints_fl)
-    }
+    # if (cnt %% 40 == 0) {
+    #     write_RDS(data, trackpoints_fl)
+    # }
 }
 ## final write
 write_RDS(data, trackpoints_fl)

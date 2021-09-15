@@ -25,10 +25,18 @@ source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 
 
 
-## load data
+## load data from gpx gather
 DT           <- readRDS(trackpoints_fl)
 ## drop files dates
 DT[, F_mtime:=NULL]
+
+## load data from google locations
+DT2 <- readRDS(goolgepoints_fl)
+DT2[, F_mtime:=NULL]
+
+## combine data
+DT <- rbind(DT, DT2[, names(DT), with =F ] )
+rm(DT2)
 
 ## remove fake dates
 DT[ time < "1971-01-01", time := NA ]
