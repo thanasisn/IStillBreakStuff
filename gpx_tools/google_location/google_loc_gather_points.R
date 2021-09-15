@@ -94,45 +94,45 @@ for (af in filelist) {
 
 ## do some stats
 
-table(gather$source)
-table(gather$main_activity)
-
-
-gather[, .N, by = .(source, main_activity) ]
-
-acc_cl <- gather[  , .N, by = .(Acur_Class = (gather$accuracy %/% 100) * 100) ]
-setorder(acc_cl)
-acc_cl
-
-alt_cl <- gather[  , .N, by = .(Acur_Class = (gather$altitude %/% 100) * 100) ]
-setorder(alt_cl)
-alt_cl
-
-
-gather[accuracy > ACCURACY_LIMIT , .N, by = .(source, main_activity) ]
-table(gather[accuracy > ACCURACY_LIMIT, year(time) ])
-
-
-
-hist(gather$altitude,breaks = 100)
-hist(gather$accuracy,breaks = 100)
-hist(gather$verticalAccuracy,breaks = 100)
-hist(gather$velocity,breaks = 100)
-
-for (act in unique(gather$main_activity)) {
-    temp <- gather[ main_activity == act,]
-
-    hist(temp$altitude,         breaks = 100)
-    hist(temp$accuracy,         breaks = 100)
-    hist(temp$verticalAccuracy, breaks = 100)
-    hist(temp$velocity,         breaks = 100)
-
-
-    }
-
-
-
-any(duplicated(gather$Date))
+# table(gather$source)
+# table(gather$main_activity)
+#
+#
+# gather[, .N, by = .(source, main_activity) ]
+#
+# acc_cl <- gather[  , .N, by = .(Acur_Class = (gather$accuracy %/% 100) * 100) ]
+# setorder(acc_cl)
+# acc_cl
+#
+# alt_cl <- gather[  , .N, by = .(Acur_Class = (gather$altitude %/% 100) * 100) ]
+# setorder(alt_cl)
+# alt_cl
+#
+#
+# gather[accuracy > ACCURACY_LIMIT , .N, by = .(source, main_activity) ]
+# table(gather[accuracy > ACCURACY_LIMIT, year(time) ])
+#
+#
+#
+# hist(gather$altitude,breaks = 100)
+# hist(gather$accuracy,breaks = 100)
+# hist(gather$verticalAccuracy,breaks = 100)
+# hist(gather$velocity,breaks = 100)
+#
+# for (act in unique(gather$main_activity)) {
+#     temp <- gather[ main_activity == act,]
+#
+#     hist(temp$altitude,         breaks = 100)
+#     hist(temp$accuracy,         breaks = 100)
+#     hist(temp$verticalAccuracy, breaks = 100)
+#     hist(temp$velocity,         breaks = 100)
+#
+#
+#     }
+#
+#
+#
+# any(duplicated(gather$Date))
 
 
 
