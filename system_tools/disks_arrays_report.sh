@@ -50,7 +50,7 @@ ls -d -1 "/dev/md"* | while read device; do
 
     echo ""
     echo "** REPORT FOR $device **"
-    mdadm --detail "${device}"
+    /usr/sbin/mdadm --detail "${device}"
 
     echo ""
 done
