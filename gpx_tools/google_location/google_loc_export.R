@@ -20,7 +20,8 @@ library(data.table)
 library(dplyr)
 library(myRtools)
 library(arrow)
-library(hdf5r)
+library(rhdf5)
+library(feather)
 
 
 ## time distance for activity characterization
@@ -60,8 +61,11 @@ locations <- locations[ abs(Long) < 179.9999 ]
 ## list groups of activities
 unique(locations$activity)
 
-time.rds   <- system.time({})
-time.arrow <- system.time({})
+time.rds      <- system.time({})
+time.hdf      <- system.time({})
+time.feather  <- system.time({})
+time.feather2 <- system.time({})
+
 
 ####  Export daily data  ####
 ## also try to use the main activity to characterize points
@@ -110,38 +114,55 @@ for (aday in unique(as.Date(locations$Date))) {
                  file     = paste0(ydirec,"GLH_",today,".Rds"))
     )
 
-    time.arrow <- time.arrow + system.time(
-        saveRDS( object   = daydata,
-                 file     = paste0(ydirec,"GLH_",today,".Rds"))
-    )
-
-
-    write_parquet( x = data.frame(daydata),
-                   sink = paste0(ydirec,"GLH_",today,".parquet"))
-
-    write_feather(x = data.frame(daydata),
-                  sink = paste0(ydirec,"GLH_",today,".feather"))
-
-
-    filehh <- H5File$new(paste0(ydirec,"GLH_",today,".h5"))
-    filehh <- daydata
-    filehh$close_all()
-
-    filehh$ls()
-
     stop()
+
+    # time.arrow <- time.arrow + system.time(
+    # )
+
+    x <- data.frame(daydata)
+    file <- path.expand(paste0(ydirec,"GLH_",today,".parquet"))
+
+    write_parquet( x, file)
+
+    file <- path.expand(paste0(ydirec,"GLH_",today,".feather"))
+    write_feather( x = x,sink = file)
+
+
+    # time.hdf <- time.hdf + system.time({
+    #     h5write(daydata, file = paste0(ydirec,"GLH_",today,".h5"), "daydata",level = 9 )
+    #     h5closeAll()
+    # })
+
+
+    # x <- data.frame(daydata)
+    # write_feather( x, path =  paste0(ydirec,"GLH_",today,".feather"))
+    #
+    # stop()
+
+
+    # cat(paste("RDS:"),"\n")
+    # cat(paste(time.rds),"\n")
+    # cat(paste("hdf:"),"\n")
+    # cat(paste(time.hdf),"\n")
+
 
 }
 
-
-
 summary( as.Date(locations$Date) )
 
-cat(paste("RDS:"),"\n")
-cat(paste(time.rds),"\n")
-cat(paste("Arrow:"),"\n")
-cat(paste(time.rds),"\n")
+# cat(paste("RDS:"),"\n")
+# cat(paste(time.rds),"\n")
+# cat(paste("Arrow:"),"\n")
+# cat(paste(time.rds),"\n")
 
+tf1 <- tempfile(fileext = ".parquet")
+write_parquet(data.frame(x = 1:5), tf1)
+
+# using compression
+if (codec_is_available("gzip")) {
+    tf2 <- tempfile(fileext = ".gz.parquet")
+    write_parquet(data.frame(x = 1:5), tf2, compression = "gzip", compression_level = 5)
+}
 
 ####_ END _####
 tac = Sys.time()
