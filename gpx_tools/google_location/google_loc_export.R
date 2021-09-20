@@ -120,12 +120,15 @@ for (aday in unique(as.Date(locations$Date))) {
     # )
 
     x <- data.frame(daydata)
-    file <- path.expand(paste0(ydirec,"GLH_",today,".parquet"))
 
-    write_parquet( x, file)
+    typeof(x)
+    x <- as.data.frame(x)
+
+    # file <- path.expand(paste0(ydirec,"GLH_",today,".parquet"))
+    # write_parquet( x, file)
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".feather"))
-    write_feather( x = x,sink = file)
+    feather::write_feather( x, file)
 
 
     # time.hdf <- time.hdf + system.time({
@@ -134,8 +137,8 @@ for (aday in unique(as.Date(locations$Date))) {
     # })
 
 
-    # x <- data.frame(daydata)
-    # write_feather( x, path =  paste0(ydirec,"GLH_",today,".feather"))
+    # file <- path.expand(paste0(ydirec,"GLH_",today,".feather2"))
+    # arrow::write_feather( x, file)
     #
     # stop()
 
