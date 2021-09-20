@@ -19,6 +19,9 @@ library(jsonlite)
 library(data.table)
 library(dplyr)
 library(myRtools)
+library(arrow)
+library(hdf5r)
+
 
 ## time distance for activity characterization
 ACTIVITY_MATCH_THRESHOLD <- 60*3
@@ -57,6 +60,8 @@ locations <- locations[ abs(Long) < 179.9999 ]
 ## list groups of activities
 unique(locations$activity)
 
+time.rds   <- system.time({})
+time.arrow <- system.time({})
 
 ####  Export daily data  ####
 ## also try to use the main activity to characterize points
@@ -100,12 +105,42 @@ for (aday in unique(as.Date(locations$Date))) {
     cat(print(table(daydata$main_activity)),"\n")
     cat("\n")
 
-    saveRDS( object   = daydata,
-             file     = paste0(ydirec,"GLH_",today,".Rds"),
-             compress = "xz")
+    time.rds <- time.rds + system.time(
+        saveRDS( object   = daydata,
+                 file     = paste0(ydirec,"GLH_",today,".Rds"))
+    )
+
+    time.arrow <- time.arrow + system.time(
+        saveRDS( object   = daydata,
+                 file     = paste0(ydirec,"GLH_",today,".Rds"))
+    )
+
+
+    write_parquet( x = data.frame(daydata),
+                   sink = paste0(ydirec,"GLH_",today,".parquet"))
+
+    write_feather(x = data.frame(daydata),
+                  sink = paste0(ydirec,"GLH_",today,".feather"))
+
+
+    filehh <- H5File$new(paste0(ydirec,"GLH_",today,".h5"))
+    filehh <- daydata
+    filehh$close_all()
+
+    filehh$ls()
+
+    stop()
+
 }
 
+
+
 summary( as.Date(locations$Date) )
+
+cat(paste("RDS:"),"\n")
+cat(paste(time.rds),"\n")
+cat(paste("Arrow:"),"\n")
+cat(paste(time.rds),"\n")
 
 
 ####_ END _####
