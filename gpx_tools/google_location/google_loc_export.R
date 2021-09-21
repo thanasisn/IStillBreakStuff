@@ -62,7 +62,7 @@ unique(locations$activity)
 time.rds      <- system.time({})
 time.hdf      <- system.time({})
 time.feather  <- system.time({})
-time.feather2 <- system.time({})
+time.dat      <- system.time({})
 time.parquet  <- system.time({})
 ####  Export daily data  ####
 ## also try to use the main activity to characterize points
@@ -111,73 +111,24 @@ for (aday in unique(as.Date(locations$Date))) {
     daydata$activity         <- NULL
     daydata$locationMetadata <- NULL
 
-
-    attributes(daydata) <- c()
-
+    daydata <- as.data.frame(daydata)
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".Rds"))
     time.rds <- time.rds + system.time({
         write_RDS(object = daydata,
-                  file = file)
-        ss<-readRDS(file)
-
-        attributes(ss)
-
-
+                  file   = file)
+        readRDS(file)
     })
 
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".dat"))
-    write_dat(object = daydata,
-              file = file)
+    time.dat <- time.dat + system.time(
+        write_dat(object  = daydata,
+                  file    = file,
+                  clean   = TRUE,
+                  archive = TRUE)
+    )
 
-
-    # gzip
-    paste0("gzip -c ", file, " > ", file, ".gz")
-    system(paste0("gzip -c -9 ", file, " > ", file, ".gz"))
-
-    initisize <- file.size(file)
-    stats <- data.frame()
-    stats$File <- NA
-    stats$Size <- NA
-
-    for (i in 1:9) {
-        outfile <- paste0(file,".",i ,".gz")
-        comma   <- paste0("gzip -c -",i," ", file, " > ", outfile)
-        system(comma)
-    }
-
-    for (i in 1:9) {
-        outfile <- paste0(file,".",i ,".bz2")
-        comma <- paste0("bzip2 -c -",i," ", file, " > ", outfile)
-        system(comma)
-    }
-
-    for (i in 1:9) {
-        outfile <- paste0(file,".",i ,".xz")
-        comma   <- paste0("xz -c -",i," ", file, " > ", outfile)
-        system(comma)
-    }
-
-
-
-    # bzip2
-
-    # xz
-
-
-
-
-
-
-    memDecompress(length(memCompress(file, type = "gzip")))
-    length(memCompress(file, type = "bzip2"))
-    length(memCompress(file, type = "xz"))
-
-
-    compressFile()
-
-    attributes(ss)
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".prqt"))
     time.parquet <- time.parquet + system.time({
@@ -195,18 +146,8 @@ for (aday in unique(as.Date(locations$Date))) {
     cat(paste(signif(time.rds,digits = 10)),"\n")
     cat(paste("parquet  :"))
     cat(paste(signif(time.parquet,digits = 10)),"\n")
-    # cat(paste("feather  :"))
-    # cat(paste(signif(time.feather,digits = 10)),"\n")
-    #
-    #
-
-    stop("test")
-
-
-
-library(myRtools)
-
-
+    cat(paste("dat      :"))
+    cat(paste(signif(time.dat,digits = 10)),"\n")
 
 }
 
