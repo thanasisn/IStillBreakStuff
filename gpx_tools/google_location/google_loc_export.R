@@ -20,8 +20,6 @@ library(data.table)
 library(dplyr)
 library(myRtools)
 library(arrow)
-library(rhdf5)
-library(feather)
 
 
 ## time distance for activity characterization
@@ -65,8 +63,7 @@ time.rds      <- system.time({})
 time.hdf      <- system.time({})
 time.feather  <- system.time({})
 time.feather2 <- system.time({})
-
-
+time.parquet  <- system.time({})
 ####  Export daily data  ####
 ## also try to use the main activity to characterize points
 for (aday in unique(as.Date(locations$Date))) {
@@ -76,96 +73,74 @@ for (aday in unique(as.Date(locations$Date))) {
     ## but is that always true?
     setorder(daydata, Date)
     today   <- as.Date(daydata[1,Date])
-    cat(paste("Working on:", today, "  points:", nrow(daydata)))
+    cat(paste("Working on:", today, "  points:", nrow(daydata)),"\n")
 
     ydirec <- paste0(basedir, year(daydata[1,Date]), "/" )
     dir.create(ydirec,showWarnings = F)
 
-    ## add main activity data
+    ## get activities characterization
     activities <- daydata$activity
     sel        <- sapply(activities, function(x) !is.null(x[[1]]))
     activities <- activities[sel]
     df3        <- do.call("bind_rows", activities)
 
+
     main_activity <- sapply(df3$activity, function(x) x[[1]][1][[1]][1])
     activities_2  <- data.table(main_activity = main_activity,
-                               time = as.POSIXct(as.numeric(df3$timestampMs)/1000, origin = "1970-01-01"))
+                                time          = as.POSIXct(as.numeric(df3$timestampMs)/1000, origin = "1970-01-01"))
     setorder(activities_2, time)
 
+    ## match activities
     activities_2$main_activity <- factor(activities_2$main_activity)
 
     ## find nearest
     mi <- nearest( target =  as.numeric(activities_2$time),
                    probe  =  as.numeric(daydata$Date ))
 
-    ## add possible main activity
+    ## add possible main activity to each record
     daydata$main_activity <- activities_2$main_activity[mi]
 
     ## apply a time threshold of validity for main activity
     not_valid_idx <- which( as.numeric(abs(activities_2$time[mi] - daydata$Date)) > ACTIVITY_MATCH_THRESHOLD  )
-
     daydata$main_activity[ not_valid_idx ] <- "UNKNOWN"
 
     cat(print(table(daydata$main_activity)),"\n")
     cat("\n")
 
-    time.rds <- time.rds + system.time(
+    ## clean table
+    daydata$activity         <- NULL
+    daydata$locationMetadata <- NULL
+
+    # x <- data.frame(daydata)
+
+    file <- path.expand(paste0(ydirec,"GLH_",today,".Rds"))
+    time.rds <- time.rds + system.time({
         saveRDS( object   = daydata,
-                 file     = paste0(ydirec,"GLH_",today,".Rds"))
-    )
+                 file     = file)
+        readRDS(file)
+    })
 
-    stop()
+    file <- path.expand(paste0(ydirec,"GLH_",today,".prqt"))
+    time.parquet <- time.parquet + system.time({
+        arrow::write_parquet( daydata, file, compression = 'zstd', compression_level = 9)
+        arrow::read_parquet(file)
+    })
 
-    # time.arrow <- time.arrow + system.time(
-    # )
+    file <- path.expand(paste0(ydirec,"GLH_",today,".fthr"))
+    time.feather <- time.feather + system.time({
+        arrow::write_feather( daydata, file, compression = 'zstd', compression_level = 9)
+        arrow::read_feather(file)
+    })
 
-    x <- data.frame(daydata)
-
-    typeof(x)
-    x <- as.data.frame(x)
-
-    # file <- path.expand(paste0(ydirec,"GLH_",today,".parquet"))
-    # write_parquet( x, file)
-
-    file <- path.expand(paste0(ydirec,"GLH_",today,".feather"))
-    feather::write_feather( x, file)
-
-
-    # time.hdf <- time.hdf + system.time({
-    #     h5write(daydata, file = paste0(ydirec,"GLH_",today,".h5"), "daydata",level = 9 )
-    #     h5closeAll()
-    # })
-
-
-    # file <- path.expand(paste0(ydirec,"GLH_",today,".feather2"))
-    # arrow::write_feather( x, file)
-    #
-    # stop()
-
-
-    # cat(paste("RDS:"),"\n")
-    # cat(paste(time.rds),"\n")
-    # cat(paste("hdf:"),"\n")
-    # cat(paste(time.hdf),"\n")
-
+    cat(paste("RDS      :"))
+    cat(paste(signif(time.rds,digits = 10)),"\n")
+    cat(paste("parquet  :"))
+    cat(paste(signif(time.parquet,digits = 10)),"\n")
+    cat(paste("feather  :"))
+    cat(paste(signif(time.feather,digits = 10)),"\n")
 
 }
 
-summary( as.Date(locations$Date) )
-
-# cat(paste("RDS:"),"\n")
-# cat(paste(time.rds),"\n")
-# cat(paste("Arrow:"),"\n")
-# cat(paste(time.rds),"\n")
-
-tf1 <- tempfile(fileext = ".parquet")
-write_parquet(data.frame(x = 1:5), tf1)
-
-# using compression
-if (codec_is_available("gzip")) {
-    tf2 <- tempfile(fileext = ".gz.parquet")
-    write_parquet(data.frame(x = 1:5), tf2, compression = "gzip", compression_level = 5)
-}
 
 ####_ END _####
 tac = Sys.time()

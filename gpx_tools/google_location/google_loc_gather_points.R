@@ -42,8 +42,14 @@ filelist <- grep("/[0-9]{4}/",filelist,value = T)
 ## Parse all available data
 gather <- data.table()
 for (af in filelist) {
+
+    stop("test")
+
     cat(paste("Parse", basename(af)),"\n")
     tempd <- readRDS(af)
+
+    attributes(tempd)
+
 
     ## drop some data
     tempd[, deviceTag        := NULL]
