@@ -131,8 +131,51 @@ for (aday in unique(as.Date(locations$Date))) {
     write_dat(object = daydata,
               file = file)
 
-    memCompress()
 
+    # gzip
+    paste0("gzip -c ", file, " > ", file, ".gz")
+    system(paste0("gzip -c -9 ", file, " > ", file, ".gz"))
+
+    initisize <- file.size(file)
+    stats <- data.frame()
+    stats$File <- NA
+    stats$Size <- NA
+
+    for (i in 1:9) {
+        outfile <- paste0(file,".",i ,".gz")
+        comma   <- paste0("gzip -c -",i," ", file, " > ", outfile)
+        system(comma)
+    }
+
+    for (i in 1:9) {
+        outfile <- paste0(file,".",i ,".bz2")
+        comma <- paste0("bzip2 -c -",i," ", file, " > ", outfile)
+        system(comma)
+    }
+
+    for (i in 1:9) {
+        outfile <- paste0(file,".",i ,".xz")
+        comma   <- paste0("xz -c -",i," ", file, " > ", outfile)
+        system(comma)
+    }
+
+
+
+    # bzip2
+
+    # xz
+
+
+
+
+
+
+    memDecompress(length(memCompress(file, type = "gzip")))
+    length(memCompress(file, type = "bzip2"))
+    length(memCompress(file, type = "xz"))
+
+
+    compressFile()
 
     attributes(ss)
 
