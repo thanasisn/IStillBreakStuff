@@ -111,14 +111,30 @@ for (aday in unique(as.Date(locations$Date))) {
     daydata$activity         <- NULL
     daydata$locationMetadata <- NULL
 
-    # x <- data.frame(daydata)
+
+    attributes(daydata) <- c()
+
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".Rds"))
     time.rds <- time.rds + system.time({
-        saveRDS( object   = daydata,
-                 file     = file)
-        readRDS(file)
+        write_RDS(object = daydata,
+                  file = file)
+        ss<-readRDS(file)
+
+        attributes(ss)
+
+
     })
+
+
+    file <- path.expand(paste0(ydirec,"GLH_",today,".dat"))
+    write_dat(object = daydata,
+              file = file)
+
+    memCompress()
+
+
+    attributes(ss)
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".prqt"))
     time.parquet <- time.parquet + system.time({
@@ -126,21 +142,30 @@ for (aday in unique(as.Date(locations$Date))) {
         arrow::read_parquet(file)
     })
 
-    file <- path.expand(paste0(ydirec,"GLH_",today,".fthr"))
-    time.feather <- time.feather + system.time({
-        arrow::write_feather( daydata, file, compression = 'zstd', compression_level = 9)
-        arrow::read_feather(file)
-    })
+    # file <- path.expand(paste0(ydirec,"GLH_",today,".fthr"))
+    # time.feather <- time.feather + system.time({
+    #     arrow::write_feather( daydata, file, compression = 'zstd', compression_level = 9)
+    #     arrow::read_feather(file)
+    # })
 
     cat(paste("RDS      :"))
     cat(paste(signif(time.rds,digits = 10)),"\n")
     cat(paste("parquet  :"))
     cat(paste(signif(time.parquet,digits = 10)),"\n")
-    cat(paste("feather  :"))
-    cat(paste(signif(time.feather,digits = 10)),"\n")
+    # cat(paste("feather  :"))
+    # cat(paste(signif(time.feather,digits = 10)),"\n")
+    #
+    #
+
+    stop("test")
+
+
+
+library(myRtools)
+
+
 
 }
-
 
 ####_ END _####
 tac = Sys.time()
