@@ -73,7 +73,6 @@ iter <- iter[ , .N , by = .(year(Date), month(Date)) ]
 ## also try to use the main activity to characterize points
 # for (aday in unique(as.Date(locations$Date))) {
     # daydata <- locations[ as.Date(Date) == aday  ]
-
 for ( ii in 1:nrow(iter) ) {
     jj <- iter[ii,]
 
@@ -133,7 +132,7 @@ for ( ii in 1:nrow(iter) ) {
     time.rds <- time.rds + system.time({
         write_RDS(object = daydata,
                   file   = file,
-                  clean  = FALSE )
+                  clean  = TRUE )
         ss <- readRDS(file)
     })
 
@@ -178,7 +177,7 @@ for ( ii in 1:nrow(iter) ) {
 
 }
 
-system.time()
+system.time({})
 
 ####_ END _####
 tac = Sys.time()
