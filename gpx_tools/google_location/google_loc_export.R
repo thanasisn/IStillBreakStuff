@@ -125,8 +125,7 @@ for (aday in unique(as.Date(locations$Date))) {
     time.dat <- time.dat + system.time(
         write_dat(object  = daydata,
                   file    = file,
-                  clean   = TRUE,
-                  archive = TRUE)
+                  clean   = TRUE)
     )
 
 
