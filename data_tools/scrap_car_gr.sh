@@ -44,6 +44,7 @@ for pp in {1..30}; do
     ## get all search results
     echo "$downlist" | while read line; do
 
+
         targetfile="$(basename $line)"
         newfile="${REPO}/${targetfile}_$(date +%F).txt"
 
@@ -76,7 +77,8 @@ for pp in {1..30}; do
             sed 's/[_]\+/_/g'                             |\
             sed '/[ ]\+[A-Za-z0-9]\+=]/d'                 |\
             sed '/Μη στέλνετε προκαταβολή αν δεν έχετε/d' |\
-            sed '/-thumb-[0-9]\+/d'
+            sed '/-thumb-[0-9]\+/d'                       |\
+            sed 's/[^*,-\\/\\:_. [:alnum:]]//g'
         ) | iconv -c -f utf-8 -t utf-8 > "$newfile"
 
         ## be nice

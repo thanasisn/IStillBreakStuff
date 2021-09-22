@@ -133,7 +133,7 @@ for ( ii in 1:nrow(iter) ) {
     time.rds <- time.rds + system.time({
         write_RDS(object = daydata,
                   file   = file,
-                  clean  = TRUE )
+                  clean  = FALSE )
         ss <- readRDS(file)
     })
 
@@ -145,9 +145,9 @@ for ( ii in 1:nrow(iter) ) {
         ss <- fread(file)
     })
 
+    daydata <- as.data.frame(daydata)
     file <- path.expand(paste0(ydirec,"GLH_",today,".prqt"))
     time.parquet <- time.parquet + system.time({
-        attributes(daydata) <- object_metadata(daydata)
         write_parquet( daydata, file, compression = 'zstd', compression_level = 9)
         ss <- read_parquet(file)
     })
@@ -161,21 +161,20 @@ for ( ii in 1:nrow(iter) ) {
     # })
 
     cat(paste("RDS      :"))
-    cat(paste(signif(time.rds,digits = 4)),"\n")
+    cat(paste(signif(time.rds,     digits = 4)),"\n")
     cat(paste("parquet  :"))
-    cat(paste(signif(time.parquet,digits = 4)),"\n")
+    cat(paste(signif(time.parquet, digits = 4)),"\n")
     cat(paste("dat      :"))
-    cat(paste(signif(time.dat,digits = 4)),"\n")
+    cat(paste(signif(time.dat,     digits = 4)),"\n")
 
 
     ref <- time.rds
     cat(paste("RDS      :"))
-    cat(paste(signif(time.rds/ref,digits = 4)),"\n")
+    cat(paste(signif(time.rds/ref,     digits = 4)),"\n")
     cat(paste("parquet  :"))
-    cat(paste(signif(time.parquet/ref,digits = 4)),"\n")
+    cat(paste(signif(time.parquet/ref, digits = 4)),"\n")
     cat(paste("dat      :"))
-    cat(paste(signif(time.dat/ref,digits = 4)),"\n")
-
+    cat(paste(signif(time.dat/ref,     digits = 4)),"\n")
 
 }
 

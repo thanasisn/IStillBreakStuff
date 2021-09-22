@@ -13,8 +13,8 @@
 ##TODO add a threshold check on compression ratio or size reduction
 
 # SHOW_TABLE=true
-# APPLY_COMPRESSION=true
-# REMOVE_ORIGINAL=true
+APPLY_COMPRESSION=true
+REMOVE_ORIGINAL=true
 
 ##TODO don't compress if size reduction in bytes is less than this
 SIZE_THRESHOLD=10
@@ -140,10 +140,15 @@ for af in "$@" ; do
                 echo "APPLY COMPRESSION: ${Scodecs[0]} -c -${Sclevel[0]} $af > $newfile "
                 ${Scodecs[0]} -c -"${Sclevel[0]}" "$af" > "$newfile"
                 status=$?
+                newsize=$(stat -c%s "$newfile")
                 ## remove original file
-                if [ $REMOVE_ORIGINAL ]; then
-                    [[ $status -eq 0 ]] && trash "$af"
-                    echo "Removed:           $af"
+                if [ $newsize -gt 0 ]; then
+                    if [ $REMOVE_ORIGINAL ]; then
+                        [[ $status -eq 0 ]] && trash "$af"
+                        echo "Removed:           $af"
+                    fi
+                else
+                   echo "WARNING empty file: $newfile"
                 fi
             fi
         fi

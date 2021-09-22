@@ -78,7 +78,8 @@ for pp in {1..30}; do
             sed 's/[_]\+/_/g'                              |\
             sed '/[ ]\+[A-Za-z0-9]\+=]/d'                  |\
             sed '/Do not send a downpayment if you have/d' |\
-            sed '/-thumb-[0-9]\+/d'
+            sed '/-thumb-[0-9]\+/d'                        |\
+            sed 's/[^*,-\\/\\:_. [:alnum:]]//g'
         ) | iconv -c -f utf-8 -t utf-8  > "$newfile"
 
         ## be nice
