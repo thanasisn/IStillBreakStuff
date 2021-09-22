@@ -59,21 +59,36 @@ locations <- locations[ abs(Long) < 179.9999 ]
 ## list groups of activities
 unique(locations$activity)
 
+
 time.rds      <- system.time({})
 time.hdf      <- system.time({})
 time.feather  <- system.time({})
 time.dat      <- system.time({})
 time.parquet  <- system.time({})
+
+iter <- data.table(Date = locations$Date)
+iter <- iter[ , .N , by = .(year(Date), month(Date)) ]
+
 ####  Export daily data  ####
 ## also try to use the main activity to characterize points
-for (aday in unique(as.Date(locations$Date))) {
-    daydata <- locations[ as.Date(Date) == aday  ]
+# for (aday in unique(as.Date(locations$Date))) {
+    # daydata <- locations[ as.Date(Date) == aday  ]
+
+for ( ii in 1:nrow(iter) ) {
+    jj <- iter[ii,]
+
+    daydata <- locations[ year(Date) == jj$year & month(Date) == jj$month  ]
+
     ## This sorting will hide dating errors
     ## we can assume that data point are already sorted
     ## but is that always true?
     setorder(daydata, Date)
-    today   <- as.Date(daydata[1,Date])
+
+    # today <- as.Date(daydata[1,Date])
+
+    today <- sprintf("%04g-%02g", jj$year, jj$month)
     cat(paste("Working on:", today, "  points:", nrow(daydata)),"\n")
+
 
     ydirec <- paste0(basedir, year(daydata[1,Date]), "/" )
     dir.create(ydirec,showWarnings = F)
@@ -107,33 +122,37 @@ for (aday in unique(as.Date(locations$Date))) {
     cat(print(table(daydata$main_activity)),"\n")
     cat("\n")
 
-    ## clean table
+    ## clean table from lists and subtables
     daydata$activity         <- NULL
     daydata$locationMetadata <- NULL
 
+    ## limit of other export methods to a simple structured data table
     daydata <- as.data.frame(daydata)
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".Rds"))
     time.rds <- time.rds + system.time({
         write_RDS(object = daydata,
-                  file   = file)
-        readRDS(file)
+                  file   = file,
+                  clean  = TRUE )
+        ss <- readRDS(file)
     })
 
-
     file <- path.expand(paste0(ydirec,"GLH_",today,".dat"))
-    time.dat <- time.dat + system.time(
+    time.dat <- time.dat + system.time({
         write_dat(object  = daydata,
                   file    = file,
                   clean   = TRUE)
-    )
-
+        ss <- fread(file)
+    })
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".prqt"))
     time.parquet <- time.parquet + system.time({
+        attributes(daydata) <- object_metadata(daydata)
         write_parquet( daydata, file, compression = 'zstd', compression_level = 9)
-        read_parquet(file)
+        ss <- read_parquet(file)
     })
+
+    all.equal(ss, daydata)
 
     # file <- path.expand(paste0(ydirec,"GLH_",today,".fthr"))
     # time.feather <- time.feather + system.time({
@@ -142,13 +161,25 @@ for (aday in unique(as.Date(locations$Date))) {
     # })
 
     cat(paste("RDS      :"))
-    cat(paste(signif(time.rds,digits = 10)),"\n")
+    cat(paste(signif(time.rds,digits = 4)),"\n")
     cat(paste("parquet  :"))
-    cat(paste(signif(time.parquet,digits = 10)),"\n")
+    cat(paste(signif(time.parquet,digits = 4)),"\n")
     cat(paste("dat      :"))
-    cat(paste(signif(time.dat,digits = 10)),"\n")
+    cat(paste(signif(time.dat,digits = 4)),"\n")
+
+
+    ref <- time.rds
+    cat(paste("RDS      :"))
+    cat(paste(signif(time.rds/ref,digits = 4)),"\n")
+    cat(paste("parquet  :"))
+    cat(paste(signif(time.parquet/ref,digits = 4)),"\n")
+    cat(paste("dat      :"))
+    cat(paste(signif(time.dat/ref,digits = 4)),"\n")
+
 
 }
+
+system.time()
 
 ####_ END _####
 tac = Sys.time()
