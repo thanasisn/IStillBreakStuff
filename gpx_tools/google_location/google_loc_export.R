@@ -131,8 +131,8 @@ for (aday in unique(as.Date(locations$Date))) {
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".prqt"))
     time.parquet <- time.parquet + system.time({
-        arrow::write_parquet( daydata, file, compression = 'zstd', compression_level = 9)
-        arrow::read_parquet(file)
+        write_parquet( daydata, file, compression = 'zstd', compression_level = 9)
+        read_parquet(file)
     })
 
     # file <- path.expand(paste0(ydirec,"GLH_",today,".fthr"))

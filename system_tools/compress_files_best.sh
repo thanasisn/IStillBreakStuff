@@ -8,11 +8,21 @@
 ## The intend is to be used for archiving original data like .csv .dat .txt
 ## Most programming languages can read this files directly
 ## Will try to compress already compressed files
-## Will not recompress with the same algorith
+## Will not recompress with the same algorithm
+
+##TODO add a threshold check on compression ratio or size reduction
 
 # SHOW_TABLE=true
 # APPLY_COMPRESSION=true
 # REMOVE_ORIGINAL=true
+
+##TODO don't compress if size reduction in bytes is less than this
+SIZE_THRESHOLD=10
+
+##TODO don't compress if ration reduction in % is less than this
+RATIO_THRESHOLD=0.01
+
+
 
 ## compression commands to test
 ALGO=( bzip2 gzip xz )
