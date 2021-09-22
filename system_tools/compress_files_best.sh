@@ -8,11 +8,11 @@
 ## The intend is to be used for archiving original data like .csv .dat .txt
 ## Most programming languages can read this files directly
 ## Will try to compress already compressed files
-
+## Will not recompress with the same algorith
 
 # SHOW_TABLE=true
-APPLY_COMPRESSION=true
-REMOVE_ORIGINAL=true
+# APPLY_COMPRESSION=true
+# REMOVE_ORIGINAL=true
 
 ## compression commands to test
 ALGO=( bzip2 gzip xz )
@@ -46,8 +46,8 @@ if [[ $REMOVE_ORIGINAL ]]; then
         echo ""
     else
         echo "EXIT"
-    exit 0
-fi
+        exit 0
+    fi
 fi
 
 
@@ -68,7 +68,7 @@ for af in "$@" ; do
         bsize=$FILESIZE
         ## compression levels to test
         for cl in {1..9}; do
-            size=$($com -c "$af" -$cl | wc -c)
+            size=$($com -c "$af" -"$cl" | wc -c)
             # echo $com $cl $size
 
             ## stop when no improvement
@@ -76,21 +76,19 @@ for af in "$@" ; do
             [[ $size -ge $bsize ]] && break
 
             ## keep stats
-            codecs+=( $com  )
-            fsizes+=( $size )
-            clevel+=( $cl   )
-            cratio+=( $(echo "scale=3; 100 * ($size - $FILESIZE)  / $FILESIZE" | bc | sed -e 's/^-\./-0./' -e 's/^\./0./') )
+            codecs+=( "$com"  )
+            fsizes+=( "$size" )
+            clevel+=( "$cl"   )
+            cratio+=( "$(echo "scale=3; 100 * ($size - $FILESIZE)  / $FILESIZE" | bc | sed -e 's/^-\./-0./' -e 's/^\./0./')" )
 
             ## remember previous
             bsize=$size
         done
     done
 
-    ## use best for compression
-
     ## get sorted indexes
     indexes=$( for k in "${!fsizes[@]}"; do
-                    echo $k ' - ' ${fsizes["$k"]}
+                    echo "$k" ' - ' "${fsizes["$k"]}"
                 done | sort -n -k3 | cut -d' ' -f1 | tr '\n' ' ' | sed 's/,$//')
     ## sorted arrays
     Sfsizes=()
@@ -98,10 +96,10 @@ for af in "$@" ; do
     Sclevel=()
     Scratio=()
     for i in $indexes; do
-        Sfsizes+=( ${fsizes[$i]} )
-        Scodecs+=( ${codecs[$i]} )
-        Sclevel+=( ${clevel[$i]} )
-        Scratio+=( ${cratio[$i]} )
+        Sfsizes+=( "${fsizes[$i]}" )
+        Scodecs+=( "${codecs[$i]}" )
+        Sclevel+=( "${clevel[$i]}" )
+        Scratio+=( "${cratio[$i]}" )
     done
 
     ## just show stats table
@@ -109,17 +107,19 @@ for af in "$@" ; do
         paste <(printf "%s\n" "${Scodecs[@]}") <(printf "%s\n" "${Sclevel[@]}") <(printf "%s\n" "${Sfsizes[@]}") <(printf "%s %%\n" "${Scratio[@]}")
     fi
 
+    ## compression logic
     if [ ${#Scodecs[@]} -eq 0 ]; then
         echo "No compression benefits found for file"
     else
-        ext=$(echo ${Scodecs[0]} | sed 's/ip//g')
-        echo "BEST found:        ${Scodecs[0]} ${Sclevel[0]} ${Sfsizes[0]} ${Scratio[0]} %"
+        ext="$(echo "${Scodecs[0]}" | sed 's/ip//g')"
+        ## usefull to gather stats for multiple files
+        echo "BEST found:        ${Scodecs[0]} ${Sclevel[0]} ${Sfsizes[0]} ${Scratio[0]}% $af "
 
-        ## skip if file has the same extention
+        ## skip if file has the same extension
         fname="$(basename "$af")"
         oldexten="${fname##*.}"
 
-        ## avoid recompress with the same algorithm
+        ## just avoid recompress with the same algorithm
         if [ "$oldexten" == "$ext" ]; then
             echo "Same extensions $oldexten $ext"
             echo "Skip compression!!"
@@ -128,7 +128,7 @@ for af in "$@" ; do
             ## apply best compression to file
             if [ $APPLY_COMPRESSION ]; then
                 echo "APPLY COMPRESSION: ${Scodecs[0]} -c -${Sclevel[0]} $af > $newfile "
-                ${Scodecs[0]} -c -${Sclevel[0]} "$af" > "$newfile"
+                ${Scodecs[0]} -c -"${Sclevel[0]}" "$af" > "$newfile"
                 status=$?
                 ## remove original file
                 if [ $REMOVE_ORIGINAL ]; then
@@ -138,10 +138,11 @@ for af in "$@" ; do
             fi
         fi
     fi
-echo
+    echo
 done
 
-
+echo
+echo "FINISHED"
+echo
 exit
-
 
