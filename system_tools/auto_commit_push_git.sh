@@ -47,7 +47,7 @@ git push -f -u origin master
 ## The following add files to git automatically
 
 echo "------"
-folder='$HOME/CM_21_GLB/'
+folder="$HOME/CM_21_GLB/"
 cd ${folder}
 pwd
 rm -f "${folder}/.git/index.lock"
@@ -82,7 +82,7 @@ git push -f -u origin main
 ##  Autocommit in local repos  ##
 
 
-folder='$HOME/PROJECTS/'
+folder="$HOME/PROJECTS/"
 echo ${folder}
 cd ${folder}
 rm -f "${folder}/.git/index.lock"
@@ -114,7 +114,7 @@ echo
 
 
 
-folder='$HOME/TEX/'
+folder="$HOME/TEX/"
 echo ${folder}
 cd ${folder}
 rm -f "${folder}/.git/index.lock"
@@ -141,10 +141,10 @@ echo
 #TODO
 
 ## python 2 folder
-folder='$HOME/PYTHON2'
+folder="$HOME/PYTHON2"
 echo ${folder}
 cd ${folder}
-rm -f '$HOME/PYTHON2/.git/index.lock'
+rm -f "$HOME/PYTHON2/.git/index.lock"
 
 find . -type f \(    -iname '*.sh'   \
                   -o -iname '*.py'   \
@@ -161,10 +161,10 @@ echo
 
 
 ## python 3 folder
-folder='$HOME/PYTHON3'
+folder="$HOME/PYTHON3"
 echo ${folder}
 cd ${folder}
-rm -f '$HOME/PYTHON3/.git/index.lock'
+rm -f "HOME/PYTHON3/.git/index.lock"
 
 
 find . -type f \(  -iname '*.sh'  \
@@ -184,10 +184,10 @@ find . -type f \(  -iname '*.sh'  \
 git commit -uno -a -m "auto update $(date +%F_%T)"
 echo
 
-folder='$HOME/UVindex_prod'
+folder="$HOME/UVindex_prod"
 echo ${folder}
 cd  ${folder}
-rm -f '$HOME/UVindex_prod/.git/index.lock'
+rm -f "$HOME/UVindex_prod/.git/index.lock"
 
 find . -type f \(  -iname '*.sh'   \
                 -o -iname '*.r'    \
@@ -211,7 +211,7 @@ echo
 ####    ALL HOSTS    ##########################################################
 
 
-folder='$HOME/Aerosols/'
+folder="$HOME/Aerosols/"
 
 echo ""
 echo " vvvv START vvvv ${folder}"
@@ -249,7 +249,7 @@ echo " ^^^^ FINISH ^^^^ ${folder}"
 
 #-----------------------------------------------------------------------------#
 
-folder='$HOME/Ecotime_machine/Scripts/'
+folder="$HOME/Ecotime_machine/Scripts/"
 
 echo ""
 echo " vvvv START vvvv ${folder}"
@@ -290,7 +290,7 @@ echo " ^^^^ FINISH ^^^^ ${folder}"
 
 #-----------------------------------------------------------------------------#
 
-folder='$HOME/Improved_Aerosols_O3'
+folder="$HOME/Improved_Aerosols_O3"
 
 echo ""
 echo " vvvv START vvvv ${folder}"
@@ -328,7 +328,7 @@ echo " ^^^^ FINISH ^^^^ ${folder}"
 
 #-----------------------------------------------------------------------------#
 
-folder='$HOME/LibRadTranG'
+folder="$HOME/LibRadTranG"
 
 echo ""
 echo " vvvv START vvvv ${folder}"
@@ -354,7 +354,7 @@ echo " ^^^^ FINISH ^^^^ ${folder}"
 
 #-----------------------------------------------------------------------------#
 
-folder='$HOME/BASH'
+folder="$HOME/BASH"
 
 echo ""
 echo " vvvv START vvvv ${folder}"
@@ -388,7 +388,7 @@ echo " ^^^^ FINISH ^^^^ ${folder}"
 
 #-----------------------------------------------------------------------------#
 
-folder='$HOME/Formal/CV'
+folder="$HOME/Formal/CV"
 
 echo ""
 echo " vvvv START vvvv ${folder}"
@@ -409,7 +409,7 @@ echo " ^^^^ FINISH ^^^^ ${folder}"
 
 #-----------------------------------------------------------------------------#
 
-folder='$HOME/FUNCTIONS'
+folder="$HOME/FUNCTIONS"
 
 echo ""
 echo " vvvv START vvvv ${folder}"
@@ -445,7 +445,7 @@ echo " ^^^^ FINISH ^^^^ ${folder}"
 
 #-----------------------------------------------------------------------------#
 
-folder='$HOME/LifeAsti'
+folder="$HOME/LifeAsti"
 
 echo ""
 echo " vvvv START vvvv ${folder}"
@@ -478,7 +478,7 @@ git commit -uno -a -m "auto update $(date +%F_%T)"
 
 #-----------------------------------------------------------------------------#
 
-folder='$HOME/Documents/to'
+folder="$HOME/Documents/to"
 
 echo ""
 echo " vvvv START vvvv ${folder}"
@@ -499,7 +499,7 @@ echo " ^^^^ FINISH ^^^^ ${folder}"
 
 #-----------------------------------------------------------------------------#
 
-folder='$HOME/Documents/po'
+folder="$HOME/Documents/po"
 
 echo ""
 echo " vvvv START vvvv ${folder}"
