@@ -60,6 +60,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.frm' \
                   -o -iname '*.par' \
                   -o -iname '*.f90' \
+                  -o -iname '*.jl'  \
                   -o -iname '*.c'   \
                   -o -iname '*.h'   \
                   -o -iname '*.gp'  \
@@ -96,6 +97,7 @@ find . -type f \(  -iname '*.sh'  \
                 -o -iname '*.f90' \
                 -o -iname '*.gnu' \
                 -o -iname '*.dot' \
+                -o -iname '*.jl'  \
                 -o -iname '*.frm' \
                 -o -iname '*.c'   \
                 -o -iname '*.h'   \
@@ -144,14 +146,14 @@ echo ${folder}
 cd ${folder}
 rm -f '$HOME/PYTHON2/.git/index.lock'
 
-find . -type f \(    -iname '*.sh'  \
-                  -o -iname '*.py'  \
+find . -type f \(    -iname '*.sh'   \
+                  -o -iname '*.py'   \
                   -o -iname '*.gnu'  \
                   -o -iname '*.dot'  \
                   -o -iname '*.frm'  \
-                  -o -iname '*.jl'  \
-                  -o -iname '*.c'   \
-                  -o -iname '*.cpp' \) -print0  |\
+                  -o -iname '*.jl'   \
+                  -o -iname '*.c'    \
+                  -o -iname '*.cpp'  \) -print0  |\
         xargs -0 git add
 
 git commit -uno -a -m "auto update $(date +%F_%T)"
@@ -187,12 +189,13 @@ echo ${folder}
 cd  ${folder}
 rm -f '$HOME/UVindex_prod/.git/index.lock'
 
-find . -type f \(  -iname '*.sh'  \
-                -o -iname '*.r'   \
+find . -type f \(  -iname '*.sh'   \
+                -o -iname '*.r'    \
                 -o -iname '*.gnu'  \
                 -o -iname '*.dot'  \
+                -o -iname '*.jl'  \
                 -o -iname '*.frm'  \
-                -o -iname '*.py'  \
+                -o -iname '*.py'   \
                 -o -iname '*.frm' \) -print0  |\
         xargs -0 git add
 
@@ -226,6 +229,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.frm' \
                   -o -iname '*.par' \
                   -o -iname '*.f90' \
+                  -o -iname '*.jl'  \
                   -o -iname '*.c'   \
                   -o -iname '*.h'   \
                   -o -iname '*.gp'  \
@@ -261,6 +265,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.gnu' \
                   -o -iname '*.dot' \
                   -o -iname '*.frm' \
+                  -o -iname '*.jl'  \
                   -o -iname '*.par' \
                   -o -iname '*.f90' \
                   -o -iname '*.c'   \
@@ -302,6 +307,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.par' \
                   -o -iname '*.gnu' \
                   -o -iname '*.dot' \
+                  -o -iname '*.jl'  \
                   -o -iname '*.frm' \
                   -o -iname '*.f90' \
                   -o -iname '*.c'   \
@@ -335,6 +341,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.md'  \
                   -o -iname '*.gnu' \
                   -o -iname '*.dot' \
+                  -o -iname '*.jl'  \
                   -o -iname '*.frm' \
                   -o -iname '*.pbs' \
                   -o -iname '*.r'   \) -print0  |\
@@ -364,6 +371,7 @@ find . -type f \(    -iname '*.sh'   \
                   -o -iname '*.dot'  \
                   -o -iname '*.frm'  \
                   -o -iname '*.gnu'  \
+                  -o -iname '*.jl'   \
                   -o -iname '*.gp'   \
                   -o -iname '*.jl'   \
                   -o -iname '*.list' \
@@ -419,6 +427,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.ex'  \
                   -o -iname '*.f90' \
                   -o -iname '*.frm' \
+                  -o -iname '*.jl'  \
                   -o -iname '*.gnu' \
                   -o -iname '*.gp'  \
                   -o -iname '*.h'   \
@@ -455,6 +464,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.f90' \
                   -o -iname '*.frm' \
                   -o -iname '*.gnu' \
+                  -o -iname '*.jl'  \
                   -o -iname '*.gp'  \
                   -o -iname '*.h'   \
                   -o -iname '*.md'  \
@@ -498,7 +508,7 @@ echo ""
 cd ${folder}
 rm -f "${folder}/.git/index.lock"
 
-find . -type f \(    -iname '*.sh'  \
+find . -type f \( -o -iname '*.sh'  \
                   -o -iname '*.md'  \
                   -o -iname '*.txt' \) -print0  |\
                   xargs -0 git add
