@@ -508,7 +508,7 @@ echo ""
 cd ${folder}
 rm -f "${folder}/.git/index.lock"
 
-find . -type f \( -o -iname '*.sh'  \
+find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.md'  \
                   -o -iname '*.txt' \) -print0  |\
                   xargs -0 git add
