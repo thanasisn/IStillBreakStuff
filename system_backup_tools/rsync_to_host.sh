@@ -5,15 +5,15 @@
 ## This is DANGEROUS will remove files from remote
 
 list=(
-    "$HOME/BASH"
-    "$HOME/CODE"
-    "$HOME/FUNCTIONS"
-    "$HOME/LOGs"
-    "$HOME/Notes"
-    "$HOME/TRAIN"
-    "$HOME/PROGRAMS"
     "$HOME/.Renviron"
     "$HOME/.Rprofile"
+    # "$HOME/BASH"
+    # "$HOME/CODE"
+    # "$HOME/FUNCTIONS"
+    # "$HOME/LOGs"
+    # "$HOME/Notes"
+    # "$HOME/PROGRAMS"
+    # "$HOME/TRAIN"
 )
 
 
