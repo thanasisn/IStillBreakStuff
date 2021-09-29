@@ -68,6 +68,7 @@ time.parquet  <- system.time({})
 
 iter <- data.table(Date = locations$Date)
 iter <- iter[ , .N , by = .(year(Date), month(Date)) ]
+iter <- iter[ , .N , by = .(year(Date) ]
 
 ####  Export daily data  ####
 ## also try to use the main activity to characterize points
@@ -76,7 +77,9 @@ iter <- iter[ , .N , by = .(year(Date), month(Date)) ]
 for ( ii in 1:nrow(iter) ) {
     jj <- iter[ii,]
 
-    daydata <- locations[ year(Date) == jj$year & month(Date) == jj$month  ]
+    # daydata <- locations[ year(Date) == jj$year & month(Date) == jj$month  ]
+    daydata <- locations[ year(Date) == jj$year  ]
+
 
     ## This sorting will hide dating errors
     ## we can assume that data point are already sorted
@@ -85,12 +88,14 @@ for ( ii in 1:nrow(iter) ) {
 
     # today <- as.Date(daydata[1,Date])
 
-    today <- sprintf("%04g-%02g", jj$year, jj$month)
+    # today <- sprintf("%04g-%02g", jj$year, jj$month)
+    today <- sprintf("%04g", jj$year )
     cat(paste("Working on:", today, "  points:", nrow(daydata)),"\n")
 
-
+stop("todo")
     ydirec <- paste0(basedir, year(daydata[1,Date]), "/" )
     dir.create(ydirec,showWarnings = F)
+
 
     ## get activities characterization
     activities <- daydata$activity
@@ -130,9 +135,10 @@ for ( ii in 1:nrow(iter) ) {
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".Rds"))
     time.rds <- time.rds + system.time({
-        write_RDS(object = daydata,
+        writeDATA(object = daydata,
                   file   = file,
-                  clean  = TRUE )
+                  clean  = TRUE,
+                  type   = "rds")
         ss <- readRDS(file)
     })
 
