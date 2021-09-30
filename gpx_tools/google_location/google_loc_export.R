@@ -22,20 +22,33 @@ library(myRtools)
 library(arrow)
 
 
+
+# ndjson = { ndjson::stream_in(f) },
+# jsonlite = { jsonlite::stream_in(file(f), flatten=TRUE, verbose=FALSE) }
+
+
+
+
+
 ## time distance for activity characterization
 ACTIVITY_MATCH_THRESHOLD <- 60*3
 
 ## Data export path
 basedir  <- "~/DATA_RAW/Other/GLH/"
 
+## input filed
+jsonfile <- "~/DATA_RAW/Other/Google_Takeout/Location History/Location History.json"
 
 
 #### _ Main _ ####
 
 ####  Read and prepare data  ####
+ndjson::stream_in(jsonfile)
+jsonlite::stream_in(file(jsonfile), flatten=TRUE, verbose=FALSE)
 
+stop("")
 ## This is a big file to read
-locations <- data.table(fromJSON("~/LOGs/Takeout/Location History/Location History.json"))
+locations <- data.table(fromJSON(jsonfile))
 locations <- data.table(locations[[1]][[1]])
 
 ## proper dates
@@ -67,8 +80,9 @@ time.dat      <- system.time({})
 time.parquet  <- system.time({})
 
 iter <- data.table(Date = locations$Date)
-iter <- iter[ , .N , by = .(year(Date), month(Date)) ]
-iter <- iter[ , .N , by = .(year(Date) ]
+# iter <- iter[ , .N , by = .(year(Date), month(Date)) ]
+iter <- iter[ , .N , by = .(year(Date)) ]
+
 
 ####  Export daily data  ####
 ## also try to use the main activity to characterize points
@@ -92,10 +106,9 @@ for ( ii in 1:nrow(iter) ) {
     today <- sprintf("%04g", jj$year )
     cat(paste("Working on:", today, "  points:", nrow(daydata)),"\n")
 
-stop("todo")
-    ydirec <- paste0(basedir, year(daydata[1,Date]), "/" )
+    # ydirec <- paste0(basedir, year(daydata[1,Date]), "/" )
+    ydirec <- paste0(basedir, "Yearly", "/" )
     dir.create(ydirec,showWarnings = F)
-
 
     ## get activities characterization
     activities <- daydata$activity
@@ -126,7 +139,7 @@ stop("todo")
     cat(print(table(daydata$main_activity)),"\n")
     cat("\n")
 
-    ## clean table from lists and subtables
+    ## clean table from lists and sub tables
     daydata$activity         <- NULL
     daydata$locationMetadata <- NULL
 
@@ -137,23 +150,27 @@ stop("todo")
     time.rds <- time.rds + system.time({
         writeDATA(object = daydata,
                   file   = file,
-                  clean  = TRUE,
-                  type   = "rds")
+                  clean  = FALSE,
+                  type   = "Rds")
         ss <- readRDS(file)
     })
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".dat"))
     time.dat <- time.dat + system.time({
-        write_dat(object  = daydata,
-                  file    = file,
-                  clean   = TRUE)
+        writeDATA(object = daydata,
+                  file   = file,
+                  clean  = FALSE,
+                  type   = "dat")
         ss <- fread(file)
     })
 
     daydata <- as.data.frame(daydata)
     file <- path.expand(paste0(ydirec,"GLH_",today,".prqt"))
     time.parquet <- time.parquet + system.time({
-        write_parquet( daydata, file, compression = 'zstd', compression_level = 9)
+        writeDATA(object = daydata,
+                  file   = file,
+                  clean  = FALSE,
+                  type   = "prqt")
         ss <- read_parquet(file)
     })
 
@@ -183,7 +200,8 @@ stop("todo")
 
 }
 
-system.time({})
+
+
 
 ####_ END _####
 tac = Sys.time()
