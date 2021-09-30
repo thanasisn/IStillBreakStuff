@@ -43,8 +43,8 @@ jsonfile <- "~/DATA_RAW/Other/Google_Takeout/Location History/Location History.j
 #### _ Main _ ####
 
 ####  Read and prepare data  ####
-test1 <- ndjson::stream_in(jsonfile, cls = "dt" )
-test2 <- jsonlite::stream_in(file(jsonfile), flatten=TRUE, verbose=FALSE)
+# test1 <- ndjson::stream_in(jsonfile, cls = "dt" )
+# test2 <- jsonlite::stream_in(file(jsonfile), flatten=TRUE, verbose=FALSE)
 
 
 ## This is a big file to read
