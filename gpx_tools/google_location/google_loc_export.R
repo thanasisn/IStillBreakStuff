@@ -48,6 +48,47 @@ for ( af in filestodo) {
     ## read data and prepare
     tempdt <- readRDS(af)
 
+    ## get activities characterization
+    activities <- tempdt$activity
+    sel        <- sapply(activities, function(x) !is.null(x[[1]]))
+    activities <- activities[sel]
+    df3        <- do.call("bind_rows", activities)
+
+    main_activity <- sapply(df3$activity, function(x) x[[1]][1][[1]][1])
+    activities_2  <- data.table(main_activity = main_activity,
+                                time          = as.POSIXct(as.numeric(df3$timestampMs)/1000, origin = "1970-01-01"))
+    setorder(activities_2, time)
+
+    ## match activities
+    activities_2$main_activity <- factor(activities_2$main_activity)
+
+    ## find nearest
+    mi <- nearest( target =  as.numeric(activities_2$time),
+                   probe  =  as.numeric(tempdt$Date ))
+
+    ## add possible main activity to each record
+    tempdt$main_activity <- activities_2$main_activity[mi]
+
+    ## apply a time threshold of validity for main activity
+    not_valid_idx <- which( as.numeric(abs(activities_2$time[mi] - tempdt$Date)) > ACTIVITY_MATCH_THRESHOLD  )
+    tempdt$main_activity[ not_valid_idx ] <- "UNKNOWN"
+
+    print(table(tempdt$main_activity))
+    cat("\n")
+
+    ## clean table from lists and sub tables
+    tempdt[ , activity         := NULL ]
+    tempdt[ , locationMetadata := NULL ]
+    tempdt[ , deviceTag        := NULL ]
+
+    ## limit of other export methods to a simple structured data table
+    tempdt <- as.data.frame(tempdt)
+
+    ## get years to do
+    yearstodo <- unique(year(tempdt$Date))
+
+
+
 
 
 
@@ -59,9 +100,6 @@ for ( af in filestodo) {
 
 
 }
-
-
-
 
 
 
@@ -115,41 +153,25 @@ for ( ii in 1:nrow(iter) ) {
     ydirec <- paste0(basedir, "Yearly", "/" )
     dir.create(ydirec,showWarnings = F)
 
-    ## get activities characterization
-    activities <- daydata$activity
-    sel        <- sapply(activities, function(x) !is.null(x[[1]]))
-    activities <- activities[sel]
-    df3        <- do.call("bind_rows", activities)
 
 
-    main_activity <- sapply(df3$activity, function(x) x[[1]][1][[1]][1])
-    activities_2  <- data.table(main_activity = main_activity,
-                                time          = as.POSIXct(as.numeric(df3$timestampMs)/1000, origin = "1970-01-01"))
-    setorder(activities_2, time)
 
-    ## match activities
-    activities_2$main_activity <- factor(activities_2$main_activity)
 
-    ## find nearest
-    mi <- nearest( target =  as.numeric(activities_2$time),
-                   probe  =  as.numeric(daydata$Date ))
 
-    ## add possible main activity to each record
-    daydata$main_activity <- activities_2$main_activity[mi]
 
-    ## apply a time threshold of validity for main activity
-    not_valid_idx <- which( as.numeric(abs(activities_2$time[mi] - daydata$Date)) > ACTIVITY_MATCH_THRESHOLD  )
-    daydata$main_activity[ not_valid_idx ] <- "UNKNOWN"
 
-    cat(print(table(daydata$main_activity)),"\n")
-    cat("\n")
 
-    ## clean table from lists and sub tables
-    daydata$activity         <- NULL
-    daydata$locationMetadata <- NULL
 
-    ## limit of other export methods to a simple structured data table
-    daydata <- as.data.frame(daydata)
+
+
+
+
+
+
+
+
+
+
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".Rds"))
     time.rds <- time.rds + system.time({

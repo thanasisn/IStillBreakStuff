@@ -3,18 +3,17 @@
 ## https://github.com/thanasisn <lapauththanasis@gmail.com>
 
 
-#### Compress individual files after testing for best compression method for each file
+#### Compress individual folders after testing for best compression method for each folder
 
-## The intend is to be used for archiving original data like .csv .dat .txt
-## Most programming languages can read this files directly anyway
+## The intend is to be used for archiving folders
 ## Can be run interactively or in batch mode for scripting
 
 ## Defaults ##
-SHOW_TABLE="yes"
+SHOW_TABLE="no"
 APPLY_COMPRESSION="yes"
-REMOVE_ORIGINAL="yes"
+REMOVE_ORIGINAL="no"
 INTERACTIVE="yes"
-BYTES_REDUCTION="10"
+BYTES_REDUCTION="1024"
 OVERWRITE="yes"
 
 ALGO=( bzip2 gzip xz )
@@ -25,7 +24,7 @@ cat <<EOF
 
 $*
 
-    Usage: $(basename "${0}") <[options]> ./Glob/path/**/*.*
+    Usage: $(basename "${0}") <[options]> ./Glob/path/*/
 
     Options:
         --ask-human       [yes/no] ($INTERACTIVE) Ask human for input. Setting to 'no' may be dangerous.
@@ -131,10 +130,10 @@ fi
 ## MAIN LOGIC ##
 
 for af in "$@" ; do
-    [[ ! -f "$af" ]] && echo "NOT A FILE: $af" && continue
+    [[ ! -d "$af" ]] && echo "NOT A FOLDER: $af" && continue
 
     ## initialize stats for a file
-    FILESIZE=$(stat -c%s "$af")
+    FILESIZE=$(tar -cf - "$af" 2> >(grep -v "Removing leading") | wc -c   )
     fsizes=()
     codecs=()
     clevel=()
@@ -148,7 +147,7 @@ for af in "$@" ; do
         ## compression levels to test
         for cl in {1..9}; do
             ## test compression command
-            size=$($com -c "$af" -"$cl" | wc -c)
+            size=$(tar -cf - "$af" 2> >(grep -v "Removing leading") | $com -c -"$cl" - | wc -c)
             ## stop when no further improvement
             [[ $size -ge $bsize ]] && break
             ## keep stats in arrays
@@ -205,7 +204,7 @@ for af in "$@" ; do
         continue
     fi
 
-    newfile="${af}.${ext}"
+    newfile="${af%/}.tar.${ext}"
     ## apply best compression to file
     if [[ $APPLY_COMPRESSION == "yes" ]]; then
         ## avoid overwrite
@@ -214,7 +213,7 @@ for af in "$@" ; do
             continue
         fi
         echo "COMPRESS: ${Scodecs[0]} -c -${Sclevel[0]} $af > $newfile "
-        ${Scodecs[0]} -c -"${Sclevel[0]}" "$af" > "$newfile"
+        tar -cf - "$af" 2> >(grep -v "Removing leading") | ${Scodecs[0]} -c -"${Sclevel[0]}" - > "$newfile"
         status=$?
         newsize=$(stat -c%s "$newfile")
         ## remove original file if new non empty
