@@ -1,5 +1,7 @@
 #!/bin/bash
 ## created on 2019-11-22
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### Display the keybinds of some programs by parsing their config files
 ## The config files have to be formatted in a specific way

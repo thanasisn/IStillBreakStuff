@@ -1,4 +1,6 @@
 #!/bin/bash
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### Create a new executable bash script
 

@@ -1,5 +1,7 @@
 #!/bin/bash
 ## created on 2019-01-11
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### List libraries used in R and Rmd scripts
 ## It is not very robust but it is helpful

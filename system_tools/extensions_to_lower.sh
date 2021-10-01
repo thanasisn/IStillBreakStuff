@@ -1,5 +1,7 @@
 #!/bin/bash
 ## created on 2020-11-02
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### Convert file extensions to lower case
 

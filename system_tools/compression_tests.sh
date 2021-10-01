@@ -1,5 +1,7 @@
 #!/bin/bash
 ## created on 2015-11-22
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### Compress something with multiple algorithms and compression levels
 ## This is a method for testing the optimal options to use

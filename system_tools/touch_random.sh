@@ -1,4 +1,6 @@
 #!/bin/bash
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### Randomize files and folders dates
 ## The dates are ranged so that it will be difficult to be recognized in the system

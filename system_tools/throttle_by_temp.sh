@@ -1,4 +1,6 @@
 #!/bin/bash
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### Throttle a process cpu usage according to cpu temperature
 

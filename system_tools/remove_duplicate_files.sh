@@ -1,4 +1,6 @@
 #!/bin/bash
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### find duplicate files with fdupes and remove them by matching patter
 ## operates in the same folder and asks for pattern to grep files to delete

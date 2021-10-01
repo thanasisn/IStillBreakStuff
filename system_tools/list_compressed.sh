@@ -1,5 +1,7 @@
 #!/bin/bash
 ## created on 2015-11-23
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### List compressed files by looking for mime type
 
@@ -17,5 +19,5 @@ find "$FOLDER" -type f -exec file {} + |\
     cut -d: -f1                        |\
     grep -i -v ".*.rds"
 
-    
-exit 0 
+
+exit 0

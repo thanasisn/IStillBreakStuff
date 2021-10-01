@@ -1,5 +1,7 @@
 #!/bin/bash
 ## created on 2022-09-21
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### Compress individual files after testing for best compression method for each file
 

@@ -1,5 +1,7 @@
 #!/bin/bash
 ## created on 2020-11-09
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### Find duplicate filenames recursively in a folder structure
 ## Used to detect dups filenames when you want filename uniqueness within a folder structure

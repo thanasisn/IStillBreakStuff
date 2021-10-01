@@ -1,5 +1,7 @@
 #!/bin/bash
 ## created on 2020-04-02
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### Just create a new md file with the current date
 

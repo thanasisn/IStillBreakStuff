@@ -1,5 +1,7 @@
 #!/bin/bash
 ## created on 2020-11-08
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### Gather information for disks arrays
 ## For btrfs and raid arrays

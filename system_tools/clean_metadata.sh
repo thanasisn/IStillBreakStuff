@@ -1,4 +1,6 @@
 #!/bin/bash
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### Remove metadata from any file using exiftool
 
@@ -21,7 +23,7 @@ echo "REMOVE METADATA:  $FILE"
 ## This will empty tags (XMP + metadata) from any file
 exiftool -overwrite_original -all:all= "$FILE"
 
-## Not sure why I use that  
+## Not sure why I use that
 qpdf --linearize "$FILE" "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
 
 ## Show remaining metadata to be sure

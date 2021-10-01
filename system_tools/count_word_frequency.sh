@@ -1,5 +1,8 @@
 #!/bin/bash
 ## created on 2019-10-27
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
+
 
 #### Count word frequency
 ## works for multiple languages
@@ -30,7 +33,7 @@ sed -e 's/[^[:alpha:]]/ /g' "$AFILE" |\
     tr -s " "                        |\
     tr " " '\n'                      |\
     awk '{print tolower($0)}'        |\
-    sort 
+    sort
 )"
 
 ## Count word frequency

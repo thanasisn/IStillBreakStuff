@@ -1,5 +1,7 @@
 #!/bin/bash
 ## created on 2016-09-24
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### list unique extensions and count them
 

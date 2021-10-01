@@ -1,5 +1,7 @@
 #!/bin/bash
 ## created on 2016-09-24
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
+
 
 #### Get the length of filename in characters and in bytes
 ## Useful to find files exceeding file system limitations
