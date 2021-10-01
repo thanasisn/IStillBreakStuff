@@ -41,19 +41,19 @@ filestodo <- list.files(path        = indir,
                         pattern     = "GLH_part.*.Rds",
                         ignore.case = TRUE,
                         full.names  = TRUE)
-
+filestodo <- sort(filestodo,decreasing = T)
 ####  Parse all raw files to yearly files  ####
 for ( af in filestodo) {
     cat(paste("Parse:",af),"\n")
 
     ## read data and prepare
-    tempdt <- readRDS(af)
+    tempdt <- data.table( readRDS(af) )
 
     ## get activities characterization
-    activities <- tempdt$activity
-    sel        <- sapply(activities, function(x) !is.null(x[[1]]))
-    activities <- activities[sel]
-    df3        <- do.call("bind_rows", activities)
+    activities    <- tempdt$activity
+    sel           <- sapply(activities, function(x) !is.null(x[[1]]))
+    activities    <- activities[sel]
+    df3           <- do.call("bind_rows", activities)
 
     main_activity <- sapply(df3$activity, function(x) x[[1]][1][[1]][1])
     activities_2  <- data.table(main_activity = main_activity,
@@ -82,10 +82,11 @@ for ( af in filestodo) {
     tempdt[ , locationMetadata := NULL ]
     tempdt[ , deviceTag        := NULL ]
     tempdt[ , heading          := NULL ]
+    tempdt[ , platformType     := NULL ]
 
 
     ## limit of other export methods to a simple structured data table
-    tempdt <- as.data.frame(tempdt)
+    tempdt <- data.table(tempdt)
 
     ## get years to do
     yearstodo <- unique(year(tempdt$Date))
@@ -97,10 +98,10 @@ for ( af in filestodo) {
         if (!file.exists(yrfl)) {
             gather <- data.table()
         } else {
-            gather <- readRDS(yrfl)
+            gather <- data.table(readRDS(yrfl))
         }
         ## gather and save
-        gather <- unique(rbind(gather, tempdt, fill = TRUE))
+        gather <- rbind(gather, tempdt, fill = TRUE)
         setorder(gather,Date)
         writeDATA(object = gather,
                   file   = yrfl,
