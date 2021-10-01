@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
 
 #'
 #' #### Split Google location history to smaller manageable files
-#' Probably we don't this.
 #' The output may need some manual adjustment
 #'
 
@@ -14,20 +14,28 @@ Sys.setenv(TZ = "UTC")
 tic = Sys.time()
 Script.Name = funr::sys.script()
 
+library(data.table)
+library(jsonlite)
+library(myRtools)
 
 ## break every n data points
-breaks <- 10000
+breaks <- 20000
 
 ## input file path
-file  <- "~/LOGs/Takeout/Location History/Location History.json"
+file     <- "~/DATA_RAW/Other/Google_Takeout/Location History/Location History.json"
 
-## output base
-outdir <- "/dev/shm/glh/"
-dir.create(outdir, showWarnings = F )
+## raw output location
+storedir <- "~/DATA_RAW/Other/GLH/Raw"
 
-nfile <- paste0(outdir, "master_temp.json")
+## temp output base
+tempdir   <- "/dev/shm/glh/"
 
-## create a working file
+dir.create(storedir, showWarnings = F )
+dir.create(tempdir,  showWarnings = F )
+
+nfile <- paste0(tempdir, "master_temp.json")
+
+## create a copy of working file
 file.copy(file, nfile)
 rm(file)
 
@@ -41,20 +49,20 @@ lines <- readLines(nfile)
 
 ## find the location of each point in the file
 ntim <- grep("timestampMs", lines)
-nlat <- grep("latitudeE7", lines)
+nlat <- grep("latitudeE7",  lines)
 nlon <- grep("longitudeE7", lines)
-
+## move indexes same as ntime
 nlat <- nlat - 1
 nlon <- nlon - 2
 
 ## these are sets anyway
 stopifnot( all(nlat == nlon) )
 
-## the location of every point
+## the location of every point start
 npoints <- intersect(ntim,nlat)
-## distribute the point to chunks
+## distribute the point to chunks for breaking
 targets <- which( npoints %% breaks == 1)
-## index of spit points
+## index of split points
 spltlin <- c(1,npoints[targets], length(lines))
 
 for ( ii in 1:(length(spltlin)-1) ) {
@@ -64,15 +72,12 @@ for ( ii in 1:(length(spltlin)-1) ) {
     cat("\n")
     cat(paste(from, until,"\n"))
 
-    # ## inspect chunk start
-    # cat(lines[(from-1):(from+4)],sep = "\n")
-    #
-    # cat("\n")
-    #
-    # ## inspect chunk end
-    # cat(lines[(until-5):(until-1)],sep = "\n")
+    ## inspect chunk
+    # head(temp)
+    # tail(temp)
 
     temp <- lines[(from-1):(until-1)]
+
 
     ## fix proper ends
     if (grepl("\\}, \\{", temp[length(temp)])) {
@@ -97,11 +102,52 @@ for ( ii in 1:(length(spltlin)-1) ) {
     cat("......\n")
 
     ## write splitted files
-    writeLines( temp, paste0(outdir,"GLH_part_", sprintf("%04d",ii), ".json"))
+    writeLines( temp, paste0(tempdir,"GLH_part_", sprintf("%04d",ii), ".json"))
 }
-# file.remove(nfile)
+file.remove(nfile)
+rm(lines)
 
-cat(paste("May need to do manual corrections"),"\n")
+cat(paste("May need to do manual corrections to the splitted json files"),"\n")
+
+filestodo <- list.files(path       = tempdir,
+                        pattern    = "GLH_part.*.json",
+                        full.names = T)
+
+for (af in filestodo) {
+    cat(paste("Parsing: ",af),"\n")
+
+    # test1 <- ndjson::stream_in(af, cls = "dt" )
+    # test2 <- jsonlite::stream_in(file(af), flatten=TRUE, verbose=FALSE)
+    temp <- data.table(jsonlite::fromJSON(af))
+
+    ## proper dates
+    temp[, Date := as.POSIXct(as.numeric(timestampMs)/1000, tz='GMT', origin='1970-01-01') ]
+    temp[, timestampMs := NULL]
+
+    ## proper coordinates
+    temp[, Lat         := latitudeE7  / 1e7 ]
+    temp[, Long        := longitudeE7 / 1e7 ]
+    temp[, latitudeE7  := NULL]
+    temp[, longitudeE7 := NULL]
+
+    ## clean data coordinates
+    temp[ Long == 0, Long := NA ]
+    temp[ Lat  == 0, Lat  := NA ]
+    temp <- temp[ !is.na(Long) ]
+    temp <- temp[ !is.na(Lat)  ]
+    temp <- temp[ abs(Lat)  <  89.9999 ]
+    temp <- temp[ abs(Long) < 179.9999 ]
+
+
+    ## ouput file name
+    outfile <- paste0(storedir,"/",basename(af))
+    ## write to Rds to preserve sub tables in cells
+    writeDATA(temp,
+              file  = outfile,
+              clean = TRUE,
+              type  = "Rds")
+}
+file.remove(tempdir)
 
 ####_ END _####
 tac = Sys.time()

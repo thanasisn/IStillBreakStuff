@@ -12,7 +12,7 @@ Sys.setenv(TZ = "UTC")
 tic = Sys.time()
 Script.Name = funr::sys.script()
 # if(!interactive())pdf(file=sub("\\.R$",".pdf",Script.Name))
-sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
+# sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
 
 
 library(jsonlite)
@@ -22,11 +22,8 @@ library(myRtools)
 library(arrow)
 
 
-
 # ndjson = { ndjson::stream_in(f) },
 # jsonlite = { jsonlite::stream_in(file(f), flatten=TRUE, verbose=FALSE) }
-
-
 
 
 
@@ -48,7 +45,8 @@ jsonfile <- "~/DATA_RAW/Other/Google_Takeout/Location History/Location History.j
 
 
 ## This is a big file to read
-locations <- data.table(fromJSON(jsonfile))
+locations <- data.table(fromJSON(jsonfile))[[1]][[1]]
+
 
 stop("check it")
 
