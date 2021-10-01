@@ -82,7 +82,6 @@ for ( ii in 1:(length(spltlin)-1) ) {
 
     temp <- lines[(from-1):(until-1)]
 
-
     ## fix proper ends
     if (grepl("\\}, \\{", temp[length(temp)])) {
         temp[length(temp)] <- "} ]"

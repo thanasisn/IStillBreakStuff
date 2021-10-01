@@ -27,7 +27,7 @@ indir   <- "~/DATA_RAW/Other/GLH/Raw/"
 ## Temp data location
 tempdir <- "/dev/shm/tmp_glh"
 ## Data export path
-outdir  <- "~/DATA_RAW/Other/GLH/"
+outdir  <- "~/DATA/Other/GLH/Yearly"
 
 
 
@@ -35,13 +35,14 @@ outdir  <- "~/DATA_RAW/Other/GLH/"
 #### _ MAIN _ ####
 
 dir.create(tempdir, recursive = T, showWarnings = F)
+dir.create(outdir,  recursive = T, showWarnings = F)
 
 filestodo <- list.files(path        = indir,
                         pattern     = "GLH_part.*.Rds",
                         ignore.case = TRUE,
                         full.names  = TRUE)
 
-####  Parse all raw files  ####
+####  Parse all raw files to yearly files  ####
 for ( af in filestodo) {
     cat(paste("Parse:",af),"\n")
 
@@ -73,13 +74,15 @@ for ( af in filestodo) {
     not_valid_idx <- which( as.numeric(abs(activities_2$time[mi] - tempdt$Date)) > ACTIVITY_MATCH_THRESHOLD  )
     tempdt$main_activity[ not_valid_idx ] <- "UNKNOWN"
 
-    print(table(tempdt$main_activity))
+    # print(table(tempdt$main_activity))
     cat("\n")
 
     ## clean table from lists and sub tables
     tempdt[ , activity         := NULL ]
     tempdt[ , locationMetadata := NULL ]
     tempdt[ , deviceTag        := NULL ]
+    tempdt[ , heading          := NULL ]
+
 
     ## limit of other export methods to a simple structured data table
     tempdt <- as.data.frame(tempdt)
@@ -87,16 +90,41 @@ for ( af in filestodo) {
     ## get years to do
     yearstodo <- unique(year(tempdt$Date))
 
+    for (ay in yearstodo) {
+        ## this year file
+        yrfl <- paste0(outdir,"/GLH_",ay,".Rds")
+        ## check if previous data exist
+        if (!file.exists(yrfl)) {
+            gather <- data.table()
+        } else {
+            gather <- readRDS(yrfl)
+        }
+        ## gather and save
+        gather <- unique(rbind(gather, tempdt, fill = TRUE))
+        setorder(gather,Date)
+        writeDATA(object = gather,
+                  file   = yrfl,
+                  clean  = TRUE,
+                  type   = "Rds")
+    }
+}
 
 
 
 
+####  Read and export yearly data to multiple formats  ####
+yearlytodo <- list.files(path       = outdir,
+                         pattern    = "GLS_*.Rds",
+                         full.names = T )
 
-    stop("eee")
+time.rds      <- system.time({})
+time.dat      <- system.time({})
+time.parquet  <- system.time({})
 
-    ## add data to yearly file
 
-    ## for every year load add unique write
+for (af in yearlytodo) {
+    cat(paste(af),"\n")
+
 
 
 }
@@ -104,24 +132,7 @@ for ( af in filestodo) {
 
 
 
-
-
-
-
-
-stop("")
-
-
-## list groups of activities
-unique(locations$activity)
-
-
-time.rds      <- system.time({})
-time.hdf      <- system.time({})
-time.feather  <- system.time({})
-time.dat      <- system.time({})
-time.parquet  <- system.time({})
-
+stop("FF")
 iter <- data.table(Date = locations$Date)
 # iter <- iter[ , .N , by = .(year(Date), month(Date)) ]
 iter <- iter[ , .N , by = .(year(Date)) ]
@@ -143,15 +154,9 @@ for ( ii in 1:nrow(iter) ) {
     ## but is that always true?
     setorder(daydata, Date)
 
-    # today <- as.Date(daydata[1,Date])
 
-    # today <- sprintf("%04g-%02g", jj$year, jj$month)
     today <- sprintf("%04g", jj$year )
     cat(paste("Working on:", today, "  points:", nrow(daydata)),"\n")
-
-    # ydirec <- paste0(basedir, year(daydata[1,Date]), "/" )
-    ydirec <- paste0(basedir, "Yearly", "/" )
-    dir.create(ydirec,showWarnings = F)
 
 
 
@@ -203,11 +208,6 @@ for ( ii in 1:nrow(iter) ) {
 
     all.equal(ss, daydata)
 
-    # file <- path.expand(paste0(ydirec,"GLH_",today,".fthr"))
-    # time.feather <- time.feather + system.time({
-    #     arrow::write_feather( daydata, file, compression = 'zstd', compression_level = 9)
-    #     arrow::read_feather(file)
-    # })
 
     cat(paste("RDS      :"))
     cat(paste(signif(time.rds,     digits = 4)),"\n")
