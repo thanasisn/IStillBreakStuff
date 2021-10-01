@@ -1,11 +1,12 @@
 #!/usr/bin/env Rscript
+## https://github.com/thanasisn <lapauththanasis@gmail.com>
 
 #'
-#' #### Export Google location history to RDS
+#' #### Export Google location history Rds to clean tables in multiple formats
 #' - Try to characterize points by main activity
 #'
 
-#### _ Set environment _ ####
+#### _ INIT _ ####
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
@@ -14,61 +15,64 @@ Script.Name = funr::sys.script()
 # if(!interactive())pdf(file=sub("\\.R$",".pdf",Script.Name))
 # sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
 
-
-library(jsonlite)
 library(data.table)
 library(dplyr)
 library(myRtools)
-library(arrow)
-
-
-# ndjson = { ndjson::stream_in(f) },
-# jsonlite = { jsonlite::stream_in(file(f), flatten=TRUE, verbose=FALSE) }
-
-
 
 ## time distance for activity characterization
 ACTIVITY_MATCH_THRESHOLD <- 60*3
 
+## Raw data location
+indir   <- "~/DATA_RAW/Other/GLH/Raw/"
+## Temp data location
+tempdir <- "/dev/shm/tmp_glh"
 ## Data export path
-basedir  <- "~/DATA_RAW/Other/GLH/"
-
-## input filed
-jsonfile <- "~/DATA_RAW/Other/Google_Takeout/Location History/Location History.json"
+outdir  <- "~/DATA_RAW/Other/GLH/"
 
 
-#### _ Main _ ####
-
-####  Read and prepare data  ####
-# test1 <- ndjson::stream_in(jsonfile, cls = "dt" )
-# test2 <- jsonlite::stream_in(file(jsonfile), flatten=TRUE, verbose=FALSE)
 
 
-## This is a big file to read
-locations <- data.table(fromJSON(jsonfile))[[1]][[1]]
+#### _ MAIN _ ####
+
+dir.create(tempdir, recursive = T, showWarnings = F)
+
+filestodo <- list.files(path        = indir,
+                        pattern     = "GLH_part.*.Rds",
+                        ignore.case = TRUE,
+                        full.names  = TRUE)
+
+####  Parse all raw files  ####
+for ( af in filestodo) {
+    cat(paste("Parse:",af),"\n")
+
+    ## read data and prepare
+    tempdt <- readRDS(af)
 
 
-stop("check it")
 
-locations <- data.table(locations[[1]][[1]])
 
-## proper dates
-locations[, Date := as.POSIXct(as.numeric(timestampMs)/1000, tz='GMT', origin='1970-01-01') ]
-locations[, timestampMs := NULL]
+    stop("eee")
 
-## proper coordinates
-locations[, Lat         := latitudeE7  / 1e7 ]
-locations[, Long        := longitudeE7 / 1e7 ]
-locations[, latitudeE7  := NULL]
-locations[, longitudeE7 := NULL]
+    ## add data to yearly file
 
-## clean data coordinates
-locations[ Long == 0, Long := NA ]
-locations[ Lat  == 0, Lat  := NA ]
-locations <- locations[ !is.na(Long) ]
-locations <- locations[ !is.na(Lat)  ]
-locations <- locations[ abs(Lat)  <  89.9999 ]
-locations <- locations[ abs(Long) < 179.9999 ]
+    ## for every year load add unique write
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+stop("")
+
 
 ## list groups of activities
 unique(locations$activity)

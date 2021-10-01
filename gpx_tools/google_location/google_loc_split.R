@@ -2,12 +2,12 @@
 ## https://github.com/thanasisn <lapauththanasis@gmail.com>
 
 #'
-#' #### Split Google location history to smaller manageable files
+#' #### Split Google location history json to smaller manageable Rds files
 #' The output may need some manual adjustment
 #'
 
+#### _ INIT _ ####
 
-####    Set environment    ####
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
@@ -19,7 +19,7 @@ library(jsonlite)
 library(myRtools)
 
 ## break every n data points
-breaks <- 20000
+breaks   <- 10000
 
 ## input file path
 file     <- "~/DATA_RAW/Other/Google_Takeout/Location History/Location History.json"
@@ -28,7 +28,10 @@ file     <- "~/DATA_RAW/Other/Google_Takeout/Location History/Location History.j
 storedir <- "~/DATA_RAW/Other/GLH/Raw"
 
 ## temp output base
-tempdir   <- "/dev/shm/glh/"
+tempdir  <- "/dev/shm/glh/"
+
+
+#### _ MAIN _ ####
 
 dir.create(storedir, showWarnings = F )
 dir.create(tempdir,  showWarnings = F )
@@ -65,11 +68,12 @@ targets <- which( npoints %% breaks == 1)
 ## index of split points
 spltlin <- c(1,npoints[targets], length(lines))
 
+#### Split json in smaller json files ####
 for ( ii in 1:(length(spltlin)-1) ) {
     from  <- spltlin[ii]
     until <- spltlin[ii+1]
 
-    cat("\n")
+    cat(paste("Part:",ii),"\n")
     cat(paste(from, until,"\n"))
 
     ## inspect chunk
@@ -90,7 +94,11 @@ for ( ii in 1:(length(spltlin)-1) ) {
     }
 
     ## fix end all for the last chunk
-    if ( ii+1 == length(spltlin) ) {
+    ## FIXME not writing to the end every time works on manual runs
+    if ( ii == length(spltlin)-1 ) {
+        ## remove last comma
+        ## altougth this mean that some lines at the end may be missing
+        temp[length(temp)] <- sub(",$","", temp[length(temp)])
         temp <- c(temp,"} ]")
     }
 
@@ -104,51 +112,51 @@ for ( ii in 1:(length(spltlin)-1) ) {
     ## write splitted files
     writeLines( temp, paste0(tempdir,"GLH_part_", sprintf("%04d",ii), ".json"))
 }
-file.remove(nfile)
 rm(lines)
 
-cat(paste("May need to do manual corrections to the splitted json files"),"\n")
+cat(paste("May need to do manual corrections to the last splitted json files"),"\n")
 
 filestodo <- list.files(path       = tempdir,
                         pattern    = "GLH_part.*.json",
                         full.names = T)
 
+####  Parse smaller json files to Rds  ####
 for (af in filestodo) {
     cat(paste("Parsing: ",af),"\n")
 
     # test1 <- ndjson::stream_in(af, cls = "dt" )
     # test2 <- jsonlite::stream_in(file(af), flatten=TRUE, verbose=FALSE)
-    temp <- data.table(jsonlite::fromJSON(af))
+    tempJ <- data.table(jsonlite::fromJSON(af))
 
     ## proper dates
-    temp[, Date := as.POSIXct(as.numeric(timestampMs)/1000, tz='GMT', origin='1970-01-01') ]
-    temp[, timestampMs := NULL]
+    tempJ[, Date := as.POSIXct(as.numeric(timestampMs)/1000, tz='GMT', origin='1970-01-01') ]
+    tempJ[, timestampMs := NULL]
 
     ## proper coordinates
-    temp[, Lat         := latitudeE7  / 1e7 ]
-    temp[, Long        := longitudeE7 / 1e7 ]
-    temp[, latitudeE7  := NULL]
-    temp[, longitudeE7 := NULL]
+    tempJ[, Lat         := latitudeE7  / 1e7 ]
+    tempJ[, Long        := longitudeE7 / 1e7 ]
+    tempJ[, latitudeE7  := NULL]
+    tempJ[, longitudeE7 := NULL]
 
     ## clean data coordinates
-    temp[ Long == 0, Long := NA ]
-    temp[ Lat  == 0, Lat  := NA ]
-    temp <- temp[ !is.na(Long) ]
-    temp <- temp[ !is.na(Lat)  ]
-    temp <- temp[ abs(Lat)  <  89.9999 ]
-    temp <- temp[ abs(Long) < 179.9999 ]
+    tempJ[ Long == 0, Long := NA ]
+    tempJ[ Lat  == 0, Lat  := NA ]
+    tempJ <- tempJ[ !is.na(Long) ]
+    tempJ <- tempJ[ !is.na(Lat)  ]
+    tempJ <- tempJ[ abs(Lat)  <  89.9999 ]
+    tempJ <- tempJ[ abs(Long) < 179.9999 ]
 
-
-    ## ouput file name
+    ## output file name
     outfile <- paste0(storedir,"/",basename(af))
     ## write to Rds to preserve sub tables in cells
-    writeDATA(temp,
+    writeDATA(tempJ,
               file  = outfile,
               clean = TRUE,
               type  = "Rds")
 }
-file.remove(tempdir)
+## remove temp folder
+unlink(tempdir, recursive = T)
 
-####_ END _####
+#### _ END _ ####
 tac = Sys.time()
 cat(sprintf("\n%s H:%s U:%s S:%s T:%f\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
