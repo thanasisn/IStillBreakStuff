@@ -51,31 +51,35 @@ for ( af in filestodo) {
 
     ## get activities characterization
     activities    <- tempdt$activity
-    sel           <- sapply(activities, function(x) !is.null(x[[1]]))
-    activities    <- activities[sel]
-    df3           <- do.call("bind_rows", activities)
 
-    main_activity <- sapply(df3$activity, function(x) x[[1]][1][[1]][1])
-    activities_2  <- data.table(main_activity = main_activity,
-                                time          = as.POSIXct(as.numeric(df3$timestampMs)/1000, origin = "1970-01-01"))
-    setorder(activities_2, time)
+    if (!is.null(activities)) {
 
-    ## match activities
-    activities_2$main_activity <- factor(activities_2$main_activity)
+        sel           <- sapply(activities, function(x) !is.null(x[[1]]))
+        activities    <- activities[sel]
+        df3           <- do.call("bind_rows", activities)
 
-    ## find nearest
-    mi <- nearest( target =  as.numeric(activities_2$time),
-                   probe  =  as.numeric(tempdt$Date ))
+        main_activity <- sapply(df3$activity, function(x) x[[1]][1][[1]][1])
+        activities_2  <- data.table(main_activity = main_activity,
+                                    time          = as.POSIXct(as.numeric(df3$timestampMs)/1000, origin = "1970-01-01"))
+        setorder(activities_2, time)
 
-    ## add possible main activity to each record
-    tempdt$main_activity <- activities_2$main_activity[mi]
+        ## match activities
+        activities_2$main_activity <- factor(activities_2$main_activity)
 
-    ## apply a time threshold of validity for main activity
-    not_valid_idx <- which( as.numeric(abs(activities_2$time[mi] - tempdt$Date)) > ACTIVITY_MATCH_THRESHOLD  )
-    tempdt$main_activity[ not_valid_idx ] <- "UNKNOWN"
+        ## find nearest
+        mi <- nearest( target =  as.numeric(activities_2$time),
+                       probe  =  as.numeric(tempdt$Date ))
+
+        ## add possible main activity to each record
+        tempdt$main_activity <- activities_2$main_activity[mi]
+
+        ## apply a time threshold of validity for main activity
+        not_valid_idx <- which( as.numeric(abs(activities_2$time[mi] - tempdt$Date)) > ACTIVITY_MATCH_THRESHOLD  )
+        tempdt$main_activity[ not_valid_idx ] <- "UNKNOWN"
+    }
 
     # print(table(tempdt$main_activity))
-    cat("\n")
+    # cat("\n")
 
     ## clean table from lists and sub tables
     tempdt[ , activity         := NULL ]
@@ -108,9 +112,10 @@ for ( af in filestodo) {
                   clean  = TRUE,
                   type   = "Rds")
     }
+    cat("\n")
 }
 
-
+stop("more codding")
 
 
 ####  Read and export yearly data to multiple formats  ####
