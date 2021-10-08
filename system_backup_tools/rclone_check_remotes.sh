@@ -121,7 +121,7 @@ for (( ii=0; ii<total; ii++ )); do
     ## we ignore fractional bytes
     TOTAL=$(( TOTAL + ${stotal%.*} ))
     USED=$((  USED  + ${sused%.*}  ))
-#     FREE=$((  FREE  + ${sfree%.*}  ))
+    FREE=$((  FREE  + ${sfree%.*}  ))
     TRASH=$(( TRASH + ${strash%.*} ))
     OTHER=$(( OTHER + ${sother%.*} ))
     FOLDR=$(( FOLDR + folde ))
