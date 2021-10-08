@@ -2,6 +2,8 @@
 
 #### Report on the usage of all rclone remotes
 
+DEDUPLICATE="yes"
+EMPTYTRASH="no"
 
 ## allow only one instance
 LOCK_FILE="/dev/shm/$(basename "${0}").lock"
@@ -17,11 +19,6 @@ set +e
 ## always kill watchdog and lock if this script ends
 ## hope we don't unlock when we shouldn't
 cleanup() {
-    echo "CLEANING UP"
-    rm -rf "$TEMP_FOLDER"
-    rm -f "$LOCK_FILE"
-    # pkill rclone
-    pkill -9 -e ".*rclone.*"
     kill -9 "$watchdogpid"
 }
 
@@ -82,12 +79,17 @@ for (( ii=0; ii<total; ii++ )); do
     echo ""
     echo "  ===  $((ii+1)) / $total  ${remotes[$ii]}  === " ;
 
-#     ## do a dedupe
-#     ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${remotes[$ii]}"
-#     ## do empty trash
-#     ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${remotes[$ii]}"
+    if [[ $DEDUPLICATE == "yes" ]]; then
+        echo "Deduplicate remote"
+        ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${remotes[$ii]}"
+    fi
 
-    ## info on the gdrive account
+    if [[ $EMPTYTRASH == "yes" ]]; then
+        echo "Empty remotes trash"
+         ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${remotes[$ii]}"
+    fi
+
+    ## get info of the remote
     rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about         "${remotes[$ii]}/" )
     ## info for the backup storage folder
     rdire=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  size          "${remotes[$ii]}/" )
