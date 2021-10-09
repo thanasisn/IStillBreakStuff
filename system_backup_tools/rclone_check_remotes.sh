@@ -80,13 +80,17 @@ for (( ii=0; ii<total; ii++ )); do
     echo "  ===  $((ii+1)) / $total  ${remotes[$ii]}  === " ;
 
     if [[ $DEDUPLICATE == "yes" ]]; then
-        echo "Deduplicate remote"
+        echo
+        echo "Deduplicating  ${remotes[$ii]}"
         ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${remotes[$ii]}"
+        echo
     fi
 
     if [[ $EMPTYTRASH == "yes" ]]; then
-        echo "Empty remotes trash"
-         ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${remotes[$ii]}"
+        echo
+        echo "Emptying trash ${remotes[$ii]}"
+        ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${remotes[$ii]}"
+        echo
     fi
 
     ## get info of the remote
@@ -170,7 +174,7 @@ status "AVAILABLE ACCOUNTS:$total"
 ##   clear an account to be reused    ##
 ##------------------------------------##
 
-otheropt=" --delete-before --delete-excluded --drive-use-trash=false"
+# otheropt=" --delete-before --delete-excluded --drive-use-trash=false"
 
 # ${RCLONE} --config "$RCLONE_CONFIG" ${otheropt} purge   "skts01:/hde_1"
 # ${RCLONE} --config "$RCLONE_CONFIG" ${otheropt} cleanup "skts01:/hde_1"
