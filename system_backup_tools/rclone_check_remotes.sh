@@ -2,8 +2,12 @@
 
 #### Report on the usage of all rclone remotes
 
-DEDUPLICATE="yes"
+# DEDUPLICATE="yes"
+DEDUPLICATE="no"
+# EMPTYTRASH="yes"
 EMPTYTRASH="no"
+
+
 
 ## allow only one instance
 LOCK_FILE="/dev/shm/$(basename "${0}").lock"
@@ -19,6 +23,7 @@ set +e
 ## always kill watchdog and lock if this script ends
 ## hope we don't unlock when we shouldn't
 cleanup() {
+    rm -f "$LOCK_FILE"
     kill -9 "$watchdogpid"
 }
 
@@ -33,7 +38,7 @@ ldir="/home/athan/LOGs/SYSTEM_LOGS/"
 mkdir -p "$ldir"
 
 ID="$1"
-: ${ID:=$(hostname)}
+: "${ID:=$(hostname)}"
 SCRIPT="$(basename "$0")"
 
 fsta="${ldir}/$(basename "$0").log"
@@ -50,8 +55,8 @@ info "script started"
 TEMP_FOLDER="/dev/shm/borg_to_rclone_hom"
 RCLONE="$HOME/PROGRAMS/rclone"
 RCLONE_CONFIG="$HOME/Documents/rclone.conf"
-LOG_FILE="/tmp/$(basename $0)_$(date +%F_%R).log"
-ERR_FILE="/tmp/$(basename $0)_$(date +%F_%R).err"
+LOG_FILE="/tmp/$(basename "$0")_$(date +%F_%R).log"
+ERR_FILE="/tmp/$(basename "$0")_$(date +%F_%R).err"
 
 
 exec  > >(tee -i "$LOG_FILE")
@@ -76,6 +81,7 @@ WASTE=0
 
 
 for (( ii=0; ii<total; ii++ )); do
+    echo ""
     echo ""
     echo "  ===  $((ii+1)) / $total  ${remotes[$ii]}  === " ;
 
