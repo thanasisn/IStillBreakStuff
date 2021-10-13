@@ -2,10 +2,10 @@
 
 #### Report on the usage of all rclone remotes
 
-DEDUPLICATE="yes"
-# DEDUPLICATE="no"
-EMPTYTRASH="yes"
-# EMPTYTRASH="no"
+# DEDUPLICATE="yes"
+DEDUPLICATE="no"
+# EMPTYTRASH="yes"
+EMPTYTRASH="no"
 
 
 
