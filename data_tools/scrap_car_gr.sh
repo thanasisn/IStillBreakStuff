@@ -8,6 +8,8 @@ REPO="$HOME/LOGs/car_gr_repo"
 mkdir -p "$REPO"
 
 
+
+
 ## assume no more than 20 pages of results
 for pp in {1..30}; do
     echo "PAGE $pp"
