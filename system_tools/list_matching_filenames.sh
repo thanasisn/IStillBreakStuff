@@ -9,6 +9,7 @@
 folder="$1"
 [ ! -d "$folder" ] && echo "$folder  NOT A FOLDER" && exit
 
+suffix="_occurances.list"
 
 find "$folder" -type f -exec bash -c 'basename "$0" ".${0##*.}"' {} \; |\
     sort |\
@@ -17,12 +18,16 @@ find "$folder" -type f -exec bash -c 'basename "$0" ".${0##*.}"' {} \; |\
     while read afn ; do
         cnt="$(echo "$afn" | cut -d' ' -f1)"
         pat="$(echo "$afn" | cut -d' ' -f2-)"
-
-        outputfile="${folder}/${cnt}_occurances.list"
+        outputfile="${folder}/${cnt}${suffix}"
 
         find "$folder" -type f -iname "*${pat}*" >> "$outputfile"
-
-        sort -u  -o "$outputfile" "$outputfile"
     done
+
+find "$folder" -type f -name "*${suffix}" |\
+    while read al; do
+        echo "$al"
+        sort -u  -o "$al" "$al"
+    done
+
 
 exit 0
