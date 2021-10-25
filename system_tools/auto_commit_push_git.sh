@@ -480,7 +480,7 @@ git commit -uno -a -m "auto update $(date +%F_%T)"
 
 #-----------------------------------------------------------------------------#
 
-folder="$HOME/Documents/to"
+folder="$HOME/Documents/Docu/to"
 
 echo ""
 echo " vvvv START vvvv ${folder}"
