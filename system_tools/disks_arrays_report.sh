@@ -59,12 +59,9 @@ done
 
 echo ""
 echo "$(date +%F_%R) ** RAID report end ** "
-
 echo ""
 echo "--------------------------------------------------------"
 echo ""
-
-
 echo "$(date +%F_%R) BTRFS report start on $(hostname)"
 echo ""
 sudo -S /bin/btrfs fi show;
@@ -77,9 +74,35 @@ sudo -S /bin/btrfs fi show | grep -o "/dev/.*" | while read device; do
 done
 
 echo "$(date +%F_%R) ** RAID report end ** "
-echo
-
+echo ""
 echo "--------------------------------------------------------"
+echo ""
+echo "$(date +%F_%R) file system report start on $(hostname)"
+echo ""
+echo " ** lsblk -af ** "
+echo ""
+sudo lsblk -af
+echo ""
+echo "--------------------------------------------------------"
+echo ""
+echo " ** df -h ** "
+echo ""
+sudo df -h
+echo ""
+echo "--------------------------------------------------------"
+echo ""
+echo " ** fdisk -l ** "
+echo ""
+sudo fdisk -l
+echo ""
+echo "--------------------------------------------------------"
+echo ""
+echo " ** mount -l ** "
+echo ""
+sudo mount -l
+echo ""
+echo "--------------------------------------------------------"
+
 
 
 exit 0
