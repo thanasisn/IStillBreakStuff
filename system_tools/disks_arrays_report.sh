@@ -11,10 +11,11 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+set +x
+
 ## Variables
 USER="athan"
 LOGDIR="/home/$USER/LOGs/SYSTEM_LOGS"
-
 
 mkdir -p "$LOGDIR"
 
