@@ -47,7 +47,7 @@ echo "------"
 cd "$HOME/CODE/deploy/"
 pwd
 git commit -uno -a -m "Auto commit"
-git push -f -u origin master
+git push -f -u origin main
 
 
 
