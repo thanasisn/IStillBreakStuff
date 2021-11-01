@@ -43,6 +43,14 @@ git commit -uno -a -m "Auto commit"
 git push -f -u origin master
 
 
+echo "------"
+cd "$HOME/CODE/deploy/"
+pwd
+git commit -uno -a -m "Auto commit"
+git push -f -u origin master
+
+
+
 
 ##  COMMIT PUSH to local repos  ################################################
 
