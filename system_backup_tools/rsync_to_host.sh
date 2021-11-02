@@ -6,7 +6,7 @@
 
 list=(
     "$HOME/.Renviron"
-    "$HOME/.Rprofile"
+    # "$HOME/.Rprofile"
     # "$HOME/BASH"
     # "$HOME/CODE"
     # "$HOME/FUNCTIONS"
@@ -21,7 +21,7 @@ list=(
 # "$HOME/.cache/evolution"
 # "$HOME/.local/share/evolution"
 
-REMOTE_HOST="crane"
+REMOTE_HOST="kostas"
 REMOTE_USER="$USER"
 REMOTE="${REMOTE_USER}@${REMOTE_HOST}"
 OPTIONS=" --info=progress2 --info=name0 -arvh --stats --delete "
