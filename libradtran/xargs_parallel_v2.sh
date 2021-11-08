@@ -37,9 +37,10 @@ Tic="$(date +%s%N)"    ## keep time
 Tac="$(date +"%F %T")" ## keep time
 cntt=0
 
-## THIS IS THE PARALLEL TRICK ##
-## run all input files through the WORKER_sh
-find "${INPDIR}" -type f -iname "*.inp"  | sort | while read line;do
+
+#### THIS IS THE PARALLEL TRICK ####
+## run all input files in inptut folder through the WORKER_sh
+find "${INPDIR}" -type f -iname "*.inp"  | sort | while read line; do
     echo "$line" "$((++cntt))"
 done | xargs -n 2 -P "$cores" "$WORKER_sh" "${OUTDIR}" "${ERRDIR}" "$total" "$Tic"
 

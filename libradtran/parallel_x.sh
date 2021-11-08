@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#### Worker to run one instance of uvspec
+####  Simple worker to run one instance of uvspec
 
 sleep $((RANDOM%10+1))
 

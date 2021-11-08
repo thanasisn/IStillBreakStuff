@@ -4,6 +4,7 @@
 #### Worker to run one instance of uvspec
 ## This is to be used by another script for parallel execution of uvspec
 
+
 ## get arguments
 OUTDIR="${1}"
 ERRDIR="${2}"
@@ -21,6 +22,7 @@ UVSPEC="/path/to/uvspec"
 ## check how many arguments
 if [ $# -ne 6 ] ; then  echo " 6 arguments needed" ;  exit 1 ; fi
 
+
 ## input base file name
 fname="$(basename $INPUTF)"
 
@@ -32,6 +34,7 @@ ERRFIL="${ERRDIR}/${fname%.*}.err"
 TOT=$(echo "scale=1; (($cntt*100/$total))" | bc)
 ETA=$(($(($((total-cntt))*$(($(date +%s%N)-Tic))/60000000000))/cntt))
 printf " %5s %5s/$total %5s%%  ETA: %4s min\n" $((total-cntt))  $cntt $TOT $ETA
+
 
 ## keep a log of what happened
 echo "$(date +"%F %T") $fname $cntt" >> "${logfile}"
