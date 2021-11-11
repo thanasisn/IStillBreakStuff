@@ -11,6 +11,7 @@
 ## can add to /etc/sudoers
 ## athan ALL=(ALL) NOPASSWD:/sbin/cryptsetup luksOpen
 ## athan ALL=(ALL) NOPASSWD:/sbin/cryptsetup luksClose
+## athan ALL=(ALL) NOPASSWD:/sbin/cryptsetup close
 ## athan ALL=(ALL) NOPASSWD:/usr/sbin/dmsetup ls
 
 
