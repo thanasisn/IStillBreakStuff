@@ -11,9 +11,14 @@ list=(
     "$HOME/CODE"
     "$HOME/FUNCTIONS"
     "$HOME/LOGs"
+    "$HOME/LifeAsti"
     "$HOME/Notes"
     "$HOME/PROGRAMS"
+    "$HOME/PYTHON2"
+    "$HOME/PYTHON3"
     "$HOME/TRAIN"
+    "$HOME/Workspaces"
+    "$HOME/Formal"
 )
 
 

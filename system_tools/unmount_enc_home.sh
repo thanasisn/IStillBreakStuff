@@ -1,17 +1,15 @@
 #!/bin/bash
 
-#### Unmount mounted user home and clos LUKS
-
-##TODO luksClose don't always close
+#### Unmount mounted user home and close LUKS
 
 mountpath="/home/athan"
 cryptname="crypthome"
 
-
 ## unmount home
 if mountpoint -q "$mountpath"; then
     echo "$mountpath is mounted"
-    sudo /usr/bin/umount -v -l -f "$mountpath"
+    sudo /usr/bin/umount -v -f "$mountpath"
+    sudo /usr/bin/umount -v -l "$mountpath"
 else
     echo "$mountpath NOT mounted"
 fi
@@ -21,9 +19,10 @@ if mountpoint -q "$mountpath"; then
 fi
 
 ## close LUKS
-
 sudo /sbin/cryptsetup -v luksClose "$cryptname"
+sudo /sbin/cryptsetup -v close "$cryptname"
+sudo /sbin/cryptsetup -v status "$cryptname"
 
-
-## should try to close all connected programs first
-
+echo " - - end - - "
+echo " run 'cd' "
+exit
