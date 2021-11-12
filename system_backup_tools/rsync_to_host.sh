@@ -4,29 +4,13 @@
 ## Fast sync before unison
 ## This is DANGEROUS will remove files from remote
 
+
 list=(
     "$HOME/.Renviron"
-    "$HOME/.Rprofile"
-    "$HOME/BASH"
-    "$HOME/CODE"
-    "$HOME/FUNCTIONS"
-    "$HOME/LOGs"
-    "$HOME/LifeAsti"
-    "$HOME/Notes"
-    "$HOME/PROGRAMS"
-    "$HOME/PYTHON2"
-    "$HOME/PYTHON3"
-    "$HOME/TRAIN"
-    "$HOME/Workspaces"
-    "$HOME/Formal"
 )
 
 
-# "$HOME/.config/evolution"
-# "$HOME/.cache/evolution"
-# "$HOME/.local/share/evolution"
-
-REMOTE_HOST="crane"
+REMOTE_HOST="insane"
 REMOTE_USER="$USER"
 REMOTE="${REMOTE_USER}@${REMOTE_HOST}"
 OPTIONS=" --info=progress2 --info=name0 -arvh --stats --delete "
