@@ -51,6 +51,7 @@ wmname LG3D
 
 
 
+kill_run  system-config-printer-applet 
 kill_run  dunst
 kill_run  kdeconnect-indicator
 kill_run  volumeicon
