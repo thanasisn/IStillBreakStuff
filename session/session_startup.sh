@@ -44,7 +44,7 @@ wmname LG3D
 
 
 
-kill_run  system-config-printer-applet 
+kill_run  system-config-printer-applet
 kill_run  dunst
 kill_run  kdeconnect-indicator
 kill_run  volumeicon
@@ -58,9 +58,6 @@ if [[ $(hostname) == "crane" ]]; then
     /usr/bin/xmodmap -e "keysym ISO_Level3_Shift = Menu"
 #     /usr/bin/xmodmap -e "keysym 0xff67 = Menu"
 #     /usr/bin/xmodmap -e "keycode 108 = Menu"
-
-    ## setup screen
-    x-terminal-emulator -e "$HOME/BASH/AWESOME/awesome_screen.sh" # &
 
 fi
 
