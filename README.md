@@ -36,6 +36,9 @@ Backup and system setup tools
 ## [system_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/system_tools)
 General system and file tools for linux systems.
 
+## [templates](https://github.com/thanasisn/IStillBreakStuff/tree/main/templates)
+Scripts templates and snippets
+
 ## [training_analysis](https://github.com/thanasisn/IStillBreakStuff/tree/main/training_analysis)
 Tools for processing my training data.
 
