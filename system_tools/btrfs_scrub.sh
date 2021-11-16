@@ -9,9 +9,10 @@ mkdir -p "$LOGDIR"
 
 logfile="${LOGDIR}/Btrfs_scrub_$(hostname)_$(date +'%F').check"
 echo " " > "$logfile"
+chmod a+rw  "$logfile"
 
 exec  > >(tee -i "${logfile}")
-# exec 2> >(tee -i "${logfile}" >&2)
+exec 2> >(tee -i "${logfile}" >&2)
 
 
 lsblk -f | grep  "btrfs" | grep -o " /.*" | while read device; do
