@@ -35,13 +35,6 @@ numlockx on
 killall -9  nm-applet
 nohup       nm-applet &
 
-killall -9  smart-notifier
-nohup       smart-notifier &
-
-killall -9  system-config-printer-applet
-nohup       system-config-printer-applet &
-
-
 # killall -9  skypeforlinux
 # nohup       skypeforlinux &
 
@@ -65,10 +58,6 @@ if [[ $(hostname) == "crane" ]]; then
     /usr/bin/xmodmap -e "keysym ISO_Level3_Shift = Menu"
 #     /usr/bin/xmodmap -e "keysym 0xff67 = Menu"
 #     /usr/bin/xmodmap -e "keycode 108 = Menu"
-
-#     killall -s 9 synergys
-#     synergys -c "$HOME/.quicksynergy/synergy.conf"
-
 
     ## setup screen
     x-terminal-emulator -e "$HOME/BASH/AWESOME/awesome_screen.sh" # &
