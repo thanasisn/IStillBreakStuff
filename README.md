@@ -3,8 +3,9 @@
 
 My small projects are collected here.
 
-Each folder has a README file.
+Each folder should have a README file.
 
+------------------------------------------------------------------------
 
 ## [conky](https://github.com/thanasisn/IStillBreakStuff/tree/main/conky)
 WYSIWYG
@@ -30,21 +31,24 @@ Music library management tools.
 ## [pdf_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/pdf_tools)
 Bash tools to manipulate pdf files.
 
+## [session](https://github.com/thanasisn/IStillBreakStuff/tree/main/session)
+My linux session configuration.
+
 ## [system_backup_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/system_backup_tools)
-Backup and system setup tools
+Backup and system setup tools.
 
 ## [system_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/system_tools)
 General system and file tools for linux systems.
 
 ## [templates](https://github.com/thanasisn/IStillBreakStuff/tree/main/templates)
-Scripts templates and snippets
+Scripts templates and snippets.
 
 ## [training_analysis](https://github.com/thanasisn/IStillBreakStuff/tree/main/training_analysis)
 Tools for processing my training data.
 
 
 
-
+------------------------------------------------------------------------
 *Suggestions and improvements are always welcome.*
 
 *I use those regular, but they have their quirks, may broke and maybe superseded by other tools.*
