@@ -3,6 +3,10 @@
 
 #### Continuously Update dwm status bar
 
+## kill previous instances of the script
+ps -ax | grep session/dwm_status_updater.sh | head -n -2 | grep -o "^[ 0-9]\+" | xargs kill  2>/dev/null
+
+## endless loop
 while true; do
     UTIME="$(awk '{print int($1/86400)"d "int($1%86400/3600)":"int(($1%3600)/60)":"int($1%60)}' /proc/uptime)"
     DATE="$(date +"%y-%m-%d(%j) %H:%M")"
