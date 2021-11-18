@@ -186,6 +186,31 @@ if [[ $filesnum -gt 0 ]]; then
 fi
 
 
+echo "some more listings"
+
+
+## find some really bad characters    % $#,?<> \:*| "
+## this will create multiples or replacements
+#find  -depth  -execdir rename -n  's/[%\$#,?<>\\:*|\"]/_/g' "{}" \;
+
+echo " --------Panctuation"
+find "$FOLDER" \
+                -depth    \
+                -not \( -path "*/.git*"       -prune \) \
+                -not \( -path "*/inst/art/*"  -prune \) \
+                -not \( -path "*/inst/as/*"   -prune \) \
+                -not \( -path "*/inst/.art*"  -prune \) \
+                -regextype grep -regex ".*[%$\#?<>:*|\"'!]\+.*"
+
+echo " ----- wierd chars"
+find "$FOLDER" \
+                -depth    \
+                -not \( -path "*/.git*"       -prune \) \
+                -not \( -path "*/inst/art/*"  -prune \) \
+                -not \( -path "*/inst/as/*"   -prune \) \
+                -not \( -path "*/inst/.art*"  -prune \) \
+                -regextype grep ! -regex "[άέήίόύώΆΈΉΊΌΎΏ0-9a-zA-Zα-ωΑ-Ω./ '&-’—_\!]\+"
+# ’`
 
 
 
