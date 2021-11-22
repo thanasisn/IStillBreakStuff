@@ -80,6 +80,7 @@ replace_with () {
                     -not \( -path "*/inst/art/*"  -prune \) \
                     -not \( -path "*/inst/as/*"   -prune \) \
                     -not \( -path "*/inst/.art*"  -prune \) \
+                    -not \( -path "*/.Docu.enc/*" -prune \) \
                     -name "*$char*" )"
     ## print list and count
     echo "$getlist" | sed '/^\s*$/d'
@@ -115,6 +116,7 @@ simplify_multiple () {
                     -not \( -path "*/inst/art/*"  -prune \) \
                     -not \( -path "*/inst/as/*"   -prune \) \
                     -not \( -path "*/inst/.art*"  -prune \) \
+                    -not \( -path "*/.Docu.enc/*" -prune \) \
                     -name "*$rep*" | grep "$rep$rep" )"
     ## print list and count
     echo "$getlist" | sed '/^\s*$/d'
@@ -158,6 +160,7 @@ getlist="$(find "$FOLDER" \
                 -not \( -path "*/inst/art/*"  -prune \) \
                 -not \( -path "*/inst/as/*"   -prune \) \
                 -not \( -path "*/inst/.art*"  -prune \) \
+                -not \( -path "*/.Docu.enc/*" -prune \) \
                 -regextype grep -regex ".*/[ _]\+.*" )"
 
 ## print list and count
@@ -191,6 +194,7 @@ getlist="$(find "$FOLDER" \
                 -not \( -path "*/inst/art/*"  -prune \) \
                 -not \( -path "*/inst/as/*"   -prune \) \
                 -not \( -path "*/inst/.art*"  -prune \) \
+                -not \( -path "*/.Docu.enc/*" -prune \) \
                 -regextype grep -regex ".*[ _]\+\..*")"
 
 ## print list and count
@@ -214,6 +218,7 @@ getlist="$(find "$FOLDER" \
                 -not \( -path "*/inst/art/*"  -prune \) \
                 -not \( -path "*/inst/as/*"   -prune \) \
                 -not \( -path "*/inst/.art*"  -prune \) \
+                -not \( -path "*/.Docu.enc/*" -prune \) \
                 -regextype grep -regex ".*[ _]\+$" )"
 
 ## print list and count
@@ -237,6 +242,7 @@ getlist="$(find "$FOLDER" \
                 -not \( -path "*/inst/art/*"  -prune \) \
                 -not \( -path "*/inst/as/*"   -prune \) \
                 -not \( -path "*/inst/.art*"  -prune \) \
+                -not \( -path "*/.Docu.enc/*" -prune \) \
                 -regextype grep -regex ".*[ _]\+/.*")"
 
 ## print list and count
