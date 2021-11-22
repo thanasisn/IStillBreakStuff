@@ -2,6 +2,7 @@
 ## created on 2017-09-26
 
 #### Make file and folder names consistent and nice
+## uses 'rename', will not overwrite
 
 
 FOLDER="$@"
@@ -13,9 +14,87 @@ echo "$FOLDER"
 # -n, --nono
 #     No action: print names of files to be renamed, but don't rename.
 
+## SAFE, do nothing
 DO=" -n "
+## will try to apply
 DO=" -v "
 
+
+remove_char () {
+    ## search for this char
+    char="$1"
+    ## in this folder
+    FOLDER="$2"
+
+    [[ -z "$char"   ]] && echo "Empty search char!! EXIT"      && exit
+    [[ -z "$FOLDER" ]] && echo "Empty folder variable!! EXIT"  && exit
+
+    echo
+    echo "#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#"
+    echo "    REMOVE >>\"$char\"<< in filenames    "
+    echo "#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#"
+    ## find files
+    getlist="$(find "$FOLDER" \
+                    -depth    \
+                    -not \( -path "*/.git*"       -prune \) \
+                    -not \( -path "*/inst/art/*"  -prune \) \
+                    -not \( -path "*/inst/as/*"   -prune \) \
+                    -not \( -path "*/inst/.art*"  -prune \) \
+                    -not \( -path "*/.Docu.enc/*" -prune \) \
+                    -name "*$char*" )"
+    ## print list and count
+    echo "$getlist" | sed '/^\s*$/d'
+    echo "----"
+    filesnum=$(echo "$getlist" | sed '/^\s*$/d' | wc -l)
+    echo "Files found:  $filesnum"
+
+    ## rename files
+    if [[ $filesnum -gt 0 ]]; then
+        read -p "REMOVE multiple >>\"$char\"<< with >>\"$rep\"<<  in filenames ? " -r REPLY
+        if [[ $REPLY =~ ^[Yy]$ ]] ; then
+            echo "$getlist" | tr '\n' '\0' | xargs -0 -n1 rename $DO "s/[$char]+//g"
+        fi
+    fi
+}
+
+replace_with () {
+    ## search for this char
+    char="$1"
+    ## replace it with this
+    rep="$2"
+    ## in this folder
+    FOLDER="$3"
+
+    [[ -z "$char"   ]] && echo "Empty search char!! EXIT"      && exit
+    [[ -z "$rep"    ]] && echo "Empty replacement char!! EXIT" && exit
+    [[ -z "$FOLDER" ]] && echo "Empty folder variable!! EXIT"  && exit
+
+    echo
+    echo "#########################################"
+    echo "    Replace >>\"$char\"<< with >>\"$rep\"<<  in names    "
+    echo "#########################################"
+    ## find files
+    getlist="$(find "$FOLDER" \
+                    -depth    \
+                    -not \( -path "*/.git*"       -prune \) \
+                    -not \( -path "*/inst/art/*"  -prune \) \
+                    -not \( -path "*/inst/as/*"   -prune \) \
+                    -not \( -path "*/inst/.art*"  -prune \) \
+                    -name "*$char*" )"
+    ## print list and count
+    echo "$getlist" | sed '/^\s*$/d'
+    echo "----"
+    filesnum=$(echo "$getlist" | sed '/^\s*$/d' | wc -l)
+    echo "Files found:  $filesnum"
+
+    ## rename files
+    if [[ $filesnum -gt 0 ]]; then
+        read -p "REPLACE multiple >>\"$char\"<< with >>\"$rep\"<<  in filenames ? " -r REPLY
+        if [[ $REPLY =~ ^[Yy]$ ]] ; then
+            echo "$getlist" | tr '\n' '\0' | xargs -0 -n1 rename $DO "s/[$char]+/$rep/g"
+        fi
+    fi
+}
 
 
 simplify_multiple () {
@@ -177,14 +256,8 @@ fi
 
 
 
-
-echo "some more listings"
-
-
-
-
 echo
-PS3="Choose replacement character for script: "
+PS3="Choose replacement character : "
 
 select opt in  space underscore dash EXIT ; do
   case $opt in
@@ -200,53 +273,37 @@ echo "Replacement char  >>$rep<< "
 
 
 
-## check for more panctuation
+## check for more panctuation problems
 
-chars=( "%" "$" "#" "?" "<" ">" ":" "*" "|" '"' "'" "!" )
+## TODO doesn't work for $
+## not all tested
+
+chars=( "%" "\$" "#" "\?" "<" ">" ":" "\*" "|" '"' "'" "!" "-" "~" "^" "—" "_" " " '\' "\`" )
+
+## remove or replace offending characters
 for ch in "${chars[@]}"; do
-    echo "---------------------"
-    echo "ddd $ch ddd"
 
+    remove_char  "$ch"        "$FOLDER"
 
+    ## no point to replace with the same
+    [ "$ch" = "$rep" ] && continue
 
-    find "$FOLDER" \
-         -depth    \
-         -not \( -path "*/.git*"       -prune \) \
-         -not \( -path "*/inst/art/*"  -prune \) \
-         -not \( -path "*/inst/as/*"   -prune \) \
-         -not \( -path "*/inst/.art*"  -prune \) \
-         -regextype grep -regex ".*[$ch]\+.*"
-
-
-
+    replace_with "$ch" "$rep" "$FOLDER"
 
 done
 
 
+## allow only some good characters in file names
+echo "----- Detect possible weird chars"
 
-
-## find some really bad characters    % $#,?<> \:*| "
-## this will create multiples or replacements
-#find  -depth  -execdir rename -n  's/[%\$#,?<>\\:*|\"]/_/g' "{}" \;
-
-echo " --------Panctuation"
 find "$FOLDER" \
-                -depth    \
-                -not \( -path "*/.git*"       -prune \) \
-                -not \( -path "*/inst/art/*"  -prune \) \
-                -not \( -path "*/inst/as/*"   -prune \) \
-                -not \( -path "*/inst/.art*"  -prune \) \
-                -regextype grep -regex ".*[%$\#?<>:*|\"'!]\+.*"
+    -depth    \
+    -not \( -path "*/.git*"       -prune \) \
+    -not \( -path "*/inst/art/*"  -prune \) \
+    -not \( -path "*/inst/as/*"   -prune \) \
+    -not \( -path "*/inst/.art*"  -prune \) \
+    -regextype grep ! -regex "[άέήίόύώΆΈΉΊΌΎΏ0-9a-zA-Zα-ωΑ-Ω./ '&-’_\!]\+"
 
-echo " ----- wierd chars"
-find "$FOLDER" \
-                -depth    \
-                -not \( -path "*/.git*"       -prune \) \
-                -not \( -path "*/inst/art/*"  -prune \) \
-                -not \( -path "*/inst/as/*"   -prune \) \
-                -not \( -path "*/inst/.art*"  -prune \) \
-                -regextype grep ! -regex "[άέήίόύώΆΈΉΊΌΎΏ0-9a-zA-Zα-ωΑ-Ω./ '&-’—_\!]\+"
-# ’`
 
 
 
