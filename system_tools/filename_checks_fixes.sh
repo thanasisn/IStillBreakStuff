@@ -18,63 +18,48 @@ DO=" -v "
 
 
 
-echo
-echo "#########################################"
-echo "    Simplify multiple spaces in files    "
-echo "#########################################"
+simplify_multiple () {
+    rep="$1"
+    FOLDER="$2"
 
-## find files
-getlist="$(find "$FOLDER" \
-                -depth    \
-                -not \( -path "*/.git*"       -prune \) \
-                -not \( -path "*/inst/art/*"  -prune \) \
-                -not \( -path "*/inst/as/*"   -prune \) \
-                -not \( -path "*/inst/.art*"  -prune \) \
-                -name "* *" | grep "  " )"
+    [[ -z "$rep"    ]] && echo "Empty replacement char!! EXIT" && exit
+    [[ -z "$FOLDER" ]] && echo "Empty folder variable !! EXIT" && exit
 
-## print list and count
-echo "$getlist" | sed '/^\s*$/d'
-echo "----"
-filesnum=$(echo "$getlist" | sed '/^\s*$/d' | wc -l)
-echo "Files found:  $filesnum"
+    echo
+    echo "#########################################"
+    echo "    Simplify multiple >>\"$rep\"<< in files    "
+    echo "#########################################"
+    ## find files
+    getlist="$(find "$FOLDER" \
+                    -depth    \
+                    -not \( -path "*/.git*"       -prune \) \
+                    -not \( -path "*/inst/art/*"  -prune \) \
+                    -not \( -path "*/inst/as/*"   -prune \) \
+                    -not \( -path "*/inst/.art*"  -prune \) \
+                    -name "*$rep*" | grep "$rep$rep" )"
+    ## print list and count
+    echo "$getlist" | sed '/^\s*$/d'
+    echo "----"
+    filesnum=$(echo "$getlist" | sed '/^\s*$/d' | wc -l)
+    echo "Files found:  $filesnum"
 
-## rename files
-if [[ $filesnum -gt 0 ]]; then
-    read -p "Simpify multiple spaces in filenames ? " -r REPLY
-    if [[ $REPLY =~ ^[Yy]$ ]] ; then
-        echo "$getlist" | tr '\n' '\0' | xargs -0 -n1 rename $DO "s/[ ]+/ /g"
+    ## rename files
+    if [[ $filesnum -gt 0 ]]; then
+        read -p "Simpify multiple >>\"$rep\"<< in filenames ? " -r REPLY
+        if [[ $REPLY =~ ^[Yy]$ ]] ; then
+            echo "$getlist" | tr '\n' '\0' | xargs -0 -n1 rename $DO "s/[$rep]+/$rep/g"
+        fi
     fi
-fi
+}
 
 
+## Simplify some usually recurrent characters ##
 
-echo
-echo "##############################################"
-echo "    Simplify multiple underscores in files    "
-echo "##############################################"
+simplify_multiple " "  "$FOLDER"
+simplify_multiple "_"  "$FOLDER"
+simplify_multiple "\." "$FOLDER"
+simplify_multiple "\-" "$FOLDER"
 
-## find files
-getlist="$(find "$FOLDER" \
-                -depth    \
-                -not \( -path "*/.git*"       -prune \) \
-                -not \( -path "*/inst/art/*"  -prune \) \
-                -not \( -path "*/inst/as/*"   -prune \) \
-                -not \( -path "*/inst/.art*"  -prune \) \
-                -name "*_*" | grep "__" )"
-
-## print list and count
-echo "$getlist" | sed '/^\s*$/d'
-echo "----"
-filesnum=$(echo "$getlist" | sed '/^\s*$/d' | wc -l)
-echo "Files found:  $filesnum"
-
-## rename files
-if [[ $filesnum -gt 0 ]]; then
-    read -p "Simpify multiple underscores in filenames ? " -r REPLY
-    if [[ $REPLY =~ ^[Yy]$ ]] ; then
-        echo "$getlist" | tr '\n' '\0' | xargs -0 -n1 rename $DO "s/[_]+/_/g"
-    fi
-fi
 
 
 
@@ -83,7 +68,8 @@ echo "#############################################"
 echo "    Find preceding spaces and underscores    "
 echo "#############################################"
 
-# find -depth -regextype grep -regex ".*/[ _]\+.*" -execdir rename -n "s/\/[ _]+/\//" "{}" \;
+## TODO allow only filenames start with [a-z][A-Z][α-ω][Α-Ω][0-9]
+
 # find -depth -regextype grep -regex ".*[ _]\+\..*" -execdir rename -n "s/[ ]+\././g" "{}" \;
 
 ## find files
@@ -111,9 +97,12 @@ fi
 
 
 
+
+
+
 echo
 echo "#############################################"
-echo "    Find subciding spaces and underscores    "
+echo "    Find subsiding spaces and underscores    "
 echo "#############################################"
 
 ## find files
@@ -186,7 +175,54 @@ if [[ $filesnum -gt 0 ]]; then
 fi
 
 
+
+
+
 echo "some more listings"
+
+
+
+
+echo
+PS3="Choose replacement character for script: "
+
+select opt in  space underscore dash EXIT ; do
+  case $opt in
+    space)       rep=" "; break    ;;
+    underscore)  rep="_"; break    ;;
+    dash)        rep="-"; break    ;;
+    EXIT)        exit              ;;
+    *)           echo "Invalid option $REPLY"   ;;
+  esac
+done
+
+echo "Replacement char  >>$rep<< "
+
+
+
+## check for more panctuation
+
+chars=( "%" "$" "#" "?" "<" ">" ":" "*" "|" '"' "'" "!" )
+for ch in "${chars[@]}"; do
+    echo "---------------------"
+    echo "ddd $ch ddd"
+
+
+
+    find "$FOLDER" \
+         -depth    \
+         -not \( -path "*/.git*"       -prune \) \
+         -not \( -path "*/inst/art/*"  -prune \) \
+         -not \( -path "*/inst/as/*"   -prune \) \
+         -not \( -path "*/inst/.art*"  -prune \) \
+         -regextype grep -regex ".*[$ch]\+.*"
+
+
+
+
+done
+
+
 
 
 ## find some really bad characters    % $#,?<> \:*| "
