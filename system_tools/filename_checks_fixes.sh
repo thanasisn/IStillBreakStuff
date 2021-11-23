@@ -3,7 +3,7 @@
 
 #### Make file and folder names consistent and nice
 ## uses 'rename', will not overwrite
-
+## TODO it is not tested for all cases
 
 FOLDER="$@"
 echo "$FOLDER"
@@ -41,6 +41,7 @@ remove_char () {
                     -not \( -path "*/inst/as/*"   -prune \) \
                     -not \( -path "*/inst/.art*"  -prune \) \
                     -not \( -path "*/.Docu.enc/*" -prune \) \
+                    -not \( -path "*/_book/*"     -prune \) \
                     -name "*$char*" )"
     ## print list and count
     echo "$getlist" | sed '/^\s*$/d'
@@ -81,6 +82,7 @@ replace_with () {
                     -not \( -path "*/inst/as/*"   -prune \) \
                     -not \( -path "*/inst/.art*"  -prune \) \
                     -not \( -path "*/.Docu.enc/*" -prune \) \
+                    -not \( -path "*/_book/*"     -prune \) \
                     -name "*$char*" )"
     ## print list and count
     echo "$getlist" | sed '/^\s*$/d'
@@ -117,6 +119,7 @@ simplify_multiple () {
                     -not \( -path "*/inst/as/*"   -prune \) \
                     -not \( -path "*/inst/.art*"  -prune \) \
                     -not \( -path "*/.Docu.enc/*" -prune \) \
+                    -not \( -path "*/_book/*"     -prune \) \
                     -name "*$rep*" | grep "$rep$rep" )"
     ## print list and count
     echo "$getlist" | sed '/^\s*$/d'
@@ -161,6 +164,7 @@ getlist="$(find "$FOLDER" \
                 -not \( -path "*/inst/as/*"   -prune \) \
                 -not \( -path "*/inst/.art*"  -prune \) \
                 -not \( -path "*/.Docu.enc/*" -prune \) \
+                -not \( -path "*/_book/*"     -prune \) \
                 -regextype grep -regex ".*/[ _]\+.*" )"
 
 ## print list and count
@@ -195,6 +199,7 @@ getlist="$(find "$FOLDER" \
                 -not \( -path "*/inst/as/*"   -prune \) \
                 -not \( -path "*/inst/.art*"  -prune \) \
                 -not \( -path "*/.Docu.enc/*" -prune \) \
+                -not \( -path "*/_book/*"     -prune \) \
                 -regextype grep -regex ".*[ _]\+\..*")"
 
 ## print list and count
@@ -219,6 +224,7 @@ getlist="$(find "$FOLDER" \
                 -not \( -path "*/inst/as/*"   -prune \) \
                 -not \( -path "*/inst/.art*"  -prune \) \
                 -not \( -path "*/.Docu.enc/*" -prune \) \
+                -not \( -path "*/_book/*"     -prune \) \
                 -regextype grep -regex ".*[ _]\+$" )"
 
 ## print list and count
@@ -243,6 +249,7 @@ getlist="$(find "$FOLDER" \
                 -not \( -path "*/inst/as/*"   -prune \) \
                 -not \( -path "*/inst/.art*"  -prune \) \
                 -not \( -path "*/.Docu.enc/*" -prune \) \
+                -not \( -path "*/_book/*"     -prune \) \
                 -regextype grep -regex ".*[ _]\+/.*")"
 
 ## print list and count
@@ -279,12 +286,12 @@ echo "Replacement char  >>$rep<< "
 
 
 
-## check for more panctuation problems
+## check for more punctuation problems
 
 ## TODO doesn't work for $
 ## not all tested
 
-chars=( "%" "\$" "#" "\?" "<" ">" ":" "\*" "|" '"' "'" "!" "-" "~" "^" "—" "_" " " '\' "\`" )
+chars=( "%" "\$" "#" "\?" "<" ">" ":" "\*" "|" '"' "'" "!" "\-" "~" "^" "—" "_" " " '\' "\`" "\+" )
 
 ## remove or replace offending characters
 for ch in "${chars[@]}"; do
