@@ -6,7 +6,9 @@
 ## TODO it is not tested for all cases
 
 FOLDER="$@"
-echo "$FOLDER"
+echo
+echo "Working in: $FOLDER"
+echo
 
 ## rename
 # -d, --filename, --nopath, --nofullpath
@@ -18,6 +20,8 @@ echo "$FOLDER"
 DO=" -n "
 ## will try to apply
 DO=" -v "
+
+
 
 
 remove_char () {
@@ -307,6 +311,7 @@ done
 
 
 ## allow only some good characters in file names
+echo
 echo "----- Detect possible weird chars"
 
 find "$FOLDER" \
@@ -315,9 +320,26 @@ find "$FOLDER" \
     -not \( -path "*/inst/art/*"  -prune \) \
     -not \( -path "*/inst/as/*"   -prune \) \
     -not \( -path "*/inst/.art*"  -prune \) \
+    -not \( -path "*/.Docu.enc/*" -prune \) \
+    -not \( -path "*/_book/*"     -prune \) \
     -regextype grep ! -regex "[άέήίόύώΆΈΉΊΌΎΏ0-9a-zA-Zα-ωΑ-Ω./ '&-’_\!]\+"
 
 
 
+echo
+echo "----- Detect files not starting with alphanumeric"
+
+find "$FOLDER" \
+    -depth    \
+    -not \( -path "*/.git*"       -prune \) \
+    -not \( -path "*/inst/art/*"  -prune \) \
+    -not \( -path "*/inst/as/*"   -prune \) \
+    -not \( -path "*/inst/.art*"  -prune \) \
+    -not \( -path "*/.Docu.enc/*" -prune \) \
+    -not \( -path "*/_book/*"     -prune \) \
+    -exec bash -c 'echo "$(basename "$0")" @@@ "${0}" ' {} \; |\
+    grep -v "^[άέήίόύώΆΈΉΊΌΎΏ0-9a-zA-Zα-ωΑ-Ω]" |\
+    grep -o "@@@.*" |\
+    cut -d' ' -f2-
 
 exit 0
