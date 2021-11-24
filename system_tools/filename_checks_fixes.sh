@@ -55,7 +55,7 @@ remove_char () {
 
     ## rename files
     if [[ $filesnum -gt 0 ]]; then
-        read -p "REMOVE multiple >>\"$char\"<< with >>\"$rep\"<<  in filenames ? " -r REPLY
+        read -p "REMOVE multiple >>\"$char\"<< in filenames ? " -r REPLY
         if [[ $REPLY =~ ^[Yy]$ ]] ; then
             echo "$getlist" | tr '\n' '\0' | xargs -0 -n1 rename $DO "s/[$char]+//g"
         fi
