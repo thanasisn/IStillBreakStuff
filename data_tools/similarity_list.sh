@@ -37,12 +37,11 @@ Help () {
     echo ""
 }
 
-
 prefix=""
 useprefix=false
 ignoreshort=false
 
-while getopts ":hpi:" option; do
+while getopts "hp::i::" option; do
    case $option in
       h) # display Help
          Help
@@ -59,9 +58,8 @@ while getopts ":hpi:" option; do
    esac
 done
 
-
-[ $useprefix ] &&  echo "Prefix to ignore: $prefix "
-
+echo "Prefix to ignore:    $prefix "
+echo "Ignore shorter than: $short "
 
 ## alternative to fstrcmp
 function levenshtein {
@@ -96,10 +94,15 @@ function levenshtein {
     fi
 }
 
-
 ## remove empty lines and colors
 data="$(echo "$data" | sed '/^$/d' | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g" )"
-## count lines
+
+# ## remove shorter lines
+# if $ignoreshort; then
+#     echo "$data" | sed '/^.\{,'"$short"'\}$/d'
+# fi
+
+## count lines to iterate
 tl="$(echo "$data" | wc -l )"
 
 echo "Total lines: $tl"
@@ -123,6 +126,13 @@ for (( i=1; i<=$tl; i++ )); do
             two="$(echo "$two" | sed 's,'"$pretwo"',,')"
         fi
         # echo "$one" "$oone" "$two" "$otwo"
+
+        ## skip short terms
+        if $ignoreshort; then
+            if [ ${#one} -lt $short ] || [ ${#two} -lt $short ] ; then
+                continue
+            fi
+        fi
 
         ## get distances
         printf "F:%6s \"%s\" \"%s\"  ::  \"%s\" \"%s\"\n" "$(fstrcmp -p  "$one" "$two")" "$one" "$two" "$oone" "$otwo"
