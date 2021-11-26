@@ -3,7 +3,7 @@
 
 #### Create list of filename (ignoring extensions) occurrences recursively
 
-## Useful for side files
+## Useful for checking of side files
 ## Use this list to remove files conditionally that don't match
 ## example cat ./1_occurances.list | grep "props" | xargs -d '\n' trash
 
