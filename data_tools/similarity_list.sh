@@ -26,20 +26,23 @@ Help () {
     echo " Reads from stdin. Use to find similar names, or lines of text in a file with appropriate pre formatting."
     echo " It is slow, so better redirect output to a file."
     echo
-    echo "   -p  grep pattern to get prefix"
+    echo "   -p <pattern>    grep pattern to get prefix"
+    echo "   -i <#>          skip arguments sorter than #"
     echo "   -h  print this help text"
     echo
     echo " Usage:"
     echo "    ls | $(basename $0) "
-    echo "    find -maxdepth 2 -iname "*.sh" -type f | $(basename $0) -p \".*/\" "
+    echo "    find -maxdepth 2 -iname "*.sh" -type f | $(basename $0) -p \".*/\" > similarfilenames.txt "
+    echo "    sort similarfilenames.txt"
     echo ""
 }
 
 
 prefix=""
 useprefix=false
+ignoreshort=false
 
-while getopts ":hp:" option; do
+while getopts ":hpi:" option; do
    case $option in
       h) # display Help
          Help
@@ -47,6 +50,9 @@ while getopts ":hp:" option; do
       p) # prefix pattern
          useprefix=true
          prefix=$OPTARG;;
+      i) # ingore sort arguments
+         ignoreshort=true
+         short=$OPTARG;;
      \?) # Invalid option
          echo "Error: Invalid option"
          exit;;
@@ -54,9 +60,8 @@ while getopts ":hp:" option; do
 done
 
 
-if $useprefix; then
-    echo "Prefix to ignore: $prefix "
-fi
+[ $useprefix ] &&  echo "Prefix to ignore: $prefix "
+
 
 ## alternative to fstrcmp
 function levenshtein {
@@ -120,7 +125,7 @@ for (( i=1; i<=$tl; i++ )); do
         # echo "$one" "$oone" "$two" "$otwo"
 
         ## get distances
-        printf "F:: %-6s %s %s  ::  %s %s\n" "$(fstrcmp -p  "$one" "$two")" "$one" "$two" "$oone" "$otwo"
+        printf "F:%6s \"%s\" \"%s\"  ::  \"%s\" \"%s\"\n" "$(fstrcmp -p  "$one" "$two")" "$one" "$two" "$oone" "$otwo"
         # printf "L:: %-6s %s %s  ::  %s %s\n" "$(levenshtein "$one" "$two")" "$one" "$two" "$oone" "$otwo"
 
     done
