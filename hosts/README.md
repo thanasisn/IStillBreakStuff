@@ -9,7 +9,9 @@ I use it as crontab command.
 - Download and merges lists from different sources.
 - Accepts custom url entries.
 - **Will try to update the host file.**
-- It can list more than 815k domains.
+- It can block more than 1 million domains.
+- Of course this is overkill. 
+
 
 It uses `sudo` to update the `/etc/hosts` file without any warning.
 *May disrupt the spacetime continuum forever.*

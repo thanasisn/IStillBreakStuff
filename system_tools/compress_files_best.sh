@@ -12,7 +12,7 @@
 ## Defaults ##
 SHOW_TABLE="yes"
 APPLY_COMPRESSION="yes"
-REMOVE_ORIGINAL="yes"
+REMOVE_ORIGINAL="no"
 INTERACTIVE="yes"
 BYTES_REDUCTION="10"
 OVERWRITE="yes"
@@ -53,6 +53,19 @@ ARGUMENT_LIST=(
     "overwrite"
     "threshold-bytes"
 )
+
+bytesToHuman() {
+    b=${1:-0}; d=''; s=0; S=("      B" {K,M,G,T,P,E,Z,Y}iB)
+    while ((b > 1024)); do
+        d="$(printf ".%03d" $((b % 1024 * 100 / 1024)))"
+        b=$((b / 1024))
+        (( s++ ))
+    done
+#     echo   "$b$d ${S[$s]}"
+    printf "%5s%s %s" "$b" "$d" "${S[$s]}"
+}
+
+
 
 # read arguments
 opts=$(getopt \
@@ -129,6 +142,8 @@ fi
 
 
 ## MAIN LOGIC ##
+totalsize="0"
+totalcompressed="0"
 
 for af in "$@" ; do
     [[ ! -f "$af" ]] && echo "NOT A FILE: $af" && continue
@@ -192,9 +207,11 @@ for af in "$@" ; do
     ## useful to gather stats for multiple files compression analysis
     echo "BEST:     c:${Scodecs[0]} l:${Sclevel[0]} b:${Sfsizes[0]} r:${Scratio[0]}% $af "
     echo "BENEFIT:  $(( FILESIZE - Sfsizes[0] )) b"
+    totalsize=$(( totalsize + FILESIZE ))
+    totalcompressed=$(( totalcompressed + Sfsizes[0] ))
 
     ## check benefit
-    if [[ $(( FILESIZE - ${Sfsizes[0]} )) -lt $BYTES_REDUCTION  ]]; then
+    if [[ $(( FILESIZE - Sfsizes[0] )) -lt $BYTES_REDUCTION  ]]; then
         echo "SKIP:     Benefit limit exceeded:  $af"
         continue
     fi
@@ -231,3 +248,8 @@ done
 echo
 echo "FINISHED"
 echo
+echo "Total input:      $(bytesToHuman $totalsize)   $totalsize b"
+echo "Total compressed: $(bytesToHuman $totalcompressed)   $totalcompressed b"
+echo "Total benefit:    $(bytesToHuman $(( totalsize - totalcompressed )))   $(( totalsize - totalcompressed )) b"
+
+exit
