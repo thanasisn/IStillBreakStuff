@@ -9,6 +9,8 @@
 ## Most programming languages can read this files directly anyway
 ## Can be run interactively or in batch mode for scripting
 
+## TODO option to choose algorithm
+
 ## Defaults ##
 SHOW_TABLE="yes"
 APPLY_COMPRESSION="yes"
@@ -18,6 +20,8 @@ BYTES_REDUCTION="10"
 OVERWRITE="yes"
 
 ALGO=( bzip2 gzip xz )
+# ALGO=( gzip )
+
 
 function _usage()
 {
