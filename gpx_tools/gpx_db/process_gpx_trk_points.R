@@ -23,6 +23,10 @@ library(sf)
 source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 
 
+## TODO find files in bb 23.67452854,39.90723739,23.72368429,39.94759822
+## 22.94751066,40.59749471,23.02471994,40.65515229
+bb <- c(23.52248397,39.88553600,23.75088442,40.03016131)
+# bb <- c(21.67452854,35.90723739,26.72368429,42.94759822)
 
 
 ## load data from gpx gather
@@ -30,13 +34,14 @@ DT           <- readRDS(trackpoints_fl)
 ## drop files dates
 DT[, F_mtime:=NULL]
 
-## load data from google locations
-DT2 <- readRDS(goolgepoints_fl)
-DT2[, F_mtime:=NULL]
-
-## combine data
-DT <- rbind(DT, DT2[, names(DT), with =F ] )
-rm(DT2)
+# ## load data from google locations
+# DT2 <- readRDS(goolgepoints_fl)
+# names(DT2)[names(DT2)=="file"] <- "filename"
+# DT2[, F_mtime:=NULL]
+#
+# ## combine data
+# DT <- rbind(DT, DT2[, names(DT), with =F ] )
+# rm(DT2)
 
 ## remove fake dates
 DT[ time < "1971-01-01", time := NA ]
@@ -68,13 +73,13 @@ if ( nrow(DT[ is.na(X) |
 if ( nrow( DT[ is.na(time)] ) > 0 ) {
     cat(paste(nrow(DT[is.na(time)]), "Points missing times\n"))
 
-    mistime <- DT[ is.na(time), .N, by = file]
+    mistime <- DT[ is.na(time), .N, by = filename]
     cat(paste(nrow(mistime), "Files with missing times\n"))
 
     ## show on terminal
     # print(mistime[,.(N,file)])
     ## write to file
-    gdata::write.fwf(mistime[,.(N,file)],
+    gdata::write.fwf(mistime[,.(N,filename)],
                      sep  = " ; ",
                      file = fl_notimes )
     ## clean bad data
@@ -83,7 +88,16 @@ if ( nrow( DT[ is.na(time)] ) > 0 ) {
 
 
 
+####  List file points in a bounding box
 
+
+DT[ Xdeg >= bb[1] &
+    Xdeg <= bb[3] &
+    Ydeg >= bb[2] &
+    Ydeg <= bb[4] &
+    grepl(".*.gpx", filename, ignore.case = T), .(Hits = .N), by = filename ]
+
+stop()
 
 
 
@@ -91,14 +105,14 @@ if ( nrow( DT[ is.na(time)] ) > 0 ) {
 cat(paste("Get possible duplicate files\n"))
 
 ## get files with points in the same date
-file_dates <- DT[, .N, by = .(Date = as.Date(time), file)]
+file_dates <- DT[, .N, by = .(Date = as.Date(time), filename)]
 same_date  <- list()
 for (ad in unique(file_dates$Date)) {
     ad   <- as.Date(ad, origin = "1970-01-01")
     temp <- file_dates[Date == ad]
     if (nrow(temp) > 1 ) {
         # cat(paste(temp$file),"\n")
-        same_date <- c(same_date, list(t(temp$file)))
+        same_date <- c(same_date, list(t(temp$filename)))
     }
 }
 
@@ -106,7 +120,7 @@ for (ad in unique(file_dates$Date)) {
 dup_points <- data.frame()
 for (il in 1:length(same_date)) {
 
-    temp <- DT[ file %in% same_date[[il]]]
+    temp <- DT[ filename %in% same_date[[il]]]
 
     ## only when we have time
     temp <- temp[ !is.na(time) ]
@@ -117,11 +131,11 @@ for (il in 1:length(same_date)) {
     duppoints <- temp[fD == TRUE]
 
     ## files with dups points
-    countP <- duppoints[ , .(DupPnts = .N, STime = min(time), ETime = max(time)) , by = .(file ) ]
+    countP <- duppoints[ , .(DupPnts = .N, STime = min(time), ETime = max(time)) , by = .(filename) ]
     countP$TotPnts <- 0
     countP$Set     <- il
-    for (af in unique(countP$file)) {
-        countP[file==af, TotPnts := DT[file == af, .N] ]
+    for (af in unique(countP$filename)) {
+        countP[ filename == af, TotPnts := DT[ filename == af, .N] ]
     }
     dup_points <- rbind(dup_points, countP)
 }
@@ -137,13 +151,13 @@ dup_points$ETime <- format( dup_points$ETime, "%FT%R:%S" )
 
 ## get sets with big coverage
 gdata::write.fwf(dup_points[ Set %in% unique(dup_points[ Cover >= cover_threshold, Set]),
-                             .(Set, file, DupPnts, TotPnts, Cover, STime, ETime) ],
+                             .(Set, filename, DupPnts, TotPnts, Cover, STime, ETime) ],
                  sep   = " ; ",
                  quote = FALSE,
                  file  = fl_suspctpt )
 
 ## get all sets
-gdata::write.fwf(dup_points[,.(Set, file, DupPnts, TotPnts, Cover, STime, ETime)],
+gdata::write.fwf(dup_points[,.(Set, filename, DupPnts, TotPnts, Cover, STime, ETime)],
                  sep = " ; ", quote = FALSE,
                  file = fl_suspctpt_all )
 
@@ -161,13 +175,13 @@ table((DT$dist     %/% 1000) * 1000 )
 table(abs(DT$kph   %/% 200) * 200 )
 
 cat(paste("\nGreat distances\n"))
-DT[dist > 100000, .( .N, MaxDist = max(dist)) , by = file]
+DT[dist > 100000, .( .N, MaxDist = max(dist)) , by = filename]
 
 cat(paste("\nGreat speeds\n"))
-DT[kph > 500000 & !is.infinite(kph), .(.N, MaxKph = max(kph), time[which.max(kph)]) , by = file ]
+DT[kph > 500000 & !is.infinite(kph), .(.N, MaxKph = max(kph), time[which.max(kph)]) , by = filename ]
 
 cat(paste("\nGreat times\n"))
-DT[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(timediff)]) , by = file ]
+DT[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(timediff)]) , by = filename ]
 
 
 # esss <- DT[kph > 200, .(file, kph, timediff, dist ,time) ]
@@ -194,9 +208,9 @@ DT[ , time :=  (as.numeric(time) %/% rsltemp * rsltemp) + (rsltemp/2)]
 DT[ , time :=  as.POSIXct( time, origin = "1970-01-01") ]
 
 ## exclude some data paths not mine
-DT <- DT[ grep("/Plans/",   file, invert = T ), ]
-DT <- DT[ grep("/E_paths/", file, invert = T ), ]
-DT <- DT[ grep("/ROUT/",    file, invert = T ), ]
+DT <- DT[ grep("/Plans/",   filename, invert = T ), ]
+DT <- DT[ grep("/E_paths/", filename, invert = T ), ]
+DT <- DT[ grep("/ROUT/",    filename, invert = T ), ]
 
 ## get unique points
 setkey( DT, time, X, Y )
@@ -208,7 +222,7 @@ DT <- unique( DT[list(time, X, Y), nomatch = 0]  )
 DT <- DT[ !is.na(X) ]
 DT <- DT[ !is.na(Y) ]
 
-cat(paste( length(unique( DT$file )), "files to bin\n" ))
+cat(paste( length(unique( DT$filename )), "files to bin\n" ))
 cat(paste( nrow( DT ), "points to bin\n" ))
 
 
@@ -216,11 +230,11 @@ cat(paste( nrow( DT ), "points to bin\n" ))
 
 ## break data in two categories
 Dtrain <- rbind(
-    DT[ grep("/TRAIN/", file ), ]
+    DT[ grep("/TRAIN/", filename ), ]
 )
 Dtrain <- unique(Dtrain)
 
-Drest <- DT[ ! grep("/TRAIN/", file ), ]
+Drest <- DT[ ! grep("/TRAIN/", filename ), ]
 Drest <- unique(Drest)
 
 # unique(dirname( Dtrain$file))

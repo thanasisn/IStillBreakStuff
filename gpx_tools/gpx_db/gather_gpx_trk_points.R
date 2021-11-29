@@ -27,7 +27,7 @@ source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 # options(warn=2)
 options(warn=1)
 
-
+## TODO add compressed gpx files or use fit files
 
 ## gather all gpx files
 gpxlist <- c()
@@ -50,9 +50,9 @@ if (file.exists(trackpoints_fl)) {
     ## load old data
     data <- readRDS(trackpoints_fl)
     ## remove missing files
-    data <- data[ file.exists(file) ]
+    data <- data[ file.exists(filename) ]
     ## get parsed files
-    dblist <- unique( data[, c("file","F_mtime")] )
+    dblist <- unique( data[, c("filename","F_mtime")] )
     ## get all files
     fllist <- data.frame(file = gpxlist,
                          F_mtime = file.mtime(gpxlist))
@@ -61,9 +61,9 @@ if (file.exists(trackpoints_fl)) {
 
     ## check for changed files
     ##FIXME  not tested
-    data <- data[ ! file %in% ddd$file ]
+    data <- data[ ! filename %in% ddd$filename ]
 
-    gpxlist <- ddd$file
+    gpxlist <- ddd$filename
 
 } else {
     data <- data.table()
@@ -109,20 +109,21 @@ for (af in gpxlist) {
     temp   <- cbind(temp, latlon)
 
     ## data to keep
-    temp   <- temp[, .(time,X,Y,Xdeg,Ydeg,dist,timediff, file = af, F_mtime = file.mtime(af))]
+    temp   <- temp[, .(time,X,Y,Xdeg,Ydeg,dist,timediff, filename = af, F_mtime = file.mtime(af))]
 
     ## some files don't have tracks
     if (!nrow(temp)>0) { next() }
     data <- rbind(data,temp)
 
     ## partial write
-    # if (cnt %% 40 == 0) {
-    #     write_RDS(data, trackpoints_fl)
-    # }
+    if (cnt %% 40 == 0) {
+        # write_RDS(data, trackpoints_fl)
+        saveRDS(data, trackpoints_fl)
+    }
 }
 ## final write
-write_RDS(data, trackpoints_fl)
-
+# write_RDS(data, trackpoints_fl)
+saveRDS(data, trackpoints_fl, compress = "xz")
 
 
 ####_ END _####
