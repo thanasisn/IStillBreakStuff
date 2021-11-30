@@ -47,8 +47,6 @@ traincomplist <- list.files("~/TRAIN/GoldenCheetah/Athan/imports/",
                             full.names = T)
 gpxlist <- unique(c(gpxlist, traincomplist))
 
-read_sf(gunzip(traincomplist[1], remove = FALSE, temporary = TRUE, skip = TRUE ), layer = "track_points")
-read_sf(gunzip(gpxlist[1], remove = FALSE, temporary = TRUE, skip = TRUE ), layer = "track_points")
 
 ## exclude some files
 # gpxlist <- gpxlist[grep("orig", basename(gpxlist), ignore.case = TRUE, invert = T)]
@@ -92,7 +90,6 @@ for (af in gpxlist) {
     ## read both gz and regular files
     temp <- read_sf( gunzip(af, remove = FALSE, temporary = TRUE, skip = TRUE ),
                      layer = "track_points")
-
 
     ## This assumes that dates in file are correct.......
     temp <- temp[ order(temp$time, na.last = FALSE), ]
