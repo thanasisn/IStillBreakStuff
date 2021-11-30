@@ -19,6 +19,7 @@ library(dplyr)
 library(data.table)
 library(trip)
 library(myRtools)
+library(R.utils)
 
 ## read vars
 source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
@@ -40,6 +41,14 @@ for (ar in gpx_repos) {
     gpxlist <- unique(c(gpxlist, templist))
 }
 
+## add compressed data files
+traincomplist <- list.files("~/TRAIN/GoldenCheetah/Athan/imports/",
+                            pattern = "activity.*.gz",
+                            full.names = T)
+gpxlist <- unique(c(gpxlist, traincomplist))
+
+read_sf(gunzip(traincomplist[1], remove = FALSE, temporary = TRUE, skip = TRUE ), layer = "track_points")
+read_sf(gunzip(gpxlist[1], remove = FALSE, temporary = TRUE, skip = TRUE ), layer = "track_points")
 
 ## exclude some files
 # gpxlist <- gpxlist[grep("orig", basename(gpxlist), ignore.case = TRUE, invert = T)]
@@ -79,7 +88,12 @@ for (af in gpxlist) {
     cat(paste(cnt,total,af,"\n"))
 
     ## get all points
-    temp <- read_sf(af, layer = "track_points")
+    # temp <- read_sf(af, layer = "track_points")
+    ## read both gz and regular files
+    temp <- read_sf( gunzip(af, remove = FALSE, temporary = TRUE, skip = TRUE ),
+                     layer = "track_points")
+
+
     ## This assumes that dates in file are correct.......
     temp <- temp[ order(temp$time, na.last = FALSE), ]
     if (nrow(temp)<2) { next() }
