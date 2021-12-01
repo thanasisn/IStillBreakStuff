@@ -25,7 +25,7 @@ source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 
 ## TODO find files in bb 23.67452854,39.90723739,23.72368429,39.94759822
 ## 22.94751066,40.59749471,23.02471994,40.65515229
-bb <- c(23.52248397,39.88553600,23.75088442,40.03016131)
+bb <- c(23.19148951,40.25211520,23.22016370,40.26935524)
 # bb <- c(21.67452854,35.90723739,26.72368429,42.94759822)
 
 
@@ -90,14 +90,12 @@ if ( nrow( DT[ is.na(time)] ) > 0 ) {
 
 ####  List file points in a bounding box
 
+# files_bb <- DT[ Xdeg >= bb[1] &
+#                 Xdeg <= bb[3] &
+#                 Ydeg >= bb[2] &
+#                 Ydeg <= bb[4] &
+#                 grepl(".*.gpx", filename, ignore.case = T), .(Hits = .N), by = filename ]
 
-DT[ Xdeg >= bb[1] &
-    Xdeg <= bb[3] &
-    Ydeg >= bb[2] &
-    Ydeg <= bb[4] &
-    grepl(".*.gpx", filename, ignore.case = T), .(Hits = .N), by = filename ]
-
-stop()
 
 
 
@@ -143,7 +141,6 @@ for (il in 1:length(same_date)) {
 dup_points[, Cover := DupPnts / TotPnts]
 
 cat(paste(nrow(duppoints), "Duplicate points found\n"))
-
 
 dup_points$STime <- format( dup_points$STime, "%FT%R:%S" )
 dup_points$ETime <- format( dup_points$ETime, "%FT%R:%S" )
@@ -202,14 +199,25 @@ DT[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(timedi
 
 #### Bin points in grids ####
 
+## no need for all data for griding
+DT[, kph      := NULL]
+DT[, timediff := NULL]
+DT[, dist     := NULL]
+DT[, Xdeg     := NULL]
+DT[, Ydeg     := NULL]
+
+## keep only existing coordinates
+DT <- DT[ !is.na(X) ]
+DT <- DT[ !is.na(Y) ]
 
 ## aggregate times
 DT[ , time :=  (as.numeric(time) %/% rsltemp * rsltemp) + (rsltemp/2)]
 DT[ , time :=  as.POSIXct( time, origin = "1970-01-01") ]
 
+
+
 ## exclude some data paths not mine
 DT <- DT[ grep("/Plans/",   filename, invert = T ), ]
-DT <- DT[ grep("/E_paths/", filename, invert = T ), ]
 DT <- DT[ grep("/ROUT/",    filename, invert = T ), ]
 
 ## get unique points
@@ -218,9 +226,6 @@ setkey( DT, time, X, Y )
 ## remove duplicate points
 DT <- unique( DT[list(time, X, Y), nomatch = 0]  )
 
-## keep only existing coordinates
-DT <- DT[ !is.na(X) ]
-DT <- DT[ !is.na(Y) ]
 
 cat(paste( length(unique( DT$filename )), "files to bin\n" ))
 cat(paste( nrow( DT ), "points to bin\n" ))

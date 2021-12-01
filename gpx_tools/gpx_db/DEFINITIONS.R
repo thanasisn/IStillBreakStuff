@@ -35,6 +35,7 @@ fl_suspctpt_all <- paste0(baseoutput,"/Dups_point_suspects_all.csv")
 ## one file for all data
 layers_out      <- "~/GISdata/Layers/Auto/"
 fl_gis_data     <-  paste0(layers_out,"/Grid_mega.gpkg")
+fl_gis_data_test     <-  paste0(layers_out,"/Grid_mega_test.gpkg")
 
 ## Spatial aggregation
 rsls <- unique(c(
