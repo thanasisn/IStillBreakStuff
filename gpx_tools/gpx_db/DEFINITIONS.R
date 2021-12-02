@@ -52,7 +52,7 @@ rsls <- unique(c(
     50000 ))
 
 ## Temporal aggregation
-rsltemp         <- 300    ##  in seconds
+rsltemp         <- 600    ##  in seconds
 ## points inside the square counts once every 300 secs
 
 
