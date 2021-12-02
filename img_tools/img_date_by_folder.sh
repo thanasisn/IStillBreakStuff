@@ -23,37 +23,39 @@ echo "---------"
 find "$FOLDER" -type d | grep -v "$pattern"
 echo "---------"
 
-echo
-echo "Will process YYYY-MM-DD :"
-find "$FOLDER" -type d | grep "$pattern"
-echo "---------"
 
+filelist="$( find "$FOLDER" -type d | grep "$pattern" | sed '/^[[:space:]]*$/d' )"
+nfiles="$(echo "$filelist" | sed '/^[[:space:]]*$/d' | wc -l)"
+if [[ "$nfiles" -gt 0 ]]; then
+    echo
+    echo "Will process YYYY-MM-DD folders :"
+    echo "$filelist"
+    echo "---------"
+    read -p "Are you sure? " -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ $REPLY =~ ^[YyυY]$ ]]; then
+        echo "Continuing"
+        find "$FOLDER" -type d | grep "$pattern" | while read line; do
+            echo "$line"
+            date="$(echo "$line" | grep -o "$pattern")"
 
-read -p "Are you sure? " -n 1 -r
-echo    # (optional) move to a new line
-if [[ $REPLY =~ ^[YyυY]$ ]]; then
-    echo "Continuing"
-    find "$FOLDER" -type d | grep "$pattern" | while read line; do
-        echo "$line"
-        date="$(echo "$line" | grep -o "$pattern")"
+            echo "$date"
 
-        echo "$date"
+            find "$line" -type f | while read img; do
+                # echo "$img"
 
-        find "$line" -type f | while read img; do
-            # echo "$img"
+                ## create date command to use
+                ndate="$(echo "$date" | sed 's/-/:/g')"
+                comm="-AllDates=\"${ndate} 12:00:00\""
+                # echo "$comm"
 
-            ## create date command to use
-            ndate="$(echo "$date" | sed 's/-/:/g')"
-            comm="-AllDates=\"${ndate} 12:00:00\""
-            # echo "$comm"
-
-            exiftool -r -v -P "$comm" "$img"
+                exiftool -r -v -P "$comm" "$img"
+            done
         done
-    done
-else
-    echo "SKIP"
+    else
+        echo "SKIP"
+    fi
 fi
-
 
 
 ## Folder pattern YYYY-MM
@@ -66,36 +68,40 @@ echo "---------"
 find "$FOLDER" -type d | grep -v "$pattern"
 echo "---------"
 
-echo
-echo "Will process YYYY-MM :"
-find "$FOLDER" -type d | grep "$pattern"
-echo "---------"
+filelist="$( find "$FOLDER" -type d | grep "$pattern" | sed '/^[[:space:]]*$/d' )"
+nfiles="$(echo "$filelist" | sed '/^[[:space:]]*$/d' | wc -l)"
+if [[ "$nfiles" -gt 0 ]]; then
+    echo
+    echo "Will process YYYY-MM :"
+    echo "$filelist"
+    echo "---------"
+    read -p "Are you sure? " -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ $REPLY =~ ^[YyυY]$ ]]; then
+        echo "Continuing"
+        echo "$filelist" | while read line; do
+            echo "$line"
+            date="$(echo "$line" | grep -o "$pattern")"
 
+            echo "$date"
 
-read -p "Are you sure? " -n 1 -r
-echo    # (optional) move to a new line
-if [[ $REPLY =~ ^[YyυY]$ ]]; then
-    echo "Continuing"
-    find "$FOLDER" -type d | grep "$pattern" | while read line; do
-        echo "$line"
-        date="$(echo "$line" | grep -o "$pattern")"
+            find "$line" -type f | while read img; do
+                # echo "$img"
 
-        echo "$date"
+                ## create date command to use
+                ndate="$(echo "$date" | sed 's/-/:/g')"
+                comm="-AllDates=\"${ndate}:01 12:00:00\""
+                ## echo "$comm"
 
-        find "$line" -type f | while read img; do
-            # echo "$img"
-
-            ## create date command to use
-            ndate="$(echo "$date" | sed 's/-/:/g')"
-            comm="-AllDates=\"${ndate}:01 12:00:00\""
-            ## echo "$comm"
-
-            exiftool -r -v -P "$comm" "$img"
+                exiftool -r -v -P "$comm" "$img"
+            done
         done
-    done
-else
-    echo "SKIP"
+    else
+        echo "SKIP"
+    fi
 fi
+
+
 
 
 
@@ -109,38 +115,39 @@ echo "---------"
 find "$FOLDER" -type d | grep -v "$pattern"
 echo "---------"
 
-echo
-echo "Will process YYYY :"
-find "$FOLDER" -type d | grep "$pattern"
-echo "---------"
 
+filelist="$( find "$FOLDER" -type d | grep "$pattern" | sed '/^[[:space:]]*$/d' )"
+nfiles="$(echo "$filelist" | sed '/^[[:space:]]*$/d' | wc -l)"
+if [[ "$nfiles" -gt 0 ]]; then
+    echo
+    echo "Will process YYYY :"
+    echo "$filelist"
+    echo "---------"
+    read -p "Are you sure? " -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ $REPLY =~ ^[YyυY]$ ]]; then
+        echo "Continuing"
+        find "$FOLDER" -type d | grep "$pattern" | while read line; do
+            echo "$line"
+            date="$(echo "$line" | grep -o "$pattern")"
 
-read -p "Are you sure? " -n 1 -r
-echo    # (optional) move to a new line
-if [[ $REPLY =~ ^[YyυY]$ ]]; then
-    echo "Continuing"
-    find "$FOLDER" -type d | grep "$pattern" | while read line; do
-        echo "$line"
-        date="$(echo "$line" | grep -o "$pattern")"
+            echo "$date"
 
-        echo "$date"
+            find "$line" -type f | while read img; do
+                # echo "$img"
 
-        find "$line" -type f | while read img; do
-            # echo "$img"
+                ## create date command to use
+                ndate="$(echo "$date" | sed 's/-/:/g')"
+                comm="-AllDates=\"${ndate}:01:01 12:00:00\""
+                ## echo "$comm"
 
-            ## create date command to use
-            ndate="$(echo "$date" | sed 's/-/:/g')"
-            comm="-AllDates=\"${ndate}:01:01 12:00:00\""
-            ## echo "$comm"
-
-            exiftool -r -v -P "$comm" "$img"
+                exiftool -r -v -P "$comm" "$img"
+            done
         done
-    done
-else
-    echo "SKIP"
+    else
+        echo "SKIP"
+    fi
 fi
-
-
 
 echo
 
