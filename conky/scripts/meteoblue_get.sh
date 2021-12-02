@@ -5,6 +5,7 @@
 
 LOCATION_FILE="/dev/shm/CONKY/last_location.dat"
 METEOGRAM_IMG="/dev/shm/WHEATHER/meteoblue.png"
+MULTIMODE_IMG="/dev/shm/WHEATHER/meteoblue_multimodel.png"
 METEOGRAM_DAT="/dev/shm/WHEATHER/meteoblue.json"
 source "$HOME/.shell_variables"
 
@@ -13,7 +14,7 @@ set +e
 ## refresh if older than
 OLDNESS=$((3*3600))
 
-## Get location from file 
+## Get location from file
 if [[ ! -f  "$LOCATION_FILE" ]]; then
     echo "NOT EXISTING Location file : $LOCATION_FILE"
     exit 2
@@ -42,7 +43,10 @@ echo "$DATE  $LATI  $LONG  $ELEV  $CITY  $ACCU  $TYPE"
 urlm="http://my.meteoblue.com/visimage/meteogram_web?apikey=${METEOBLUE_API}&lat=${LATI}&lon=${LONG}"
 ## data url call
 urld="http://my.meteoblue.com/packages/basic-day?apikey=${METEOBLUE_API}&lat=${LATI}&lon=${LONG}"
+## multi model
+# urlmm="http://my.meteoblue.com/visimage/meteogram_multiSimple?apikey=${METEOBLUE_API}&lat=${LATI}&lon=${LONG}"
 
+echo "$urlmm"
 
 ## add elevation to url
 re='^[0-9]+$'
@@ -51,6 +55,7 @@ if ! [[ $ELEV =~ $re ]] ; then
 else
     urlm+="&asl=${ELEV}"
     urld+="&asl=${ELEV}"
+    urlmm+="&asl=${ELEV}"
 fi
 
 
@@ -93,6 +98,45 @@ if [[ $AGE -gt $OLDNESS ]]; then
 else
     echo "Image age      : $((AGE/60)) min"
 fi
+
+
+
+
+
+
+# ## Get image if not exist, get it end exit
+# if [[ ! -f "$MULTIMODE_IMG" ]]; then
+#     echo "Image not exist, try to get it ...."
+#     echo "getting from $urlmm"
+#     curl -s -o "$MULTIMODE_IMG" "$urlmm"
+#
+#     convert "$MULTIMODE_IMG"            \
+#             -crop  675x440+30+30        \
+#             -fuzz 10%                   \
+#             -transparent '#F8F8F8' "${MULTIMODE_IMG%.*}.trans.png"
+#
+# else
+#     echo "Existing image : $MULTIMODE_IMG"
+# fi
+#
+#
+# ## Check if image is old and get it again
+# AGE=$(($(date +%s)-$(date -r "$MULTIMODE_IMG" +%s)))
+# if [[ $AGE -gt $OLDNESS ]]; then
+#     echo "Image too old ($((AGE/60)) min), try to get it ...."
+#     echo "getting from $urlmm"
+#     curl -s -o "$MULTIMODE_IMG" "$urlmm"
+#
+#     convert "$MULTIMODE_IMG"            \
+#             -crop  675x440+30+30        \
+#             -fuzz 10%                   \
+#             -transparent '#F8F8F8' "${MULTIMODE_IMG%.*}.trans.png"
+#
+# else
+#     echo "Image age      : $((AGE/60)) min"
+# fi
+
+
 
 
 

@@ -33,19 +33,19 @@ fl_suspctpt_all <- paste0(baseoutput,"/Dups_point_suspects_all.csv")
 ## Output for qgis grid display ####
 
 ## one file for all data
-layers_out      <- "~/GISdata/Layers/Auto/"
-fl_gis_data     <-  paste0(layers_out,"/Grid_mega.gpkg")
-fl_gis_data_test     <-  paste0(layers_out,"/Grid_mega_test.gpkg")
+layers_out       <- "~/GISdata/Layers/Auto/"
+fl_gis_data      <-  paste0(layers_out,"/Grid_mega.gpkg")
+fl_gis_data_test <-  paste0(layers_out,"/Grid_mega_temporal.gpkg")
 
 ## Spatial aggregation
 rsls <- unique(c(
-    5,
     10,
     20,
     50,
     100,
     500,
     1000,
+    2000,
     5000,
     10000,
     20000,
