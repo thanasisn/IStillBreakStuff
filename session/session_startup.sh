@@ -80,9 +80,9 @@ fi
 # nohup $HOME/BASH/deamonize.sh "evolution" &
 
 
-## this is done by startdwm.sh
-# killall -s 9 stalonetray
-# nohup $HOME/BASH/deamonize.sh "stalonetray --sticky true -bg '#000000' --window-strut right --icon-size 19 --grow-gravity W --skip-taskbar --geometry 4x1-650-6 --icon-gravity W --kludges fix_window_pos" &
+
+killall -s 9 stalonetray
+nohup $HOME/BASH/deamonize.sh "stalonetray --sticky true -bg black --window-strut right --icon-size 19 --grow-gravity W --skip-taskbar --geometry  4x1-650-6 --icon-gravity W --kludges fix_window_pos" &
 
 
 
