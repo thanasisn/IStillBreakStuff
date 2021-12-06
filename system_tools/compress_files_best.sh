@@ -18,7 +18,6 @@ REMOVE_ORIGINAL="no"
 INTERACTIVE="yes"
 BYTES_REDUCTION="10"
 OVERWRITE="yes"
-
 ALGO=( bzip2 gzip xz )
 # ALGO=( gzip )
 
@@ -32,6 +31,7 @@ $*
     Usage: $(basename "${0}") <[options]> ./Glob/path/**/*.*
 
     Options:
+        --algorithm                (${ALGO[@]}) Give a specific algorithm to use.
         --ask-human       [yes/no] ($INTERACTIVE) Ask human for input. Setting to 'no' may be dangerous.
         --compress        [yes/no] ($APPLY_COMPRESSION) Write file with the best compressed. If no just test for best algorithm.
         --remove-source   [yes/no] ($REMOVE_ORIGINAL) Remove source file if compression was successful.
@@ -83,8 +83,12 @@ eval set --$opts
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        --algorithm  )     ALGO=( "$2" );
+                           echo "test $2";
+                           echo "${ALGO[@]}";
+                           shift 2 ;;
         --show-table )     SHOW_TABLE="$2";        shift 2 ;;
-        --compress )       APPLY_COMPRESSION="$2"; shift 2 ;;
+        --compress   )     APPLY_COMPRESSION="$2"; shift 2 ;;
         --remove-source )  REMOVE_ORIGINAL="$2";   shift 2 ;;
         --ask-human )      INTERACTIVE="$2";       shift 2 ;;
         --overwrite )      OVERWRITE="$2";         shift 2 ;;
@@ -105,6 +109,7 @@ echo
 echo "$@"
 echo
 echo "THE ABOVE PATHS WILL BE PROCESSED!"
+echo "ALGORITHM:          ${ALGO[@]}"
 echo "SHOW TABLE:         $SHOW_TABLE"
 echo "APPLY_COMPRESSION:  $APPLY_COMPRESSION"
 echo "REMOVE_ORIGINAL:    $REMOVE_ORIGINAL"
