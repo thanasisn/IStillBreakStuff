@@ -9,17 +9,14 @@
 ## Most programming languages can read this files directly anyway
 ## Can be run interactively or in batch mode for scripting
 
-## TODO option to choose algorithm
-
 ## Defaults ##
-SHOW_TABLE="yes"
+SHOW_TABLE="no"
 APPLY_COMPRESSION="yes"
 REMOVE_ORIGINAL="no"
 INTERACTIVE="yes"
 BYTES_REDUCTION="10"
 OVERWRITE="yes"
 ALGO=( bzip2 gzip xz )
-# ALGO=( gzip )
 
 
 function _usage()
@@ -31,7 +28,7 @@ $*
     Usage: $(basename "${0}") <[options]> ./Glob/path/**/*.*
 
     Options:
-        --algorithm                (${ALGO[@]}) Give a specific algorithm to use.
+        --algorithm       [bzip2 gzip xz] (${ALGO[@]}) Give a specific algorithm to use quote and space for multiple .
         --ask-human       [yes/no] ($INTERACTIVE) Ask human for input. Setting to 'no' may be dangerous.
         --compress        [yes/no] ($APPLY_COMPRESSION) Write file with the best compressed. If no just test for best algorithm.
         --remove-source   [yes/no] ($REMOVE_ORIGINAL) Remove source file if compression was successful.
@@ -49,12 +46,13 @@ EOF
 }
 
 ARGUMENT_LIST=(
+    "algorithm"
     "ask-human"
     "compress"
     "help"
+    "overwrite"
     "remove-source"
     "show-table"
-    "overwrite"
     "threshold-bytes"
 )
 
@@ -83,10 +81,7 @@ eval set --$opts
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --algorithm  )     ALGO=( "$2" );
-                           echo "test $2";
-                           echo "${ALGO[@]}";
-                           shift 2 ;;
+        --algorithm  )     ALGO=( $2 );            shift 2 ;;
         --show-table )     SHOW_TABLE="$2";        shift 2 ;;
         --compress   )     APPLY_COMPRESSION="$2"; shift 2 ;;
         --remove-source )  REMOVE_ORIGINAL="$2";   shift 2 ;;
