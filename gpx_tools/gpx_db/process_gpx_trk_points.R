@@ -88,7 +88,7 @@ if ( nrow( DT[ is.na(time)] ) > 0 ) {
 
 
 
-####  List file points in a bounding box
+####  List file points in a bounding box for cleaning up
 
 # files_bb <- DT[ Xdeg >= bb[1] &
 #                 Xdeg <= bb[3] &
@@ -210,6 +210,9 @@ DT[, Ydeg     := NULL]
 DT <- DT[ !is.na(X) ]
 DT <- DT[ !is.na(Y) ]
 
+cat(paste( length(unique( DT$filename )), "files to bin\n" ))
+cat(paste( nrow( DT ), "points to bin\n" ))
+
 ## aggregate times
 DT[ , time :=  (as.numeric(time) %/% rsltemp * rsltemp) + (rsltemp/2)]
 DT[ , time :=  as.POSIXct( time, origin = "1970-01-01") ]
@@ -227,8 +230,7 @@ setkey( DT, time, X, Y )
 DT <- unique( DT[list(time, X, Y), nomatch = 0]  )
 
 
-cat(paste( length(unique( DT$filename )), "files to bin\n" ))
-cat(paste( nrow( DT ), "points to bin\n" ))
+
 
 
 # unique(dirname( DT$file))
