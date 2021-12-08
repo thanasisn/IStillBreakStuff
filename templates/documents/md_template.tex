@@ -1,0 +1,236 @@
+% !TEX TS-program = xelatex
+% !TEX encoding = UTF-8 Unicode
+
+% -----------------
+% START OF PREAMBLE
+% -----------------
+\documentclass[a4paper,oneside,11pt]{article}
+
+\usepackage{titling}   %% for use \thedate \thetitle etc... anywhere (use before setting the variables)
+
+
+%%%% DOC info
+\newcommand{\myCdate}{20151110141516}
+
+$if(title)$
+\title{$title$}
+\newcommand{\mytitle}{$title$}
+$endif$
+
+$if(subtitle)$
+\subtitle{$subtitle$}
+$endif$
+
+\date{\today}
+$if(date)$
+\date{$date$}
+$endif$
+
+\author{$for(author)$$author$$sep$ \and $endfor$}
+$if(author)$
+\newcommand{\myname} {$author$}
+$endif$
+
+
+
+% nice greek stuff
+\usepackage{fontspec}
+\usepackage{xunicode}
+\usepackage{xltxtra}
+\usepackage{xgreek}
+
+% alot of packages
+$if(listings)$
+\usepackage{listings}
+\lstset{
+        basicstyle=\small\ttfamily,
+        frame=single,
+        float}
+$endif$
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{graphviz}
+\usepackage{ragged2e}
+\usepackage{bm}
+\usepackage{amssymb,amsfonts,xfrac}         % mathematics
+\usepackage{lastpage}                       % find last page
+\usepackage{amsmath}
+\usepackage{datetime}
+\usepackage{titlesec}                       % section title format
+\usepackage[inline]{enumitem}
+\usepackage[american]{isodate}
+\usepackage{tabularx}
+\usepackage{mathtools}
+\usepackage{url}
+\usepackage{setspace}  % multiple line spaces available
+\usepackage{pdflscape}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+
+%%%% παράγραφοι noindent και newline
+\usepackage[parfill]{parskip}
+\parskip = \baselineskip
+
+%%%% PAGE GEOMETRY
+\usepackage{geometry}
+\geometry{
+    a4paper,
+    left     = 25mm,
+    right    = 25mm,
+    top      = 30mm,
+    bottom   = 30mm,
+    headsep  = 3\baselineskip,
+    footskip = 4\baselineskip}
+
+%%%% FLOATS
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+\usepackage{float}
+\floatstyle{plain}
+\newfloat{image}{tbH}{fpic}[section]
+\floatname{image}{Εικόνα}
+
+%%%% CAPTION  format floats title
+\usepackage{caption}
+\clearcaptionsetup{}
+\captionsetup{justification=justified,
+              font={footnotesize},
+              singlelinecheck=false,
+              width=.85\textwidth,
+              labelfont=bf,textfont=it}
+
+%%%% SIUNITX   values and units
+\usepackage{siunitx}
+\sisetup{mode=text,range-phrase={~με~}}
+%\sisetup{range-units=single}
+\DeclareSIUnit\decaetia{δεκαετία}
+% \sisetup{output-decimal-marker = {,}}
+\sisetup{output-decimal-marker = {.}}
+\sisetup{expproduct=cdot}
+\sisetup{separate-uncertainty = true}
+
+%%%% TABU   options for main tables
+\usepackage{tabu}
+\usepackage{colortbl}
+\taburowcolors[1] 2 {black!0 .. black!0}
+\taburulecolor{black}
+\tabulinesep=.3ex
+\renewcommand{\arraystretch}{1} % use tabulinesep
+\newcommand{\wtop}{1.75pt}
+\newcommand{\wmid}{1pt}
+\AtBeginEnvironment{tabu}{\scriptsize}
+
+%%%% FONTS
+\usepackage{setspace}  % multiple line spaces available
+\setstretch{1.3} % maybe need for caption spacing
+\setmainfont[Scale=1.1]{Linux Libertine O}  % vv good
+
+%%%% HEADER FOOTER
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+\fancyhf{}
+\fancyhead[R]{\footnotesize{\thedate\ \textit{\myname}}} % predefined ()
+\fancyhead[L]{\footnotesize{\nouppercase{\mytitle}}} % 1. sectionname
+\lfoot{\scriptsize{\leftmark}\normalsize}
+\rfoot{\footnotesize{\thepage}}
+\renewcommand{\headrulewidth}{0.25pt}
+\renewcommand{\footrulewidth}{0.25pt}
+
+%%%% HYPERREF
+\usepackage{hyperref}    % internal links
+\hypersetup{pdfauthor={Thanasis N},%
+            pdfproducer={Thanasis N},%
+            pdfcreator={Thanasis N},
+            pdfinfo={
+            CreationDate={D:\myCdate},
+            ModDate={D:\pdfdate}}}
+
+%%%% Code highlight
+\usepackage{minted}
+\newminted{python}{fontsize=\tiny,fontseries=DejaVu Sans Mono}  % for block
+\newmint{python}{fontsize=\tiny,fontseries=DejaVu Sans Mono}    % for inline
+\newmintedfile{python}{fontsize=\tiny,fontseries=DejaVu Sans Mono}  %for external file
+\newminted{bash}{fontsize=\scriptsize,fontseries=DejaVu Sans Mono}  % for block
+
+
+\hyphenpenalty=1000 % default 50
+\tolerance=1000      % default 200
+
+\newdateformat{mydate}{\THEDAY/\THEMONTH/\THEYEAR}
+
+\allowdisplaybreaks
+
+% section setup
+%\setcounter{secnumdepth}{0}                   % drop section numbering
+\titlespacing\section{0pt}{4em}{2em}           % section spaces
+\titlespacing\subsection{0pt}{2em }{1em }      % section spaces
+\titlespacing\subsubsection{0pt}{1.5em}{.5em } % section spaces
+
+% αποστάσεις εξισώσεων
+\newcommand{\zerodisplayskips}{%
+  \setlength{\abovedisplayskip}{10pt}
+  \setlength{\belowdisplayskip}{4pt}
+  \setlength{\abovedisplayshortskip}{10pt}
+  \setlength{\belowdisplayshortskip}{4pt}}
+\appto{\normalsize}{\zerodisplayskips}
+\appto{\small}{\zerodisplayskips}
+\appto{\footnotesize}{\zerodisplayskips}
+
+
+
+
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+$if(graphics)$
+\usepackage{graphicx}
+% We will generate all images so they have a width \maxwidth. This means
+% that they will get their normal width if they fit onto the page, but
+% are scaled down if they would overflow the margins.
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth
+\else\Gin@nat@width\fi}
+\makeatother
+\let\Oldincludegraphics\includegraphics
+\renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=0.8\maxwidth]{#1}}
+$endif$
+
+\usepackage{float}
+\let\origfigure=\figure
+\let\endorigfigure=\endfigure
+\renewenvironment{figure}[1][]{%
+  \origfigure[H]
+}{%
+  \endorigfigure
+}
+
+%% hide numbering
+\renewcommand\thesection{}
+\renewcommand\thesubsection{}
+\renewcommand\thesubsubsection{}
+
+
+
+% -----------------
+%  END OF PREAMBLE
+% -----------------
+\begin{document}
+\normalsize
+\boldmath
+\noindent
+
+\begin{center}
+    \Large\textbf{\mytitle}\\
+    \large\textit{\myname}\\
+    \small{\thedate}
+\end{center}
+
+
+$body$
+
+\end{document}

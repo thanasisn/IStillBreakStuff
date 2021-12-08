@@ -9,6 +9,7 @@ They are just convenient tools for the terminal.
 Things they do:
 
 
+- **adsl_refresh_ip.sh          :**   Refresh ip by refreshing adsl connection 
 - **auto_commit_push_git.sh     :**   Auto commit and push all git repos
 - **btrfs_defrag.sh             :**   Defrag all btrfs filesystems
 - **btrfs_scrub.sh              :**   Start a btrfs scrub to check data integrity
@@ -19,6 +20,7 @@ Things they do:
 - **disks_arrays_report.sh      :**   Gather information for disks arrays
 - **disks_smart_report.sh       :**   Gather S.M.A.R.T. info on all system drives
 - **extensions_to_lower.sh      :**   Convert file extensions to lower case
+- **filename_checks_fixes.sh    :**   Make file and folder names consistent and nice
 - **list_compressed.sh          :**   List compressed files by looking for mime type
 - **list_duplicate_filenames.sh :**   Find duplicate filenames recursively in a folder structure
 - **list_extensions.sh          :**   list unique extensions and count them
@@ -28,6 +30,7 @@ Things they do:
 - **list_matching_filenames.sh  :**   Create list of filename (ignoring extensions) occurrences recursively
 - **list_no_extensions.sh       :**   List files without extensions
 - **list_R_libraries.sh         :**   List libraries used in R and Rmd scripts
+- **md_build.sh                 :**   Build md files to multiple output formats
 - **mount_enc_home.sh           :**   Mount an encrypted LUKS partition over users home
 - **new_bash.sh                 :**   Create a new executable bash script
 - **new_md.sh                   :**   Just create a new md file with the current date
