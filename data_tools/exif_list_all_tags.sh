@@ -14,6 +14,8 @@ fi
 
 
 tmpfile="$FOLDER/.tag.dump"
+emptfile="$FOLDER/.tag.empty"
+
 
 echo "get all tag data"
 exiftool -a -s -G -r "$FOLDER" > "$tmpfile"
@@ -27,7 +29,7 @@ grep "^\[" "$tmpfile"  |\
     cut -d':' -f1      |\
     sort               |\
     uniq -c            |\
-    sort -n
+    sort -k2
 
 
 
@@ -37,7 +39,7 @@ grep "^\[" "$tmpfile"  |\
     grep -v "\[File\]" |\
     sort               |\
     uniq -c            |\
-    sort -n
+    sort -k2
 
 
 
@@ -57,7 +59,7 @@ cat "$tmpfile"         |\
     sort -n
 )"
 echo "$emptytag"
-
+echo "$emptytag" > "$emptfile"
 
 ## suggest some commands to use
 echo ""
@@ -65,12 +67,13 @@ echo " --- PROCESS EMPTY TAGS ---"
 echo "$emptytag" | while read line;do
     tagg="$(echo "$line" | cut -d"]" -f2 | sed 's/^[ ]*//')"
     echo "exiftool -a -s -G -r -if '\$$tagg eq \"\"' -\"*$tagg*\" \"$FOLDER\""
+    echo "exiftool -a -s -G -r -if '\$$tagg eq \"\"' -\"*$tagg*\" \"$FOLDER\"" >> "$emptfile"
 done
 
 echo
 echo " --- CLEAN ORIGINALS ---"
 echo "find \"$FOLDER\" -name \"*_original\" "
 echo ""
-echo "$tmpfile"
+echo "$tmpfile" "$emptfile"
 
 exit 0
