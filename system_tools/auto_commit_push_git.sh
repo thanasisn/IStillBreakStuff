@@ -52,6 +52,14 @@ git push -f -u origin main
 
 
 
+echo "------"
+cd "$HOME/PANDOC/Deployment_notes"
+pwd
+git commit -uno -a -m "Auto commit"
+git push -f -u origin main
+
+
+
 
 ##  COMMIT PUSH to local repos  ################################################
 
