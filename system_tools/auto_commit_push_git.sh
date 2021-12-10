@@ -54,6 +54,9 @@ git push -f -u origin main
 
 echo "------"
 cd "$HOME/PANDOC/Deployment_notes"
+cd "./_book"
+git add -f .
+cd ".."
 pwd
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
