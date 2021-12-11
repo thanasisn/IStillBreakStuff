@@ -66,6 +66,7 @@ git push -f -u origin main
 echo "------"
 cd "$HOME/PANDOC/Libradtran_guide"
 cd "./_book"
+ln -f ./Libratran_guide.html ./index.html
 git add -f .
 cd ".."
 pwd
