@@ -15,13 +15,13 @@ set +e
 
 ## this works only on tyler
 echo "DOTFILES"
-git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME commit -uno -a -m "Auto commit"
-git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME push -u origin master
+git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" commit -uno -a -m "Auto commit"
+git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" push -u origin master
 
 
 
 echo "------"
-cd "$HOME/CODE/"
+cd "$HOME/CODE/" || return
 pwd
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
@@ -29,7 +29,7 @@ git push -f -u origin main
 
 
 echo "------"
-cd "$HOME/CODE/R_myRtools/"
+cd "$HOME/CODE/R_myRtools/" || return
 pwd
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
@@ -61,6 +61,16 @@ pwd
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
 
+
+
+echo "------"
+cd "$HOME/PANDOC/Libradtran_guide"
+cd "./_book"
+git add -f .
+cd ".."
+pwd
+git commit -uno -a -m "Auto commit"
+git push -f -u origin main
 
 
 
