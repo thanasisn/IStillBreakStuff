@@ -21,7 +21,7 @@ git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" push -u origin master
 
 
 echo "------"
-cd "$HOME/CODE/" || return
+cd "$HOME/CODE/"
 pwd
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
@@ -29,7 +29,7 @@ git push -f -u origin main
 
 
 echo "------"
-cd "$HOME/CODE/R_myRtools/" || return
+cd "$HOME/CODE/R_myRtools/"
 pwd
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
