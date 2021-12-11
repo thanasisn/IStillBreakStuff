@@ -55,6 +55,7 @@ git push -f -u origin main
 echo "------"
 cd "$HOME/PANDOC/Deployment_notes"
 cd "./_book"
+ln -f ./Deployment_notes.html ./index.html
 git add -f .
 cd ".."
 pwd
