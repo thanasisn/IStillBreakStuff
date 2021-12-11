@@ -1,9 +1,9 @@
 
-
-# libradtran
+# libRadtran
 
 Some examples of running LibRadTran in parallel on linux machines using the shell.
 
+Other notes on using libRadtran can be found here: [libradtran-guide-thanasisn.netlify.app](https://libradtran-guide-thanasisn.netlify.app/) [![Netlify Status](https://api.netlify.com/api/v1/badges/9e12398d-4e6a-4b7f-b94d-35c9315fe2b5/deploy-status)](https://app.netlify.com/sites/libradtran-guide-thanasisn/deploys)
 
 
 - **paraleltest_parallel.sh    :**  Executioner of uvspec worker
