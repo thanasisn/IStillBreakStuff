@@ -101,6 +101,34 @@ git push -f -u origin main
 
 
 echo "------"
+cd "$HOME/PANDOC/Thesis"
+pwd
+find . -type f \(    -iname '*.sh'  \
+                  -o -iname '*.py'  \
+                  -o -iname '*.md'  \
+                  -o -iname '*.bas' \
+                  -o -iname '*.gnu' \
+                  -o -iname '*.dot' \
+                  -o -iname '*.frm' \
+                  -o -iname '*.par' \
+                  -o -iname '*.f90' \
+                  -o -iname '*.jl'  \
+                  -o -iname '*.c'   \
+                  -o -iname '*.h'   \
+                  -o -iname '*.gp'  \
+                  -o -iname '*.ex'  \
+                  -o -iname '*.bib' \
+                  -o -iname '*.tex' \
+                  -o -iname '*.Rmd' \
+                  -o -iname '*.md'  \
+                  -o -iname '*.r'   \) -print0 |\
+                  xargs -0 git add
+git commit -uno -a -m "Auto commit"
+git push -f -u origin main
+
+
+
+echo "------"
 cd "$HOME/PANDOC/thanasisnsite"
 cd "./public"
 git add -f .
