@@ -77,6 +77,18 @@ git push -f -u origin main
 
 
 echo "------"
+cd "$HOME/PANDOC/CHP1_measurements_guide"
+cd "./_book"
+ln -f ./CHP1_measurements_guide.html ./index.html
+git add -f .
+cd ".."
+pwd
+git commit -uno -a -m "Auto commit"
+git push -f -u origin main
+
+
+
+echo "------"
 cd "$HOME/PANDOC/Tracker_manual"
 cd "./_book"
 ln -f ./LAP_tracker_manual.html ./index.html
