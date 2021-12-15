@@ -46,7 +46,8 @@ urld="http://my.meteoblue.com/packages/basic-day?apikey=${METEOBLUE_API}&lat=${L
 ## multi model
 # urlmm="http://my.meteoblue.com/visimage/meteogram_multiSimple?apikey=${METEOBLUE_API}&lat=${LATI}&lon=${LONG}"
 
-echo "$urlmm"
+echo "$urlm"
+echo "$urld"
 
 ## add elevation to url
 re='^[0-9]+$'
