@@ -16,6 +16,7 @@ REMOVE_ORIGINAL="no"
 INTERACTIVE="yes"
 BYTES_REDUCTION="10"
 OVERWRITE="yes"
+
 ALGO=( bzip2 gzip xz )
 
 
@@ -249,11 +250,17 @@ for af in "$@" ; do
         fi
     fi
 done
+
+## get relative numbers
+rcom="$( echo "scale=2; 100 * ${totalcompressed}/${totalsize}" | bc )"
+rben="$( echo "scale=2; 100 * ( $totalsize - $totalcompressed) /${totalsize}" | bc )"
+
 echo
 echo "FINISHED"
 echo
-echo "Total input:      $(bytesToHuman $totalsize)   $totalsize b"
-echo "Total compressed: $(bytesToHuman $totalcompressed)   $totalcompressed b"
-echo "Total benefit:    $(bytesToHuman $(( totalsize - totalcompressed )))   $(( totalsize - totalcompressed )) b"
+echo "Total input:      $(bytesToHuman $totalsize)  100%   $totalsize b"
+echo "Total compressed: $(bytesToHuman $totalcompressed)  ${rcom}%  $totalcompressed b"
+echo "Total benefit:    $(bytesToHuman $(( totalsize - totalcompressed )))  ${rben}%  $(( totalsize - totalcompressed )) b"
+
 
 exit
