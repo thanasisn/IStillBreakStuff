@@ -3,6 +3,6 @@
 
 #### Find non ascii characters, offending base latex
 
-grep -n -P "[^|a-zA-Z\{\}\s%\./\-:;,0-9@=\\\\\"'\(\)_~\$\!&\`\?+#\^<>\[\]\*]" $@
+grep --color=auto -n -P "[^|a-zA-Z\{\}\s%\./\-:;,0-9@=\\\\\"'\(\)_~\$\!&\`\?+#\^<>\[\]\*]" $@
 
 exit 0 
