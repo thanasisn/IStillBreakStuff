@@ -84,7 +84,8 @@ git add -f .
 cd ".."
 pwd
 git commit -uno -a -m "Auto commit"
-git push -f -u origin main
+## will include to thesis
+# git push -f -u origin main
 
 
 
