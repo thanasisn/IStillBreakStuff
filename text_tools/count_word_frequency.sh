@@ -2,10 +2,9 @@
 ## created on 2019-10-27
 ## https://github.com/thanasisn <lapauththanasis@gmail.com>
 
-
-
-#### Count word frequency
-## works for multiple languages
+#### Count word frequency in a file
+## Language agnostic
+## Shows:  Word Index; Ocurances; Relative Ocurances; Word
 
 # 1. Substitute all non alphanumeric characters with a blank space.
 # 2. All line breaks are converted to spaces also.
@@ -33,16 +32,20 @@ sed -e 's/[^[:alpha:]]/ /g' "$AFILE" |\
     tr -s " "                        |\
     tr " " '\n'                      |\
     awk '{print tolower($0)}'        |\
+    sed '/^$/d'                      |\
     sort
 )"
 
+
+totalw="$(echo "$words" | wc -l)"
+
 ## Count word frequency
 echo "----------------------------"
-echo "$words" | uniq -c | sort -nr | nl
+echo "$words" | uniq -c | sort -n | awk -v total=$totalw '{printf "%6s %7.3f%%  %s\n",  $1, 100 * $1/total, $2;}' | nl
 echo "----------------------------"
 
 ## Total words
-echo "Total words:  $(echo "$words" | wc -l)"
+echo "Total words:  $totalw"
 
 
 exit 0
