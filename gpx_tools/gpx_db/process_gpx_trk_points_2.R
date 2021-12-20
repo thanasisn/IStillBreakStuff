@@ -22,6 +22,8 @@ library(sf)
 ## read vars
 source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 
+## google use data from google if no other data within n seconds
+google_threshold <- 6 * 60
 
 ## TODO find files in bb 23.67452854,39.90723739,23.72368429,39.94759822
 ## 22.94751066,40.59749471,23.02471994,40.65515229
@@ -30,26 +32,38 @@ bb <- c(23.19148951,40.25211520,23.22016370,40.26935524)
 
 
 ## load data from gpx gather
-DT           <- readRDS(trackpoints_fl)
+DT  <- readRDS(trackpoints_fl)
 ## drop files dates
-DT[, F_mtime:=NULL]
-
-# ## load data from google locations
-# DT2 <- readRDS(goolgepoints_fl)
-# names(DT2)[names(DT2)=="file"] <- "filename"
-# DT2[, F_mtime:=NULL]
-#
-# ## combine data
-# DT <- rbind(DT, DT2[, names(DT), with =F ] )
-# rm(DT2)
-
-## remove fake dates
+DT[ , F_mtime:=NULL]
 DT[ time < "1971-01-01", time := NA ]
+# DT[ , type := 1]
+DT <- DT[ !is.na(time), ]
+
+## load data from google locations
+DT2 <- readRDS(goolgepoints_fl)
+names(DT2)[names(DT2)=="file"] <- "filename"
+DT2[, F_mtime:=NULL]
+DT2[ time < "1971-01-01", time := NA ]
+# DT2[, type := 2]
+DT2 <- DT2[ !is.na(time), ]
+
+## find Google data we should include due to missing data
+setorder(DT2, time )
+setorder(DT, time  )
+near <- myRtools::nearest( as.numeric( DT2$time),
+                           as.numeric( DT$time ) )
+timdiff <- abs( as.numeric(DT[ near, ]$time - DT2$time))
+DT2     <- DT2[ timdiff >= google_threshold ]
+
+## combine data
+DT <- rbind(DT, DT2[, names(DT), with =F ] )
+DT <- DTt[ ! is.na(time) ]
+rm(DT2)
 
 
 hist(DT$time , breaks = 100)
 
-typenames <- c("Points","Days","Hours")
+typenames <- c( "Points", "Days", "Hours")
 
 
 cat(paste( length(unique( DT$file )), "total files parsed\n" ))
@@ -70,6 +84,7 @@ if ( nrow(DT[ is.na(X) |
     cat("Add some code to fix!!\n")
 }
 
+## FIXME this is pointless here!!
 if ( nrow( DT[ is.na(time)] ) > 0 ) {
     cat(paste(nrow(DT[is.na(time)]), "Points missing times\n"))
 
@@ -167,9 +182,9 @@ hist(DT$timediff)
 hist(DT$dist)
 hist(DT$kph)
 
-table((DT$timediff %/% 5) * 5 )
-table((DT$dist     %/% 1000) * 1000 )
-table(abs(DT$kph   %/% 200) * 200 )
+# table((DT$timediff %/% 5) * 5 )
+# table((DT$dist     %/% 1000) * 1000 )
+# table(abs(DT$kph   %/% 200) * 200 )
 
 cat(paste("\nGreat distances\n"))
 DT[dist > 100000, .( .N, MaxDist = max(dist)) , by = filename]
@@ -231,9 +246,7 @@ DT <- DT[ , .(Points = .N) ,  by = .(X,Y,Source, time) ]
 DT[ , day  := as.Date(time) ]
 DT[ , hour := as.POSIXct(as.numeric(time) %/% 3600 * 3600, origin = "1970-01-01") ]
 
-
-
-## export different spacial resolutions
+## export different spatial resolutions
 for (res in sort(rsls,decreasing = T)) {
     resolname <- sprintf("Res %8d m",res)
 
