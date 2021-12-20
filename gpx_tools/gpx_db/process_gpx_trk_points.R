@@ -30,22 +30,46 @@ bb <- c(23.19148951,40.25211520,23.22016370,40.26935524)
 
 
 ## load data from gpx gather
-DT           <- readRDS(trackpoints_fl)
+DT  <- readRDS(trackpoints_fl)
 ## drop files dates
-DT[, F_mtime:=NULL]
+DT[ , F_mtime:=NULL]
+DT[ time < "1971-01-01", time := NA ]
+DT[ , type := 1]
 
-# ## load data from google locations
-# DT2 <- readRDS(goolgepoints_fl)
-# names(DT2)[names(DT2)=="file"] <- "filename"
-# DT2[, F_mtime:=NULL]
-#
-# ## combine data
-# DT <- rbind(DT, DT2[, names(DT), with =F ] )
+## load data from google locations
+DT2 <- readRDS(goolgepoints_fl)
+names(DT2)[names(DT2)=="file"] <- "filename"
+DT2[, F_mtime:=NULL]
+DT2[ time < "1971-01-01", time := NA ]
+DT2[, type := 2]
+
+## combine data
+DTt <- rbind(DT, DT2[, names(DT), with =F ] )
+DTt <- DTt[ ! is.na(time) ]
+
+
+DTt[, checked := FALSE]
+DTt[, row     := .I ]
+setorder(DTt, time )
+
+vec <- which(DTt$type == 2)
+
+vec <- sample(vec, 100)
+for ( ii in vec ) {
+    DTt[ ii, ]
+}
+
+
+
 # rm(DT2)
 
 ## remove fake dates
-DT[ time < "1971-01-01", time := NA ]
 
+# plot(DTt$time, DTt$type)
+
+which( DTt$type == 2 )
+
+stop()
 
 hist(DT$time , breaks = 100)
 
