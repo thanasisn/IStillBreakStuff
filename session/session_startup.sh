@@ -8,8 +8,10 @@ set +e
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 kill_run () {
-    killall -s "$1"
-    nohup      "$1" &
+    killall -s "$@"
+    pkill   -9 "$@"
+    setsid     $@ &
+#    nohup      $@ &
 }
 
 
@@ -22,6 +24,7 @@ kill_run () {
 ## to have iso date in pcmanfm
 ## have to do dpkg-reconfigure and activate en_DK.UTF-8
 export LC_TIME=en_DK.UTF-8
+export _JAVA_AWT_WM_NONREPARENTING=1                                                             [7:36:07]
 
 ## use numbers on num keyboard
 numlockx on
@@ -49,7 +52,7 @@ kill_run  dunst
 kill_run  kdeconnect-indicator
 kill_run  volumeicon
 kill_run  sxhkd
-
+kill_run  "python3 $HOME/PROGRAMS/noisy/noisy.py --config $HOME/PROGRAMS/noisy/config.json"
 
 
 
@@ -63,10 +66,7 @@ fi
 
 
 
-if [[ $(hostname) == "tyler" ]]; then
-    # dont have full keyboard
-    numlockx off
-fi
+numlockx on
 
 
 
