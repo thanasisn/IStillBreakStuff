@@ -19,9 +19,9 @@ KILL_COUNT=1000
 ## you have to set this
 : ${COMMAND:?}
 
-## we assume the first word is the program and ignore other args
-name="$(basename "$COMMAND" | cut -d" " -f1)"
-pidfile="/dev/shm/${COMMAND}.deamon"
+## unique name for deamon
+name="$(echo "$COMMAND" | sed 's/[ ]*//g' | sed 's/[-]\+/-/g')"
+pidfile="/dev/shm/${name}.deamon"
 
 ## custom notification program
 NOTIFY_SEND="notify-send"

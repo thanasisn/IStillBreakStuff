@@ -84,7 +84,7 @@ numlockx on
 
 
 killall -s 9 stalonetray
-nohup $daemonize "stalonetray --sticky true -bg black --window-strut right --icon-size 19 --grow-gravity W --skip-taskbar --geometry  4x1-650-6 --icon-gravity W --kludges fix_window_pos" &
+nohup $daemonize "stalonetray --sticky -bg black --window-strut right --icon-size 19 --grow-gravity W --skip-taskbar --geometry  4x1-650-6 --icon-gravity W --kludges fix_window_pos" &
 
 
 
