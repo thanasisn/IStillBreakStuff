@@ -7,6 +7,8 @@ set +e
 
 SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
+daemonize="$HOME/CODE/system_tools/daemonize.sh"
+
 kill_run () {
     killall -s "$@"
     pkill   -9 "$@"
@@ -82,7 +84,7 @@ numlockx on
 
 
 killall -s 9 stalonetray
-nohup $HOME/BASH/deamonize.sh "stalonetray --sticky true -bg black --window-strut right --icon-size 19 --grow-gravity W --skip-taskbar --geometry  4x1-650-6 --icon-gravity W --kludges fix_window_pos" &
+nohup $daemonize "stalonetray --sticky true -bg black --window-strut right --icon-size 19 --grow-gravity W --skip-taskbar --geometry  4x1-650-6 --icon-gravity W --kludges fix_window_pos" &
 
 
 

@@ -16,6 +16,7 @@ Things they do:
 - **clean_metadata.sh            :**  Remove metadata from any file using exiftool
 - **compress_dirs_best.sh        :**  Compress individual folders after testing for best compression method for each folder
 - **compress_files_best.sh       :**  Compress individual files after testing for best compression method for each file
+- **daemonize.sh                 :**  Keep a program always running and restart it if needed
 - **disks_arrays_report.sh       :**  Gather information for disks arrays
 - **disks_smart_report.sh        :**  Gather S.M.A.R.T. info on all system drives
 - **extensions_to_lower.sh       :**  Convert file extensions to lower case
