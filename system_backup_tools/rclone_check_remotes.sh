@@ -2,11 +2,10 @@
 
 #### Report on the usage of all rclone remotes
 
-# DEDUPLICATE="yes"
 DEDUPLICATE="no"
-# EMPTYTRASH="yes"
 EMPTYTRASH="no"
-
+EMPTYTRASH="yes"
+DEDUPLICATE="yes"
 
 
 ## allow only one instance
@@ -34,7 +33,7 @@ trap cleanup 0 1 2 3 6
 ##   logging definitions   ##
 ##-------------------------##
 
-ldir="/home/athan/LOGs/SYSTEM_LOGS/"
+ldir="$HOME/LOGs/SYSTEM_LOGS/"
 mkdir -p "$ldir"
 
 ID="$1"
@@ -52,7 +51,6 @@ watchdogpid=$!
 info "script started"
 
 ## variables for all hosts
-TEMP_FOLDER="/dev/shm/borg_to_rclone_hom"
 RCLONE="$HOME/PROGRAMS/rclone"
 RCLONE_CONFIG="$HOME/Documents/rclone.conf"
 LOG_FILE="/tmp/$(basename "$0")_$(date +%F_%R).log"
@@ -83,7 +81,7 @@ WASTE=0
 for (( ii=0; ii<total; ii++ )); do
     echo ""
     echo ""
-    echo "  ===  $((ii+1)) / $total  ${remotes[$ii]}  === " ;
+    echo "=====  $((ii+1)) / $total  ${remotes[$ii]}  ==================" ;
 
     if [[ $DEDUPLICATE == "yes" ]]; then
         echo

@@ -82,7 +82,7 @@ exec  > >(tee -i "$LOG_FILE")
 exec 2> >(tee -i "$ERR_FILE")
 
 ## set the size for each account
-breakin=$(( 14900 * 1048576 ))
+breakin=$(( 14870 * 1048576 ))
 
 ## set the bandwidth limit
 BWLIM=${1:-50}
@@ -189,6 +189,11 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
 
     [[ ! -f "${TEMP_FOLDER}/file_list_$ii" ]] && echo " * No list to do ! * " && continue
 
+    ## dedupe
+    ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${drive[$ii]}"
+    ## empty trash
+    ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${drive[$ii]}"
+    ## sync
     "$RCLONE" ${otheropt} ${bwlimit} --config       "$RCLONE_CONFIG"                   \
                                      --include-from "${TEMP_FOLDER}/file_list_$ii"     \
                                      --log-file     "/dev/shm/rc_home_borg_${ii}.log"  \
