@@ -190,9 +190,9 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     [[ ! -f "${TEMP_FOLDER}/file_list_$ii" ]] && echo " * No list to do ! * " && continue
 
     ## dedupe
-    ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${drive[$ii]}"
+    ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${drive[$jj]}"
     ## empty trash
-    ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${drive[$ii]}"
+    ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${drive[$jj]}"
     ## sync
     "$RCLONE" ${otheropt} ${bwlimit} --config       "$RCLONE_CONFIG"                       \
                                      --include-from "${TEMP_FOLDER}/file_list_$ii"         \
