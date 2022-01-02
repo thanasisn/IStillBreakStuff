@@ -4,8 +4,8 @@
 
 DEDUPLICATE="no"
 EMPTYTRASH="no"
-EMPTYTRASH="yes"
-DEDUPLICATE="yes"
+# EMPTYTRASH="yes"
+# DEDUPLICATE="yes"
 
 
 ## allow only one instance

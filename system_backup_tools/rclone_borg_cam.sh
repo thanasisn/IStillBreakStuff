@@ -247,7 +247,7 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     ## empty trash
     ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${drive[$ii]}"
     ## info on the gdrive account
-    rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about         "${drive[$ii]}/"          )
+    rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about --full  "${drive[$ii]}/"          )
     ## info for the backup storage folder
     rdire=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  size          "${drive[$ii]}/tower_$jj" )
     echo "$rinfo"

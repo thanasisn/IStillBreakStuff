@@ -58,7 +58,7 @@ DT2     <- DT2[ timdiff >= google_threshold ]
 
 ## combine data
 DT <- rbind(DT, DT2[, names(DT), with =F ] )
-DT <- DTt[ ! is.na(time) ]
+DT <- DT[ ! is.na(time) ]
 rm(DT2)
 
 
