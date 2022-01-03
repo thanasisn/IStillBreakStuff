@@ -26,17 +26,16 @@ ACCURACY_LIMIT           <- 5000
 EPSG                     <- 3857
 
 ## Data path
-basedir  <- "~/DATA_RAW/Other/GLH/"
-outfile  <- paste0(basedir,"/Count_GlL_3857.Rds")
+basedir  <- "/home/athan/DATA/Other/GLH/Yearly"
+outfile  <- paste0("~/DATA_RAW/Other/GLH/Count_GlL_3857.Rds")
 
 
 
 
 filelist <- list.files( path       = basedir ,
-                        pattern    = "[0-9]{4}.*\\.Rds",
+                        pattern    = "GLH_[0-9]{4}.*\\.Rds",
                         recursive  = T,
                         full.names = T)
-filelist <- grep("/[0-9]{4}/",filelist,value = T)
 
 ## Parse all available data
 gather <- data.table()
@@ -152,7 +151,9 @@ data <- gather[accuracy <= ACCURACY_LIMIT]
 saveRDS(data, file = outfile)
 
 
-
+myRtools::writeDATA(data,
+                    file = outfile,
+                    type = c("Rds","prqt"))
 
 
 
