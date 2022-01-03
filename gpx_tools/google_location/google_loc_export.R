@@ -1,10 +1,10 @@
 #!/usr/bin/env Rscript
 ## https://github.com/thanasisn <lapauththanasis@gmail.com>
 
-#'
-#' #### Export Google location history Rds to clean tables in multiple formats
-#' - Try to characterize points by main activity
-#'
+
+#### Export Google location history Rds to clean tables in multiple formats
+# - Try to characterize points by main activity
+
 
 #### _ INIT _ ####
 closeAllConnections()
@@ -163,25 +163,6 @@ for ( ii in 1:nrow(iter) ) {
 
     today <- sprintf("%04g", jj$year )
     cat(paste("Working on:", today, "  points:", nrow(daydata)),"\n")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     file <- path.expand(paste0(ydirec,"GLH_",today,".Rds"))

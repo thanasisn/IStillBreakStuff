@@ -1,10 +1,10 @@
 #!/usr/bin/env Rscript
 ## https://github.com/thanasisn <lapauththanasis@gmail.com>
 
-#'
-#' #### Split Google location history json to smaller manageable Rds files
-#' The output may need some manual adjustment
-#'
+
+#### Split Google location history json to smaller manageable Rds files
+## The output may need some manual adjustment
+
 
 #### _ INIT _ ####
 

@@ -1,10 +1,9 @@
 #!/usr/bin/env Rscript
 
-#'
-#' ####  Gather and store track points from Google location with activities data.
-#'
-#' https://developers.google.com/android/reference/com/google/android/gms/location/DetectedActivity
-#'
+####  Gather and store track points from Google location with activities data.
+
+# https://developers.google.com/android/reference/com/google/android/gms/location/DetectedActivity
+
 
 #### _ Set environment _ ####
 closeAllConnections()
