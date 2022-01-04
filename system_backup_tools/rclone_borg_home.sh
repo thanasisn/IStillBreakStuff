@@ -82,7 +82,7 @@ exec  > >(tee -i "$LOG_FILE")
 exec 2> >(tee -i "$ERR_FILE")
 
 ## set the size for each account
-breakin=$(( 14870 * 1048576 ))
+breakin=$(( 14850 * 1048576 ))
 
 ## set the bandwidth limit
 BWLIM=${1:-50}
