@@ -8,7 +8,7 @@
 EPSG_WGS84      <- 4326
 EPSG            <- 3857
 trackpoints_fl  <- paste0("~/GISdata/Count_sl2_",EPSG,".Rds")
-goolgepoints_fl <- "~/DATA_RAW/Other/GLH/Count_GlL_3857.Rds"
+goolgepoints_fl <- "~/DATA/Other/GLH/Count_GlL_3857.Rds"
 
 
 ## Layer with multiple polygons in which the gpx files may be

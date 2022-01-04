@@ -27,7 +27,7 @@ EPSG                     <- 3857
 
 ## Data path
 basedir  <- "/home/athan/DATA/Other/GLH/Yearly"
-outfile  <- paste0("~/DATA_RAW/Other/GLH/Count_GlL_3857.Rds")
+outfile  <- paste0("~/DATA/Other/GLH/Count_GlL_3857.Rds")
 
 
 
@@ -150,10 +150,13 @@ data <- gather[accuracy <= ACCURACY_LIMIT]
 #### Store data ######
 saveRDS(data, file = outfile)
 
+myRtools::writeDATA(data,
+                    file = outfile,
+                    type = c("Rds"))
 
 myRtools::writeDATA(data,
                     file = outfile,
-                    type = c("Rds","prqt"))
+                    type = c("prqt"))
 
 
 
