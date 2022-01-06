@@ -14,9 +14,9 @@ fi
 ## ignore errors
 set +e
 ## start watchdog
-PID=$$
-(sleep $((60*60*24)) && info "Timeout!!"  && kill "$PID") &
-watchdogpid=$!
+# PID=$$
+# (sleep $((60*60*24)) && info "Timeout!!"  && kill "$PID") &
+# watchdogpid=$!
 ## always kill watchdog and lock if this script ends
 cleanup() {
     set +e
@@ -255,11 +255,11 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     echo ""
 
     ## capture sizes from accounts
-    stotal=$(echo "$rinfo" | grep "Total"   | grep -o "[.0-9]\+[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    sused=$( echo "$rinfo" | grep "Used"    | grep -o "[.0-9]\+[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    sfree=$( echo "$rinfo" | grep "Free"    | grep -o "[.0-9]\+[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    strash=$(echo "$rinfo" | grep "Trashed" | grep -o "[.0-9]\+[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    sother=$(echo "$rinfo" | grep "Other"   | grep -o "[.0-9]\+[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+    stotal=$(echo "$rinfo" | grep "Total"   | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+    sused=$( echo "$rinfo" | grep "Used"    | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+    sfree=$( echo "$rinfo" | grep "Free"    | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+    strash=$(echo "$rinfo" | grep "Trashed" | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+    sother=$(echo "$rinfo" | grep "Other"   | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
     ## capture size of folders
     folde=$(echo "$rdire" | grep -o "([0-9]\+ Bytes)" | grep -o "[.0-9]\+")
 
@@ -345,5 +345,5 @@ otheropt=" --delete-before --delete-excluded --drive-use-trash=false"
 # ${RCLONE} --config "$RCLONE_CONFIG" ${otheropt} purge   "skts01:/hde_1"
 # ${RCLONE} --config "$RCLONE_CONFIG" ${otheropt} cleanup "skts01:/"
 
-kill "$watchdogpid"
+# kill "$watchdogpid"
 exit 0

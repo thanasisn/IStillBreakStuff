@@ -112,11 +112,11 @@ for (( ii=0; ii<total; ii++ )); do
     info "$mes"
 
     ## capture sizes from accounts
-    stotal=$(echo "$rinfo" | grep "Total"   | grep -o "[.0-9]\+[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    sused=$( echo "$rinfo" | grep "Used"    | grep -o "[.0-9]\+[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    sfree=$( echo "$rinfo" | grep "Free"    | grep -o "[.0-9]\+[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    strash=$(echo "$rinfo" | grep "Trashed" | grep -o "[.0-9]\+[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    sother=$(echo "$rinfo" | grep "Other"   | grep -o "[.0-9]\+[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+    stotal=$(echo "$rinfo" | grep "Total"   | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+    sused=$( echo "$rinfo" | grep "Used"    | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+    sfree=$( echo "$rinfo" | grep "Free"    | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+    strash=$(echo "$rinfo" | grep "Trashed" | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+    sother=$(echo "$rinfo" | grep "Other"   | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
     ## capture size of folders
     folde=$(echo "$rdire" | grep -o "([0-9]\+ Bytes)" | grep -o "[.0-9]\+")
 
