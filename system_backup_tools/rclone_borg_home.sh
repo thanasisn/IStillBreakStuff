@@ -96,7 +96,7 @@ drive=( "" $("$RCLONE" --config "$RCLONE_CONFIG" listremotes | grep "^h[0-9][0-9
 MAX_ACCOUNTS=$(( ${#drive[@]} - 1 )) 
 
 ## list of status output for each account
-declare -a stats=( 0 $(for i in $(seq 1 $((${#drive[@]})) ); do echo 1; done) )
+declare -a stats=( 0 $(for i in $(seq 1 $MAX_ACCOUNTS ); do echo 1; done) )
 
 printf "%0.s-" {1..50}; echo
 echo   " This will upload the backup from:"
@@ -187,7 +187,7 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
 
     printf "\n%s  %s/%s %21s  start %s\n" "$(date +"%F %R:%S")" "$ii" "$MAX_ACCOUNTS" "${drive[$jj]}:/$DIR_PREF" "$bwlimit"
 
-    echo "From: ${TEMP_FOLDER}/file_list_$ii  To: ${drive[$jj]}/$DIR_PREF"
+    echo "${TEMP_FOLDER}/file_list_$ii  ==>  ${drive[$jj]}/$DIR_PREF"
 
     [[ ! -f "${TEMP_FOLDER}/file_list_$ii" ]] && echo " * No list to do ! * " && continue
 
@@ -203,16 +203,15 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
                                      sync "$RCLONE_ROOT" "${drive[$jj]}/$DIR_PREF"
     stats["$jj"]=$?
     echo
-    status "Drive:${jj} Status:${stats[$jj]} Drive:${drive[$jj]}"
-    printf "%s  %s/%s %21s    %s \n" "$(date +"%F %R:%S")" "$ii" "$MAX_ACCOUNTS" "${drive[$jj]}:/$DIR_PREF" "${stats[$jj]}"
+    status "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
 done
 
 
 ## check output status for all drives
 fstatus=$(IFS=+; echo "$((${stats[*]}))")
 info "$fstatus"
-info "${stats[@]:1}
-echo "${stats[@]:1}
+info "${stats[@]:1}"
+echo "${stats[@]:1}"
 if [[ $fstatus -eq 0 ]]; then
     echo ""
     echo "******* SUCCESSFUL UPLOAD  (rclone home) ********"
