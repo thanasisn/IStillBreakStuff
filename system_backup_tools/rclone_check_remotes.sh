@@ -63,7 +63,7 @@ exec 2> >(tee -i "$ERR_FILE")
 
 remotes=( $( "$RCLONE" --config  "$RCLONE_CONFIG"  listremotes ) )
 
-remotes=( $( "$RCLONE" --config  "$RCLONE_CONFIG"  listremotes | grep "^c[0-9][0-9]_" ) )
+# remotes=( $( "$RCLONE" --config  "$RCLONE_CONFIG"  listremotes | grep "^c[0-9][0-9]_" ) )
 
 total=${#remotes[@]}
 
@@ -101,7 +101,7 @@ for (( ii=0; ii<total; ii++ )); do
     fi
 
     ## list folders on root
-    ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  lsd           "${remotes[$ii]}"
+    # ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  lsd           "${remotes[$ii]}"
     
     ## get info of the remote
     rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about         "${remotes[$ii]}/" )
