@@ -44,8 +44,8 @@ ID="$1"
 SCRIPT="$(basename "$0")"
 
 fsta="${ldir}/$(basename "$0")_$ID.status"
-info()   { echo "$(date +'%F %T') ::INF::${SCRIPT}::${ID}:: $* ::" >>"$fsta"; }
-status() { echo "$(date +'%F %T') ::STA::${SCRIPT}::${ID}:: $* ::" >>"$fsta"; }
+info()   { echo "$(date +'%F %T') ::INF::${SCRIPT}::${ID}:: $* ::" | tee -a "$fsta"; }
+status() { echo "$(date +'%F %T') ::STA::${SCRIPT}::${ID}:: $* ::" | tee -a "$fsta"; }
 
 info "script started"
 
@@ -76,6 +76,8 @@ RCLONE="$HOME/PROGRAMS/rclone"
 RCLONE_CONFIG="$HOME/Documents/rclone.conf"
 LOG_FILE="/tmp/$(basename "$0")_$(date +%F_%R).log"
 ERR_FILE="/tmp/$(basename "$0")_$(date +%F_%R).err"
+DIR_PREF="rclone_storage"
+
 
 ## start log files
 exec  > >(tee -i "$LOG_FILE")
@@ -90,17 +92,17 @@ BWLIM_K=${1:-50}
 
 ## list of configured accounts to iterate
 ## an empty element for array for 1
-drive=( "" $("$RCLONE" --config "$RCLONE_CONFIG" listremotes | grep "h[0-9][0-9]_") )
-MAX_ACCOUNTS=${#drive[@]}
+drive=( "" $("$RCLONE" --config "$RCLONE_CONFIG" listremotes | grep "^h[0-9][0-9]_") )
+MAX_ACCOUNTS=$(( ${#drive[@]} - 1 )) 
 
 ## list of status output for each account
-declare -a stats=( $(for i in $(seq 1 $((${#drive[@]}+1)) ); do echo 1; done) )
+declare -a stats=( 0 $(for i in $(seq 1 $((${#drive[@]})) ); do echo 1; done) )
 
 printf "%0.s-" {1..50}; echo
 echo   " This will upload the backup from:"
-echo   "                            $BORG_FOLDER "
-echo   " To $((MAX_ACCOUNTS-1)) google accounts:      "
-printf "                          %s\n" "${drive[@]}"
+echo   "                      $BORG_FOLDER "
+echo   " To $((MAX_ACCOUNTS)) google accounts: "
+printf "                      %s \n" "${drive[@]}"
 printf "%0.s-" {1..50}; echo
 echo   ""
 
@@ -183,9 +185,9 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     ## padded index
     ii="$(printf %02d "$ii")"
 
-    printf "\n%s  %s/%s %21s  start %s\n" "$(date +"%F %R:%S")" "$ii" "$MAX_ACCOUNTS" "${drive[$jj]}:/stack_$ii" "$bwlimit"
+    printf "\n%s  %s/%s %21s  start %s\n" "$(date +"%F %R:%S")" "$ii" "$MAX_ACCOUNTS" "${drive[$jj]}:/$DIR_PREF" "$bwlimit"
 
-    echo "From: ${TEMP_FOLDER}/file_list_$ii  To: ${drive[$jj]}/stack_$ii"
+    echo "From: ${TEMP_FOLDER}/file_list_$ii  To: ${drive[$jj]}/$DIR_PREF"
 
     [[ ! -f "${TEMP_FOLDER}/file_list_$ii" ]] && echo " * No list to do ! * " && continue
 
@@ -194,19 +196,23 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     ## empty trash
     ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${drive[$jj]}"
     ## sync
+    echo "Start" > "/dev/shm/rc_home_borg_${ii}.log"
     "$RCLONE" ${otheropt} ${bwlimit} --config       "$RCLONE_CONFIG"                   \
                                      --include-from "${TEMP_FOLDER}/file_list_$ii"     \
                                      --log-file     "/dev/shm/rc_home_borg_${ii}.log"  \
-                                     sync "$RCLONE_ROOT" "${drive[$jj]}/stack_$ii"
+                                     sync "$RCLONE_ROOT" "${drive[$jj]}/$DIR_PREF"
     stats["$jj"]=$?
+    echo
     status "Drive:${jj} Status:${stats[$jj]} Drive:${drive[$jj]}"
-    printf "%s  %s/%s %21s    %s \n" "$(date +"%F %R:%S")" "$ii" "$MAX_ACCOUNTS" "${drive[$jj]}:/stack_$ii" "${stats[$jj]}"
+    printf "%s  %s/%s %21s    %s \n" "$(date +"%F %R:%S")" "$ii" "$MAX_ACCOUNTS" "${drive[$jj]}:/$DIR_PREF" "${stats[$jj]}"
 done
 
 
 ## check output status for all drives
 fstatus=$(IFS=+; echo "$((${stats[*]}))")
 info "$fstatus"
+info "${stats[@]:1}
+echo "${stats[@]:1}
 if [[ $fstatus -eq 0 ]]; then
     echo ""
     echo "******* SUCCESSFUL UPLOAD  (rclone home) ********"
@@ -241,7 +247,7 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     ## padded
     jj=$(printf %02d "$ii")
 
-    echo " $ii/$MAX_ACCOUNTS  ${drive[$ii]}/stack_$ii "
+    echo " $ii/$MAX_ACCOUNTS  ${drive[$ii]}/$DIR_PREF "
     ## dedupe
     ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${drive[$ii]}"
     ## empty trash
@@ -249,7 +255,7 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     ## info on the gdrive account
     rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about --full  "${drive[$ii]}/"          )
     ## info for the backup storage folder
-    rdire=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  size          "${drive[$ii]}/stack_$jj" )
+    rdire=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  size          "${drive[$ii]}/$DIR_PREF" )
     echo "$rinfo"
     echo "$rdire"
     echo ""
