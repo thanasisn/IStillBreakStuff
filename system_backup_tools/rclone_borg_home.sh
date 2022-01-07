@@ -1,6 +1,6 @@
 #!/bin/bash
 
-####  Uploads borg HOME backup to multiple gmail accounts with rclone
+####  Uploads borg  HOME  backup to multiple gmail accounts with rclone
 
 
 ## allow only one instance
@@ -185,11 +185,11 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     ## padded index
     ii="$(printf %02d "$ii")"
 
-    printf "\n%s  %s/%s %21s  start %s\n" "$(date +"%F %R:%S")" "$ii" "$MAX_ACCOUNTS" "${drive[$jj]}:/$DIR_PREF" "$bwlimit"
+    info "Start  $jj / $MAX_ACCOUNTS  ${drive[$jj]}:/$DIR_PREF  $bwlimit"
 
-    echo "${TEMP_FOLDER}/file_list_$ii  ==>  ${drive[$jj]}/$DIR_PREF"
+    info "** ${TEMP_FOLDER}/file_list_$ii  ==>  ${drive[$jj]}/$DIR_PREF **"
 
-    [[ ! -f "${TEMP_FOLDER}/file_list_$ii" ]] && echo " * No list to do ! * " && continue
+    [[ ! -f "${TEMP_FOLDER}/file_list_$ii" ]] && echo " * No list to do ! * " && stats["$jj"]=0 && continue
 
     ## dedupe
     ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${drive[$jj]}"
