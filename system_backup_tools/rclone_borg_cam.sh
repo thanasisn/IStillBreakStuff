@@ -187,7 +187,7 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
 
     info "Start  $jj / $MAX_ACCOUNTS  ${drive[$jj]}:/$DIR_PREF  $bwlimit"
 
-    info "** ${TEMP_FOLDER}/file_list_$ii  ==>  ${drive[$jj]}/$DIR_PREF **"
+    echo "** ${TEMP_FOLDER}/file_list_$ii  ==>  ${drive[$jj]}/$DIR_PREF **"
 
     [[ ! -f "${TEMP_FOLDER}/file_list_$ii" ]] && echo " * No list to do ! * " && stats["$jj"]=0 && continue
 
