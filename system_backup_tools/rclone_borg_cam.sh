@@ -22,6 +22,7 @@ cleanup() {
     set +e
     # set -x
     echo " ... clean up trap... "
+    info " ... clean up trap... "
     rm -fvr "$TEMP_FOLDER"
     rm -fv  "$LOCK_FILE"
     scriptpt="$(basename "${0}")"
@@ -93,7 +94,7 @@ BWLIM_K=${1:-50}
 ## list of configured accounts to iterate
 ## an empty element for array for 1
 drive=( "" $("$RCLONE" --config "$RCLONE_CONFIG" listremotes | grep "^c[0-9][0-9]_") )
-MAX_ACCOUNTS=$(( ${#drive[@]} - 1 )) 
+MAX_ACCOUNTS=$(( ${#drive[@]} - 1 ))
 
 ## list of status output for each account
 declare -a stats=( 0 $(for i in $(seq 1 $MAX_ACCOUNTS ); do echo 1; done) )
@@ -193,10 +194,12 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
 
     ## dedupe
     ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${drive[$jj]}"
+
     ## empty trash
     ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${drive[$jj]}"
+
     ## sync
-    echo "Start" > "/dev/shm/rc_cam_borg_${ii}.log" 
+    echo "Start" > "/dev/shm/rc_cam_borg_${ii}.log"
     "$RCLONE" ${otheropt} ${bwlimit} --config       "$RCLONE_CONFIG"                   \
                                      --include-from "${TEMP_FOLDER}/file_list_$ii"     \
                                      --log-file     "/dev/shm/rc_cam_borg_${ii}.log"   \
@@ -247,14 +250,13 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     jj=$(printf %02d "$ii")
 
     echo " $ii/$MAX_ACCOUNTS  ${drive[$ii]}/$DIR_PREF "
-    ## dedupe
-    ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${drive[$ii]}"
-    ## empty trash
-    ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${drive[$ii]}"
+
     ## info on the gdrive account
     rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about --full  "${drive[$ii]}/"          )
+
     ## info for the backup storage folder
     rdire=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  size          "${drive[$ii]}/$DIR_PREF" )
+
     echo "$rinfo"
     echo "$rdire"
     echo ""
@@ -331,13 +333,7 @@ status "AVAILABLE ACCOUNTS: $((MAX_ACCOUNTS-1))"
 status "USED      ACCOUNTS: $oversized"
 
 
-# echo "----------------------"
-# echo "SUMMARY FOR ALL DRIVES"
 # echo "  TOTAL  $TOTAL" | numfmt --to=iec-i --field=2 --padding=10 --invalid=ignore --format "%10f"
-# echo "  USED   $USED"  | numfmt --to=iec-i --field=2 --padding=10 --invalid=ignore --format "%10f"
-# echo "  FREE   $FREE"  | numfmt --to=iec-i --field=2 --padding=10 --invalid=ignore --format "%10f"
-# echo "  TRASH  $TRASH" | numfmt --to=iec-i --field=2 --padding=10 --invalid=ignore --format "%10f"
-# echo "  OTHER  $OTHER" | numfmt --to=iec-i --field=2 --padding=10 --invalid=ignore --format "%10f"
 
 
 
@@ -351,4 +347,5 @@ otheropt=" --delete-before --delete-excluded --drive-use-trash=false"
 # ${RCLONE} --config "$RCLONE_CONFIG" ${otheropt} cleanup "skts01:/"
 
 # kill "$watchdogpid"
+info "Script ends here"
 exit 0
