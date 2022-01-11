@@ -2,14 +2,19 @@
 
 ####  Uploads borg  HOME  backup to multiple gmail accounts with rclone
 
+## profil
+PNAME="HOME"
+Pname="home"
+
 
 ## allow only one instance
-LOCK_FILE="/dev/shm/rclone_borg_home.lock"
+LOCK_FILE="/dev/shm/rclone_borg_$PNAME.lock"
 exec 9>"$LOCK_FILE"
 if ! flock -n 9  ; then
     echo "another instance is running";
     exit 99
 fi
+
 
 ## ignore errors
 set +e
@@ -19,15 +24,16 @@ set +e
 # watchdogpid=$!
 ## always kill watchdog and lock if this script ends
 cleanup() {
+(
     set +e
     # set -x
-    echo " ... clean up trap... "
-    info " ... clean up trap... "
+    info " ... clean up trap ... "
     rm -fvr "$TEMP_FOLDER"
     rm -fv  "$LOCK_FILE"
     scriptpt="$(basename "${0}")"
     # pgrep -l -f ".*${scriptpt%.*}.*"
     pkill -9 -e ".*${scriptpt%.*}.*"
+) >> "$LOG_FILE"
 }
 
 trap 'echo $( date )  $0 interrupted >&2;' INT TERM
@@ -54,25 +60,25 @@ info "script started"
 
 ## this actually uploads
 if [[ $(hostname) == "blue" ]]; then
-    BORG_FOLDER="/media/free/.BORGbackup/crane_HOME"
+    BORG_FOLDER="/media/free/.BORGbackup/crane_$PNAME"
     RCLONE_ROOT="/media/free/.BORGbackup"
 fi
 ## the rest are for monitoring with dry run
 if [[ $(hostname) == "crane" ]]; then
-    BORG_FOLDER="/media/free/.BORGbackup/crane_HOME"
+    BORG_FOLDER="/media/free/.BORGbackup/crane_$PNAME"
     RCLONE_ROOT="/media/free/.BORGbackup"
 fi
 if [[ $(hostname) == "kostas" ]]; then
-    BORG_FOLDER="/media/stor/borg/crane_HOME"
+    BORG_FOLDER="/media/stor/borg/crane_$PNAME"
     RCLONE_ROOT="/media/stor/borg"
 fi
 if [[ $(hostname) == "sagan" ]]; then
-    BORG_FOLDER="/home/folder/BORG/crane_HOME"
+    BORG_FOLDER="/home/folder/BORG/crane_$PNAME"
     RCLONE_ROOT="/home/folder/BORG"
 fi
 
 ## variables for all hosts
-TEMP_FOLDER="/dev/shm/borg_to_rclone_hom"
+TEMP_FOLDER="/dev/shm/borg_to_rclone_$PNAME"
 RCLONE="$HOME/PROGRAMS/rclone"
 RCLONE_CONFIG="$HOME/Documents/rclone.conf"
 LOG_FILE="/tmp/$(basename "$0")_$(date +%F_%R).log"
@@ -94,7 +100,7 @@ BWLIM_K=${1:-50}
 ## list of configured accounts to iterate
 ## an empty element for array for 1
 drive=( "" $("$RCLONE" --config "$RCLONE_CONFIG" listremotes | grep "^h[0-9][0-9]_") )
-MAX_ACCOUNTS=$(( ${#drive[@]} - 1 )) 
+MAX_ACCOUNTS=$(( ${#drive[@]} - 1 ))
 
 ## list of status output for each account
 declare -a stats=( 0 $(for i in $(seq 1 $MAX_ACCOUNTS ); do echo 1; done) )
@@ -157,7 +163,7 @@ done
 ## warn when data are going to spill out of available accounts
 oversized="$(find ${TEMP_FOLDER} -type f -iname "file_list_*" | wc -l)"
 if [[ $oversized -gt $MAX_ACCOUNTS ]]; then
-    notify-send -u critical "rclone home has gone oversize" "have to configure new gmail account for the extra data"
+    notify-send -u critical "rclone $PNAME has gone oversize" "have to configure new gmail account for the extra data"
 fi
 
 
@@ -188,7 +194,6 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
 
     info "Start  $jj / $MAX_ACCOUNTS  ${drive[$jj]}:/$DIR_PREF  $bwlimit"
 
-    echo "** ${TEMP_FOLDER}/file_list_$ii  ==>  ${drive[$jj]}/$DIR_PREF **"
 
     [[ ! -f "${TEMP_FOLDER}/file_list_$ii" ]] && echo " * No list to do ! * " && stats["$jj"]=0 && continue
 
@@ -199,34 +204,34 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${drive[$jj]}"
 
     ## sync
-    echo "Start" > "/dev/shm/rc_home_borg_${ii}.log"
-    "$RCLONE" ${otheropt} ${bwlimit} --config       "$RCLONE_CONFIG"                   \
-                                     --include-from "${TEMP_FOLDER}/file_list_$ii"     \
-                                     --log-file     "/dev/shm/rc_home_borg_${ii}.log"  \
+    drivelogfl="/dev/shm/rc_${PNAME}_borg_${ii}.log"
+    echo "Start" > "$drivelogfl"
+    "$RCLONE" ${otheropt} ${bwlimit} --config       "$RCLONE_CONFIG"                \
+                                     --include-from "${TEMP_FOLDER}/file_list_$ii"  \
+                                     --log-file     "$drivelogfl"                   \
                                      sync "$RCLONE_ROOT" "${drive[$jj]}/$DIR_PREF"
     stats["$jj"]=$?
-    echo
     status "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
+    echo "---------------------------------------------------------"
 done
 
 
 ## check output status for all drives
 fstatus=$(IFS=+; echo "$((${stats[*]}))")
-info "$fstatus"
-info "${stats[@]:1}"
-echo "${stats[@]:1}"
+info "Total status:$fstatus"
+info "All status-1:${stats[@]:1}"
 if [[ $fstatus -eq 0 ]]; then
     echo ""
     echo "******* SUCCESSFUL UPLOAD  (rclone home) ********"
     echo ""
-    echo "$(date +"%F %R:%S") $fstatus SUCCESSFUL UPLOAD (rclone home) ${0}"
+    echo "$(date +"%F %R:%S") $fstatus SUCCESSFUL UPLOAD (rclone $PNAME) ${0}"
     status "Success $fstatus"
     status "${stats[@]}"
 else
     echo ""
     echo "******* UPLOAD NOT SUCCESSFUL (rclone home) ********"
     echo ""
-    echo "$(date +"%F %R:%S") ${stats[*]} UPLOAD FAILED (rclone home) ${0}"
+    echo "$(date +"%F %R:%S") ${stats[*]} UPLOAD FAILED (rclone $PNAME) ${0}"
     status "Fail  $fstatus"
     status "${stats[@]}"
 fi
@@ -252,10 +257,10 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     echo " $ii/$MAX_ACCOUNTS  ${drive[$ii]}/$DIR_PREF "
 
     ## info on the gdrive account
-    rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about --full  "${drive[$ii]}/"          )
+    rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about  "${drive[$ii]}/"          )
 
     ## info for the backup storage folder
-    rdire=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  size          "${drive[$ii]}/$DIR_PREF" )
+    rdire=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  size   "${drive[$ii]}/$DIR_PREF" )
 
     echo "$rinfo"
     echo "$rdire"

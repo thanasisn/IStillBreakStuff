@@ -89,20 +89,20 @@ for (( ii=0; ii<total; ii++ )); do
     if [[ $DEDUPLICATE == "yes" ]]; then
         echo
         echo "Deduplicating  ${remotes[$ii]}"
-        ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${remotes[$ii]}"
+        ${RCLONE}     --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${remotes[$ii]}"
         echo
     fi
 
     if [[ $EMPTYTRASH == "yes" ]]; then
         echo
         echo "Emptying trash ${remotes[$ii]}"
-        ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${remotes[$ii]}"
+        ${RCLONE}     --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${remotes[$ii]}"
         echo
     fi
 
     ## list folders on root
     # ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  lsd           "${remotes[$ii]}"
-    
+
     ## get info of the remote
     rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about         "${remotes[$ii]}/" )
     ## info for the backup storage folder
