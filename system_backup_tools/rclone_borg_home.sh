@@ -26,8 +26,9 @@ set +e
 cleanup() {
 (
     set +e
-    # set -x
     info " ... clean up trap ... "
+    info "Total status:$fstatus"
+    info "All status-1:${stats[@]:1}"
     rm -fvr "$TEMP_FOLDER"
     rm -fv  "$LOCK_FILE"
     scriptpt="$(basename "${0}")"
@@ -194,7 +195,6 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
 
     info "Start  $jj / $MAX_ACCOUNTS  ${drive[$jj]}:/$DIR_PREF  $bwlimit"
 
-
     [[ ! -f "${TEMP_FOLDER}/file_list_$ii" ]] && echo " * No list to do ! * " && stats["$jj"]=0 && continue
 
     ## dedupe
@@ -312,30 +312,15 @@ bytesToHuman() {
 }
 
 
-echo "---------------------------"
-echo "   TOTAL   $(bytesToHuman $TOTAL)"
-echo "   USED    $(bytesToHuman $USED) "
-echo "   FREE    $(bytesToHuman $FREE) "
-echo "   WASTE   $(bytesToHuman $WASTE)"
-echo "   TRASH   $(bytesToHuman $TRASH)"
-echo "   OTHER   $(bytesToHuman $OTHER)"
-echo "---------------------------"
-echo "   FOLDERS $(bytesToHuman $FOLDR)"
-echo "---------------------------"
-echo "   AVAILABLE ACCOUNTS  $((MAX_ACCOUNTS-1))"
-echo "   USED      ACCOUNTS  $oversized"
-echo "---------------------------"
-
-
-status "TOTAL:   $(bytesToHuman $TOTAL)"
-status "USED:    $(bytesToHuman $USED)"
-status "FREE:    $(bytesToHuman $FREE)"
-status "WASTE:   $(bytesToHuman $WASTE)"
-status "TRASH:   $(bytesToHuman $TRASH)"
-status "OTHER:   $(bytesToHuman $OTHER)"
-status "FOLDERS: $(bytesToHuman $FOLDR)"
-status "AVAILABLE ACCOUNTS: $((MAX_ACCOUNTS-1))"
-status "USED      ACCOUNTS: $oversized"
+status "TOTAL:        $(bytesToHuman $TOTAL)"
+status "USED:         $(bytesToHuman $USED)"
+status "FREE:         $(bytesToHuman $FREE)"
+status "WASTE:        $(bytesToHuman $WASTE)"
+status "TRASH:        $(bytesToHuman $TRASH)"
+status "OTHER:        $(bytesToHuman $OTHER)"
+status "FOLDERS:      $(bytesToHuman $FOLDR)"
+status "AVAIL ACCNTS: $((MAX_ACCOUNTS))"
+status "USED  ACCNTS: $oversized"
 
 
 # echo "  TOTAL  $TOTAL" | numfmt --to=iec-i --field=2 --padding=10 --invalid=ignore --format "%10f"
