@@ -16,6 +16,8 @@ if ! flock -n 9  ; then
     exit 99
 fi
 
+patern="^c[0-9][0-9]_"
+
 ## ignore errors
 set +e
 
@@ -63,7 +65,7 @@ exec 2> >(tee -i "$ERR_FILE")
 
 remotes=( $( "$RCLONE" --config  "$RCLONE_CONFIG"  listremotes ) )
 
-# remotes=( $( "$RCLONE" --config  "$RCLONE_CONFIG"  listremotes | grep "^c[0-9][0-9]_" ) )
+# remotes=( $( "$RCLONE" --config  "$RCLONE_CONFIG"  listremotes | grep "$patern" ) )
 
 total=${#remotes[@]}
 
