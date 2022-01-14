@@ -4,7 +4,7 @@
 
 ## profil
 PNAME="HOME"
-remotespattern="^h[0-9][0-9]"
+remotespattern="^h[0-9][0-9]_"
 
 
 ## allow only one instance
@@ -73,7 +73,7 @@ RCLONE_CONFIG="$HOME/Documents/rclone.conf"
 LOG_FILE="/tmp/$(basename "$0")_$(date +%F_%R).log"
 ERR_FILE="/tmp/$(basename "$0")_$(date +%F_%R).err"
 DIR_PREF="rclone_storage"
-
+REPORT_SCRIPT="$HOME/CODE/system_backup_tools/rclone_remotes_usage.sh"
 
 ## start log files
 exec  > >(tee -i "$LOG_FILE")
@@ -216,84 +216,87 @@ echo ""
 ##   report on used capacity for each account    ##
 ##-----------------------------------------------##
 
-TOTAL=0
-USED=0
-FREE=0
-TRASH=0
-OTHER=0
-FOLDR=0
-WASTE=0
+echo "run: $REPORT_SCRIPT" "$remotespattern"
+"$REPORT_SCRIPT" "$remotespattern"
 
-for ii in $(seq 1 "$MAX_ACCOUNTS"); do
-    ## padded
-    jj=$(printf %02d "$ii")
-
-    echo " $ii/$MAX_ACCOUNTS  ${drive[$ii]}/$DIR_PREF "
-
-    ## info on the gdrive account
-    rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about  "${drive[$ii]}/"          )
-
-    ## info for the backup storage folder
-    rdire=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  size   "${drive[$ii]}/$DIR_PREF" )
-
-    echo "$rinfo"
-    echo "$rdire"
-    echo ""
-
-    ## capture sizes from accounts
-    stotal=$(echo "$rinfo" | grep "Total"   | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    sused=$( echo "$rinfo" | grep "Used"    | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    sfree=$( echo "$rinfo" | grep "Free"    | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    strash=$(echo "$rinfo" | grep "Trashed" | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    sother=$(echo "$rinfo" | grep "Other"   | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
-    ## capture size of folders
-    folde=$(echo "$rdire" | grep -o "([0-9]\+ Bytes)" | grep -o "[.0-9]\+")
-
-    ## set empty to zero
-    stotal=${stotal:-0}
-    sused=${sused:-0}
-    sfree=${sfree:-0}
-    strash=${strash:-0}
-    sother=${sother:-0}
-    folde=${folde:-0}
-
-    ## we ignore fractional bytes
-    TOTAL=$(( TOTAL + ${stotal%.*} ))
-    USED=$((  USED  + ${sused%.*}  ))
-    TRASH=$(( TRASH + ${strash%.*} ))
-    OTHER=$(( OTHER + ${sother%.*} ))
-    FOLDR=$(( FOLDR + folde ))
-
-    ## we only want the free size after any incomplete account
-    if [[ "$ii" -ge "$oversized" ]]; then
-        FREE=$((  FREE  + ${sfree%.*} ))
-    else
-        WASTE=$(( WASTE + ${sfree%.*} ))
-    fi
-done
-
-
-bytesToHuman() {
-    b=${1:-0}; d=''; s=0; S=("      B" {K,M,G,T,P,E,Z,Y}iB)
-    while ((b > 1024)); do
-        d="$(printf ".%03d" $((b % 1024 * 100 / 1024)))"
-        b=$((b / 1024))
-        (( s++ ))
-    done
-#     echo   "$b$d ${S[$s]}"
-    printf "%5s%s %s" "$b" "$d" "${S[$s]}"
-}
-
-
-status "TOTAL:        $(bytesToHuman $TOTAL)"
-status "USED:         $(bytesToHuman $USED)"
-status "FREE:         $(bytesToHuman $FREE)"
-status "WASTE:        $(bytesToHuman $WASTE)"
-status "TRASH:        $(bytesToHuman $TRASH)"
-status "OTHER:        $(bytesToHuman $OTHER)"
-status "FOLDERS:      $(bytesToHuman $FOLDR)"
-status "AVAIL ACCNTS: $((MAX_ACCOUNTS))"
-status "USED  ACCNTS: $oversized"
+# TOTAL=0
+# USED=0
+# FREE=0
+# TRASH=0
+# OTHER=0
+# FOLDR=0
+# WASTE=0
+# 
+# for ii in $(seq 1 "$MAX_ACCOUNTS"); do
+#     ## padded
+#     jj=$(printf %02d "$ii")
+# 
+#     echo " $ii/$MAX_ACCOUNTS  ${drive[$ii]}/$DIR_PREF "
+# 
+#     ## info on the gdrive account
+#     rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about  "${drive[$ii]}/"          )
+# 
+#     ## info for the backup storage folder
+#     rdire=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  size   "${drive[$ii]}/$DIR_PREF" )
+# 
+#     echo "$rinfo"
+#     echo "$rdire"
+#     echo ""
+# 
+#     ## capture sizes from accounts
+#     stotal=$(echo "$rinfo" | grep "Total"   | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+#     sused=$( echo "$rinfo" | grep "Used"    | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+#     sfree=$( echo "$rinfo" | grep "Free"    | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+#     strash=$(echo "$rinfo" | grep "Trashed" | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+#     sother=$(echo "$rinfo" | grep "Other"   | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
+#     ## capture size of folders
+#     folde=$(echo "$rdire" | grep -o "([0-9]\+ Bytes)" | grep -o "[.0-9]\+")
+# 
+#     ## set empty to zero
+#     stotal=${stotal:-0}
+#     sused=${sused:-0}
+#     sfree=${sfree:-0}
+#     strash=${strash:-0}
+#     sother=${sother:-0}
+#     folde=${folde:-0}
+# 
+#     ## we ignore fractional bytes
+#     TOTAL=$(( TOTAL + ${stotal%.*} ))
+#     USED=$((  USED  + ${sused%.*}  ))
+#     TRASH=$(( TRASH + ${strash%.*} ))
+#     OTHER=$(( OTHER + ${sother%.*} ))
+#     FOLDR=$(( FOLDR + folde ))
+# 
+#     ## we only want the free size after any incomplete account
+#     if [[ "$ii" -ge "$oversized" ]]; then
+#         FREE=$((  FREE  + ${sfree%.*} ))
+#     else
+#         WASTE=$(( WASTE + ${sfree%.*} ))
+#     fi
+# done
+# 
+# 
+# bytesToHuman() {
+#     b=${1:-0}; d=''; s=0; S=("      B" {K,M,G,T,P,E,Z,Y}iB)
+#     while ((b > 1024)); do
+#         d="$(printf ".%03d" $((b % 1024 * 100 / 1024)))"
+#         b=$((b / 1024))
+#         (( s++ ))
+#     done
+# #     echo   "$b$d ${S[$s]}"
+#     printf "%5s%s %s" "$b" "$d" "${S[$s]}"
+# }
+# 
+# 
+# status "TOTAL:        $(bytesToHuman $TOTAL)"
+# status "USED:         $(bytesToHuman $USED)"
+# status "FREE:         $(bytesToHuman $FREE)"
+# status "WASTE:        $(bytesToHuman $WASTE)"
+# status "TRASH:        $(bytesToHuman $TRASH)"
+# status "OTHER:        $(bytesToHuman $OTHER)"
+# status "FOLDERS:      $(bytesToHuman $FOLDR)"
+# status "AVAIL ACCNTS: $((MAX_ACCOUNTS))"
+# status "USED  ACCNTS: $oversized"
 
 
 

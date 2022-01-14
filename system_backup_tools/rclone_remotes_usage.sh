@@ -1,15 +1,11 @@
 #!/bin/bash
 
-#### Report on the usage of all rclone remotes
+#### Report on storage usage of rclone remotes
+## accept a grep pattern to match rclone remotes
 
 remotespattern="${1:-.*}"
 
 echo "Remotes pattern:  $remotespattern"
-
-DEDUPLICATE="no"
-EMPTYTRASH="no"
-# EMPTYTRASH="yes"
-# DEDUPLICATE="yes"
 
 
 ## allow only one instance
@@ -98,25 +94,6 @@ WASTE=0
 
 for (( ii=0; ii<total; ii++ )); do
     echo ""
-    echo ""
-    echo "=====  $((ii+1)) / $total  ${remotes[$ii]}  ==================" ;
-
-    if [[ $DEDUPLICATE == "yes" ]]; then
-        echo
-        echo "Deduplicating  ${remotes[$ii]}"
-        ${RCLONE}     --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${remotes[$ii]}"
-        echo
-    fi
-
-    if [[ $EMPTYTRASH == "yes" ]]; then
-        echo
-        echo "Emptying trash ${remotes[$ii]}"
-        ${RCLONE}     --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${remotes[$ii]}"
-        echo
-    fi
-
-    ## list folders on root
-    # ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  lsd           "${remotes[$ii]}"
 
     ## get info of the remote
     rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about         "${remotes[$ii]}/" )
@@ -124,10 +101,8 @@ for (( ii=0; ii<total; ii++ )); do
     rdire=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  size          "${remotes[$ii]}/" )
 
     ## display as it runs
-    echo "$rinfo"
-    echo "$rdire"
     mes="\n"
-    mes+="--- ${remotes[$ii]} ---\n"
+    mes+="=====  $((ii+1)) / $total  ${remotes[$ii]}  ==================\n"
     mes+="$rinfo\n"
     mes+="$rdire\n"
     info "$mes"
@@ -172,7 +147,7 @@ bytesToHuman() {
 }
 
 
-
+## display summary
 echo ""
 echo "---------------------------"
 status "TOTAL:   $(bytesToHuman $TOTAL)"
@@ -183,21 +158,9 @@ status "TRASH:   $(bytesToHuman $TRASH)"
 status "OTHER:   $(bytesToHuman $OTHER)"
 echo "---------------------------"
 status "FOLDERS: $(bytesToHuman $FOLDR)"
-status "PARSED ACCOUNTS:$total"
+status "PARSED ACCOUNTS: $total"
 echo "---------------------------"
 echo ""
-
-
-
-##------------------------------------##
-##   clear an account to be reused    ##
-##------------------------------------##
-
-# otheropt=" --delete-before --delete-excluded --drive-use-trash=false"
-
-# ${RCLONE} --config "$RCLONE_CONFIG" ${otheropt} purge   "skts01:/hde_1"
-# ${RCLONE} --config "$RCLONE_CONFIG" ${otheropt} cleanup "skts01:/hde_1"
-# ${RCLONE} --config "$RCLONE_CONFIG" ${otheropt} cleanup "skts01:/"
 
 kill "$watchdogpid"
 exit 0
