@@ -16,7 +16,7 @@ if ! flock -n 9  ; then
 fi
 
 if [[ $(hostname) != "blue" ]]; then
-    echo "This script should run only on blue"    
+    echo "This script should run only on blue"
     exit
 fi
 
@@ -147,7 +147,7 @@ find ${TEMP_FOLDER} -type f -iname "file_list_*" | sort | while read line; do
 done
 
 ## warn when data are going to spill out of available accounts
-## TODO use the global notify system 
+## TODO use the global notify system
 oversized="$(find ${TEMP_FOLDER} -type f -iname "file_list_*" | wc -l)"
 if [[ $oversized -gt $MAX_ACCOUNTS ]]; then
     notify-send -u critical "rclone $PNAME has gone oversize" "have to configure new gmail account for the extra data"
@@ -187,7 +187,7 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     "$RCLONE" ${otheropt} ${bwlimit} --config       "$RCLONE_CONFIG"                \
                                      --include-from "${TEMP_FOLDER}/file_list_$ii"  \
                                      --log-file     "$drivelogfl"                   \
-                                     --stats        "5m"                            \
+                                     --stats        "10m"                           \
                                      sync "$RCLONE_ROOT" "${drive[$jj]}/$DIR_PREF"
     stats["$jj"]=$?
     status "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
@@ -226,23 +226,23 @@ echo "run: $REPORT_SCRIPT" "$remotespattern"
 # OTHER=0
 # FOLDR=0
 # WASTE=0
-# 
+#
 # for ii in $(seq 1 "$MAX_ACCOUNTS"); do
 #     ## padded
 #     jj=$(printf %02d "$ii")
-# 
+#
 #     echo " $ii/$MAX_ACCOUNTS  ${drive[$ii]}/$DIR_PREF "
-# 
+#
 #     ## info on the gdrive account
 #     rinfo=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  about  "${drive[$ii]}/"          )
-# 
+#
 #     ## info for the backup storage folder
 #     rdire=$(${RCLONE} --stats=0 --config "$RCLONE_CONFIG"  size   "${drive[$ii]}/$DIR_PREF" )
-# 
+#
 #     echo "$rinfo"
 #     echo "$rdire"
 #     echo ""
-# 
+#
 #     ## capture sizes from accounts
 #     stotal=$(echo "$rinfo" | grep "Total"   | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
 #     sused=$( echo "$rinfo" | grep "Used"    | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
@@ -251,7 +251,7 @@ echo "run: $REPORT_SCRIPT" "$remotespattern"
 #     sother=$(echo "$rinfo" | grep "Other"   | grep -o "[.0-9]\+[ ]*[KkMmGgTt]" | sed -e 's/[Kk]/\*1024/g' -e 's/[Mm]/\*1024*1024/g' -e 's/[Gg]/\*1024*1024*1024/g' | bc)
 #     ## capture size of folders
 #     folde=$(echo "$rdire" | grep -o "([0-9]\+ Bytes)" | grep -o "[.0-9]\+")
-# 
+#
 #     ## set empty to zero
 #     stotal=${stotal:-0}
 #     sused=${sused:-0}
@@ -259,14 +259,14 @@ echo "run: $REPORT_SCRIPT" "$remotespattern"
 #     strash=${strash:-0}
 #     sother=${sother:-0}
 #     folde=${folde:-0}
-# 
+#
 #     ## we ignore fractional bytes
 #     TOTAL=$(( TOTAL + ${stotal%.*} ))
 #     USED=$((  USED  + ${sused%.*}  ))
 #     TRASH=$(( TRASH + ${strash%.*} ))
 #     OTHER=$(( OTHER + ${sother%.*} ))
 #     FOLDR=$(( FOLDR + folde ))
-# 
+#
 #     ## we only want the free size after any incomplete account
 #     if [[ "$ii" -ge "$oversized" ]]; then
 #         FREE=$((  FREE  + ${sfree%.*} ))
@@ -274,8 +274,8 @@ echo "run: $REPORT_SCRIPT" "$remotespattern"
 #         WASTE=$(( WASTE + ${sfree%.*} ))
 #     fi
 # done
-# 
-# 
+#
+#
 # bytesToHuman() {
 #     b=${1:-0}; d=''; s=0; S=("      B" {K,M,G,T,P,E,Z,Y}iB)
 #     while ((b > 1024)); do
@@ -286,8 +286,8 @@ echo "run: $REPORT_SCRIPT" "$remotespattern"
 # #     echo   "$b$d ${S[$s]}"
 #     printf "%5s%s %s" "$b" "$d" "${S[$s]}"
 # }
-# 
-# 
+#
+#
 # status "TOTAL:        $(bytesToHuman $TOTAL)"
 # status "USED:         $(bytesToHuman $USED)"
 # status "FREE:         $(bytesToHuman $FREE)"

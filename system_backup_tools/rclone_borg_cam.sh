@@ -187,7 +187,7 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     "$RCLONE" ${otheropt} ${bwlimit} --config       "$RCLONE_CONFIG"                \
                                      --include-from "${TEMP_FOLDER}/file_list_$ii"  \
                                      --log-file     "$drivelogfl"                   \
-                                     --stats        "5m"                            \
+                                     --stats        "10m"                           \
                                      sync "$RCLONE_ROOT" "${drive[$jj]}/$DIR_PREF"
     stats["$jj"]=$?
     status "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
