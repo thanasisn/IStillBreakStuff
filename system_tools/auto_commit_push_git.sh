@@ -131,6 +131,7 @@ git push -f -u origin main
 
 echo "------"
 cd "$HOME/PANDOC/thanasisnsite"
+git add -f .
 cd "./public"
 git add -f .
 cd ".."
