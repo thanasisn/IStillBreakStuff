@@ -1,7 +1,7 @@
 #!/bin/bash
 ## created on 2013-09-14
 
-#### Transcode music library image from FLAC to mp3
+#### Transcode music library image from FLAC to mp3 and trim silence
 ## The intentions is to make music available to other machines and mp3 devices
 ## We keep the folder structure to share playlist easily
 
@@ -13,8 +13,15 @@ OUT="/media/barel/Music_img"
 
 ## Transcode quality target
 QQ=1
-## mp3 transcode threshold
-BIT=240
+## mp3 transcode/copy threshold
+BIT=220
+
+## duration of non silence
+sl_start_duration="2"
+## silense volume
+sl_start_threshold="-29dB"
+## detection method "rms" or "peak"
+sl_detection="rms"
 
 if [ ! -d "$IN" ]; then
     echo "$IN is not a directory"
@@ -89,6 +96,36 @@ find "$IN" -type f -iname "*.wma"
                    -id3v2_version 3 \
                    -write_id3v1 1   \
                    "$OF" 2>/dev/null
+            ## trim silence after transcoding
+            tmpfl="$OF.tmp.mp3"
+
+            ## try to trim the file
+            ffmpeg -y            \
+                -nostdin         \
+                -loglevel error  \
+                -i "$OF"         \
+                -aq "$QQ"        \
+                -map_metadata 0  \
+                -id3v2_version 3 \
+                -write_id3v1 1   \
+                -af              \
+                "silenceremove=\
+                start_periods=1:\
+                start_duration=$sl_start_duration:\
+                start_threshold=$sl_start_threshold:\
+                detection=$sl_detection,\
+                aformat=dblp,areverse,silenceremove=\
+                start_periods=1:\
+                start_duration=$sl_start_duration:\
+                start_threshold=$sl_start_threshold:\
+                detection=$sl_detection,\
+                aformat=dblp,areverse" "$tmpfl"
+
+            ## replace original file
+            if [ -e "$tmpfl" ]; then
+                echo "Removed silense"
+                mv "$tmpfl" "$OF"
+            fi
         else
             echo "EXIST: $OF"
         fi
@@ -131,6 +168,36 @@ find "$IN" -type f -iname "*.mp3" | while read mfile; do
                        -id3v2_version 3 \
                        -write_id3v1 1   \
                        "$OF" 2>/dev/null
+                ## trim silence after transcoding
+                tmpfl="$OF.tmp.mp3"
+
+                ## try to trim the file
+                ffmpeg -y            \
+                    -nostdin         \
+                    -loglevel error  \
+                    -i "$OF"         \
+                    -aq "$QQ"        \
+                    -map_metadata 0  \
+                    -id3v2_version 3 \
+                    -write_id3v1 1   \
+                    -af              \
+                    "silenceremove=\
+                    start_periods=1:\
+                    start_duration=$sl_start_duration:\
+                    start_threshold=$sl_start_threshold:\
+                    detection=$sl_detection,\
+                    aformat=dblp,areverse,silenceremove=\
+                    start_periods=1:\
+                    start_duration=$sl_start_duration:\
+                    start_threshold=$sl_start_threshold:\
+                    detection=$sl_detection,\
+                    aformat=dblp,areverse" "$tmpfl"
+
+                ## replace original file
+                if [ -e "$tmpfl" ]; then
+                    echo "Removed silense"
+                    mv "$tmpfl" "$OF"
+                fi
             else
                 echo "EXIST: $OF"
             fi
@@ -138,6 +205,36 @@ find "$IN" -type f -iname "*.mp3" | while read mfile; do
             ## copy mp3
             printf "$cc/$nmp3 "
             cp -vu "$mfile" "$OF"
+            ## trim silence after copying
+            tmpfl="$OF.tmp.mp3"
+
+            ## try to trim the file
+            ffmpeg -y            \
+                -nostdin         \
+                -loglevel error  \
+                -i "$OF"         \
+                -aq "$QQ"        \
+                -map_metadata 0  \
+                -id3v2_version 3 \
+                -write_id3v1 1   \
+                -af              \
+                "silenceremove=\
+                start_periods=1:\
+                start_duration=$sl_start_duration:\
+                start_threshold=$sl_start_threshold:\
+                detection=$sl_detection,\
+                aformat=dblp,areverse,silenceremove=\
+                start_periods=1:\
+                start_duration=$sl_start_duration:\
+                start_threshold=$sl_start_threshold:\
+                detection=$sl_detection,\
+                aformat=dblp,areverse" "$tmpfl"
+
+            ## replace original file
+            if [ -e "$tmpfl" ]; then
+                echo "Removed silense"
+                mv "$tmpfl" "$OF"
+            fi
         fi
     else
         echo "Missing source $mdile"
