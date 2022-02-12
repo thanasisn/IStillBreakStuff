@@ -4,11 +4,13 @@
 Music library management tools.
 
 
-- **convert_m3u_playlists.sh    :**   Convert mp3 play list from master library to image library
-- **flac_cue_split.sh           :**   Split and add metadata to flac files from cue list
-- **music_library_imag_check.sh :**    Music library image maintenance
-- **music_library_transcode.sh  :**   Transcode music library image from FLAC to mp3
-- **yt_playlist_dl.sh           :**   Download youtube playlists as mp3
+
+- **convert_m3u_playlists.sh        :**   Convert mp3 play list from master library to image library
+- **flac_cue_split.sh               :**   Split and add metadata to flac files from cue list
+- **music_library_imag_check.sh     :**   Music library image maintenance
+- **music_library_transcode.sh      :**   Transcode music library image from FLAC to mp3 and trim silence
+- **.sh                             :**   enter description here
+- **yt_playlist_dl.sh               :**   Download youtube playlists as mp3
 
 
 
