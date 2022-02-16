@@ -71,6 +71,7 @@ if [[ count -gt 0 ]]; then
     cat "$mastermis" | while read line ; do
         echo  "TO RM:  ${imagedir}${line}.mp3"
         rm -v "${imagedir}${line}.mp3"
+        echo "Run music_library_transcode.sh"
     done
 fi
 
@@ -90,6 +91,7 @@ cat "$masterfil" | while read original; do
             echo "Remove old duplicate $duplicate"
             ## remove old dups in order to reencode with newer version
             rm -v "$duplicate"
+            echo "Run music_library_transcode.sh"
         fi
     fi
 done
