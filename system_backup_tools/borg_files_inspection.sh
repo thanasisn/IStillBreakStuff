@@ -1,7 +1,7 @@
 #!/bin/bash
 ## https://github.com/thanasisn <lapauththanasis@gmail.com>
 
-#### Slip borg backup logs to list of ignored and backuped files
+#### Spit borg backup logs to list of ignored and archived files and display them
 ## Input file is *.files from "borg_backup.sh" or "borg_backup_test.sh" scripts
 ## It filters out some common files from output for better humman consumption
 
