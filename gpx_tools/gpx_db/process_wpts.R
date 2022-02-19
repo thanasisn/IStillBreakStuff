@@ -75,13 +75,11 @@ if (file.exists(fl_waypoints)) {
 }
 
 
-
 ####  Read polygons for the regions  ####
 regions <- st_read(fl_regions, stringsAsFactors = FALSE)
 regions <- st_transform(regions, EPSG)
 regions$NFiles  <- 0
 regions$NPoints <- 0
-
 
 
 wecare <- c("ele", "time", "magvar", "geoidheight", "name", "cmt", "desc", "src", "sym", "type", "ageofdgpsdata", "dgpsid", "geometry", "Region","file","mtime")
@@ -175,7 +173,6 @@ if (DRINKING_WATER) {
 }
 
 
-
 ## Add waterfalls from OSM ####
 if (WATERFALLS) {
 
@@ -197,14 +194,12 @@ if (WATERFALLS) {
     dwm <- st_transform(dw, EPSG) # apply transformation to points sf
 
     # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
-
     ## find close points
     # dd <- which(distmwt < 5, arr.ind = T)
 
     gather_wpt <- rbind( gather_wpt, dwm )
     rm(dw,dwm)
 }
-
 
 
 ## Add caves from OSM ####
@@ -228,23 +223,16 @@ if (WATERFALLS) {
     dwm <- st_transform(dw, EPSG) # apply transformation to points sf
 
     # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
-
     ## find close points
     # dd <- which(distmwt < 5, arr.ind = T)
 
     gather_wpt <- rbind( gather_wpt, dwm )
     rm(dw,dwm)
 }
-
-
 gather_wpt <- unique(gather_wpt)
 
 
-
-
-
-## characterize all wpt ####
-## go through polygons
+## characterize all waypoints within each polygon
 for (ii in 1:length(regions$Name)) {
 
     cat(paste("Characterize", regions$Name[ii],"\n"))
@@ -265,9 +253,6 @@ if (update) {
 ssel <- gather_wpt$geometry == ffff$geometry
 gather_wpt <- gather_wpt[ ! ssel, ]
 
-
-##TEST for testing ####
-# gather_wpt <- readRDS(fl_waypoints)
 
 ## clean
 gather_wpt <- gather_wpt[ ! lapply(gather_wpt$geometry, length) != 2, ]
@@ -311,7 +296,6 @@ for (i in 1:nrow(dd)) {
 # pA <- gather_wpt[dd[,1],]
 # pA <- data.table(pA)
 # pA <- pA[, .(Total_Dups = .N),by=file]
-#
 # for (ii in 1:nrow(pA)){
 #     afi <- unlist(pA[ii,file])
 #     pA[ii,Total_Dups]
@@ -322,7 +306,6 @@ for (i in 1:nrow(dd)) {
 
 dd <- unique(dd)
 paste( nrow(dd), "point couples under", close_flag,"m distance" )
-
 
 
 
@@ -368,7 +351,6 @@ setorder(filescnt, N)
 gdata::write.fwf(filescnt,
                  sep = " ; ", quote = TRUE,
                  file = "~/GISdata/Suspect_wpt_to_clean.csv" )
-
 
 
 
@@ -449,6 +431,8 @@ gather_wpt <- gather_wpt[ grep("[[:space:]]*Κάτω δεξιά[[:space:]]*",   
 gather_wpt <- gather_wpt[ grep("[[:space:]]*Κατω δεξιά[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[ grep("[[:space:]]*Κατω δεξια[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[ grep("[[:space:]]*Λυκ?",                             gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[ grep("[[:space:]]*Μονοπάτι[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[ grep("[[:space:]]*Μονοπατι[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[ grep("[[:space:]]*άσφαλτος[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[ grep("[[:space:]]*από εδώ[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[ grep("[[:space:]]*αριστερά[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
@@ -482,7 +466,6 @@ drop_files <- c(
 
 
 
-
 ## export gpx waypoints by region ####
 for (ar in unique(gather_wpt$Region)) {
 
@@ -499,11 +482,9 @@ for (ar in unique(gather_wpt$Region)) {
     }
     temp <- unique(temp)
 
-
-    ## export all data fot qgis with all metadata
+    ## export all data for qgis with all metadata
     if (nrow(temp)<1) { next() }
     write_sf(temp, paste0("~/LOGs/waypoints/wpt_",ar,".gpx"), driver = "GPX", append = F, overwrite = T)
-
 
     ## remove a lot of data for gpx devices
     ##TODO you are removing useful info!!
@@ -529,17 +510,17 @@ distm <- raster::pointDistance(p1 = gather_wpt, lonlat = T, allpairs = T)
 dd <- which(distm < close_flag, arr.ind = T)
 ## remove diagonal
 dd <- dd[dd[,1] != dd[,2], ]
-cat(paste( nrow(dd), "point couples under", close_flag,"m distance" ),"\n")
+cat(paste( nrow(dd), "point couples under", close_flag, "m distance" ),"\n")
 
 ## remove pairs 2,3 == 3,2
 for (i in 1:nrow(dd)) {
     dd[i, ] = sort(dd[i, ])
 }
 dd <- unique(dd)
-cat(paste( nrow(dd), "point couples under", close_flag,"m distance" ),"\n")
+cat(paste( nrow(dd), "point couples under", close_flag, "m distance" ),"\n")
 
 
-####
+## indentify suspects
 suspects <- data.table(
     name_A = gather_wpt$name    [dd[,1]],
     geom_A = gather_wpt$geometry[dd[,1]],
@@ -563,20 +544,20 @@ filescnt <- suspects[, .(file_A,file_B) ]
 filescnt <- filescnt[, .N , by = (paste(file_A,file_B))]
 filescnt$Max_dist <- close_flag
 setorder(filescnt, N)
-write.csv(filescnt, "~/GISdata/Layers/Suspect_point_to_clean_filtered.csv", row.names = FALSE)
-# gdata::write.fwf(filescnt,
-#                  sep = " ; ", quote = TRUE,
-#                  file = "~/GISdata/Layers/Suspect_point_to_clean_filtered.csv" )
-
+# write.csv(filescnt, "~/GISdata/Layers/Suspect_point_to_clean_filtered.csv", row.names = FALSE)
+myRtools::write_dat(object = filescnt,
+                    file   = "~/GISdata/Layers/Suspect_point_to_clean_filtered.csv",
+                    clean  = TRUE)
 
 
 wecare = grep("geom", names(suspects),invert = T,value = T )
 wecare <- c("Dist","name_A","name_B","file_A","file_B" )
 
-write.csv(suspects[,..wecare], "~/GISdata/Suspects_filtered.csv", row.names = FALSE)
-# gdata::write.fwf(suspects[,..wecare],
-#                  sep = " ; ", quote = TRUE,
-#                  file = "~/GISdata/Layers/Suspects_filtered.csv" )
+# write.csv(suspects[,..wecare], "~/GISdata/Suspects_filtered.csv", row.names = FALSE)
+myRtools::write_dat(object = suspects[,..wecare],
+                    file   = "~/GISdata/Suspects_filtered.csv",
+                    clean  = TRUE)
+
 
 ## export all points for gps devices
 gather_wpt$Region <- NULL
@@ -584,9 +565,6 @@ gather_wpt$cmt  <- NA
 gather_wpt$desc <- NA
 gather_wpt$src  <- NA
 write_sf(gather_wpt, '~/LOGs/waypoints_etrex/WPT_ALL.gpx', driver = "GPX", append = F, overwrite = T)
-
-
-
 
 
 
