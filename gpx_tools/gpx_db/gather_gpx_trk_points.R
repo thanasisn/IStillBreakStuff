@@ -68,18 +68,19 @@ if (file.exists(trackpoints_fl)) {
 
     ## check for changed files
     ##FIXME  not tested
-    data <- data[ ! filename %in% ddd$filename ]
+    # data <- data[ ! filename %in% ddd$filename ]
 
-    gpxlist <- ddd$filename
+    gpxlist <- ddd$file
 
 } else {
     data <- data.table()
 }
 
 
+
+## Parse all the files
 cnt   <- 0
 total <- length(gpxlist)
-
 for (af in gpxlist) {
     cnt <- cnt + 1
     if (!file.exists(af)) { next() }
