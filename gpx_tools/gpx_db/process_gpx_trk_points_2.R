@@ -49,9 +49,9 @@ DT2 <- DT2[ !is.na(time), ]
 
 ## find Google data we should include due to missing data
 setorder(DT2, time )
-setorder(DT, time  )
-near <- myRtools::nearest( as.numeric( DT2$time),
-                           as.numeric( DT$time ) )
+setorder(DT,  time )
+near    <- myRtools::nearest( as.numeric( DT2$time),
+                              as.numeric( DT$time ) )
 timdiff <- abs( as.numeric(DT[ near, ]$time - DT2$time))
 DT2     <- DT2[ timdiff >= google_threshold ]
 
