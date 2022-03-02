@@ -9,10 +9,12 @@ They are just convenient tools for the terminal.
 Things they do:
 
 
+
 - **adsl_refresh_ip.sh           :**  Refresh ip by refreshing adsl connection 
 - **auto_commit_push_git.sh      :**  Auto commit and push all git repos
 - **btrfs_defrag.sh              :**  Defrag all btrfs filesystems
 - **btrfs_scrub.sh               :**  Start a btrfs scrub to check data integrity
+- **clamscan_daily.sh            :** 
 - **clean_metadata.sh            :**  Remove metadata from any file using exiftool
 - **compress_dirs_best.sh        :**  Compress individual folders after testing for best compression method for each folder
 - **compress_files_best.sh       :**  Compress individual files after testing for best compression method for each file
@@ -36,11 +38,16 @@ Things they do:
 - **remove_duplicate_files.sh    :**  find duplicate files with fdupes and remove them by matching patter
 - **remove_old_snaps.sh          :**  Removes old revisions of snaps
 - **scripts_titles.sh            :**  Get info for scripts containing a specified header
+- **shell_keep_history.sh        :**  Keep a record of all history from all hosts  
 - **show_config.sh               :**  Display the keybinds of some programs by parsing their config files
 - **speedup_clock.sh             :**  Speed up the time of a linux machine by adding a fixed amount of time at every interval
 - **throttle_by_temp.sh          :**  Throttle a process cpu usage according to cpu temperature
 - **touch_random.sh              :**  Randomize files and folders dates
 - **unmount_enc_home.sh          :**  Unmount mounted user home and close LUKS
+- **vnc_connect.sh               :**  Creates a ssh tunnel and open a new vnc connection to known hosts
+
+
+
 
 
 *Suggestions and improvements are always welcome.*
