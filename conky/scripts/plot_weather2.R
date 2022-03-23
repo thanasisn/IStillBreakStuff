@@ -178,12 +178,12 @@ has_wind <- any(!is.na(c(Wind$wind_speed, Wind$windSpeed)), na.rm = TRUE)
 
 #### Prepare daily value from meteo blue ####
 
+
 blue$From  <- as.POSIXct(strptime( paste(blue$day, "00:00"), "%F %R" ), tz = "Europe/Athens")
-blue$Until <- as.POSIXct(paste(blue$day, "24:00"), tz = "Europe/Athens")
-
-blue <- data.frame(blue)
-
-blue <- blue[ blue$From <= dt_end ]
+blue$Until <- as.POSIXct(strptime( paste(blue$day, "23:59"), "%F %R" ), tz = "Europe/Athens")
+# blue$Until <- blue$From + 3600 * 24
+blue       <- data.frame(blue)
+blue       <- blue[ blue$From <= dt_end, ]
 
 
 #### Prepare data from LAP DAVIS  ####
@@ -202,10 +202,10 @@ lapd$humidex   <- fahrenheit_to_celsius(lapd$humidex)
 
 testa <- lapd[ lapd$dateTime > Sys.Date() - 10 * 3600 * 24, ]
 
-plot( testa$dt, testa$appTemp,   "l")
-lines(testa$dt, testa$outTemp,   col = 2)
-lines(testa$dt, testa$heatindex, col = 3)
-lines(testa$dt, testa$humidex, col = 3)
+# plot( testa$dt, testa$appTemp,   "l")
+# lines(testa$dt, testa$outTemp,   col = 2)
+# lines(testa$dt, testa$heatindex, col = 3)
+# lines(testa$dt, testa$humidex, col = 3)
 
 
 #### Start plotting ####
