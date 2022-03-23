@@ -7,6 +7,12 @@ Each folder should have a README file.
 
 ------------------------------------------------------------------------
 
+## [FUNCTIONS](https://github.com/thanasisn/IStillBreakStuff/tree/main/FUNCTIONS)
+Collection of simple functions, sourced regular by other programs.
+
+## [car_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/car_tools)
+
+
 ## [conky](https://github.com/thanasisn/IStillBreakStuff/tree/main/conky)
 WYSIWYG
 
@@ -42,6 +48,9 @@ General system and file tools for linux systems.
 
 ## [templates](https://github.com/thanasisn/IStillBreakStuff/tree/main/templates)
 Scripts templates and snippets.
+
+## [text_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/text_tools)kj
+Tools for processing text or text files and creating documents.:W
 
 ## [training_analysis](https://github.com/thanasisn/IStillBreakStuff/tree/main/training_analysis)
 Tools for processing my training data.

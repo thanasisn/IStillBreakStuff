@@ -26,6 +26,8 @@ Sys.setenv(TZ = "Europe/Athens")
 ## variables
 repo   <- "~/LOGs/carpros/"
 mycars <- c("Duster", "Carina")
+mycars <- c("Carina", "Duster")
+
 TANK   <- c(  70    ,   60    )
 
 
@@ -183,12 +185,23 @@ for (CAR in mycars) {
         taplog$Car_Consumption_Rate[taplog$Car_Consumption_Rate > 20] <- NA
     }
 
+    indx2 <- which(sapply(taplog, is.character))
+    for (j in indx2) set(taplog, i = grep("^$|^ $", taplog[[j]]), j = j, value = NA_character_)
+
     taplog        <- rm.cols.dups.df(taplog)
     taplog$Source <- "taplog"
     taplog        <- data.table(taplog)
+
+
+
+    vec <- !is.na(taplog$Fuel_Level)
+    taplog[ vec , Fuel_Level_diff := c(0,diff(Fuel_Level)) ]
+    taplog[ vec , Fuel_Level_trip := c(0,diff(Odometer)) ]
+
+
     setorder(taplog, Date )
     write.csv(x = taplog, file = paste0("~/LOGs/car_logs/Taplog_",CAR,".csv"),row.names = F)
-
+stop()
 
     ####  Prepare service data carpros  ####
     service <- fread(grep(paste0(CAR,"_ServiceData"),files,value = T))
