@@ -26,8 +26,7 @@ Sys.setenv(TZ = "Europe/Athens")
 ## variables
 repo   <- "~/LOGs/carpros/"
 mycars <- c("Duster", "Carina")
-mycars <- c("Carina", "Duster")
-
+# mycars <- c("Carina", "Duster")
 TANK   <- c(  70    ,   60    )
 
 
@@ -198,10 +197,13 @@ for (CAR in mycars) {
     taplog[ vec , Fuel_Level_diff := c(0,diff(Fuel_Level)) ]
     taplog[ vec , Fuel_Level_trip := c(0,diff(Odometer)) ]
 
+    taplog[ vec & Fuel_Level_trip >0 & Fuel_Level_diff <= 0,
+            Fuel_Level_change_p100km := 100 * Fuel_Level_diff / Fuel_Level_trip]
 
     setorder(taplog, Date )
     write.csv(x = taplog, file = paste0("~/LOGs/car_logs/Taplog_",CAR,".csv"),row.names = F)
-stop()
+
+
 
     ####  Prepare service data carpros  ####
     service <- fread(grep(paste0(CAR,"_ServiceData"),files,value = T))
@@ -219,11 +221,12 @@ stop()
     gas[, Date := as.Date(Date, "%m/%d/%y") ]
     gas[, Date := as.POSIXct(paste(Date, Time))]
     gas[, Time := NULL]
+    gas[, Lat  := NULL]
+    gas[, Lng  := NULL]
     gas[, Litre := Cost / UnitPrice ]
     names(gas)[names(gas) == "Mileage"] <- "Odometer"
     setorder(gas, Date)
     write.csv(x = gas, file = paste0("~/LOGs/car_logs/Gas_stats_", CAR,".csv"),row.names = F)
-
 
 
     ####  Prepare trip data carpros  ####
@@ -346,6 +349,7 @@ stop()
     }
 
     data <- unique(data)
+    data <- rm.cols.dups.DT(data)
     setorder(data,Date)
     data[is.na(Source), Source := "Other"]
 
