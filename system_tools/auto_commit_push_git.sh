@@ -5,6 +5,14 @@
 
 #### Auto commit and push all git repos
 
+
+exec 9>"/dev/shm/$(basename $0).lock"
+if ! flock -n 9  ; then
+    echo "another instance of $0 is running";
+    exit 1
+fi
+
+
 set +e
 
 
@@ -123,7 +131,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.Rmd' \
                   -o -iname '*.md'  \
                   -o -iname '*.r'   \) -print0 |\
-                  xargs -0 git add
+                  xargs -t -0 git add
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
 
@@ -176,7 +184,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.Rmd' \
                   -o -iname '*.md'  \
                   -o -iname '*.r'   \) -print0 |\
-                  xargs -0 git add
+                  xargs -t -0 git add
 
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
