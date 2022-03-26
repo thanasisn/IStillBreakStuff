@@ -131,7 +131,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.Rmd' \
                   -o -iname '*.md'  \
                   -o -iname '*.r'   \) -print0 |\
-                  xargs -t -0 git add
+                  xargs -t -0 git add -f
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
 
