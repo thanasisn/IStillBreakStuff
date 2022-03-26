@@ -170,6 +170,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.h'   \
                   -o -iname '*.gp'  \
                   -o -iname '*.ex'  \
+                  -o -iname '*.png' \
                   -o -iname '*.bib' \
                   -o -iname '*.tex' \
                   -o -iname '*.Rmd' \
