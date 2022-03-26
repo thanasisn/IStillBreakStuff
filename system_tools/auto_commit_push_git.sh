@@ -178,13 +178,12 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.h'   \
                   -o -iname '*.gp'  \
                   -o -iname '*.ex'  \
-                  -o -iname '*.png' \
                   -o -iname '*.bib' \
                   -o -iname '*.tex' \
                   -o -iname '*.Rmd' \
                   -o -iname '*.md'  \
                   -o -iname '*.r'   \) -print0 |\
-                  xargs -t -0 git add -f
+                  xargs -t -0 git add 
 
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
