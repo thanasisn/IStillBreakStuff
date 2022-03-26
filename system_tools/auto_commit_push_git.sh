@@ -184,7 +184,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.Rmd' \
                   -o -iname '*.md'  \
                   -o -iname '*.r'   \) -print0 |\
-                  xargs -t -0 git add
+                  xargs -t -0 git add -f
 
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
@@ -521,41 +521,6 @@ git commit -uno -a -m "auto update $(date +%F_%T)"
 echo ""
 echo " ^^^^ FINISH ^^^^ ${folder}"
 
-#-----------------------------------------------------------------------------#
-
-folder="$HOME/FUNCTIONS"
-
-echo ""
-echo " vvvv START vvvv ${folder}"
-echo ""
-
-cd ${folder}
-rm -f "${folder}/.git/index.lock"
-
-find . -type f \(    -iname '*.sh'  \
-                  -o -iname '*.Rmd' \
-                  -o -iname '*.bas' \
-                  -o -iname '*.bib' \
-                  -o -iname '*.c'   \
-                  -o -iname '*.dot' \
-                  -o -iname '*.ex'  \
-                  -o -iname '*.f90' \
-                  -o -iname '*.frm' \
-                  -o -iname '*.jl'  \
-                  -o -iname '*.gnu' \
-                  -o -iname '*.gp'  \
-                  -o -iname '*.h'   \
-                  -o -iname '*.md'  \
-                  -o -iname '*.par' \
-                  -o -iname '*.py'  \
-                  -o -iname '*.tex' \
-                  -o -iname '*.r'   \) -print0 |\
-                  xargs -0 git add
-
-git commit -uno -a -m "auto update $(date +%F_%T)"
-
-echo ""
-echo " ^^^^ FINISH ^^^^ ${folder}"
 
 #-----------------------------------------------------------------------------#
 
