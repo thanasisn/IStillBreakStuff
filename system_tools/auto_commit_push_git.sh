@@ -40,7 +40,7 @@ echo "------"
 cd "$HOME/CODE/R_myRtools/"
 pwd
 git commit -uno -a -m "Auto commit"
-git push -f -u origin main
+git push -f -u origin master
 
 
 
@@ -183,7 +183,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.Rmd' \
                   -o -iname '*.md'  \
                   -o -iname '*.r'   \) -print0 |\
-                  xargs -t -0 git add 
+                  xargs -t -0 git add
 
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
