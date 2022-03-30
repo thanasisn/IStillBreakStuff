@@ -37,7 +37,7 @@ git push -f -u origin main
 
 
 echo "------"
-cd "$HOME/CODE/R_myRtools/"
+cd "$HOME/CODE/R_myRtools/myRtools"
 pwd
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
