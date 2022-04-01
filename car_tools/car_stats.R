@@ -26,8 +26,11 @@ Sys.setenv(TZ = "Europe/Athens")
 ## variables
 repo   <- "~/LOGs/carpros/"
 mycars <- c("Duster", "Carina")
-# mycars <- c("Carina", "Duster")
 TANK   <- c(  70    ,   60    )
+
+# mycars <- c("Carina", "Duster")
+# TANK   <- c(  60    ,   70    )
+
 
 
 ## functions
@@ -109,11 +112,15 @@ for (CAR in mycars) {
     taplog$longitude        <- NULL
     taplog$speed            <- NULL
     taplog$bearing          <- NULL
+    taplog$timezoneOffset   <- NULL
 
     ## assume gas has the same data with taplog
     taplog           <- taplog[ grep("fill", taplog$cat1, invert = T), ]
 
-    taplog$timestamp <- strptime( taplog$timestamp , "%FT%T")
+    sub(":00$" ,"00",sub("\\.[0-9]+\\+" ,"+",taplog$timestamp))
+    sub("\\.[0-9]+\\+" ,"+",taplog$timestamp)
+
+    taplog$timestamp <- strptime( sub(":00$" ,"00",sub("\\.[0-9]+\\+" ,"+",taplog$timestamp)) , "%FT%T")
     taplog$timestamp <- as.POSIXct(taplog$timestamp)
     taplog$tdiff     <- c(90000,diff(taplog$timestamp))
     taplog$gid       <- NA
