@@ -22,7 +22,7 @@ library(myRtools)
 breaks   <- 10000
 
 ## input file path
-file     <- "~/DATA_RAW/Other/Google_Takeout/Location History/Location History.json"
+Bfile     <- "~/DATA_RAW/Other/Google_Takeout/Location History/Records.json"
 
 ## raw output location
 storedir <- "~/DATA_RAW/Other/GLH/Raw"
@@ -39,8 +39,8 @@ dir.create(tempdir,  showWarnings = F )
 nfile <- paste0(tempdir, "master_temp.json")
 
 ## create a copy of working file
-file.copy(file, nfile)
-rm(file)
+file.copy(Bfile, nfile)
+
 
 ## remove some decorations of the file
 system(paste("sed -i '/\"locations\" :/d'", nfile ))
@@ -108,7 +108,7 @@ for ( ii in 1:(length(spltlin)-1) ) {
     cat(tail(temp),sep = "\n")
     cat("......\n")
 
-    ## write splitted files
+    ## write spitted files
     writeLines( temp, paste0(tempdir,"GLH_part_", sprintf("%04d",ii), ".json"))
 }
 rm(lines)
@@ -118,6 +118,8 @@ cat(paste("May need to do manual corrections to the last splitted json files"),"
 filestodo <- list.files(path       = tempdir,
                         pattern    = "GLH_part.*.json",
                         full.names = T)
+## read directly the main file
+filestodo <- Bfile
 
 ####  Parse smaller json files to Rds  ####
 for (af in filestodo) {
@@ -126,9 +128,11 @@ for (af in filestodo) {
     # test1 <- ndjson::stream_in(af, cls = "dt" )
     # test2 <- jsonlite::stream_in(file(af), flatten=TRUE, verbose=FALSE)
     tempJ <- data.table(jsonlite::fromJSON(af))
+    saveRDS(tempJ, "./tempj_temp.Rdat")
 
     ## proper dates
-    tempJ[, Date := as.POSIXct(as.numeric(timestampMs)/1000, tz='GMT', origin='1970-01-01') ]
+    tempJ[, Date := strptime(timestamp,"%FT%H:%M:%OS") ]
+    # tempJ[, Date := as.POSIXct(as.numeric(timestampMs)/1000, tz='GMT', origin='1970-01-01') ]
     tempJ[, timestampMs := NULL]
 
     ## proper coordinates
