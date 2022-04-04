@@ -131,9 +131,9 @@ for (af in filestodo) {
     saveRDS(tempJ, "./tempj_temp.Rdat")
 
     ## proper dates
-    tempJ[, Date := strptime(timestamp,"%FT%H:%M:%OS") ]
+    tempJ[, Date := as.POSIXct(strptime(timestamp,"%FT%H:%M:%OS")) ]
     # tempJ[, Date := as.POSIXct(as.numeric(timestampMs)/1000, tz='GMT', origin='1970-01-01') ]
-    tempJ[, timestampMs := NULL]
+    tempJ[, timestamp := NULL]
 
     ## proper coordinates
     tempJ[, Lat         := latitudeE7  / 1e7 ]
