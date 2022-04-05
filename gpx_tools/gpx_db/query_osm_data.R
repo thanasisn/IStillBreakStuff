@@ -47,6 +47,7 @@ for (ar in regions) {
     q1$sym  <- "Campground"
     q1$desc <- "camp"
     saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Camp_sites.Rds")
+
     q2      <- add_osm_feature(call, key = '^name(:.*)?$', value = 'camping',
                                value_exact = FALSE, key_exact = FALSE, match_case = FALSE)
     q2      <- osmdata_sf(q2)
@@ -58,6 +59,7 @@ for (ar in regions) {
 
     wecare <- intersect(names(q1),names(q2))
     Q      <- rbind( q1[wecare], q2[wecare])
+    Q$geometry <- sf::st_centroid(Q$geometry)
 
     ## drop fields
     Q$osm_id               <- NULL
