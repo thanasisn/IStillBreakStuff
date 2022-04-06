@@ -42,6 +42,8 @@ for (ar in regions) {
 
     q1      <- add_osm_feature(call, key = "tourism", value =  "camp_site")
     q1      <- osmdata_sf(q1)
+    # q1$geometry <- sf::st_centroid(q1$geometry)
+
     Sys.sleep(20) ## be polite to server
     q1      <- q1$osm_points
     q1$sym  <- "Campground"
@@ -51,14 +53,17 @@ for (ar in regions) {
     q2      <- add_osm_feature(call, key = '^name(:.*)?$', value = 'camping',
                                value_exact = FALSE, key_exact = FALSE, match_case = FALSE)
     q2      <- osmdata_sf(q2)
+    # q2$geometry <- sf::st_centroid(q2$geometry)
+
     Sys.sleep(20) ## be polite to server
     q2      <- q2$osm_points
     q2$sym  <- "Campground"
     q2$desc <- "camp"
     saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_Camping.Rds")
 
-    wecare <- intersect(names(q1),names(q2))
-    Q      <- rbind( q1[wecare], q2[wecare])
+    wecare     <- intersect(names(q1),names(q2))
+    Q          <- rbind( q1[wecare], q2[wecare])
+    Q          <- unique(Q)
     Q$geometry <- sf::st_centroid(Q$geometry)
 
     ## drop fields
@@ -155,6 +160,7 @@ for (ar in regions) {
     q1$sym  <-"Drinking Water"
     q1$desc <- "vrisi"
     saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Drinking_water.Rds")
+
     q2      <- add_osm_feature(call, key = 'natural', value = 'spring'         )
     q2      <- osmdata_sf(q2)
     Sys.sleep(20) ## be polite to server
@@ -166,6 +172,8 @@ for (ar in regions) {
     ## combine available water
     wecare <- intersect(names(q1),names(q2))
     Q      <- rbind( q1[wecare], q2[wecare])
+    Q          <- unique(Q)
+    # Q$geometry <- sf::st_centroid(Q$geometry)
 
     ## drop fields
     Q$osm_id               <- NULL
@@ -269,6 +277,9 @@ for (ar in regions) {
     saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Waterfalls.Rds")
 
     Q <-    q1
+    Q          <- unique(Q)
+    # Q$geometry <- sf::st_centroid(Q$geometry)
+
 
     Q$osm_id               <- NULL
     Q$wikipedia            <- NULL
@@ -358,6 +369,8 @@ for (ar in regions) {
 
     wecare  <- intersect(names(q1),names(q2))
     Q       <- rbind( q1[wecare], q2[wecare])
+    Q          <- unique(Q)
+    # Q$geometry <- sf::st_centroid(Q$geometry)
 
     Q$sym  <- "Mine"
     Q$desc <- "cave"
