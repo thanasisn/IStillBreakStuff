@@ -155,9 +155,6 @@ git push -f -u origin main
 
 
 
-##  COMMIT PUSH to local repos  ################################################
-
-## The following add files to git automatically
 
 echo "------"
 folder="$HOME/CM_21_GLB/"
@@ -184,14 +181,42 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.md'  \
                   -o -iname '*.r'   \) -print0 |\
                   xargs -t -0 git add
-
 git commit -uno -a -m "Auto commit"
 git push -f -u origin main
 
 
 
+echo "------"
+folder="$HOME/CHP_1_DIR/"
+cd ${folder}
+pwd
+rm -f "${folder}/.git/index.lock"
+find . -type f \(    -iname '*.sh'  \
+                  -o -iname '*.py'  \
+                  -o -iname '*.md'  \
+                  -o -iname '*.bas' \
+                  -o -iname '*.gnu' \
+                  -o -iname '*.dot' \
+                  -o -iname '*.frm' \
+                  -o -iname '*.par' \
+                  -o -iname '*.f90' \
+                  -o -iname '*.jl'  \
+                  -o -iname '*.c'   \
+                  -o -iname '*.h'   \
+                  -o -iname '*.gp'  \
+                  -o -iname '*.ex'  \
+                  -o -iname '*.bib' \
+                  -o -iname '*.tex' \
+                  -o -iname '*.Rmd' \
+                  -o -iname '*.md'  \
+                  -o -iname '*.r'   \) -print0 |\
+                  xargs -t -0 git add
+git commit -uno -a -m "Auto commit"
+git push -f -u origin main
 
 
+
+##  COMMIT PUSH to local repos  ################################################
 ##  Autocommit in local repos  ##
 
 
