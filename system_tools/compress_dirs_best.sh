@@ -79,6 +79,7 @@ opts=$(getopt \
 
 eval set --$opts
 
+##TODO check if input is no or yes
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --algorithm  )     ALGO=( $2 );            shift 2 ;;
@@ -98,6 +99,7 @@ while [[ $# -gt 0 ]]; do
         * ) break ;;
     esac
 done
+echo $#
 [ $# = 0 ] && _usage " >>> NO TARGET GIVEN <<<  " && exit
 
 echo
