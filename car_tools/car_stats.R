@@ -233,9 +233,11 @@ for (CAR in mycars) {
     gas[, Lng  := NULL]
     gas[, Litre := Cost / UnitPrice ]
     names(gas)[names(gas) == "Mileage"] <- "Odometer"
-    gas[ , lp100km     := 100 * Litre / c(NA, abs(diff(Odometer)))]
-    gas[ , Avg_lp100km := 100 * sum(gas$Litre[ 1:(nrow(gas)-1) ]) / diff(range(gas$Odometer)) ]
+    gas[ , dist_traveled := c(NA, abs(diff(Odometer)))]
+    gas[ , lp100km       := 100 * Litre / dist_traveled ]
+    gas[ , Avg_lp100km   := 100 * sum(gas$Litre[ 1:(nrow(gas)-1) ]) / diff(range(gas$Odometer)) ]
     write.csv(x = gas, file = paste0("~/LOGs/car_logs/Gas_stats_", CAR,".csv"),row.names = F)
+
 
     ####  Prepare trip data carpros  ####
     afile <- grep("carpros_manual",files,value = T)
