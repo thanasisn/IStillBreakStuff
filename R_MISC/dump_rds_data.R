@@ -10,6 +10,10 @@ library(optparse,   quietly = T, warn.conflicts = F)
 
 
 
+args = commandArgs(trailingOnly=TRUE)
+print(paste(args))
+
+
 option_list <-  list(
     make_option(c("-o", "--output"),
                 type    = "character",
@@ -18,6 +22,10 @@ option_list <-  list(
                 metavar = "yyyy-mm-dd")
 )
 opt_parser <- OptionParser(option_list = option_list)
+
+print(opt_parser)
+
+
 args       <- parse_args(opt_parser)
 
 
