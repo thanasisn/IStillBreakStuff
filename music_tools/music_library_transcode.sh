@@ -19,7 +19,7 @@ BIT=220
 ## duration of non silence
 sl_start_duration="2"
 ## silense volume
-sl_start_threshold="-29dB"
+sl_start_threshold="-27dB"
 ## detection method "rms" or "peak"
 sl_detection="rms"
 
