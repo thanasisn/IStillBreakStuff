@@ -13,20 +13,20 @@ node      <- Sys.info()["nodename"]
 year      <- strftime(Sys.Date(), "%Y")
 keep_file <- paste0("~/LOGs/Locations/",node,"_",year,"_locations.dat" )
 
-dir.create(  "/dev/shm/CONKY/", recursive = T, showWarnings = F)
-CURRENT_FL = "/dev/shm/CONKY/Locations.Rds"
+dir.create(   "/dev/shm/CONKY/", recursive = T, showWarnings = F)
+CURRENT_FL <- "/dev/shm/CONKY/Locations.Rds"
 
-ALLOW_SWITCH_WIFI = TRUE
-# ALLOW_SWITCH_WIFI = FALSE
+ALLOW_SWITCH_WIFI <- TRUE
+# ALLOW_SWITCH_WIFI <- FALSE
 
 ## load known locations (no spaces for bash sake)
-LOCs <- read.table("~/BASH/PARAMS/Known_locations.csv",sep = ";",strip.white = T, header = T)
+LOCs    <- read.table("~/BASH/PARAMS/Known_locations.csv",sep = ";",strip.white = T, header = T)
 LOCs$Dt <- Sys.time()
 
 ## location for different sources
-loc_H <- data.frame()
-loc_0 <- data.frame()
-loc_1 <- data.frame()
+loc_H   <- data.frame()
+loc_0   <- data.frame()
+loc_1   <- data.frame()
 ## location method that worked
 AT_HOME <- FALSE
 AT_WIFI <- FALSE
