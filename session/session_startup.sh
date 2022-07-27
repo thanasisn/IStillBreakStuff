@@ -12,8 +12,7 @@ daemonize="$HOME/CODE/system_tools/daemonize.sh"
 kill_run () {
     killall -s "$@"
     pkill   -9 "$@"
-    setsid     $@ &
-#    nohup      $@ &
+    setsid     "$@" &
 }
 
 
@@ -83,15 +82,15 @@ numlockx on
 
 
 
-killall -s 9 stalonetray
-nohup $daemonize "stalonetray --sticky -bg black --window-strut right --icon-size 19 --grow-gravity W --skip-taskbar --geometry  4x1-650-6 --icon-gravity W --kludges fix_window_pos" &
+# killall -s 9 stalonetray
+# nohup $daemonize "stalonetray --sticky -bg black --window-strut right --icon-size 19 --grow-gravity W --skip-taskbar --geometry  4x1-650-6 --icon-gravity W --kludges fix_window_pos" &
 
 
 
 
 ## start conky
 # export DISPLAY=0 && $HOME/BASH/STARTUP/conky_chooser.sh
-export DISPLAY=:0 ;  $HOME/CODE/conky/conky_choose_bigger.sh &
+export DISPLAY=:0 ; $HOME/CODE/conky/conky_choose_bigger.sh &
 
 ## update backgrounds on all screens
 export DISPLAY=:0 ; $HOME/CODE/conky/scripts/update_background.sh &
