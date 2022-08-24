@@ -5,21 +5,27 @@
 ## The intentions is to make music available to other machines and mp3 devices
 ## We keep the folder structure to share playlist easily
 
+## Parallel process
+NP=2
 
 ## Original library
 IN="/home/folder/Music/"
+
 ## Trascoded library
 OUT="/media/barel/Music_img"
 
 ## Transcode quality target
 QQ=1
+
 ## mp3 transcode/copy threshold
 BIT=220
 
 ## duration of non silence
 sl_start_duration="2"
+
 ## silense volume
 sl_start_threshold="-27dB"
+
 ## detection method "rms" or "peak"
 sl_detection="rms"
 
@@ -72,68 +78,68 @@ find "$IN" -type f -iname "*.flac"
 find "$IN" -type f -iname "*.wma"
 ) | while read mfile; do
 
-    ## skip deleted files
-    if [ -e "$mfile" ] ; then
+        ## skip deleted files
+        if [ -e "$mfile" ] ; then
 
-        OF="$(echo "$mfile" |\
-              sed 's@.flac$@.mp3@g' |\
-              sed 's@.wma$@.mp3@g'  |\
-              sed 's,'"$IN","$OUT\/"',g' )"
-        dir="$(dirname "$OF")"
+            OF="$(echo "$mfile" |\
+                  sed 's@.flac$@.mp3@g' |\
+                  sed 's@.wma$@.mp3@g'  |\
+                  sed 's,'"$IN","$OUT\/"',g' )"
+            dir="$(dirname "$OF")"
 
-        mkdir -p "$dir"
+            mkdir -p "$dir"
 
-        ## skip existing files
-        if [ ! -e "$OF" ]; then
-            echo "$cc/$nflac :: $(basename "$dir") :: $(basename "$OF") "
-            # echo "$mfile -> $OF"
-            #avconv -nostats -loglevel info  -i "$mfile" -codec:a libmp3lame -qscale:a $QQ  "$OF"
-            ffmpeg -nostdin         \
-                   -loglevel error  \
-                   -i "$mfile"      \
-                   -aq "$QQ"        \
-                   -map_metadata 0  \
-                   -id3v2_version 3 \
-                   -write_id3v1 1   \
-                   "$OF" 2>/dev/null
-            ## trim silence after transcoding
-            tmpfl="$OF.tmp.mp3"
+            ## skip existing files
+            if [ ! -e "$OF" ]; then
+                echo "$cc/$nflac :: $(basename "$dir") :: $(basename "$OF") "
+                # echo "$mfile -> $OF"
+                #avconv -nostats -loglevel info  -i "$mfile" -codec:a libmp3lame -qscale:a $QQ  "$OF"
+                ffmpeg -nostdin         \
+                       -loglevel error  \
+                       -i "$mfile"      \
+                       -aq "$QQ"        \
+                       -map_metadata 0  \
+                       -id3v2_version 3 \
+                       -write_id3v1 1   \
+                       "$OF" 2>/dev/null
+                ## trim silence after transcoding
+                tmpfl="$OF.tmp.mp3"
 
-            ## try to trim the file
-            ffmpeg -y            \
-                -nostdin         \
-                -loglevel error  \
-                -i "$OF"         \
-                -aq "$QQ"        \
-                -map_metadata 0  \
-                -id3v2_version 3 \
-                -write_id3v1 1   \
-                -af              \
-                "silenceremove=\
-                start_periods=1:\
-                start_duration=$sl_start_duration:\
-                start_threshold=$sl_start_threshold:\
-                detection=$sl_detection,\
-                aformat=dblp,areverse,silenceremove=\
-                start_periods=1:\
-                start_duration=$sl_start_duration:\
-                start_threshold=$sl_start_threshold:\
-                detection=$sl_detection,\
-                aformat=dblp,areverse" "$tmpfl"
+                ## try to trim the file
+                ffmpeg -y            \
+                    -nostdin         \
+                    -loglevel error  \
+                    -i "$OF"         \
+                    -aq "$QQ"        \
+                    -map_metadata 0  \
+                    -id3v2_version 3 \
+                    -write_id3v1 1   \
+                    -af              \
+                    "silenceremove=\
+                    start_periods=1:\
+                    start_duration=$sl_start_duration:\
+                    start_threshold=$sl_start_threshold:\
+                    detection=$sl_detection,\
+                    aformat=dblp,areverse,silenceremove=\
+                    start_periods=1:\
+                    start_duration=$sl_start_duration:\
+                    start_threshold=$sl_start_threshold:\
+                    detection=$sl_detection,\
+                    aformat=dblp,areverse" "$tmpfl"
 
-            ## replace original file
-            if [ -e "$tmpfl" ]; then
-                echo "Removed silense"
-                mv "$tmpfl" "$OF"
+                ## replace original file
+                if [ -e "$tmpfl" ]; then
+                    echo "Removed silense"
+                    mv "$tmpfl" "$OF"
+                fi
+            else
+                echo "EXIST: $OF"
             fi
         else
-            echo "EXIST: $OF"
+            echo "Missing source $mfile"
         fi
-    else
-        echo "Missing source $mfile"
-    fi
 
-    cc=$((cc+1))
+        cc=$((cc+1))
 done
 
 
