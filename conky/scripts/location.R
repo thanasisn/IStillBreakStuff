@@ -33,6 +33,15 @@ AT_WIFI <- FALSE
 AT_IP   <- FALSE
 
 
+#' Create columns if not exist
+fncols <- function(data, cname) {
+    add <-cname[!cname%in%names(data)]
+    if(length(add)!=0) data[add] <- NA
+    data
+}
+
+
+
 ##  For wifi AP mac address  ###################################################
 try({
     res <- "Nothing"
@@ -207,9 +216,12 @@ if ( AT_HOME ) {
     Location_data <- plyr::rbind.fill(Location_data, loc_0)
 }
 
+
+export_columns <- c("Dt", "Lat", "Lng", "Elv", "City", "Acc", "Type", "Key")
 Location_data <- Location_data[ ! is.na( Location_data$Lat ) & ! is.na( Location_data$Lng ), ]
 Location_data <- Location_data[ order(Location_data$Dt),]
 Location_data <- unique(Location_data)
+Location_data <- fncols(Location_data, export_columns)
 Location_data <- Location_data[ , c("Dt", "Lat", "Lng", "Elv", "City", "Acc", "Type", "Key") ]
 
 ## store location data
