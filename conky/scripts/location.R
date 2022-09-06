@@ -51,7 +51,6 @@ try({
     ## we got something useful to process
     if ( !is.null(res) && length(res) > 0  ) {
         AT_HOME <- any(apply(LOCs[1],1, grepl, res))
-
         if (AT_HOME) {
             loc_H  <- LOCs[ apply(LOCs[1],1, function(x) { any(grepl(x, res)) } ),  ]
             cat(paste("Known location Access Point\n"))
@@ -218,11 +217,11 @@ if ( AT_HOME ) {
 
 
 export_columns <- c("Dt", "Lat", "Lng", "Elv", "City", "Acc", "Type", "Key")
-Location_data <- Location_data[ ! is.na( Location_data$Lat ) & ! is.na( Location_data$Lng ), ]
-Location_data <- Location_data[ order(Location_data$Dt),]
-Location_data <- unique(Location_data)
-Location_data <- fncols(Location_data, export_columns)
-Location_data <- Location_data[ , c("Dt", "Lat", "Lng", "Elv", "City", "Acc", "Type", "Key") ]
+Location_data  <- Location_data[ ! is.na( Location_data$Lat ) & ! is.na( Location_data$Lng ), ]
+Location_data  <- Location_data[ order(Location_data$Dt),]
+Location_data  <- unique(Location_data)
+Location_data  <- fncols(Location_data, export_columns)
+Location_data  <- Location_data[ , c("Dt", "Lat", "Lng", "Elv", "City", "Acc", "Type", "Key") ]
 
 ## store location data
 Location_data <- Location_data[ order(Location_data$Dt ), ]
