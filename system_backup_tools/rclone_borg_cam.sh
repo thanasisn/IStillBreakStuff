@@ -24,9 +24,9 @@ fi
 ## ignore errors
 set +e
 ## start watchdog to kill self kill after long time
-PID=$$
-(sleep $((60*60*24)) && info "Timeout!!"  && kill "$PID") &
-watchdogpid=$!
+# PID=$$
+# (sleep $((60*60*24)) && info "Timeout!!"  && kill "$PID") &
+# watchdogpid=$!
 ## always kill watchdog and lock if this script ends
 cleanup() {
 (
