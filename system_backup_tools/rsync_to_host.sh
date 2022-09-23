@@ -4,13 +4,14 @@
 ## Fast sync before unison
 ## This is DANGEROUS will remove files from remote
 
-
+## This list CAN NOT COPE WITH SPACES !!
 list=(
-    "$HOME/.Renviron"
+'/home/athan/BASH'
+'/home/athan/PROGRAMS'
 )
 
 
-REMOTE_HOST="insane"
+REMOTE_HOST="crane"
 REMOTE_USER="$USER"
 REMOTE="${REMOTE_USER}@${REMOTE_HOST}"
 OPTIONS=" --info=progress2 --info=name0 -arvh --stats --delete "
