@@ -8,10 +8,11 @@
 list=(
 '/home/athan/BASH'
 '/home/athan/PROGRAMS'
+'/home/athan/CODE'
 )
 
 
-REMOTE_HOST="crane"
+REMOTE_HOST="192.168.1.105"
 REMOTE_USER="$USER"
 REMOTE="${REMOTE_USER}@${REMOTE_HOST}"
 OPTIONS=" --info=progress2 --info=name0 -arvh --stats --delete "
