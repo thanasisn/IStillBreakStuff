@@ -38,6 +38,10 @@ numlockx on
 
 killall -9  nm-applet
 nohup       nm-applet &
+killall -9  nm-tray
+nohup       nm-tray &
+
+
 
 # killall -9  skypeforlinux
 # nohup       skypeforlinux &
