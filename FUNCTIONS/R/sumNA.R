@@ -1,4 +1,5 @@
 
+#### Sum function which can cope with NA values.
 
 ## Taken from: https://github.com/paulponcet/bazar/blob/master/R/sumNA.R
 
@@ -37,11 +38,10 @@
 #'
 sumNA <-
     function(...,
-             na.rm = FALSE)
-    {
+             na.rm = FALSE) {
+
         x <- unlist(list(...))
         if (na.rm && length(x) && all(is.na(x))) return(x[1] + NA)
         sum(x, na.rm = na.rm)
+
     }
-
-

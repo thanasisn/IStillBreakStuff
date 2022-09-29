@@ -1,7 +1,5 @@
 
-##
-##  Trigonometric Functions with degrees
-##
+####  Trigonometric Functions with degrees
 
 
 sinde   <- function(x)       sinpi( x / 180 )
@@ -20,5 +18,3 @@ secde   <- function(x)   1 / cosd( x )
 cscde   <- function(x)   1 / sind( x )
 asecde  <- function(x)       asec( x ) * 180 / pi
 acscde  <- function(x)       acsc( x ) * 180 / pi
-
-

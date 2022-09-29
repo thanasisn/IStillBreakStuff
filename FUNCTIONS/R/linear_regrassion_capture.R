@@ -1,4 +1,5 @@
 
+#### Function to capture some variables of an lm model in R.
 
 
 #' @param lm An \code{lm()} object.
