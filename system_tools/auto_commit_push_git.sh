@@ -28,7 +28,7 @@ git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" push -u origin master
 
 
 
-echo "------"
+echo "---------------"
 cd "$HOME/CODE/"
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
@@ -36,7 +36,7 @@ git push -f -u origin main
 
 
 
-echo "------"
+echo "---------------"
 cd "$HOME/CODE/R_myRtools/myRtools"
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
@@ -44,7 +44,7 @@ git push -f -u origin main
 
 
 
-echo "------"
+echo "---------------"
 cd "$HOME/CODE/R_POLAr/POLAr/"
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
@@ -52,7 +52,7 @@ git push -f -u origin master
 
 
 
-echo "------"
+echo "---------------"
 cd "$HOME/CODE/deploy/"
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
@@ -60,7 +60,7 @@ git push -f -u origin main
 
 
 
-echo "------"
+echo "---------------"
 cd "$HOME/PANDOC/Deployment_notes"
 cd "./_book"
 ln -f ./Deployment_notes.html ./index.html
@@ -72,7 +72,7 @@ git push -f -u origin main
 
 
 
-echo "------"
+echo "---------------"
 cd "$HOME/PANDOC/Libradtran_guide"
 cd "./_book"
 ln -f ./Libratran_guide.html ./index.html
@@ -84,7 +84,7 @@ git push -f -u origin main
 
 
 
-echo "------"
+echo "---------------"
 cd "$HOME/PANDOC/CHP1_measurements_guide"
 cd "./_book"
 ln -f ./CHP1_measurements_guide.html ./index.html
@@ -97,7 +97,7 @@ git commit -uno -a -m "Commit $(date +'%F %R')"
 
 
 
-echo "------"
+echo "---------------"
 cd "$HOME/PANDOC/Tracker_manual"
 cd "./_book"
 ln -f ./LAP_tracker_manual.html ./index.html
@@ -109,7 +109,7 @@ git push -f -u origin main
 
 
 
-echo "------"
+echo "---------------"
 cd "$HOME/PANDOC/Thesis"
 pwd
 find . -type f \(    -iname '*.sh'  \
@@ -137,7 +137,7 @@ git push -f -u origin main
 
 
 
-echo "------"
+echo "---------------"
 cd "$HOME/PANDOC/thanasisnsite"
 git add -f .
 cd "./public"
@@ -156,7 +156,7 @@ git push -f -u origin main
 
 
 
-echo "------"
+echo "---------------"
 folder="$HOME/CM_21_GLB/"
 cd ${folder}
 pwd
@@ -186,7 +186,7 @@ git push -f -u origin main
 
 
 
-echo "------"
+echo "---------------"
 folder="$HOME/CHP_1_DIR/"
 cd ${folder}
 pwd
@@ -216,7 +216,7 @@ git push -f -u origin main
 
 
 
-echo "------"
+echo "---------------"
 folder="$HOME/TSI"
 cd ${folder}
 pwd
