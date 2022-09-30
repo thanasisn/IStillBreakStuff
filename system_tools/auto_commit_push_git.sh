@@ -23,7 +23,7 @@ set +e
 
 ## this works only on tyler
 echo "DOTFILES"
-git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" commit -uno -a -m "Auto commit"
+git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" commit -uno -a -m "Commit $(date +'%F %R')"
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" push -u origin master
 
 
@@ -31,7 +31,7 @@ git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" push -u origin master
 echo "------"
 cd "$HOME/CODE/"
 pwd
-git commit -uno -a -m "Commit $(date %F %T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 
 
@@ -39,7 +39,7 @@ git push -f -u origin main
 echo "------"
 cd "$HOME/CODE/R_myRtools/myRtools"
 pwd
-git commit -uno -a -m "Commit $(date %F %T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 
 
@@ -47,7 +47,7 @@ git push -f -u origin main
 echo "------"
 cd "$HOME/CODE/R_POLAr/POLAr/"
 pwd
-git commit -uno -a -m "Commit $(date %F %T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin master
 
 
@@ -55,7 +55,7 @@ git push -f -u origin master
 echo "------"
 cd "$HOME/CODE/deploy/"
 pwd
-git commit -uno -a -m "Commit $(date %F %T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 
 
@@ -67,7 +67,7 @@ ln -f ./Deployment_notes.html ./index.html
 git add -f .
 cd ".."
 pwd
-git commit -uno -a -m "Commit $(date %F %T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 
 
@@ -79,7 +79,7 @@ ln -f ./Libratran_guide.html ./index.html
 git add -f .
 cd ".."
 pwd
-git commit -uno -a -m "Commit $(date %F %T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 
 
@@ -91,7 +91,7 @@ ln -f ./CHP1_measurements_guide.html ./index.html
 git add -f .
 cd ".."
 pwd
-git commit -uno -a -m "Commit $(date %F %T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 ## will include to thesis
 # git push -f -u origin main
 
@@ -104,7 +104,7 @@ ln -f ./LAP_tracker_manual.html ./index.html
 git add -f .
 cd ".."
 pwd
-git commit -uno -a -m "Commit $(date %F %T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 
 
@@ -132,7 +132,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.md'  \
                   -o -iname '*.r'   \) -print0 |\
                   xargs -t -0 git add -f
-git commit -uno -a -m "Commit $(date %F %T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 
 
@@ -150,7 +150,7 @@ cd "./themes"
 git add -f .
 cd ".."
 pwd
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 
 
@@ -181,7 +181,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.md'  \
                   -o -iname '*.r'   \) -print0 |\
                   xargs -t -0 git add
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 
 
@@ -211,7 +211,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.md'  \
                   -o -iname '*.r'   \) -print0 |\
                   xargs -t -0 git add
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 
 
@@ -241,7 +241,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.md'  \
                   -o -iname '*.r'   \) -print0 |\
                   xargs -t -0 git add
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 
 
@@ -278,7 +278,7 @@ find . -type f \(  -iname '*.sh'  \
                 -o -iname '*.r'   \) -print0  |\
                 xargs -0 git add
 
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 echo
 
 
@@ -300,7 +300,7 @@ find . -type f \( -iname '*.sh' \
         -o -iname '*.r'   \) -print0  |\
         xargs -0 git add
 
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 echo
 
 
@@ -325,7 +325,7 @@ find . -type f \(    -iname '*.sh'   \
                   -o -iname '*.cpp'  \) -print0  |\
         xargs -0 git add
 
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 echo
 
 
@@ -350,7 +350,7 @@ find . -type f \(  -iname '*.sh'  \
                 -o -iname '*.cpp' \) -print0  |\
         xargs -0 git add
 
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 echo
 
 folder="$HOME/UVindex_prod"
@@ -368,7 +368,7 @@ find . -type f \(  -iname '*.sh'   \
                 -o -iname '*.frm' \) -print0  |\
         xargs -0 git add
 
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 echo
 
 
@@ -411,7 +411,7 @@ find . -type f \(    -iname '*.sh'  \
                   xargs -0 git add
 
 sleep $((RANDOM%60+1))
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 
 echo ""
 echo " ^^^^ FINISH ^^^^ ${folder}"
@@ -448,7 +448,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.r'   \) -print0 |\
                   xargs -0 git add
 
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 
 echo ""
 echo " ^^^^ FINISH ^^^^ ${folder}"
@@ -490,7 +490,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.r'   \) -print0  |\
                   xargs -0 git add
 
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 
 echo ""
 echo " ^^^^ FINISH ^^^^ ${folder}"
@@ -516,7 +516,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.r'   \) -print0  |\
                   xargs -0 git add
 
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 
 echo ""
 echo " ^^^^ FINISH ^^^^ ${folder}"
@@ -550,7 +550,7 @@ find . -type f \(    -iname '*.sh'   \
                   -o -iname '*.ex'   \) -print0 |\
                   xargs -0 git add
 
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 
 echo ""
 echo " ^^^^ FINISH ^^^^ ${folder}"
@@ -571,7 +571,7 @@ find . -type f \(    -iname '*.tex'   \
                   -o -iname '*.md'    \) -print0 |\
                   xargs -0 git add
 
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 
 echo ""
 echo " ^^^^ FINISH ^^^^ ${folder}"
@@ -608,7 +608,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.r'   \) -print0  |\
                   xargs -0 git add
 
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 
 #-----------------------------------------------------------------------------#
 
@@ -626,7 +626,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.txt' \) -print0  |\
                   xargs -0 git add
 
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 
 echo ""
 echo " ^^^^ FINISH ^^^^ ${folder}"
@@ -648,7 +648,7 @@ find . -type f \(    -iname '*.sh'  \
                   xargs -0 git add
 
 sleep $((RANDOM%60+1))
-git commit -uno -a -m "auto update $(date +%F_%T)"
+git commit -uno -a -m "Commit $(date +'%F %R')"
 
 echo ""
 echo " ^^^^ FINISH ^^^^ ${folder}"
