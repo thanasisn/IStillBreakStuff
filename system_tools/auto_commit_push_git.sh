@@ -31,7 +31,7 @@ git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" push -u origin master
 echo "------"
 cd "$HOME/CODE/"
 pwd
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date %F %T)"
 git push -f -u origin main
 
 
@@ -39,7 +39,7 @@ git push -f -u origin main
 echo "------"
 cd "$HOME/CODE/R_myRtools/myRtools"
 pwd
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date %F %T)"
 git push -f -u origin main
 
 
@@ -47,7 +47,7 @@ git push -f -u origin main
 echo "------"
 cd "$HOME/CODE/R_POLAr/POLAr/"
 pwd
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date %F %T)"
 git push -f -u origin master
 
 
@@ -55,7 +55,7 @@ git push -f -u origin master
 echo "------"
 cd "$HOME/CODE/deploy/"
 pwd
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date %F %T)"
 git push -f -u origin main
 
 
@@ -67,7 +67,7 @@ ln -f ./Deployment_notes.html ./index.html
 git add -f .
 cd ".."
 pwd
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date %F %T)"
 git push -f -u origin main
 
 
@@ -79,7 +79,7 @@ ln -f ./Libratran_guide.html ./index.html
 git add -f .
 cd ".."
 pwd
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date %F %T)"
 git push -f -u origin main
 
 
@@ -91,7 +91,7 @@ ln -f ./CHP1_measurements_guide.html ./index.html
 git add -f .
 cd ".."
 pwd
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date %F %T)"
 ## will include to thesis
 # git push -f -u origin main
 
@@ -104,7 +104,7 @@ ln -f ./LAP_tracker_manual.html ./index.html
 git add -f .
 cd ".."
 pwd
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date %F %T)"
 git push -f -u origin main
 
 
@@ -132,7 +132,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.md'  \
                   -o -iname '*.r'   \) -print0 |\
                   xargs -t -0 git add -f
-git commit -uno -a -m "Auto commit"
+git commit -uno -a -m "Commit $(date %F %T)"
 git push -f -u origin main
 
 
