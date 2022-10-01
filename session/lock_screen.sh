@@ -9,19 +9,19 @@ COLOR="black"
 mkdir -p "/dev/shm/CONKY"
 
 ## get image target resolution
-resol="$(xrandr | grep -o " connected [0-9]\+x[0-9]\+" | grep -o "[0-9]\+x[0-9]\+" | sort -n | tail -n 1)"
+resol="$(xrandr | grep -o " connected .*" | grep -o "[0-9]\+x[0-9]\+" | sort -n | tail -n 1)"
 echo "$resol"
 
 ## create a proper image
-convert             "$BASE_IMG"     \
-        -gravity    center          \
-        -background $COLOR          \
-        -extent     $resol          \
+convert             "$BASE_IMG"    \
+        -gravity    "center"       \
+        -background "$COLOR"       \
+        -extent     "$resol"       \
                     "$TARGET"
 
-## lock screen
-( i3lock -c 000000 -i "$TARGET" & )
-## black screen
-( sleep 15; xset dpms force suspend )
+## lock screen and black screen
+( i3lock -t -c 000000 -i "$TARGET" ) &
+sleep 30
+( xset dpms force off )
 
 exit 0
