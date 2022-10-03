@@ -38,7 +38,7 @@ dd$newactive[ is.na(dd$newactive)] <- 0
 dd$aaa <- cumsum( dd$newactive )
 
 ## plot only last days
-dd <- dd[ dd$date > Sys.time() - 45 * 24 * 3600, ]
+dd <- dd[ dd$date > Sys.time() - 90 * 24 * 3600, ]
 
 if (!any( as.Date(dd$date) == as.Date(Sys.time()) )) {
     ## add today empty
@@ -83,4 +83,3 @@ png("/dev/shm/CONKY/corana.png", width = 400, height = 180, units = "px", bg = "
                  col.axis = "grey", format = "%d\n%m" )
 }
 dev.off()
-
