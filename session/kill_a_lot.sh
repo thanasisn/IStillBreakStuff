@@ -5,15 +5,17 @@
 
 ## list of prosses to kill
 kkk=(
-"Clamav:       'sudo killall -9 -v clamscan'                    "
-"Clamav:       'sudo systemctl stop clamav-freshclam.service'   "
-"Conky:        'killall -9 -v conky'                            "
-"Evolution:    'kill -9 \$(pgrep "evolution*")'                 "
-"Hp-systray:   'killall -9 -v hp-systray'                       "
-"Thunderbird:  'killall -9 -v thunderbird'                      "
-"Transmission: 'sudo killall -9 -v transmission-daemon'         "
-"Transmission: 'sudo systemctl stop transmission-daemon.service'"
-"Zeitgeist:    'kill -9 \$(pgrep  zeitgeist)'                   "
+"Clamav:         'sudo killall -9 -v clamscan'                    "
+"Clamav:         'sudo systemctl stop clamav-freshclam.service'   "
+"Conky:          'killall -9 -v conky'                            "
+"Dunst:          'killall -9 -v dunst'                            "
+"Evolution:      'kill -9 \$(pgrep "evolution*")'                 "
+"Hp-systray:     'killall -9 -v hp-systray'                       "
+"Keyring daemon: 'killall -9 -v gnome-keyring-daemon'             "
+"Thunderbird:    'killall -9 -v thunderbird'                      "
+"Transmission:   'sudo killall -9 -v transmission-daemon'         "
+"Transmission:   'sudo systemctl stop transmission-daemon.service'"
+"Zeitgeist:      'kill -9 \$(pgrep  zeitgeist)'                   "
 )
 
 echo
