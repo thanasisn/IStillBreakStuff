@@ -29,7 +29,8 @@ flip_matrix_v <- function(x) {
 #' @export
 #'
 rm.cols.DT <- function( DT , pattern ) {
-    cat(paste("Removing columns:", grep( pattern , names(DT)) ),"\n")
+    message(paste("\nRemoving columns:", grep( pattern , names(DT), value = T) ))
+    # cat(paste("\nRemoving columns:", grep( pattern , names(DT), value = T) ),"\n")
     suppressWarnings(
         DT[ , (grep( pattern , names(DT))) := NULL ]
     )
