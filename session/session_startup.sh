@@ -102,12 +102,12 @@ export DISPLAY=:0 ; $HOME/CODE/conky/scripts/update_background.sh &
 ## start all conky cron scripts and truncate status logs
 $HOME/CODE/conky/crons/run_all_crons.sh &
 
-# ## test polybar
-# killall polybar
-# xrandr --listactivemonitors | sed 's/^.* //' | sed 1d | while read screen; do
-#     export MONITOR=$screen
-#     polybar -c $HOME/.config/polybar/config -r example &
-# done
+## test polybar
+killall polybar
+xrandr --listactivemonitors | sed 's/^.* //' | sed 1d | while read screen; do
+    export MONITOR=$screen
+    polybar -c $HOME/.config/polybar/config -r example &
+done
 
 
 
