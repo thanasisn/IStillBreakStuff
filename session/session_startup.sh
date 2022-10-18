@@ -65,7 +65,9 @@ setsid syncthing -config="$HOME/.config/syncthing_$(hostname)" \
                  -no-browser                                   \
                  -auditfile="/dev/shm/syncthing_audit"         \
                  -logfile="/dev/shm/synchthing_log"            &
-kill_run syncthing-gtk --minimized 
+
+## restart applet
+kill_run syncthing-gtk --minimized --home "$HOME/.config/syncthing_$(hostname)" 
 
 
 if [[ $(hostname) == "crane" ]]; then
