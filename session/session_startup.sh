@@ -36,11 +36,6 @@ numlockx on
 ## -------------------
 
 
-killall -9  nm-applet
-nohup       nm-applet &
-killall -9  nm-tray
-nohup       nm-tray &
-
 
 
 # killall -9  skypeforlinux
@@ -52,6 +47,8 @@ wmname LG3D
 
 
 
+kill_run  nm-tray
+kill_run  nm-applet
 kill_run  system-config-printer-applet
 kill_run  dunst
 kill_run  kdeconnect-indicator
@@ -59,6 +56,16 @@ kill_run  volumeicon
 kill_run  sxhkd
 kill_run  "python3 $HOME/PROGRAMS/noisy/noisy.py --config $HOME/PROGRAMS/noisy/config.json"
 
+
+## restart sycnthing server
+killall -9 syncthing 
+setsid syncthing -config="$HOME/.config/syncthing_$(hostname)" \
+                 -data="$HOME/.config/syncthing_$(hostname)"   \
+                 -audit                                        \
+                 -no-browser                                   \
+                 -auditfile="/dev/shm/syncthing_audit"         \
+                 -logfile="/dev/shm/synchthing_log"            &
+kill_run syncthing-gtk --minimized 
 
 
 if [[ $(hostname) == "crane" ]]; then
