@@ -26,7 +26,7 @@ ID="$1"
 SCRIPT="$(basename "$0")"
 SCRIPT_ROOT="$(dirname $(readlink -f "$0"))"
 
-fsta="${ldir}/$(basename "$0")_$ID.status"
+fsta="${ldir}/$(basename "$0")_$ID.log"
 info()   { echo "$(date +'%F %T') ::INF::${SCRIPT}::${ID}:: $* ::" >>"$fsta"; }
 status() { echo "$(date +'%F %T') ::STA::${SCRIPT}::${ID}:: $* ::" >>"$fsta"; }
 
