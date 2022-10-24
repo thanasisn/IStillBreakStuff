@@ -35,6 +35,8 @@ SCRIPTS="$HOME/CODE/conky/scripts/"
 set +e
 
 "$SCRIPTS"transact_plot.R  &
+"$HOME/CODE/training_analysis/GC_plots.R" &
+
 
 
 ## don't ignore errors
