@@ -69,7 +69,7 @@ fCTL1 = 1/42
 fCTL2 = 1-exp(-fCTL1)
 
 ## select metrics for pdf
-wecare <- c("Work","TRIMP_Points","TRIMP_Zonal_Points","TriScore","GOVSS","Aerobic_TISS","Anaerobic_TISS","Calories","Workbeat_stress","Distance")
+wecare <- c("Work","TRIMP_Points","TRIMP_Zonal_Points","TriScore","GOVSS","Aerobic_TISS","Anaerobic_TISS","Calories","Distance")
 extend <- 15
 pdays  <- c(700, 180, 90)
 
