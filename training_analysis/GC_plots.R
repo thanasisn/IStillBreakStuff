@@ -102,10 +102,11 @@ for (days in pdays) {
         pp[, TSB1 := CTL1 - ATL1]
         pp[, TSB2 := CTL2 - ATL2]
 
-        ylim <- range(pp[ , c(ATL1,ATL2,CTL1,CTL2)])
-
-        plot(pp$date,pp$value, ylim = ylim,col = "grey",lwd=0.5,
+        plot(pp$date,pp$value, col = "grey",lwd=0.7,
              type = "l", ylab = "", xlab = "")
+        par(new = T)
+        plot(pp$date,pp$ATL1, col = 2, lwd = 1.5,"l")
+
         abline(v=Sys.Date(),col="green",lty=2)
         lines(pp$date,pp$ATL1, col = 2, lwd = 1.5 )
         lines(pp$date,pp$ATL2, col = 3, lwd = 1.5 )
@@ -165,12 +166,11 @@ for (days in pdays) {
         pp[, TSB1 := CTL1 - ATL1]
         pp[, TSB2 := CTL2 - ATL2]
 
-        ylim <- range(pp[ , c(ATL1,ATL2,CTL1,CTL2)])
-
-        plot(pp$date,pp$value, ylim = ylim,col = "grey",lwd=0.2,
+        plot(pp$date,pp$value, col = "grey",lwd=0.7,
              type = "l", ylab = "", xlab = "")
-        # axis(1,col="white")
-        # axis(2,col="white")
+        box(col="white")
+        par(new = T)
+        plot(pp$date,pp$ATL1, col = 2, lwd = 1.5,"l")
         box(col="white")
 
         abline(v=Sys.Date(),col="green",lty=2)

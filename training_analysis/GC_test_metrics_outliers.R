@@ -56,13 +56,15 @@ metricsM <- data.table(metricsM)
 metricsM <- rm.cols.dups.DT(metricsM)
 
 #+ results="asis", include=T, echo=F
-for (asp in unique(metrics$Sport)) {
+for (asp in unique(metricsM$Sport)) {
     cat(paste("\n\\newpage\n"))
     cat(paste("\n\n# ",asp,"\n\n"))
 
-    metrics  <- metricsM[ Sport == asp ]
+    metrics  <- metricsM[ Sport == asp, ]
     metrics  <- rm.cols.dups.DT(metrics)
     cat(paste("\n\nNrow:", nrow(metrics),"\n\n"))
+
+    if (nrow(metrics)<=1) next()
 
     wecare  <- names(Filter(is.numeric, metrics))
     wecare  <- grep("Time_in_Zone",      wecare, value = T, invert = T )
@@ -74,7 +76,7 @@ for (asp in unique(metrics$Sport)) {
 
     for (var in wecare) {
         cat(paste("\n\\newpage\n"))
-        cat(paste("\n\n## ",var,"\n\n"))
+        cat(paste("\n\n## Sport class:",var,"\n\n"))
 
         temp    <- data.table(metrics$date,  metrics[[var]])
         temp$V1 <- as.numeric(temp$V1)
