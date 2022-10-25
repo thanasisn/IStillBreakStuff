@@ -131,7 +131,7 @@ for (days in pdays) {
 ## select metrics for png
 wecare <- c("TRIMP_Points","TriScore")
 extend <- 15
-pdays  <- c(500, 180)
+pdays  <- c(500, 100)
 
 for (days in pdays) {
     for (avar in wecare) {
@@ -188,6 +188,8 @@ for (days in pdays) {
               xlab = "", ylab = "",yaxt="n", xaxt="n")
         lines(pp$date, pp$TSB2, "l", col = 7, lwd = 2)
         # title(paste0(days,"days ", avar),line = 3)
+        legend("topleft",bty = "n",title = paste(avar,days),legend = c(""))
+
         dev.off()
     }
 }

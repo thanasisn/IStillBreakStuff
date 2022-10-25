@@ -7,9 +7,6 @@
 #' fontsize:      11pt
 #' geometry:      "left=1in,right=1in,top=1in,bottom=1in"
 #'
-#' bibliography:  [references.bib]
-#' biblio-style:  apalike
-#'
 #' header-includes:
 #' - \usepackage{caption}
 #' - \usepackage{placeins}
@@ -54,64 +51,71 @@ source("~/FUNCTIONS/R/data.R")
 
 
 
-metrics <- readRDS("~/LOGs/GCmetrics.Rds")
-metrics <- data.table(metrics)
-metrics <- rm.cols.dups.DT(metrics)
-
-wecare  <- names(Filter(is.numeric, metrics))
-
-wecare  <- grep("Time_in_Zone",      wecare, value = T, invert = T )
-wecare  <- grep("Time_in_Pace_Zone", wecare, value = T, invert = T )
-wecare  <- grep("Percent_in_Zone",   wecare, value = T, invert = T )
-wecare  <- grep("Checksum",          wecare, value = T, invert = T )
-##TODO we may want that for detection extremes
-wecare  <- grep("Best_",             wecare, value = T, invert = T )
-wecare <- grep("date|notes|time|sport|workout_code|bike|shoes|workout_title|device|Calendar_text|Elevation_Gain_Carrying|heartbeats|Max_Core_Temperature|Checksum|Right_Balance|Percent_in_Zone|Percent_in_Pace_Zone|Best_|Distance_Swim|Equipment_Weight|Average_Core_Temperature|Average_Temp|Max_Cadence|Max_Temp|min_Peak_Pace|_Peak_Pace|_Peak_Pace_HR|_Peak_Power|_Peak_Power_HR|min_Peak_Hr|_Peak_WPK|Min_temp|Average_Cadence|Average_Running_Cadence|Max_Running_Cadence|Percent_in_Pace_Zone",
-               wecare, ignore.case = T,value = T,invert = T)
-
-
+metricsM <- readRDS("~/LOGs/GCmetrics.Rds")
+metricsM <- data.table(metricsM)
+metricsM <- rm.cols.dups.DT(metricsM)
 
 #+ results="asis", include=T, echo=F
-for (var in wecare) {
+for (asp in unique(metrics$Sport)) {
     cat(paste("\n\\newpage\n"))
-    cat(paste("\n\n## ",var,"\n\n"))
+    cat(paste("\n\n# ",asp,"\n\n"))
 
-    temp    <- data.table(metrics$date,  metrics[[var]])
-    temp$V1 <- as.numeric(temp$V1)
+    metrics  <- metricsM[ Sport == asp ]
+    metrics  <- rm.cols.dups.DT(metrics)
+    cat(paste("\n\nNrow:", nrow(metrics),"\n\n"))
 
-    outlier_values <- boxplot.stats(temp$V2)$out  # outlier values.
+    wecare  <- names(Filter(is.numeric, metrics))
+    wecare  <- grep("Time_in_Zone",      wecare, value = T, invert = T )
+    wecare  <- grep("Time_in_Pace_Zone", wecare, value = T, invert = T )
+    wecare  <- grep("date|notes|time|sport|workout_code|bike|shoes|workout_title|device|Calendar_text|Elevation_Gain_Carrying|heartbeats|Max_Core_Temperature|Checksum|Right_Balance|Percent_in_Zone|Percent_in_Pace_Zone|Best_|Distance_Swim|Equipment_Weight|Average_Core_Temperature|Average_Temp|Max_Cadence|Max_Temp|min_Peak_Pace|_Peak_Pace|_Peak_Pace_HR|_Peak_Power|_Peak_Power_HR|min_Peak_Hr|_Peak_WPK|Min_temp|Average_Cadence|Average_Running_Cadence|Max_Running_Cadence|Percent_in_Pace_Zone|moderate_fatigue|heavy_fatigue|low_fatigue|severe_fatigue|[0-9]_HRV",
+                    wecare, ignore.case = T,value = T,invert = T)
+    wecare <- sort(wecare)
 
-    # boxplot(temp$V2, main=var, boxwex=0.1)
-    # mtext(paste("Outliers: ", paste(outlier_values, collapse=", ")), cex=0.6)
-    cat(paste("\n\n"))
 
-    # For continuous variable (convert to categorical if needed.)
-    boxplot(V2 ~ V1, data=temp, main=var)
-    cat(paste("\n\n"))
-    boxplot(V2 ~ cut(V1, pretty(temp$V1 )), data=temp, main=var, cex.axis=0.5)
-    cat(paste("\n\n"))
+    for (var in wecare) {
+        cat(paste("\n\\newpage\n"))
+        cat(paste("\n\n## ",var,"\n\n"))
 
-    temp$V1 <- as.Date(temp$V1,origin = "1970-01-01")
+        temp    <- data.table(metrics$date,  metrics[[var]])
+        temp$V1 <- as.numeric(temp$V1)
 
-    plot(temp$V1, temp$V2)
-    title(var)
-    cat(paste("\n\n"))
+        outlier_values <- boxplot.stats(temp$V2)$out  # outlier values.
 
-    hist(temp$V2)
-    cat(paste("\n\n"))
+        # boxplot(temp$V2, main=var, boxwex=0.1)
+        # mtext(paste("Outliers: ", paste(outlier_values, collapse=", ")), cex=0.6)
+        # cat(paste("\n\n"))
 
-    mod <- lm( as.numeric(V1) ~ V2, data=temp)
-    temp$cooksd <- cooks.distance(mod)
+        # For continuous variable (convert to categorical if needed.)
+        boxplot(V2 ~ V1, data=temp, main=var)
+        cat(paste("\n\n"))
+        boxplot(V2 ~ cut(V1, pretty(temp$V1 )), data=temp, main=var, cex.axis=0.5)
+        cat(paste("\n\n"))
 
-    plot(temp$V1, temp$cooksd, pch="*", cex=2, main=var)  # plot cook's distance
-    abline(h = 4*mean(temp$cooksd, na.rm=T), col="red")  # add cutoff line
-    # text(x=1:length(cooksd)+1, y=cooksd, labels=ifelse(cooksd>4*mean(cooksd, na.rm=T),names(cooksd),""), col="red")  # add labels
-    cat(paste("\n\n"))
+        temp$V1 <- as.Date(temp$V1,origin = "1970-01-01")
 
-    cat(pander::pander( temp[ cooksd > 4*mean(cooksd, na.rm=T), ] ))
+        plot(temp$V1, temp$V2)
+        title(var)
+        cat(paste("\n\n"))
 
-    cat(paste("\n\n"))
+        hist(temp$V2)
+        cat(paste("\n\n"))
+
+        mod <- lm( as.numeric(V1) ~ V2, data=temp)
+        temp$cooksd <- cooks.distance(mod)
+
+        plot(temp$V1, temp$cooksd, pch="*", cex=2, main=var)  # plot cook's distance
+        abline(h = 4*mean(temp$cooksd, na.rm=T), col="red")  # add cutoff line
+        # text(x=1:length(cooksd)+1, y=cooksd, labels=ifelse(cooksd>4*mean(cooksd, na.rm=T),names(cooksd),""), col="red")  # add labels
+        cat(paste("\n\n"))
+
+        pp <- temp[ cooksd > 4*mean(cooksd, na.rm=T), V2,V1 ]
+        setorder(pp,V2)
+        names(pp) <- c("Date",var)
+
+        cat(pander::pander( pp ))
+        cat(paste("\n\n"))
     }
+}
 #'
 
 
