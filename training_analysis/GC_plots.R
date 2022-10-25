@@ -137,8 +137,6 @@ for (days in pdays) {
     for (avar in wecare) {
         png(paste0("/dev/shm/CONKY/",avar,"_",days,".png"), width = 470, height = 200, units = "px", bg = "transparent")
 
-
-
         par("mar" = c(2,0,0,0), col = "white",
             col.axis = "white",
             col.lab  = "white")
@@ -190,12 +188,6 @@ for (days in pdays) {
               xlab = "", ylab = "",yaxt="n", xaxt="n")
         lines(pp$date, pp$TSB2, "l", col = 7, lwd = 2)
         # title(paste0(days,"days ", avar),line = 3)
-        # axis(1,col="white")
-        # axis(2,col="white")
-        # box(col="white")
-
-
-
         dev.off()
     }
 }
