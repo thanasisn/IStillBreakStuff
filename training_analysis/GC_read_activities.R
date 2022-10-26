@@ -12,13 +12,14 @@
 
 
 ####_ Set environment _####
-Sys.setenv(TZ = "UTC")
-tic = Sys.time()
-Script.Name = funr::sys.script()
-if(!interactive()) {
-    pdf(file=sub("\\.R$",".pdf",Script.Name))
-    sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
-}
+# Sys.setenv(TZ = "UTC")
+# tic = Sys.time()
+# Script.Name = funr::sys.script()
+# if(!interactive()) {
+#     pdf(file=sub("\\.R$",".pdf",Script.Name))
+#     sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
+# }
+
 
 library(myRtools)
 library(data.table)
@@ -119,21 +120,31 @@ if (length(files)!=0) {
     }
 
     ## drop zeros on some columns
-    wecare <- c("Time.Moving",
-                "Duration",
-                "Distance",
-                "Work",
-                "Calories",
-                "Average.Heart.Rate",
-                "OVRD_total_distance",
-                "OVRD_time_riding",
-                "VO2max.detected",
-                "Recovery.Time",
-                "Equipment.Weight",
-                "Daniels.Points")
+    wecare <- c(
+        "Aerobic.Training.Effect",
+        "Anaerobic.Training.Effect",
+        "Average.Heart.Rate",
+        "Average.Speed",
+        "CP",
+        "Calories",
+        "Daniels.Points",
+        "Distance",
+        "Duration",
+        "Equipment.Weight",
+        "OVRD_time_riding",
+        "OVRD_total_distance",
+        "RPE",
+        "Recovery.Time",
+        "Time.Moving",
+        "V02max.detected",
+        "VO2max.detected",
+        "Work",
+        NULL)
+    wecare <- names(gather)[names(gather)%in%wecare]
     for (avar in wecare) {
         gather[[avar]][gather[[avar]] == 0] <- NA
     }
+
     gather <- rm.cols.dups.DT(gather)
     gather <- rm.cols.NA.DT(gather)
 

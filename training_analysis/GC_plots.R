@@ -15,7 +15,7 @@ inputdata  <- "~/LOGs/GCmetrics.Rds"
 moredata   <- "~/DATA/Other/GC_json_data.Rds"
 outputpdf  <- paste0("~/LOGs/car_logs/",  basename(sub("\\.R$",".pdf", Script.Name)))
 datascript <- "~/CODE/training_analysis/GC_read_activities.R"
-
+daysback   <- 1500
 
 
 if(!interactive()) {
@@ -41,15 +41,46 @@ source(datascript)
 ## load outside Goldencheetah
 metrics <- readRDS(inputdata)
 metrics <- data.table(metrics)
+## drop zeros on some columns
+wecare <- c(
+    "Aerobic.Training.Effect",
+    "Anaerobic.Training.Effect",
+    "Average.Heart.Rate",
+    "Average.Speed",
+    "CP",
+    "Calories",
+    "Daniels.Points",
+    "Distance",
+    "Duration",
+    "Equipment.Weight",
+    "OVRD_time_riding",
+    "OVRD_total_distance",
+    "RPE",
+    "Recovery.Time",
+    "Time.Moving",
+    "V02max.detected",
+    "VO2max.detected",
+    "Work",
+    NULL)
+wecare <- names(metrics)[names(metrics)%in%wecare]
+for (avar in wecare) {
+    metrics[[avar]][metrics[[avar]] == 0] <- NA
+}
 metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
+metrics[, Notes := NULL]
+metrics[, color := NULL]
+metrics[, Data  := NULL]
+
+
+
 
 ## covert types
 for (avar in names(metrics)) {
     if (is.character(metrics[[avar]])) {
         ## find empty and replace
-        metrics[[avar]] <- sub("^[ ]*$" ,NA , metrics[[avar]])
-        metrics[[avar]] <- sub("^[ ]*NA[ ]*$" ,NA , metrics[[avar]])
+        metrics[[avar]] <- sub("^[ ]*$",       NA, metrics[[avar]])
+        metrics[[avar]] <- sub("^[ ]*NA[ ]*$", NA, metrics[[avar]])
         if (!all(is.na((as.numeric(metrics[[avar]]))))) {
             metrics[[avar]] <- as.numeric(metrics[[avar]])
         }
@@ -58,10 +89,14 @@ for (avar in names(metrics)) {
 
 
 gather  <- readRDS(moredata)
+gather[, Data  := NULL ]
+gather[, color := NULL ]
+gather[, Year  := NULL ]
+
 
 ## limit data back
-metrics <- metrics[ date > Sys.Date() - 2000,]
-gather  <- gather[  time > Sys.time() - 2000*24*3600,]
+metrics <- metrics[ date > Sys.Date() - daysback,]
+gather  <- gather[  time > Sys.time() - daysback*24*3600,]
 
 metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
@@ -69,12 +104,17 @@ gather  <- rm.cols.dups.DT(gather)
 gather  <- rm.cols.NA.DT(gather)
 
 ##FIXME
-tocheck <- intersect(names(gather),names(metrics))
+tocheck <- grep("time",intersect(names(gather),names(metrics)),invert = T,ignore.case = T, value = T)
 metrics <- unique(merge(gather,metrics,by = "time"))
 
 for (avar in tocheck) {
     getit <- grep(paste0(avar,"\\.[xy]"),names(metrics), value = T)
-    metrics[[getit[1]]] == metrics[[getit[2]]]
+    # hist(metrics[[getit[1]]])
+    # hist(metrics[[getit[2]]])
+    if (all(metrics[[getit[1]]] == metrics[[getit[2]]])) {
+        metrics[[getit[2]]] <- NULL
+        names(metrics)[names(metrics) == getit[1]] <- avar
+    }
 }
 
 
@@ -87,15 +127,9 @@ hist(metrics$Calories.x, breaks = 100)
 metrics[ !is.na(Calories.x), ..tessss ]
 metrics[ !is.na(Calories.x),  ]
 
-stop("jjjjjjj")
 
-
-
-rm(gather)
 setorder(metrics,date)
 
-metrics[,color := NULL]
-metrics[,Data  := NULL]
 
 
 wecare <- names(metrics)
@@ -123,7 +157,7 @@ fCTL1 = 1/42
 fCTL2 = 1-exp(-fCTL1)
 
 ## select metrics for pdf
-wecare <- c("TRIMP_Points","TRIMP_Zonal_Points","TriScore","Aerobic_TISS","Anaerobic_TISS")
+wecare <- c("TRIMP_Points","TRIMP_Zonal_Points","EPOC","TriScore","Aerobic_TISS")
 ## work, calories
 extend <- 30
 pdays  <- c(400, 100)
@@ -279,7 +313,7 @@ for (days in pdays) {
 
 
 ## select metrics for png
-wecare <- c("TRIMP_Points","TRIMP_Zonal_Points")
+wecare <- c("TRIMP_Points","TRIMP_Zonal_Points","EPOC")
 extend <- 30
 pdays  <- c(400, 100)
 
