@@ -25,7 +25,7 @@ if(!interactive()) {
 }
 
 
-## load outside goldencheetah
+## load outside Goldencheetah
 metrics <- readRDS(inputdata)
 source("~/FUNCTIONS/R/data.R")
 
@@ -45,7 +45,7 @@ metrics[,Data  := NULL]
 
 
 wecare <- names(metrics)
-wecare <- grep("date|notes|time|sport|workout_code|bike|shoes|workout_title|device|Calendar_text|Elevation_Gain_Carrying|heartbeats|Max_Core_Temperature|Checksum|Right_Balance|Percent_in_Zone|Percent_in_Pace_Zone|Best_|Distance_Swim|Equipment_Weight|Average_Core_Temperature|Average_Temp|Max_Cadence|Max_Temp|min_Peak_Pace|_Peak_Pace|_Peak_Pace_HR|_Peak_Power|_Peak_Power_HR|min_Peak_Hr|_Peak_WPK|Min_temp|Average_Cadence|Average_Running_Cadence|Max_Running_Cadence",
+wecare <- grep("date|notes|time|sport|workout_code|_Fatigue|bike|shoes|workout_title|device|Calendar_text|Elevation_Gain_Carrying|heartbeats|Max_Core_Temperature|Checksum|Right_Balance|Percent_in_Zone|Percent_in_Pace_Zone|Best_|Distance_Swim|Equipment_Weight|Average_Core_Temperature|Average_Temp|Max_Cadence|Max_Temp|min_Peak_Pace|_Peak_Pace|_Peak_Pace_HR|_Peak_Power|_Peak_Power_HR|min_Peak_Hr|_Peak_WPK|Min_temp|Average_Cadence|Average_Running_Cadence|Max_Running_Cadence",
                wecare, ignore.case = T,value = T,invert = T)
 
 for (avar in wecare) {
@@ -69,18 +69,49 @@ fCTL1 = 1/42
 fCTL2 = 1-exp(-fCTL1)
 
 ## select metrics for pdf
-wecare <- c("Work","TRIMP_Points","TRIMP_Zonal_Points","TriScore","GOVSS","Aerobic_TISS","Anaerobic_TISS","Calories","Distance")
-extend <- 15
-pdays  <- c(700, 180, 90)
+wecare <- c("TRIMP_Points","TRIMP_Zonal_Points","TriScore","Aerobic_TISS","Anaerobic_TISS","Calories","Work")
+extend <- 30
+pdays  <- c(400, 100)
+
+# fitness = 0;
+# for(i=0, i < count(TRIMP); i++)
+# {
+#     fitness = fitness * exp(-1/r1) + TRIMP[i];
+#     fatigue = fatigue * exp(-1/r2) + TRIMP[i];
+#     performance = fitness * k1 - fatigue * k2;
+# }
+# k1=1.0, k2=1.8-2.0, r1=49-50, r2=11.
+banister <- function(fitness, fatigue, trimp, k1 = 1.0, k2 = 1.8, r1 = 49, r2 = 11) {
+    fitness     <- fitness * exp(-1/r1) + trimp
+    fatigue     <- fatigue * exp(-1/r2) + trimp
+    performance <- fitness * k1 - fatigue * k2
+
+    list(fitness     = fitness,
+         fatigue     = fatigue,
+         performance = performance)
+}
+
+busso <- function(fitness, fatigue, trimp, par2 , k1 = 0.031, k3 = 0.000035, r1 = 30.8, r2 = 16.8, r3 = 2.3) {
+    fitness     <- fitness * exp(-1/r1) + trimp
+    fatigue     <- fatigue * exp(-1/r2) + trimp
+    par2        <- fatigue * exp(-1/r3) + par2
+    k2          <- k3      * par2
+    performance <- fitness * k1 - fatigue * k2
+
+    list(fitness     = fitness,
+         fatigue     = fatigue,
+         performance = performance,
+         par2        = par2)
+}
 
 for (days in pdays) {
     for (avar in wecare) {
 
-        par("mar" = c(2,2,4,1), xpd = TRUE)
 
         pp <- data.table(time  = metrics$time,
                          value = metrics[[avar]] )
         pp <- pp[, .(value = sum(value)), by = .(date=as.Date(time))]
+        last <- pp[ date == max(date),]
         pp <- merge(
             data.table(date = seq.Date(from = min(pp$date), to = max(pp$date)+extend, by = "day")),
             pp, all = T)
@@ -92,36 +123,99 @@ for (days in pdays) {
         pp[, ATL2 := pp$value[1]]
         pp[, CTL1 := pp$value[1]]
         pp[, CTL2 := pp$value[1]]
+        pp[, ban.fatigue := 0 ]
+        pp[, ban.fitness := 0 ]
+        pp[, ban.perform := 0 ]
+        pp[, bus.fatigue := 0 ]
+        pp[, bus.fitness := 0 ]
+        pp[, bus.perform := 0 ]
+        pp[, bus.par2    := 1 ]
 
         for (nr in 2:nrow(pp)) {
             pp$ATL1[nr] = fATL1 * pp$value[nr] + (1-fATL1) * pp$ATL1[nr-1]
             pp$ATL2[nr] = fATL2 * pp$value[nr] + (1-fATL2) * pp$ATL2[nr-1]
             pp$CTL1[nr] = fCTL1 * pp$value[nr] + (1-fCTL1) * pp$CTL1[nr-1]
             pp$CTL2[nr] = fCTL2 * pp$value[nr] + (1-fCTL2) * pp$CTL2[nr-1]
+            ## calculate banister
+            res <- banister(fitness = pp$ban.fitness[nr-1],
+                            fatigue = pp$ban.fatigue[nr-1],
+                            trimp   = pp$value[nr] )
+            pp$ban.fatigue[nr] <- res$fatigue
+            pp$ban.fitness[nr] <- res$fitness
+            pp$ban.perform[nr] <- res$performance
+            ## calculate busso
+            res <- busso(fitness = pp$bus.fitness[nr-1],
+                         fatigue = pp$bus.fatigue[nr-1],
+                         par2    = pp$bus.par2[nr-1],
+                         trimp   = pp$value[nr] )
+            pp$bus.fatigue[nr] <- res$fatigue
+            pp$bus.fitness[nr] <- res$fitness
+            pp$bus.perform[nr] <- res$performance
+            pp$bus.par2[nr]    <- res$par2
         }
         pp[, TSB1 := CTL1 - ATL1]
         pp[, TSB2 := CTL2 - ATL2]
 
-        plot(pp$date,pp$value, col = "grey",lwd=0.7,
-             type = "l", ylab = "", xlab = "")
-        par(new = T)
-        plot(pp$date,pp$ATL1, col = 2, lwd = 1.5,"l")
+        #### Training Impulse model plot ####
+        par("mar" = c(2,0,3,0), xpd = TRUE)
 
+        plot(pp$date, pp$ATL2, col = 3, lwd = 1.1, "l", yaxt="n")
         abline(v=Sys.Date(),col="green",lty=2)
-        lines(pp$date,pp$ATL1, col = 2, lwd = 1.5 )
-        lines(pp$date,pp$ATL2, col = 3, lwd = 1.5 )
-        lines(pp$date,pp$CTL1, col = 4, lwd = 1.5 )
-        lines(pp$date,pp$CTL2, col = 5, lwd = 1.5 )
-
-        legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.1), cex = 0.7,
-               legend = c("ATL1","ATL2","CTL1","CTL2","TSB1","TSB2"),
-               col    = c(    2 ,    3 ,    4 ,    5 ,    6 ,    7 ) )
-
         par(new = T)
-        plot( pp$date, pp$TSB1, "l", col = 6, lwd = 1.5,
-              xlab = "", ylab = "",yaxt="n", xaxt="n")
-        lines(pp$date, pp$TSB2, "l", col = 7, lwd = 1.5)
-        title(paste0(days,"days ", avar),line = 3)
+        plot(pp$date, pp$CTL2, col = 5, lwd = 1.1, "l", yaxt="n")
+        par(new = T)
+        plot(pp$date, pp$TSB2, col = 6, lwd =   2, "l", yaxt="n")
+
+        legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
+               legend = c("ATL2", "CTL2","TSB2"),
+               col    = c(    3 ,     5 ,    6 ) )
+
+        prediction <- pp[ date > last$date, ]
+        best       <- prediction[which.max(TSB2)]
+        abline(v=best$date, col = "yellow",lty=2)
+        abline(h=best$TSB2, col = "yellow",lty=2)
+        title(paste(days,"days", avar,"best:", best$date),line = 2)
+
+
+
+        #### Banister model plot ####
+        par("mar" = c(2,0,3,0), xpd = TRUE)
+
+        plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
+        par(new = T)
+        plot( pp$date, pp$ban.fitness, lwd = 1.1, "l", col = 5, yaxt="n")
+        par(new = T)
+        plot( pp$date, pp$ban.perform, lwd =   2, "l", col = 6, yaxt="n")
+
+        legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
+               legend = c("Fatigue","Fitness","Performance"),
+               col    = c(       3 ,       5 ,           6 ) )
+        abline(v=Sys.Date(),col="green",lty=2)
+
+        prediction <- pp[ date > last$date, ]
+        best       <- prediction[which.max(ban.perform)]
+        abline(v=best$date, col = "yellow",lty=2)
+        abline(h=best$ban.perform, col = "yellow",lty=2)
+        title(paste("Banister",days,"days", avar,"best:", best$date),line = 2)
+
+        #### Busson model plot ####
+        par("mar" = c(2,0,3,0), xpd = TRUE)
+
+        plot( pp$date, pp$bus.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
+        par(new = T)
+        plot( pp$date, pp$bus.fitness, lwd = 1.1, "l", col = 5, yaxt="n")
+        par(new = T)
+        plot( pp$date, pp$bus.perform, lwd =   2, "l", col = 6, yaxt="n")
+        legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
+               legend = c("Fatigue","Fitness","Performance"),
+               col    = c(       3 ,       5 ,           6 ) )
+        abline(v=Sys.Date(),col="green",lty=2)
+
+        prediction <- pp[ date > last$date, ]
+        best       <- prediction[which.max(bus.perform)]
+        abline(v=best$date, col = "yellow",lty=2)
+        abline(h=best$bus.perform, col = "yellow",lty=2)
+        title(paste("Busson", days,"days", avar,"best:", best$date),line = 2)
     }
 }
 
@@ -130,21 +224,17 @@ for (days in pdays) {
 
 
 ## select metrics for png
-wecare <- c("TRIMP_Points","TriScore")
-extend <- 15
-pdays  <- c(500, 100)
+wecare <- c("TRIMP_Points","TRIMP_Zonal_Points")
+extend <- 30
+pdays  <- c(400, 100)
 
 for (days in pdays) {
     for (avar in wecare) {
-        png(paste0("/dev/shm/CONKY/",avar,"_",days,".png"), width = 470, height = 200, units = "px", bg = "transparent")
-
-        par("mar" = c(2,0,0,0), col = "white",
-            col.axis = "white",
-            col.lab  = "white")
 
         pp <- data.table(time  = metrics$time,
                          value = metrics[[avar]] )
         pp <- pp[, .(value = sum(value)), by = .(date=as.Date(time))]
+        last <- pp[ date == max(date),]
         pp <- merge(
             data.table(date = seq.Date(from = min(pp$date), to = max(pp$date)+extend, by = "day")),
             pp, all = T)
@@ -156,39 +246,131 @@ for (days in pdays) {
         pp[, ATL2 := pp$value[1]]
         pp[, CTL1 := pp$value[1]]
         pp[, CTL2 := pp$value[1]]
+        pp[, ban.fatigue := 0 ]
+        pp[, ban.fitness := 0 ]
+        pp[, ban.perform := 0 ]
+        pp[, bus.fatigue := 0 ]
+        pp[, bus.fitness := 0 ]
+        pp[, bus.perform := 0 ]
+        pp[, bus.par2    := 1 ]
 
         for (nr in 2:nrow(pp)) {
             pp$ATL1[nr] = fATL1 * pp$value[nr] + (1-fATL1) * pp$ATL1[nr-1]
             pp$ATL2[nr] = fATL2 * pp$value[nr] + (1-fATL2) * pp$ATL2[nr-1]
             pp$CTL1[nr] = fCTL1 * pp$value[nr] + (1-fCTL1) * pp$CTL1[nr-1]
             pp$CTL2[nr] = fCTL2 * pp$value[nr] + (1-fCTL2) * pp$CTL2[nr-1]
+            ## calculate banister
+            res <- banister(fitness = pp$ban.fitness[nr-1],
+                            fatigue = pp$ban.fatigue[nr-1],
+                            trimp   = pp$value[nr] )
+            pp$ban.fatigue[nr] <- res$fatigue
+            pp$ban.fitness[nr] <- res$fitness
+            pp$ban.perform[nr] <- res$performance
+            ## calculate busso
+            res <- busso(fitness = pp$bus.fitness[nr-1],
+                         fatigue = pp$bus.fatigue[nr-1],
+                         par2    = pp$bus.par2[nr-1],
+                         trimp   = pp$value[nr] )
+            pp$bus.fatigue[nr] <- res$fatigue
+            pp$bus.fitness[nr] <- res$fitness
+            pp$bus.perform[nr] <- res$performance
+            pp$bus.par2[nr]    <- res$par2
         }
         pp[, TSB1 := CTL1 - ATL1]
         pp[, TSB2 := CTL2 - ATL2]
 
-        plot(pp$date,pp$value, col = "grey",lwd=0.7,
-             type = "l", ylab = "", xlab = "")
-        box(col="white")
-        par(new = T)
-        plot(pp$date,pp$ATL1, col = 2, lwd = 1.5,"l")
-        box(col="white")
+        #### Training Impulse model plot ####
+        png(paste0("/dev/shm/CONKY/trimp_",avar,"_",days,".png"), width = 470, height = 200, units = "px", bg = "transparent")
 
+        par("mar" = c(2,0,0,0), col = "white",
+            col.axis = "white",
+            col.lab  = "white")
+
+        plot(pp$date, pp$ATL2, col = 3, lwd = 1.5, "l", yaxt="n")
+        box(col="white")
         abline(v=Sys.Date(),col="green",lty=2)
-        lines(pp$date,pp$ATL1, col = 2, lwd = 2 )
-        lines(pp$date,pp$ATL2, col = 3, lwd = 2 )
-        lines(pp$date,pp$CTL1, col = 4, lwd = 2 )
-        lines(pp$date,pp$CTL2, col = 5, lwd = 2 )
-
-        # legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.1), cex = 0.7,
-        #        legend = c("ATL1","ATL2","CTL1","CTL2","TSB1","TSB2"),
-        #        col    = c(    2 ,    3 ,    4 ,    5 ,    6 ,    7 ) )
-
         par(new = T)
-        plot( pp$date, pp$TSB1, "l", col = 6, lwd = 2,
-              xlab = "", ylab = "",yaxt="n", xaxt="n")
-        lines(pp$date, pp$TSB2, "l", col = 7, lwd = 2)
-        # title(paste0(days,"days ", avar),line = 3)
-        legend("topleft",bty = "n",title = paste(avar,days),legend = c(""))
+        plot(pp$date, pp$CTL2, col = 5, lwd = 1.5, "l", yaxt="n")
+        box(col="white")
+        par(new = T)
+        plot(pp$date, pp$TSB2, col = 6, lwd =   3, "l", yaxt="n")
+        box(col="white")
+
+        legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
+               legend = c("ATL2", "CTL2","TSB2"),
+               col    = c(    3 ,     5 ,    6 ) )
+
+        prediction <- pp[ date > last$date, ]
+        best       <- prediction[which.max(TSB2)]
+        abline(v=best$date, col = "yellow",lty=2)
+        abline(h=best$TSB2, col = "yellow",lty=2)
+
+        legend("topleft",bty = "n",title = paste(avar, best$date),legend = c(""))
+
+        dev.off()
+
+
+
+
+        #### Banister model plot ####
+        png(paste0("/dev/shm/CONKY/banister_",avar,"_",days,".png"), width = 470, height = 200, units = "px", bg = "transparent")
+
+        par("mar" = c(2,0,0,0), col = "white",
+            col.axis = "white",
+            col.lab  = "white")
+
+        plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
+        box(col="white")
+        par(new = T)
+        plot( pp$date, pp$ban.fitness, lwd = 1.1, "l", col = 5, yaxt="n")
+        box(col="white")
+        par(new = T)
+        plot( pp$date, pp$ban.perform, lwd =   2, "l", col = 6, yaxt="n")
+        box(col="white")
+
+        legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
+               legend = c("Fatigue","Fitness","Performance"),
+               col    = c(       3 ,       5 ,           6 ) )
+        abline(v=Sys.Date(),col="green",lty=2)
+
+        prediction <- pp[ date > last$date, ]
+        best       <- prediction[which.max(ban.perform)]
+        abline(v=best$date, col = "yellow",lty=2)
+        abline(h=best$ban.perform, col = "yellow",lty=2)
+
+        legend("topleft",bty = "n",title = paste(avar, best$date),legend = c(""))
+
+        dev.off()
+
+
+
+        #### Busson model plot ####
+        png(paste0("/dev/shm/CONKY/busson_",avar,"_",days,".png"), width = 470, height = 200, units = "px", bg = "transparent")
+
+        par("mar" = c(2,0,0,0), col = "white",
+            col.axis = "white",
+            col.lab  = "white")
+
+        plot( pp$date, pp$bus.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
+        box(col="white")
+        par(new = T)
+        plot( pp$date, pp$bus.fitness, lwd = 1.1, "l", col = 5, yaxt="n")
+        box(col="white")
+        par(new = T)
+        plot( pp$date, pp$bus.perform, lwd =   2, "l", col = 6, yaxt="n")
+        box(col="white")
+
+        legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
+               legend = c("Fatigue","Fitness","Performance"),
+               col    = c(       3 ,       5 ,           6 ) )
+        abline(v=Sys.Date(),col="green",lty=2)
+
+        prediction <- pp[ date > last$date, ]
+        best       <- prediction[which.max(bus.perform)]
+        abline(v=best$date, col = "yellow",lty=2)
+        abline(h=best$bus.perform, col = "yellow",lty=2)
+
+        legend("topleft",bty = "n",title = paste(avar, best$date),legend = c(""))
 
         dev.off()
     }
