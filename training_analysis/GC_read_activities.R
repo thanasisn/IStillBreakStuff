@@ -1,6 +1,15 @@
 #!/usr/bin/env Rscript
 
-#### Golden Cheetah read activities directly
+#### Golden Cheetah read activities summary directly
+
+
+###TODO explore this tools
+# library(cycleRtools)
+# GC_activity("Athan",activity = "~/TRAIN/GoldenCheetah/Athan/activities/2008_12_19_16_00_00.json")
+# GC_activity("Athan")
+# GC_metrics("Athan")
+# read_ride(file = af)
+
 
 
 ####_ Set environment _####
@@ -14,98 +23,55 @@ if(!interactive()) {
     sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
 }
 
-
-# library(rjson)
+library(data.table)
 library(jsonlite)
-library(geosphere)
-library(VIM)
+source("~/CODE/FUNCTIONS/R/data.R")
 
 
-speed_diff_threshold <- 0.1    # km/h
-
-## load outside goldencheetah
+####  Load Goldencheetah exports  ####
 metrics <- readRDS("~/LOGs/GCmetrics.Rds")
+metrics <- data.table(metrics)
+metrics <- rm.cols.dups.DT(metrics)
+metrics <- rm.cols.NA.DT(metrics)
 
 
+####  Read data from json files  ####
 files <- list.files("~/TRAIN/GoldenCheetah/Athan/activities/",
                     pattern = "*.json",
                     full.names = TRUE)
 
 files <- sort(files)
-files <- tail(files,1)
+# files <- tail(files,10)
+
+gather <- data.table()
 
 for (af in files) {
+    ## get file
+    ride <- fromJSON(af)
+    ride <- ride$RIDE
 
-    ride <- fromJSON( af)
+    stopifnot(
+        all(names(ride) %in%
+                c("STARTTIME", "RECINTSECS", "DEVICETYPE", "IDENTIFIER", "TAGS","INTERVALS", "SAMPLES", "XDATA"))
+    )
 
-    rec <- ride$RIDE$SAMPLES
+    temp <- data.frame(
+        file       = af,
+        filemtime  = file.mtime(af),
+        time       = ride$STARTTIME,
+        RECINTSECS = ride$RECINTSECS,
+        DEVICETYPE = ride$DEVICETYPE,
+        IDENTIFIER = ride$IDENTIFIER,
+        data.frame(ride$TAGS)
+    )
 
-    if (is.null(rec)) next()
-
-    hist(rec$KPH)
-
-    # coor <- data.frame(LON = rec$LON, LAT = rec$LAT)
-    # coor$Dist <- NA
-
-    # for (ii in 2:nrow(coor)) {
-    #     coor$Dist[ii] <- distm( coor[ii,][1:2], coor[ii-1,][1:2] )
-    # }
-
-    # rec$Dist <- coor$Dist
-    # rec$Dur  <- c(NA,diff(rec$SECS))
-
-    # rec$Speed <-(rec$Dist / 10^3) / (rec$Dur/3600)
-
-    # rec$SpeedDiff = abs(rec$KPH - rec$Speed)
-
-    ## ignore too small
-    # rec$SpeedDiff[ rec$SpeedDiff < speed_diff_threshold ] <- NA
-
-    # plot(  rec$SECS, rec$KPH)
-    # points(rec$SECS, rec$Speed, col="red")
-    #
-    # plot(rec$SECS, rec$SpeedDiff)
-    # hist(rec$SpeedDiff,breaks = 100)
-    #
-    #
-    # summary(rec$Speed)
-    # quantile(rec$Speed, na.rm = T)
-    # toofast <- rec[rec$KPH > quantile(rec$KPH, na.rm = T)[4] * 2,]
-    #
-    # plot(  toofast$SECS, toofast$KPH)
-    # points(toofast$SECS, toofast$Speed, col="red")
-    # plot(  toofast$SECS, toofast$SpeedDiff)
-
-    # stopifnot(all(rec$KPH   < 30))
-    # stopifnot(all(rec$Speed < 30))
-    # stopifnot(all(rec$SpeedDiff < 10))
-
-    ## break spikes
-    # rec$KPH[rec$KPH > quantile(rec$KPH, na.rm = T)[4] * 3] <- NA
-    ## fix NA with nearest neighbor
-    # rec <- kNN(data = rec, variable = "KPH")
-    # rec$KPH_imp <- NULL
-
-    ## replace original data
-    # ride$RIDE$SAMPLES <- rec
-
-    # txt = sub(".json","_N.json",af)
-    # sss <- toJSON(x = ride )
-    # write_json(x = ride, path=txt, simplifyVector=F)
-
+    gather <- rbind(gather, temp, fill = T)
 }
 
+gather[, time := as.POSIXct(time) ]
 
 
-
-
-
-# library(cycleRtools)
-# GC_activity("Athan",activity = "~/TRAIN/GoldenCheetah/Athan/activities/2008_12_19_16_00_00.json")
-# GC_activity("Athan")
-#
-# GC_metrics("Athan")
-
+tess <- merge(gather,metrics, by = "time")
 
 
 
