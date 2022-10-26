@@ -56,8 +56,8 @@ if (file.exists(storagefl)) {
 
 if (length(files)!=0) {
     cat(paste("\nSomething to do\n"))
-
-    for (af in file) {
+    ## read files
+    for (af in files) {
         ## get file
         ride <- fromJSON(af)
         ride <- ride$RIDE
@@ -97,7 +97,8 @@ if (length(files)!=0) {
         for (avar in names(temp)) {
             if (is.character(temp[[avar]])) {
                 ## find empty and replace
-                temp[[avar]] <- sub("^[ ]*$" ,NA , temp[[avar]])
+                temp[[avar]] <- sub("^[ ]*$",       NA, temp[[avar]])
+                temp[[avar]] <- sub("^[ ]*NA[ ]*$", NA, temp[[avar]])
                 if (!all(is.na((as.numeric(temp[[avar]]))))) {
                     temp[[avar]] <- as.numeric(temp[[avar]])
                 }
@@ -122,6 +123,7 @@ if (length(files)!=0) {
                 "Duration",
                 "Distance",
                 "Work",
+                "Calories",
                 "Average.Heart.Rate",
                 "OVRD_total_distance",
                 "OVRD_time_riding",

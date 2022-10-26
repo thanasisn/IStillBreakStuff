@@ -40,26 +40,58 @@ source(datascript)
 
 ## load outside Goldencheetah
 metrics <- readRDS(inputdata)
-gather  <- readRDS(moredata)
-
-metrics <- metrics[metrics$date > Sys.Date() - 1000,]
-metrics <- rm.cols.dups.df(metrics)
-
-stop()
-
-
-####  Load Goldencheetah exports  ####
-metrics <- readRDS("~/LOGs/GCmetrics.Rds")
 metrics <- data.table(metrics)
 metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
 
-tess <- merge(gather,metrics, by = "time")
-stop()
+## covert types
+for (avar in names(metrics)) {
+    if (is.character(metrics[[avar]])) {
+        ## find empty and replace
+        metrics[[avar]] <- sub("^[ ]*$" ,NA , metrics[[avar]])
+        metrics[[avar]] <- sub("^[ ]*NA[ ]*$" ,NA , metrics[[avar]])
+        if (!all(is.na((as.numeric(metrics[[avar]]))))) {
+            metrics[[avar]] <- as.numeric(metrics[[avar]])
+        }
+    }
+}
+
+
+gather  <- readRDS(moredata)
+
+## limit data back
+metrics <- metrics[ date > Sys.Date() - 2000,]
+gather  <- gather[  time > Sys.time() - 2000*24*3600,]
+
+metrics <- rm.cols.dups.DT(metrics)
+metrics <- rm.cols.NA.DT(metrics)
+gather  <- rm.cols.dups.DT(gather)
+gather  <- rm.cols.NA.DT(gather)
+
+##FIXME
+tocheck <- intersect(names(gather),names(metrics))
+metrics <- unique(merge(gather,metrics,by = "time"))
+
+for (avar in tocheck) {
+    getit <- grep(paste0(avar,"\\.[xy]"),names(metrics), value = T)
+    metrics[[getit[1]]] == metrics[[getit[2]]]
+}
+
+
+tessss  <- grep("Calories",names(metrics), value = T)
+metrics[, ..tessss ]
+
+
+hist(metrics$Calories.x, breaks = 100)
+
+metrics[ !is.na(Calories.x), ..tessss ]
+metrics[ !is.na(Calories.x),  ]
+
+stop("jjjjjjj")
 
 
 
-metrics <- data.table(metrics)
+rm(gather)
 setorder(metrics,date)
 
 metrics[,color := NULL]
@@ -91,7 +123,8 @@ fCTL1 = 1/42
 fCTL2 = 1-exp(-fCTL1)
 
 ## select metrics for pdf
-wecare <- c("TRIMP_Points","TRIMP_Zonal_Points","TriScore","Aerobic_TISS","Anaerobic_TISS","Calories","Work")
+wecare <- c("TRIMP_Points","TRIMP_Zonal_Points","TriScore","Aerobic_TISS","Anaerobic_TISS")
+## work, calories
 extend <- 30
 pdays  <- c(400, 100)
 
