@@ -11,10 +11,7 @@
 # read_ride(file = af)
 
 
-
 ####_ Set environment _####
-closeAllConnections()
-rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
 Script.Name = funr::sys.script()
@@ -29,139 +26,123 @@ library(jsonlite)
 source("~/CODE/FUNCTIONS/R/data.R")
 
 
-## data storage
+## data paths
 storagefl <- "~/DATA/Other/GC_json_data.Rds"
+gcfolder  <- "~/TRAIN/GoldenCheetah/Athan/activities/"
+
+
+
+####  Read data from json files  ####
+file       <- list.files( path       = gcfolder,
+                          pattern    = "*.json",
+                          full.names = TRUE)
+filesmtime <- file.mtime(file)
+check      <- data.table(file, filesmtime)
 
 ## start with read data
 if (file.exists(storagefl)) {
     gather <- readRDS(storagefl)
+    ## find files to read
+    test  <- gather[, file, filemtime]
+    test2 <- merge(test, check , by = "file", all = T)
+    files <- test2[ filemtime != filesmtime | is.na(filemtime) , file ]
+    ## drop preexisting files
+    gather <- gather[ ! file %in% files ]
 } else {
     gather <- data.table()
 }
 
 
-## drop edited and re-read files
 
-####  Read data from json files  ####
-files <- list.files("~/TRAIN/GoldenCheetah/Athan/activities/",
-                    pattern = "*.json",
-                    full.names = TRUE)
-filesmtime <- file.mtime(files)
+if (length(files)!=0) {
+    cat(paste("\nSomething to do\n"))
 
-check      <- data.table(files, filesmtime)
+    for (af in file) {
+        ## get file
+        ride <- fromJSON(af)
+        ride <- ride$RIDE
+        cat(paste(basename(af)),"\n")
 
-## find files to read
+        stopifnot(
+            all(names(ride) %in%
+                    c("STARTTIME",
+                      "OVERRIDES",
+                      "RECINTSECS",
+                      "DEVICETYPE",
+                      "IDENTIFIER",
+                      "TAGS",
+                      "SAMPLES",
+                      "XDATA",
+                      "INTERVALS"))
+        )
 
+        temp <- data.frame(
+            file       = af,
+            filemtime  = file.mtime(af),
+            time       = as.POSIXct(ride$STARTTIME),
+            RECINTSECS = ride$RECINTSECS,
+            DEVICETYPE = ride$DEVICETYPE,
+            IDENTIFIER = ride$IDENTIFIER,
+            data.frame(ride$TAGS)
+        )
 
+        if (!is.null( ride$OVERRIDES )) {
+            ss <- data.frame(t(diag(as.matrix(ride$OVERRIDES))))
+            names(ss) <- paste0("OVRD_", names(ride$OVERRIDES))
+            temp <- cbind(temp,ss)
+            rm(ss)
+        }
 
-stop()
+        ## covert type
+        for (avar in names(temp)) {
+            if (is.character(temp[[avar]])) {
+                ## find empty and replace
+                temp[[avar]] <- sub("^[ ]*$" ,NA , temp[[avar]])
+                if (!all(is.na((as.numeric(temp[[avar]]))))) {
+                    temp[[avar]] <- as.numeric(temp[[avar]])
+                }
+            }
+        }
 
-
-for (af in files) {
-    ## get file
-    ride <- fromJSON(af)
-    ride <- ride$RIDE
-    cat(paste(basename(af)),"\n")
-
-    stopifnot(
-        all(names(ride) %in%
-                c("STARTTIME",
-                  "OVERRIDES",
-                  "RECINTSECS",
-                  "DEVICETYPE",
-                  "IDENTIFIER",
-                  "TAGS",
-                  "SAMPLES",
-                  "XDATA",
-                  "INTERVALS"))
-    )
-
-    temp <- data.frame(
-        file       = af,
-        filemtime  = file.mtime(af),
-        time       = as.POSIXct(ride$STARTTIME),
-        RECINTSECS = ride$RECINTSECS,
-        DEVICETYPE = ride$DEVICETYPE,
-        IDENTIFIER = ride$IDENTIFIER,
-        data.frame(ride$TAGS)
-    )
-
-    if (!is.null( ride$OVERRIDES )) {
-        ss <- data.frame(t(diag(as.matrix(ride$OVERRIDES))))
-        names(ss) <- paste0("OVRD_", names(ride$OVERRIDES))
-        temp <- cbind(temp,ss)
-        rm(ss)
+        gather <- rbind(gather, temp, fill = T)
+        rm(temp)
     }
 
-    gather <- rbind(gather, temp, fill = T)
-    rm(temp)
-}
-
-
-iris <- gather
-
-## covert type
-for (avar in names(iris)) {
-    if (is.character(iris[[avar]])) {
-        ## find empty and replace
-        iris[[avar]] <- sub("^[ ]*$" ,NA , iris[[avar]])
-        if (!all(is.na((as.numeric(iris[[avar]]))))) {
-            iris[[avar]] <- as.numeric(iris[[avar]])
+    gather <- rm.cols.dups.DT(gather)
+    gather <- rm.cols.NA.DT(gather)
+    ## for testing
+    for (avar in names(gather)) {
+        if (is.numeric(gather[[avar]])) {
+            hist( gather[[avar]], breaks = 50, main = avar )
         }
     }
-}
 
-iris <- rm.cols.dups.DT(iris)
-iris <- rm.cols.NA.DT(iris)
-for (avar in names(iris)) {
-    if (is.numeric(iris[[avar]])) {
-        hist( iris[[avar]], breaks = 50, main = avar )
+    ## drop zeros on some columns
+    wecare <- c("Time.Moving",
+                "Duration",
+                "Distance",
+                "Work",
+                "Average.Heart.Rate",
+                "OVRD_total_distance",
+                "OVRD_time_riding",
+                "VO2max.detected",
+                "Recovery.Time",
+                "Equipment.Weight",
+                "Daniels.Points")
+    for (avar in wecare) {
+        gather[[avar]][gather[[avar]] == 0] <- NA
     }
+    gather <- rm.cols.dups.DT(gather)
+    gather <- rm.cols.NA.DT(gather)
+
+    gather <- unique(gather)
+
+    ## write data
+    write_RDS(gather, storagefl)
+
+} else {
+    cat(paste("\nNothing to do\n"))
 }
-
-## drop zeros
-wecare <- c("Time.Moving",
-            "Duration",
-            "Distance",
-            "Work",
-            "Average.Heart.Rate",
-            "OVRD_total_distance",
-            "OVRD_time_riding",
-            "VO2max.detected",
-            "Recovery.Time",
-            "Equipment.Weight",
-            "Daniels.Points")
-for (avar in wecare) {
-    iris[[avar]][iris[[avar]] == 0] <- NA
-}
-
-## write data
-write_RDS(iris, storagefl)
-
-
-
-
-
-####  Load Goldencheetah exports  ####
-metrics <- readRDS("~/LOGs/GCmetrics.Rds")
-metrics <- data.table(metrics)
-metrics <- rm.cols.dups.DT(metrics)
-metrics <- rm.cols.NA.DT(metrics)
-
-
-
-
-
-
-
-
-
-
-tess <- merge(gather,metrics, by = "time")
-
-
-
-
 
 
 

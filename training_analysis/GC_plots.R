@@ -11,8 +11,12 @@ Sys.setenv(TZ = "UTC")
 tic = Sys.time()
 Script.Name = funr::sys.script()
 
-inputdata <- "~/LOGs/GCmetrics.Rds"
-outputpdf <- paste0("~/LOGs/car_logs/",  basename(sub("\\.R$",".pdf", Script.Name)))
+inputdata  <- "~/LOGs/GCmetrics.Rds"
+moredata   <- "~/DATA/Other/GC_json_data.Rds"
+outputpdf  <- paste0("~/LOGs/car_logs/",  basename(sub("\\.R$",".pdf", Script.Name)))
+datascript <- "~/CODE/training_analysis/GC_read_activities.R"
+
+
 
 if(!interactive()) {
     ## check if we have to run
@@ -25,16 +29,34 @@ if(!interactive()) {
 }
 
 
-## load outside Goldencheetah
-metrics <- readRDS(inputdata)
+library(data.table)
+# library(scales)
 source("~/FUNCTIONS/R/data.R")
 
+## run other data gather
+source(datascript)
+
+
+
+## load outside Goldencheetah
+metrics <- readRDS(inputdata)
+gather  <- readRDS(moredata)
 
 metrics <- metrics[metrics$date > Sys.Date() - 1000,]
 metrics <- rm.cols.dups.df(metrics)
 
-library(data.table)
-library(scales)
+stop()
+
+
+####  Load Goldencheetah exports  ####
+metrics <- readRDS("~/LOGs/GCmetrics.Rds")
+metrics <- data.table(metrics)
+metrics <- rm.cols.dups.DT(metrics)
+metrics <- rm.cols.NA.DT(metrics)
+
+tess <- merge(gather,metrics, by = "time")
+stop()
+
 
 
 metrics <- data.table(metrics)
