@@ -35,6 +35,9 @@ metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
 
 
+## read stored data files and mtime
+## drop edited and re-read files
+
 ####  Read data from json files  ####
 files <- list.files("~/TRAIN/GoldenCheetah/Athan/activities/",
                     pattern = "*.json",
@@ -49,10 +52,19 @@ for (af in files) {
     ## get file
     ride <- fromJSON(af)
     ride <- ride$RIDE
+    cat(paste(basename(af)),"\n")
 
     stopifnot(
         all(names(ride) %in%
-                c("STARTTIME", "RECINTSECS", "DEVICETYPE", "IDENTIFIER", "TAGS","INTERVALS", "SAMPLES", "XDATA"))
+                c("STARTTIME",
+                  "OVERRIDES",
+                  "RECINTSECS",
+                  "DEVICETYPE",
+                  "IDENTIFIER",
+                  "TAGS",
+                  "SAMPLES",
+                  "XDATA",
+                  "INTERVALS"))
     )
 
     temp <- data.frame(
@@ -65,15 +77,32 @@ for (af in files) {
         data.frame(ride$TAGS)
     )
 
+    if (!is.null( ride$OVERRIDES )) {
+        ss <- data.frame(t(diag(as.matrix(ride$OVERRIDES))))
+        names(ss) <- paste0("OVRD_", names(ride$OVERRIDES))
+        temp <- cbind(temp,ss)
+        rm(ss)
+    }
+
     gather <- rbind(gather, temp, fill = T)
+    rm(temp)
 }
 
 gather[, time := as.POSIXct(time) ]
 
+iris <- gather
+
+for (avar in names(iris)) {
+
+    ## try to numeric
+    if (is.character(iris[[avar]])) {
+        as.numeric(iris[[avar]])
+    }
+}
+
+
 
 tess <- merge(gather,metrics, by = "time")
-
-
 
 
 
