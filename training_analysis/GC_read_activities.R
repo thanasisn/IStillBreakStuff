@@ -23,30 +23,39 @@ if(!interactive()) {
     sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
 }
 
+library(myRtools)
 library(data.table)
 library(jsonlite)
 source("~/CODE/FUNCTIONS/R/data.R")
 
 
-####  Load Goldencheetah exports  ####
-metrics <- readRDS("~/LOGs/GCmetrics.Rds")
-metrics <- data.table(metrics)
-metrics <- rm.cols.dups.DT(metrics)
-metrics <- rm.cols.NA.DT(metrics)
+## data storage
+storagefl <- "~/DATA/Other/GC_json_data.Rds"
+
+## start with read data
+if (file.exists(storagefl)) {
+    gather <- readRDS(storagefl)
+} else {
+    gather <- data.table()
+}
 
 
-## read stored data files and mtime
 ## drop edited and re-read files
 
 ####  Read data from json files  ####
 files <- list.files("~/TRAIN/GoldenCheetah/Athan/activities/",
                     pattern = "*.json",
                     full.names = TRUE)
+filesmtime <- file.mtime(files)
 
-files <- sort(files)
-# files <- tail(files,10)
+check      <- data.table(files, filesmtime)
 
-gather <- data.table()
+## find files to read
+
+
+
+stop()
+
 
 for (af in files) {
     ## get file
@@ -70,7 +79,7 @@ for (af in files) {
     temp <- data.frame(
         file       = af,
         filemtime  = file.mtime(af),
-        time       = ride$STARTTIME,
+        time       = as.POSIXct(ride$STARTTIME),
         RECINTSECS = ride$RECINTSECS,
         DEVICETYPE = ride$DEVICETYPE,
         IDENTIFIER = ride$IDENTIFIER,
@@ -88,17 +97,63 @@ for (af in files) {
     rm(temp)
 }
 
-gather[, time := as.POSIXct(time) ]
 
 iris <- gather
 
+## covert type
 for (avar in names(iris)) {
-
-    ## try to numeric
     if (is.character(iris[[avar]])) {
-        as.numeric(iris[[avar]])
+        ## find empty and replace
+        iris[[avar]] <- sub("^[ ]*$" ,NA , iris[[avar]])
+        if (!all(is.na((as.numeric(iris[[avar]]))))) {
+            iris[[avar]] <- as.numeric(iris[[avar]])
+        }
     }
 }
+
+iris <- rm.cols.dups.DT(iris)
+iris <- rm.cols.NA.DT(iris)
+for (avar in names(iris)) {
+    if (is.numeric(iris[[avar]])) {
+        hist( iris[[avar]], breaks = 50, main = avar )
+    }
+}
+
+## drop zeros
+wecare <- c("Time.Moving",
+            "Duration",
+            "Distance",
+            "Work",
+            "Average.Heart.Rate",
+            "OVRD_total_distance",
+            "OVRD_time_riding",
+            "VO2max.detected",
+            "Recovery.Time",
+            "Equipment.Weight",
+            "Daniels.Points")
+for (avar in wecare) {
+    iris[[avar]][iris[[avar]] == 0] <- NA
+}
+
+## write data
+write_RDS(iris, storagefl)
+
+
+
+
+
+####  Load Goldencheetah exports  ####
+metrics <- readRDS("~/LOGs/GCmetrics.Rds")
+metrics <- data.table(metrics)
+metrics <- rm.cols.dups.DT(metrics)
+metrics <- rm.cols.NA.DT(metrics)
+
+
+
+
+
+
+
 
 
 
