@@ -41,6 +41,8 @@ source(datascript)
 ## load outside Goldencheetah
 metrics <- readRDS(inputdata)
 metrics <- data.table(metrics)
+## get this from direct read
+metrics[ , VO2max_detected := NULL ]
 ## drop zeros on some columns
 wecare <- c(
     "Aerobic.Training.Effect",
@@ -59,7 +61,9 @@ wecare <- c(
     "Recovery.Time",
     "Time.Moving",
     "V02max.detected",
+    "V02max_detected",
     "VO2max.detected",
+    "VO2max_detected",
     "Work",
     NULL)
 wecare <- names(metrics)[names(metrics)%in%wecare]
@@ -464,6 +468,10 @@ for (days in pdays) {
         dev.off()
     }
 }
+
+
+pp <- metrics[,VO2max.detected,time]
+
 
 
 

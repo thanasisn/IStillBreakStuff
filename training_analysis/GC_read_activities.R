@@ -137,7 +137,9 @@ if (length(files)!=0) {
         "Recovery.Time",
         "Time.Moving",
         "V02max.detected",
+        "V02max_detected",
         "VO2max.detected",
+        "VO2max_detected",
         "Work",
         NULL)
     wecare <- names(gather)[names(gather)%in%wecare]
