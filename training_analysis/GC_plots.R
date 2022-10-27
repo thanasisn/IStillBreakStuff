@@ -42,7 +42,7 @@ source(datascript)
 metrics <- readRDS(inputdata)
 metrics <- data.table(metrics)
 ## get this from direct read
-metrics[ , VO2max_detected := NULL ]
+# metrics[ , VO2max_detected := NULL ]
 ## drop zeros on some columns
 wecare <- c(
     "Aerobic.Training.Effect",
@@ -315,7 +315,6 @@ for (days in pdays) {
 
 
 
-
 ## select metrics for png
 wecare <- c("TRIMP_Points","TRIMP_Zonal_Points","EPOC")
 extend <- 30
@@ -324,13 +323,17 @@ pdays  <- c(400, 100)
 for (days in pdays) {
     for (avar in wecare) {
 
-        pp <- data.table(time  = metrics$time,
-                         value = metrics[[avar]] )
-        pp <- pp[, .(value = sum(value)), by = .(date=as.Date(time))]
+        pp <- data.table(time            = metrics$time,
+                         value           = metrics[[avar]],
+                         VO2max.detected = metrics$VO2max.detected)
+        pp <- pp[, .(value           = sum(value, na.rm = T),
+                     VO2max.detected = mean(VO2max.detected, na.rm = T) ),
+                 by = .(date=as.Date(time))]
         last <- pp[ date == max(date),]
-        pp <- merge(
-            data.table(date = seq.Date(from = min(pp$date), to = max(pp$date)+extend, by = "day")),
-            pp, all = T)
+
+        datesseq <- data.table(date = seq.Date(from = min(pp$date), to = max(pp$date)+extend, by = "day"))
+        pp       <- merge(datesseq, pp, all = T, by = "date")
+
         pp[is.na(value),value:=0]
 
         pp <- pp[ date >= max(date)-days, ]
@@ -372,6 +375,9 @@ for (days in pdays) {
         pp[, TSB1 := CTL1 - ATL1]
         pp[, TSB2 := CTL2 - ATL2]
 
+
+
+
         #### Training Impulse model plot ####
         png(paste0("/dev/shm/CONKY/trimp_",avar,"_",days,".png"), width = 470, height = 200, units = "px", bg = "transparent")
 
@@ -379,6 +385,10 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
+        ylim <-range( 45,55, pp$VO2max.detected, na.rm = T)
+        plot( pp$date, pp$VO2max.detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
+        box(col="white")
+        par(new = T)
         plot(pp$date, pp$ATL2, col = 3, lwd = 1.5, "l", yaxt="n")
         box(col="white")
         abline(v=Sys.Date(),col="green",lty=2)
@@ -404,7 +414,6 @@ for (days in pdays) {
 
 
 
-
         #### Banister model plot ####
         png(paste0("/dev/shm/CONKY/banister_",avar,"_",days,".png"), width = 470, height = 200, units = "px", bg = "transparent")
 
@@ -412,6 +421,10 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
+        ylim <-range( 45,55, pp$VO2max.detected, na.rm = T)
+        plot( pp$date, pp$VO2max.detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
+        box(col="white")
+        par(new = T)
         plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
         box(col="white")
         par(new = T)
@@ -444,6 +457,10 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
+        ylim <-range( 45,55, pp$VO2max.detected, na.rm = T)
+        plot( pp$date, pp$VO2max.detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
+        box(col="white")
+        par(new = T)
         plot( pp$date, pp$bus.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
         box(col="white")
         par(new = T)
@@ -468,10 +485,6 @@ for (days in pdays) {
         dev.off()
     }
 }
-
-
-pp <- metrics[,VO2max.detected,time]
-
 
 
 
