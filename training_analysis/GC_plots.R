@@ -15,7 +15,7 @@ inputdata  <- "~/LOGs/GCmetrics.Rds"
 moredata   <- "~/DATA/Other/GC_json_data.Rds"
 outputpdf  <- paste0("~/LOGs/car_logs/",  basename(sub("\\.R$",".pdf", Script.Name)))
 datascript <- "~/CODE/training_analysis/GC_read_activities.R"
-daysback   <- 1500
+daysback   <- 360*3
 
 
 if(!interactive()) {
@@ -120,19 +120,21 @@ for (avar in tocheck) {
         names(metrics)[names(metrics) == getit[1]] <- avar
     }
 }
+metrics <- rm.cols.dups.DT(metrics)
+metrics <- rm.cols.NA.DT(metrics)
 
 
-tessss  <- grep("Calories",names(metrics), value = T)
-metrics[, ..tessss ]
+# tessss  <- grep("Calories",names(metrics), value = T)
+# metrics[, ..tessss ]
+#
+#
+# hist(metrics$Calories.x, breaks = 100)
+#
+# metrics[ !is.na(Calories.x), ..tessss ]
+# metrics[ !is.na(Calories.x),  ]
 
 
-hist(metrics$Calories.x, breaks = 100)
-
-metrics[ !is.na(Calories.x), ..tessss ]
-metrics[ !is.na(Calories.x),  ]
-
-
-setorder(metrics,date)
+setorder(metrics,time)
 
 
 
@@ -161,7 +163,7 @@ fCTL1 = 1/42
 fCTL2 = 1-exp(-fCTL1)
 
 ## select metrics for pdf
-wecare <- c("TRIMP_Points","TRIMP_Zonal_Points","EPOC","TriScore","Aerobic_TISS")
+wecare <- c("TRIMP_Points","TRIMP_Zonal_Points","EPOC","TriScore")
 ## work, calories
 extend <- 30
 pdays  <- c(400, 100)
@@ -255,7 +257,7 @@ for (days in pdays) {
         plot(pp$date, pp$ATL2, col = 3, lwd = 1.1, "l", yaxt="n")
         abline(v=Sys.Date(),col="green",lty=2)
         par(new = T)
-        plot(pp$date, pp$CTL2, col = 5, lwd = 1.1, "l", yaxt="n")
+        plot(pp$date, pp$CTL2, col = 5, lwd =   2, "l", yaxt="n")
         par(new = T)
         plot(pp$date, pp$TSB2, col = 6, lwd =   2, "l", yaxt="n")
 
@@ -276,7 +278,7 @@ for (days in pdays) {
 
         plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
         par(new = T)
-        plot( pp$date, pp$ban.fitness, lwd = 1.1, "l", col = 5, yaxt="n")
+        plot( pp$date, pp$ban.fitness, lwd =   2, "l", col = 5, yaxt="n")
         par(new = T)
         plot( pp$date, pp$ban.perform, lwd =   2, "l", col = 6, yaxt="n")
 
@@ -296,7 +298,7 @@ for (days in pdays) {
 
         plot( pp$date, pp$bus.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
         par(new = T)
-        plot( pp$date, pp$bus.fitness, lwd = 1.1, "l", col = 5, yaxt="n")
+        plot( pp$date, pp$bus.fitness, lwd =   2, "l", col = 5, yaxt="n")
         par(new = T)
         plot( pp$date, pp$bus.perform, lwd =   2, "l", col = 6, yaxt="n")
         legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
@@ -393,7 +395,7 @@ for (days in pdays) {
         box(col="white")
         abline(v=Sys.Date(),col="green",lty=2)
         par(new = T)
-        plot(pp$date, pp$CTL2, col = 5, lwd = 1.5, "l", yaxt="n")
+        plot(pp$date, pp$CTL2, col = 5, lwd =   2, "l", yaxt="n")
         box(col="white")
         par(new = T)
         plot(pp$date, pp$TSB2, col = 6, lwd =   3, "l", yaxt="n")
@@ -428,7 +430,7 @@ for (days in pdays) {
         plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$ban.fitness, lwd = 1.1, "l", col = 5, yaxt="n")
+        plot( pp$date, pp$ban.fitness, lwd =   2, "l", col = 5, yaxt="n")
         box(col="white")
         par(new = T)
         plot( pp$date, pp$ban.perform, lwd =   2, "l", col = 6, yaxt="n")
@@ -464,7 +466,7 @@ for (days in pdays) {
         plot( pp$date, pp$bus.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$bus.fitness, lwd = 1.1, "l", col = 5, yaxt="n")
+        plot( pp$date, pp$bus.fitness, lwd =   2, "l", col = 5, yaxt="n")
         box(col="white")
         par(new = T)
         plot( pp$date, pp$bus.perform, lwd =   2, "l", col = 6, yaxt="n")
