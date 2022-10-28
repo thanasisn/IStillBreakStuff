@@ -130,26 +130,12 @@ for (avar in tocheck) {
 metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
 
-## drop columns with zero an NA only
-
+## drop columns with zero or NA only
 for (avar in names(metrics)) {
-    getna  <- is.na(metrics[[avar]])
-    getzer <- metrics[[avar]] == 0
-    test <- data.frame(getna,getzer)
-
-    test$getzer[is.na(getzer)] <- 1
-
-    vec    <- getna + getzer
-
-    if (all(vec != 0)) {
-
-        stop("jjj")
-
+    if (all(metrics[[avar]] %in% c(NA, 0))) {
+        metrics[[avar]] <- NULL
     }
 }
-
-
-
 
 
 
@@ -157,25 +143,11 @@ for (avar in names(metrics)) {
 dup.vec <- which( duplicated(t(metrics)))
 dup.vec <- names(metrics)[dup.vec]
 
-# for (acol in dup.vec) {
-#     dup.vecT <- dup.vec[!dup.vec %in% acol]
-#     dups <- c()
-#     for (bcol in dup.vecT) {
-#         if (all(metrics[[acol]] == metrics[[bcol]],na.rm = T)) {
-#             dups <- c(dups, bcol)
-#             metrics[ metrics[[acol]] == metrics[[bcol]],  ]
-#         }
-#     }
-#     cat(paste(c(acol,dups)),"\n")
-# }
-
-
 # create a vector with the checksum for each column (and keep the column names as row names)
 col.checksums <- sapply(metrics, function(x) digest::digest(x, "md5"), USE.NAMES = T)
 dup.cols      <- data.table(col.name = names(col.checksums), hash.value = col.checksums)
 dup.cols      <- dup.cols[dup.cols,, on = "hash.value"][col.name != i.col.name,]
 
-metrics[!is.na(BikeScore.),BikeScore.]
 
 
 stop()

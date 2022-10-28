@@ -146,14 +146,19 @@ if (length(files)!=0) {
         gather[[avar]][gather[[avar]] == 0] <- NA
     }
 
+    ## drop columns with zero or NA only
+    for (avar in names(gather)) {
+        if (all(gather[[avar]] %in% c(NA, 0))) {
+            gather[[avar]] <- NULL
+        }
+    }
+
     gather <- rm.cols.dups.DT(gather)
     gather <- rm.cols.NA.DT(gather)
-
     gather <- unique(gather)
 
     ## write data
     write_RDS(gather, storagefl)
-
 } else {
     cat(paste("\nNothing to do\n"))
 }
