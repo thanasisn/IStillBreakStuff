@@ -148,23 +148,20 @@ col.checksums <- sapply(metrics, function(x) digest::digest(x, "md5"), USE.NAMES
 dup.cols      <- data.table(col.name = names(col.checksums), hash.value = col.checksums)
 dup.cols      <- dup.cols[dup.cols,, on = "hash.value"][col.name != i.col.name,]
 
+##TODO
+## remove manual
+metrics[, DEVICETYPE        := NULL ]
+metrics[, Device.Info       := NULL ]
+metrics[, VO2max.detected   := NULL ]
+metrics[, Workout.Title     := NULL ]
+metrics[, X1_sec_Peak_Power := NULL ]
+metrics[, NP                := NULL ]
+metrics[, IF                := NULL ]
 
 
-stop()
-
-# tessss  <- grep("Calories",names(metrics), value = T)
-# metrics[, ..tessss ]
-#
-#
-# hist(metrics$Calories.x, breaks = 100)
-#
-# metrics[ !is.na(Calories.x), ..tessss ]
-# metrics[ !is.na(Calories.x),  ]
 
 
 setorder(metrics,time)
-
-
 
 wecare <- names(metrics)
 wecare <- grep("date|notes|time|sport|workout_code|_Fatigue|bike|shoes|workout_title|device|Calendar_text|Elevation_Gain_Carrying|heartbeats|Max_Core_Temperature|Checksum|Right_Balance|Percent_in_Zone|Percent_in_Pace_Zone|Best_|Distance_Swim|Equipment_Weight|Average_Core_Temperature|Average_Temp|Max_Cadence|Max_Temp|min_Peak_Pace|_Peak_Pace|_Peak_Pace_HR|_Peak_Power|_Peak_Power_HR|min_Peak_Hr|_Peak_WPK|Min_temp|Average_Cadence|Average_Running_Cadence|Max_Running_Cadence",
@@ -197,8 +194,7 @@ extend <- 30
 pdays  <- c(400, 100)
 
 # fitness = 0;
-# for(i=0, i < count(TRIMP); i++)
-# {
+# for(i=0, i < count(TRIMP); i++) {
 #     fitness = fitness * exp(-1/r1) + TRIMP[i];
 #     fatigue = fatigue * exp(-1/r2) + TRIMP[i];
 #     performance = fitness * k1 - fatigue * k2;
@@ -355,9 +351,9 @@ for (days in pdays) {
 
         pp <- data.table(time            = metrics$time,
                          value           = metrics[[avar]],
-                         VO2max.detected = metrics$VO2max.detected)
+                         VO2max_detected = metrics$VO2max_detected)
         pp <- pp[, .(value           = sum(value, na.rm = T),
-                     VO2max.detected = mean(VO2max.detected, na.rm = T) ),
+                     VO2max_detected = mean(VO2max_detected, na.rm = T) ),
                  by = .(date=as.Date(time))]
         last <- pp[ date == max(date),]
 
@@ -415,8 +411,8 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-        ylim <-range( 45,55, pp$VO2max.detected, na.rm = T)
-        plot( pp$date, pp$VO2max.detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
+        ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         box(col="white")
         par(new = T)
         plot(pp$date, pp$ATL2, col = 3, lwd = 1.5, "l", yaxt="n")
@@ -451,8 +447,8 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-        ylim <-range( 45,55, pp$VO2max.detected, na.rm = T)
-        plot( pp$date, pp$VO2max.detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
+        ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         box(col="white")
         par(new = T)
         plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
@@ -487,8 +483,8 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-        ylim <-range( 45,55, pp$VO2max.detected, na.rm = T)
-        plot( pp$date, pp$VO2max.detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
+        ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         box(col="white")
         par(new = T)
         plot( pp$date, pp$bus.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
