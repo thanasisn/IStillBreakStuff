@@ -125,6 +125,8 @@ metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
 
 
+stop()
+
 # tessss  <- grep("Calories",names(metrics), value = T)
 # metrics[, ..tessss ]
 #

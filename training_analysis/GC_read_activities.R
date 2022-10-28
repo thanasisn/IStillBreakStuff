@@ -88,9 +88,9 @@ if (length(files)!=0) {
         )
 
         if (!is.null( ride$OVERRIDES )) {
-            ss <- data.frame(t(diag(as.matrix(ride$OVERRIDES))))
+            ss        <- data.frame(t(diag(as.matrix(ride$OVERRIDES))))
             names(ss) <- paste0("OVRD_", names(ride$OVERRIDES))
-            temp <- cbind(temp,ss)
+            temp      <- cbind(temp,ss)
             rm(ss)
         }
 
@@ -115,7 +115,7 @@ if (length(files)!=0) {
     ## for testing
     for (avar in names(gather)) {
         if (is.numeric(gather[[avar]])) {
-            hist( gather[[avar]], breaks = 50, main = avar )
+            hist(gather[[avar]], breaks = 50, main = avar )
         }
     }
 
