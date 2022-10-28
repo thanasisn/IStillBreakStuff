@@ -41,20 +41,18 @@ source(datascript)
 
 ## load outside Goldencheetah
 metrics <- readRDS(inputdata)
-metrics <- data.table(metrics)
+metrics <- data.frame(metrics)
 ## get this from direct read
 # metrics[ , VO2max_detected := NULL ]
-
-
 
 ## covert types
 for (avar in names(metrics)) {
     if (is.character(metrics[[avar]])) {
         ## find empty and replace
-        metrics[[avar]] <- sub("^[ ]*$",       NA, metrics[[avar]])
-        metrics[[avar]] <- sub("^[ ]*NA[ ]*$", NA, metrics[[avar]])
         metrics[[avar]] <- sub("[ ]*$",        "", metrics[[avar]])
         metrics[[avar]] <- sub("^[ ]*",        "", metrics[[avar]])
+        metrics[[avar]] <- sub("^[ ]*$",       NA, metrics[[avar]])
+        metrics[[avar]] <- sub("^[ ]*NA[ ]*$", NA, metrics[[avar]])
         if (!all(is.na((as.numeric(metrics[[avar]]))))) {
             metrics[[avar]] <- as.numeric(metrics[[avar]])
         }
@@ -72,7 +70,6 @@ wecare <- c(
     "Daniels.Points",
     "Distance",
     "Duration",
-    "BikeScore.",
     "Equipment.Weight",
     "OVRD_time_riding",
     "OVRD_total_distance",
@@ -89,6 +86,7 @@ wecare <- names(metrics)[names(metrics)%in%wecare]
 for (avar in wecare) {
     metrics[[avar]][metrics[[avar]] == 0] <- NA
 }
+metrics <- data.table(metrics)
 metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
 metrics[, Notes := NULL]
@@ -118,6 +116,8 @@ gather  <- rm.cols.NA.DT(gather)
 tocheck <- grep("time",intersect(names(gather),names(metrics)),invert = T,ignore.case = T, value = T)
 metrics <- unique(merge(gather,metrics,by = "time"))
 
+## duplicate name colms check
+
 for (avar in tocheck) {
     getit <- grep(paste0(avar,"\\.[xy]"),names(metrics), value = T)
     # hist(metrics[[getit[1]]])
@@ -130,9 +130,28 @@ for (avar in tocheck) {
 metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
 
-names(metrics)[names(metrics) %in% tocheck]
+## drop columns with zero an NA only
 
-metrics$Device.Info
+for (avar in names(metrics)) {
+    getna  <- is.na(metrics[[avar]])
+    getzer <- metrics[[avar]] == 0
+    test <- data.frame(getna,getzer)
+
+    test$getzer[is.na(getzer)] <- 1
+
+    vec    <- getna + getzer
+
+    if (all(vec != 0)) {
+
+        stop("jjj")
+
+    }
+}
+
+
+
+
+
 
 ## get duplicate columns
 dup.vec <- which( duplicated(t(metrics)))
