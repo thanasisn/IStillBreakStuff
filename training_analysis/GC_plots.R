@@ -21,6 +21,7 @@ daysback   <- 360*3
 if(!interactive()) {
     ## check if we have to run
     if (!file.exists(outputpdf) |
+        !file.exists("/dev/shm/CONKY/banister_EPOC_400.png") |
         file.mtime(inputdata) > file.mtime(outputpdf) |
         file.mtime(outputpdf) < Sys.time() - 12 * 3600 ) {
         cat(paste("will run"))
@@ -115,7 +116,7 @@ for (avar in tocheck) {
     getit <- grep(paste0(avar,"\\.[xy]"),names(metrics), value = T)
     # hist(metrics[[getit[1]]])
     # hist(metrics[[getit[2]]])
-    if (all(metrics[[getit[1]]] == metrics[[getit[2]]])) {
+    if (all(metrics[[getit[1]]] == metrics[[getit[2]]], na.rm = TRUE)) {
         metrics[[getit[2]]] <- NULL
         names(metrics)[names(metrics) == getit[1]] <- avar
     }
