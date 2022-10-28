@@ -44,6 +44,23 @@ metrics <- readRDS(inputdata)
 metrics <- data.table(metrics)
 ## get this from direct read
 # metrics[ , VO2max_detected := NULL ]
+
+
+
+## covert types
+for (avar in names(metrics)) {
+    if (is.character(metrics[[avar]])) {
+        ## find empty and replace
+        metrics[[avar]] <- sub("^[ ]*$",       NA, metrics[[avar]])
+        metrics[[avar]] <- sub("^[ ]*NA[ ]*$", NA, metrics[[avar]])
+        metrics[[avar]] <- sub("[ ]*$",        "", metrics[[avar]])
+        metrics[[avar]] <- sub("^[ ]*",        "", metrics[[avar]])
+        if (!all(is.na((as.numeric(metrics[[avar]]))))) {
+            metrics[[avar]] <- as.numeric(metrics[[avar]])
+        }
+    }
+}
+
 ## drop zeros on some columns
 wecare <- c(
     "Aerobic.Training.Effect",
@@ -55,6 +72,7 @@ wecare <- c(
     "Daniels.Points",
     "Distance",
     "Duration",
+    "BikeScore.",
     "Equipment.Weight",
     "OVRD_time_riding",
     "OVRD_total_distance",
@@ -79,18 +97,6 @@ metrics[, Data  := NULL]
 
 
 
-
-## covert types
-for (avar in names(metrics)) {
-    if (is.character(metrics[[avar]])) {
-        ## find empty and replace
-        metrics[[avar]] <- sub("^[ ]*$",       NA, metrics[[avar]])
-        metrics[[avar]] <- sub("^[ ]*NA[ ]*$", NA, metrics[[avar]])
-        if (!all(is.na((as.numeric(metrics[[avar]]))))) {
-            metrics[[avar]] <- as.numeric(metrics[[avar]])
-        }
-    }
-}
 
 
 gather  <- readRDS(moredata)
@@ -123,6 +129,34 @@ for (avar in tocheck) {
 }
 metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
+
+names(metrics)[names(metrics) %in% tocheck]
+
+metrics$Device.Info
+
+## get duplicate columns
+dup.vec <- which( duplicated(t(metrics)))
+dup.vec <- names(metrics)[dup.vec]
+
+# for (acol in dup.vec) {
+#     dup.vecT <- dup.vec[!dup.vec %in% acol]
+#     dups <- c()
+#     for (bcol in dup.vecT) {
+#         if (all(metrics[[acol]] == metrics[[bcol]],na.rm = T)) {
+#             dups <- c(dups, bcol)
+#             metrics[ metrics[[acol]] == metrics[[bcol]],  ]
+#         }
+#     }
+#     cat(paste(c(acol,dups)),"\n")
+# }
+
+
+# create a vector with the checksum for each column (and keep the column names as row names)
+col.checksums <- sapply(metrics, function(x) digest::digest(x, "md5"), USE.NAMES = T)
+dup.cols      <- data.table(col.name = names(col.checksums), hash.value = col.checksums)
+dup.cols      <- dup.cols[dup.cols,, on = "hash.value"][col.name != i.col.name,]
+
+metrics[!is.na(BikeScore.),BikeScore.]
 
 
 stop()

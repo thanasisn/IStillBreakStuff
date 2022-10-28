@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 
 #### Golden Cheetah read activities summary directly
+## This is sourced by other files
 
 
 ###TODO explore this tools
@@ -13,12 +14,7 @@
 
 ####_ Set environment _####
 # Sys.setenv(TZ = "UTC")
-# tic = Sys.time()
 # Script.Name = funr::sys.script()
-# if(!interactive()) {
-#     pdf(file=sub("\\.R$",".pdf",Script.Name))
-#     sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
-# }
 
 
 library(myRtools)
@@ -51,10 +47,11 @@ if (file.exists(storagefl)) {
     gather <- gather[ ! file %in% files ]
 } else {
     gather <- data.table()
+    files  <- check$file
 }
 
 
-
+####  Parse chosen files  ####
 if (length(files)!=0) {
     cat(paste("\nSomething to do\n"))
     ## read files
@@ -100,6 +97,8 @@ if (length(files)!=0) {
                 ## find empty and replace
                 temp[[avar]] <- sub("^[ ]*$",       NA, temp[[avar]])
                 temp[[avar]] <- sub("^[ ]*NA[ ]*$", NA, temp[[avar]])
+                temp[[avar]] <- sub("[ ]*$",        "", temp[[avar]])
+                temp[[avar]] <- sub("^[ ]*",        "", temp[[avar]])
                 if (!all(is.na((as.numeric(temp[[avar]]))))) {
                     temp[[avar]] <- as.numeric(temp[[avar]])
                 }
@@ -158,7 +157,6 @@ if (length(files)!=0) {
 } else {
     cat(paste("\nNothing to do\n"))
 }
-
 
 
 ####_ END _####
