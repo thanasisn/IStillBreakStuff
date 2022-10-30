@@ -73,6 +73,7 @@ wecare <- c(
     "Equipment.Weight",
     "OVRD_time_riding",
     "OVRD_total_distance",
+    "RECINTSECS",
     "RPE",
     "Recovery.Time",
     "Time.Moving",
@@ -81,6 +82,8 @@ wecare <- c(
     "VO2max.detected",
     "VO2max_detected",
     "Work",
+    "cc",
+    "xPower",
     NULL)
 wecare <- names(metrics)[names(metrics)%in%wecare]
 for (avar in wecare) {
@@ -236,8 +239,6 @@ for (days in pdays) {
             pp, all = T)
         pp[is.na(value),value:=0]
 
-        pp <- pp[ date >= max(date)-days, ]
-
         pp[, ATL1 := pp$value[1]]
         pp[, ATL2 := pp$value[1]]
         pp[, CTL1 := pp$value[1]]
@@ -274,6 +275,9 @@ for (days in pdays) {
         }
         pp[, TSB1 := CTL1 - ATL1]
         pp[, TSB2 := CTL2 - ATL2]
+
+        ## limit graph to last days
+        pp <- pp[ date >= max(date)-days, ]
 
         #### Training Impulse model plot ####
         par("mar" = c(2,0,3,0), xpd = TRUE)
@@ -362,8 +366,6 @@ for (days in pdays) {
 
         pp[is.na(value),value:=0]
 
-        pp <- pp[ date >= max(date)-days, ]
-
         pp[, ATL1 := pp$value[1]]
         pp[, ATL2 := pp$value[1]]
         pp[, CTL1 := pp$value[1]]
@@ -402,7 +404,8 @@ for (days in pdays) {
         pp[, TSB2 := CTL2 - ATL2]
 
 
-
+        ## limit graph to last days
+        pp <- pp[ date >= max(date)-days, ]
 
         #### Training Impulse model plot ####
         png(paste0("/dev/shm/CONKY/trimp_",avar,"_",days,".png"), width = 470, height = 200, units = "px", bg = "transparent")

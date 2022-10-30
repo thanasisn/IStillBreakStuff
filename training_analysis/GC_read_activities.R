@@ -132,6 +132,7 @@ if (length(files)!=0) {
         "Equipment.Weight",
         "OVRD_time_riding",
         "OVRD_total_distance",
+        "RECINTSECS",
         "RPE",
         "Recovery.Time",
         "Time.Moving",
@@ -140,6 +141,8 @@ if (length(files)!=0) {
         "VO2max.detected",
         "VO2max_detected",
         "Work",
+        "cc",
+        "xPower",
         NULL)
     wecare <- names(gather)[names(gather)%in%wecare]
     for (avar in wecare) {
@@ -152,6 +155,7 @@ if (length(files)!=0) {
             gather[[avar]] <- NULL
         }
     }
+    gather[, Year := NULL ]
 
     gather <- rm.cols.dups.DT(gather)
     gather <- rm.cols.NA.DT(gather)
