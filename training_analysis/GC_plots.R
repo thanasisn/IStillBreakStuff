@@ -229,10 +229,12 @@ busso <- function(fitness, fatigue, trimp, par2 , k1 = 0.031, k3 = 0.000035, r1 
 for (days in pdays) {
     for (avar in wecare) {
 
-
-        pp <- data.table(time  = metrics$time,
-                         value = metrics[[avar]] )
-        pp <- pp[, .(value = sum(value)), by = .(date=as.Date(time))]
+        pp <- data.table(time            = metrics$time,
+                         value           = metrics[[avar]],
+                         VO2max_detected = metrics$VO2max_detected)
+        pp <- pp[, .(value           = sum(value, na.rm = T),
+                     VO2max_detected = mean(VO2max_detected, na.rm = T) ),
+                 by = .(date=as.Date(time))]
         last <- pp[ date == max(date),]
         pp <- merge(
             data.table(date = seq.Date(from = min(pp$date), to = max(pp$date)+extend, by = "day")),
@@ -282,12 +284,20 @@ for (days in pdays) {
         #### Training Impulse model plot ####
         par("mar" = c(2,0,3,0), xpd = TRUE)
 
+
+
+        pp[ value == 0, value:=NA ]
+        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        par(new = T)
+        ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
+        par(new = T)
         plot(pp$date, pp$ATL2, col = 3, lwd = 1.1, "l", yaxt="n")
         abline(v=Sys.Date(),col="green",lty=2)
         par(new = T)
-        plot(pp$date, pp$CTL2, col = 5, lwd =   2, "l", yaxt="n")
+        plot(pp$date, pp$CTL2, col = 5, lwd = 2.5, "l", yaxt="n")
         par(new = T)
-        plot(pp$date, pp$TSB2, col = 6, lwd =   2, "l", yaxt="n")
+        plot(pp$date, pp$TSB2, col = 6, lwd = 2.5, "l", yaxt="n")
 
         legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
                legend = c("ATL2", "CTL2","TSB2"),
@@ -304,11 +314,18 @@ for (days in pdays) {
         #### Banister model plot ####
         par("mar" = c(2,0,3,0), xpd = TRUE)
 
+        pp[ value == 0, value:=NA ]
+        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        par(new = T)
+        ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
+        par(new = T)
+
         plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
         par(new = T)
-        plot( pp$date, pp$ban.fitness, lwd =   2, "l", col = 5, yaxt="n")
+        plot( pp$date, pp$ban.fitness, lwd = 2.5, "l", col = 5, yaxt="n")
         par(new = T)
-        plot( pp$date, pp$ban.perform, lwd =   2, "l", col = 6, yaxt="n")
+        plot( pp$date, pp$ban.perform, lwd = 2.5, "l", col = 6, yaxt="n")
 
         legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
                legend = c("Fatigue","Fitness","Performance"),
@@ -324,11 +341,18 @@ for (days in pdays) {
         #### Busson model plot ####
         par("mar" = c(2,0,3,0), xpd = TRUE)
 
+        pp[ value == 0, value:=NA ]
+        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        par(new = T)
+        ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
+        par(new = T)
+
         plot( pp$date, pp$bus.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
         par(new = T)
-        plot( pp$date, pp$bus.fitness, lwd =   2, "l", col = 5, yaxt="n")
+        plot( pp$date, pp$bus.fitness, lwd = 2.5, "l", col = 5, yaxt="n")
         par(new = T)
-        plot( pp$date, pp$bus.perform, lwd =   2, "l", col = 6, yaxt="n")
+        plot( pp$date, pp$bus.perform, lwd = 2.5, "l", col = 6, yaxt="n")
         legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
                legend = c("Fatigue","Fitness","Performance"),
                col    = c(       3 ,       5 ,           6 ) )
@@ -414,15 +438,20 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-        ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
+
+        pp[ value == 0, value:=NA ]
+        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        box(col="white")
+        par(new = T)
+        ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         box(col="white")
         par(new = T)
-        plot(pp$date, pp$ATL2, col = 3, lwd = 1.5, "l", yaxt="n")
+        plot(pp$date, pp$ATL2, col = 3, lwd = 1.0, "l", yaxt="n")
         box(col="white")
         abline(v=Sys.Date(),col="green",lty=2)
         par(new = T)
-        plot(pp$date, pp$CTL2, col = 5, lwd =   2, "l", yaxt="n")
+        plot(pp$date, pp$CTL2, col = 5, lwd = 2.5, "l", yaxt="n")
         box(col="white")
         par(new = T)
         plot(pp$date, pp$TSB2, col = 6, lwd =   3, "l", yaxt="n")
@@ -450,17 +479,20 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-        ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
+        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        box(col="white")
+        par(new = T)
+        ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
+        plot( pp$date, pp$ban.fatigue, lwd = 1.0, "l", col = 3, yaxt="n")
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$ban.fitness, lwd =   2, "l", col = 5, yaxt="n")
+        plot( pp$date, pp$ban.fitness, lwd = 2.5, "l", col = 5, yaxt="n")
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$ban.perform, lwd =   2, "l", col = 6, yaxt="n")
+        plot( pp$date, pp$ban.perform, lwd =   3, "l", col = 6, yaxt="n")
         box(col="white")
 
         legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
@@ -486,17 +518,20 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-        ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
+        plot(pp$value/4, ylim = range(0,pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        box(col="white")
+        par(new = T)
+        ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$bus.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
+        plot( pp$date, pp$bus.fatigue, lwd = 1.0, "l", col = 3, yaxt="n")
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$bus.fitness, lwd =   2, "l", col = 5, yaxt="n")
+        plot( pp$date, pp$bus.fitness, lwd = 2.5, "l", col = 5, yaxt="n")
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$bus.perform, lwd =   2, "l", col = 6, yaxt="n")
+        plot( pp$date, pp$bus.perform, lwd =   3, "l", col = 6, yaxt="n")
         box(col="white")
 
         legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
