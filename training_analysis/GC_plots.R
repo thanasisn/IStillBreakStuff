@@ -440,7 +440,7 @@ for (days in pdays) {
 
 
         pp[ value == 0, value:=NA ]
-        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
         box(col="white")
         par(new = T)
         ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
@@ -457,9 +457,9 @@ for (days in pdays) {
         plot(pp$date, pp$TSB2, col = 6, lwd =   3, "l", yaxt="n")
         box(col="white")
 
-        legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
-               legend = c("ATL2", "CTL2","TSB2"),
-               col    = c(    3 ,     5 ,    6 ) )
+        legend("top", bty = "n", ncol = 3, lty=1, inset=c(0,-0.05), cex = 0.7,
+               legend = c("ATL2", "CTL2", "TSB2"),
+               col    = c(    3 ,     5 ,     6 ) )
 
         prediction <- pp[ date > last$date, ]
         best       <- prediction[which.max(TSB2)]
@@ -479,7 +479,7 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
         box(col="white")
         par(new = T)
         ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
@@ -518,13 +518,13 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-        plot(pp$value/4, ylim = range(0,pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        plot(pp$value/4, ylim = range(0,pp$value, na.rm = T), yaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
         box(col="white")
         par(new = T)
         ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         box(col="white")
-        par(new = T)
+        par(new = TRUE)
         plot( pp$date, pp$bus.fatigue, lwd = 1.0, "l", col = 3, yaxt="n")
         box(col="white")
         par(new = T)
