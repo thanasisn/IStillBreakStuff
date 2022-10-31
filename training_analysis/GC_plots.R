@@ -23,7 +23,7 @@ if(!interactive()) {
     if (!file.exists(outputpdf) |
         !file.exists("/dev/shm/CONKY/banister_EPOC_400.png") |
         file.mtime(inputdata) > file.mtime(outputpdf) |
-        file.mtime(outputpdf) < Sys.time() - hourstrigers * 3600 ) {
+        file.mtime(outputpdf) < Sys.time() - hourstriger * 3600 ) {
         cat(paste("will run"))
     } else {
         stop("Don't have to run")
@@ -289,15 +289,16 @@ for (days in pdays) {
         pp[ value == 0, value:=NA ]
         plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
         par(new = T)
-        ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
+        ylim <-range( 45,53, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         par(new = T)
-        plot(pp$date, pp$ATL2, col = 3, lwd = 1.1, "l", yaxt="n")
+        ylim <- range(pp$ATL2, pp$CTL2, pp$TSB2, na.rm = T)
+        plot(pp$date, pp$ATL2, col = 3, lwd = 1.1, "l", yaxt="n", ylim = ylim)
         abline(v=Sys.Date(),col="green",lty=2)
         par(new = T)
-        plot(pp$date, pp$CTL2, col = 5, lwd = 2.5, "l", yaxt="n")
+        plot(pp$date, pp$CTL2, col = 5, lwd = 2.5, "l", yaxt="n", ylim = ylim)
         par(new = T)
-        plot(pp$date, pp$TSB2, col = 6, lwd = 2.5, "l", yaxt="n")
+        plot(pp$date, pp$TSB2, col = 6, lwd = 2.5, "l", yaxt="n", ylim = ylim)
 
         legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
                legend = c("ATL2", "CTL2","TSB2"),
@@ -317,15 +318,15 @@ for (days in pdays) {
         pp[ value == 0, value:=NA ]
         plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
         par(new = T)
-        ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
+        ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         par(new = T)
-
-        plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
+        ylim <- range(pp$ban.fatigue, pp$ban.fitness, pp$ban.perform, na.rm = T)
+        plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt="n", ylim = ylim)
         par(new = T)
-        plot( pp$date, pp$ban.fitness, lwd = 2.5, "l", col = 5, yaxt="n")
+        plot( pp$date, pp$ban.fitness, lwd = 2.5, "l", col = 5, yaxt="n", ylim = ylim)
         par(new = T)
-        plot( pp$date, pp$ban.perform, lwd = 2.5, "l", col = 6, yaxt="n")
+        plot( pp$date, pp$ban.perform, lwd = 2.5, "l", col = 6, yaxt="n", ylim = ylim)
 
         legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
                legend = c("Fatigue","Fitness","Performance"),
@@ -337,6 +338,8 @@ for (days in pdays) {
         abline(v=best$date, col = "yellow",lty=2)
         abline(h=best$ban.perform, col = "yellow",lty=2)
         title(paste("Banister",days,"days", avar,"best:", best$date),line = 2)
+
+
 
         #### Busson model plot ####
         par("mar" = c(2,0,3,0), xpd = TRUE)
@@ -482,7 +485,7 @@ for (days in pdays) {
         plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
         box(col="white")
         par(new = T)
-        ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
+        ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         box(col="white")
         par(new = T)
@@ -521,7 +524,7 @@ for (days in pdays) {
         plot(pp$value/4, ylim = range(0,pp$value, na.rm = T), yaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
         box(col="white")
         par(new = T)
-        ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
+        ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         box(col="white")
         par(new = TRUE)
