@@ -8,30 +8,31 @@
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic = Sys.time()
-Script.Name = funr::sys.script()
+tic <- Sys.time()
+Script.Name <- funr::sys.script()
 
-inputdata  <- "~/LOGs/GCmetrics.Rds"
-moredata   <- "~/DATA/Other/GC_json_data.Rds"
-outputpdf  <- paste0("~/LOGs/car_logs/",  basename(sub("\\.R$",".pdf", Script.Name)))
-datascript <- "~/CODE/training_analysis/GC_read_activities.R"
-daysback   <- 360*3
-
+inputdata   <- "~/LOGs/GCmetrics.Rds"
+moredata    <- "~/DATA/Other/GC_json_data.Rds"
+outputpdf   <- paste0("~/LOGs/car_logs/", basename(sub("\\.R$",".pdf", Script.Name)))
+datascript  <- "~/CODE/training_analysis/GC_read_activities.R"
+daysback    <- 360*3
+hourstriger <- 4
 
 if(!interactive()) {
     ## check if we have to run
     if (!file.exists(outputpdf) |
         !file.exists("/dev/shm/CONKY/banister_EPOC_400.png") |
         file.mtime(inputdata) > file.mtime(outputpdf) |
-        file.mtime(outputpdf) < Sys.time() - 12 * 3600 ) {
+        file.mtime(outputpdf) < Sys.time() - hourstrigers * 3600 ) {
         cat(paste("will run"))
-    } else {stop("Don't have to run")}
+    } else {
+        stop("Don't have to run")
+    }
     pdf(outputpdf, width = 9, height = 5)
 }
 
 
 library(data.table)
-# library(scales)
 source("~/FUNCTIONS/R/data.R")
 
 ## run other data gather
@@ -43,7 +44,6 @@ source(datascript)
 metrics <- readRDS(inputdata)
 metrics <- data.frame(metrics)
 ## get this from direct read
-# metrics[ , VO2max_detected := NULL ]
 
 ## covert types
 for (avar in names(metrics)) {
@@ -85,7 +85,7 @@ wecare <- c(
     "cc",
     "xPower",
     NULL)
-wecare <- names(metrics)[names(metrics)%in%wecare]
+wecare <- names(metrics)[names(metrics) %in% wecare]
 for (avar in wecare) {
     metrics[[avar]][metrics[[avar]] == 0] <- NA
 }
@@ -101,14 +101,14 @@ metrics[, Data  := NULL]
 
 
 gather  <- readRDS(moredata)
-gather[, Data  := NULL ]
-gather[, color := NULL ]
-gather[, Year  := NULL ]
+gather[, Data  := NULL]
+gather[, color := NULL]
+gather[, Year  := NULL]
 
 
 ## limit data back
-metrics <- metrics[ date > Sys.Date() - daysback,]
-gather  <- gather[  time > Sys.time() - daysback*24*3600,]
+metrics <- metrics[date > Sys.Date() - daysback,]
+gather  <- gather[ time > Sys.time() - daysback * 24 * 3600,]
 
 metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
@@ -116,15 +116,15 @@ gather  <- rm.cols.dups.DT(gather)
 gather  <- rm.cols.NA.DT(gather)
 
 ##FIXME
-tocheck <- grep("time",intersect(names(gather),names(metrics)),invert = T,ignore.case = T, value = T)
-metrics <- unique(merge(gather,metrics,by = "time"))
+tocheck <- grep("time",
+                intersect(names(gather), names(metrics)),
+                invert = TRUE, ignore.case = TRUE, value = TRUE)
+metrics <- unique(merge(gather, metrics, by = "time"))
 
 ## duplicate name colms check
 
 for (avar in tocheck) {
-    getit <- grep(paste0(avar,"\\.[xy]"),names(metrics), value = T)
-    # hist(metrics[[getit[1]]])
-    # hist(metrics[[getit[2]]])
+    getit <- grep(paste0(avar, "\\.[xy]"), names(metrics), value = TRUE)
     if (all(metrics[[getit[1]]] == metrics[[getit[2]]], na.rm = TRUE)) {
         metrics[[getit[2]]] <- NULL
         names(metrics)[names(metrics) == getit[1]] <- avar
@@ -143,23 +143,23 @@ for (avar in names(metrics)) {
 
 
 ## get duplicate columns
-dup.vec <- which( duplicated(t(metrics)))
+dup.vec <- which(duplicated(t(metrics)))
 dup.vec <- names(metrics)[dup.vec]
 
 # create a vector with the checksum for each column (and keep the column names as row names)
 col.checksums <- sapply(metrics, function(x) digest::digest(x, "md5"), USE.NAMES = T)
 dup.cols      <- data.table(col.name = names(col.checksums), hash.value = col.checksums)
-dup.cols      <- dup.cols[dup.cols,, on = "hash.value"][col.name != i.col.name,]
+dup.cols      <- dup.cols[dup.cols, on = "hash.value"][col.name != i.col.name,]
 
 ##TODO
 ## remove manual
-metrics[, DEVICETYPE        := NULL ]
-metrics[, Device.Info       := NULL ]
-metrics[, VO2max.detected   := NULL ]
-metrics[, Workout.Title     := NULL ]
-metrics[, X1_sec_Peak_Power := NULL ]
-metrics[, NP                := NULL ]
-metrics[, IF                := NULL ]
+metrics[, DEVICETYPE        := NULL]
+metrics[, Device.Info       := NULL]
+metrics[, VO2max.detected   := NULL]
+metrics[, Workout.Title     := NULL]
+metrics[, X1_sec_Peak_Power := NULL]
+metrics[, NP                := NULL]
+metrics[, IF                := NULL]
 
 
 
@@ -185,13 +185,13 @@ cat(paste(wecare),"\n")
 
 
 
-fATL1 = 1/7
-fATL2 = 1-exp(-fATL1)
-fCTL1 = 1/42
-fCTL2 = 1-exp(-fCTL1)
+fATL1 <- 1 / 7
+fATL2 <- 1 - exp(-fATL1)
+fCTL1 <- 1 / 42
+fCTL2 <- 1 - exp(-fCTL1)
 
 ## select metrics for pdf
-wecare <- c("TRIMP_Points","TRIMP_Zonal_Points","EPOC","TriScore")
+wecare <- c("TRIMP_Points", "TRIMP_Zonal_Points","EPOC","TriScore")
 ## work, calories
 extend <- 30
 pdays  <- c(400, 100)
@@ -254,10 +254,10 @@ for (days in pdays) {
         pp[, bus.par2    := 1 ]
 
         for (nr in 2:nrow(pp)) {
-            pp$ATL1[nr] = fATL1 * pp$value[nr] + (1-fATL1) * pp$ATL1[nr-1]
-            pp$ATL2[nr] = fATL2 * pp$value[nr] + (1-fATL2) * pp$ATL2[nr-1]
-            pp$CTL1[nr] = fCTL1 * pp$value[nr] + (1-fCTL1) * pp$CTL1[nr-1]
-            pp$CTL2[nr] = fCTL2 * pp$value[nr] + (1-fCTL2) * pp$CTL2[nr-1]
+            pp$ATL1[nr] <- fATL1 * pp$value[nr] + (1-fATL1) * pp$ATL1[nr-1]
+            pp$ATL2[nr] <- fATL2 * pp$value[nr] + (1-fATL2) * pp$ATL2[nr-1]
+            pp$CTL1[nr] <- fCTL1 * pp$value[nr] + (1-fCTL1) * pp$CTL1[nr-1]
+            pp$CTL2[nr] <- fCTL2 * pp$value[nr] + (1-fCTL2) * pp$CTL2[nr-1]
             ## calculate banister
             res <- banister(fitness = pp$ban.fitness[nr-1],
                             fatigue = pp$ban.fatigue[nr-1],
