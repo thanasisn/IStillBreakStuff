@@ -284,8 +284,6 @@ for (days in pdays) {
         #### Training Impulse model plot ####
         par("mar" = c(2,0,3,0), xpd = TRUE)
 
-
-
         pp[ value == 0, value:=NA ]
         plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
         par(new = T)
@@ -306,10 +304,30 @@ for (days in pdays) {
 
         prediction <- pp[ date > last$date, ]
         best       <- prediction[which.max(TSB2)]
-        abline(v=best$date, col = "yellow",lty=2)
-        abline(h=best$TSB2, col = "yellow",lty=2)
-        title(paste(days,"days", avar,"best:", best$date),line = 2)
+        abline(v=best$date, col = "yellow", lty = 2)
+        abline(h=best$TSB2, col = "yellow", lty = 2)
 
+        # abline(h = max(pp$TSB2, na.rm = T), col = 6, lty = 2)
+        text(pp[ which.max(pp$TSB2), date ], pp[ which.max(pp$TSB2), TSB2 ],
+             labels = round(pp[ which.max(pp$TSB2), TSB2]), col = 6, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), TSB2 ],
+             labels = round(pp[ date == Sys.Date(), TSB2 ]), col = 6, pos = 4 )
+        # abline(h = max(pp$CTL2, na.rm = T), col = 5, lty = 2)
+        text(pp[ which.max(pp$CTL2), date ], pp[ which.max(pp$CTL2), CTL2 ],
+             labels = round(pp[ which.max(pp$CTL2), CTL2]), col = 5, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), CTL2 ],
+             labels = round(pp[ date == Sys.Date(), CTL2 ]), col = 5, pos = 4 )
+        # abline(h = max(pp$ATL2, na.rm = T), col = 3, lty = 2)
+        text(pp[ which.max(pp$ATL2), date ], pp[ which.max(pp$ATL2), ATL2 ],
+             labels = round(pp[ which.max(pp$ATL2), ATL2]), col = 3, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), ATL2 ],
+             labels = round(pp[ date == Sys.Date(), ATL2 ]), col = 3, pos = 4 )
+
+
+        pp[ which.max(pp$TSB2), date ]
+
+
+        title(paste(days,"days", avar,"best:", best$date),line = 2)
 
 
         #### Banister model plot ####
@@ -337,6 +355,23 @@ for (days in pdays) {
         best       <- prediction[which.max(ban.perform)]
         abline(v=best$date, col = "yellow",lty=2)
         abline(h=best$ban.perform, col = "yellow",lty=2)
+
+        # abline(h = max(pp$ban.perform, na.rm = T), col = 6, lty = 2)
+        text(pp[ which.max(pp$ban.perform), date ], pp[ which.max(pp$ban.perform), ban.perform ],
+             labels = round(pp[ which.max(pp$ban.perform), ban.perform]), col = 6, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), ban.perform ],
+             labels = round(pp[ date == Sys.Date(), ban.perform ]), col = 6, pos = 4 )
+        # abline(h = max(pp$ban.fitness, na.rm = T), col = 5, lty = 2)
+        text(pp[ which.max(pp$ban.fitness), date ], pp[ which.max(pp$ban.fitness), ban.fitness ],
+             labels = round(pp[ which.max(pp$ban.fitness), ban.fitness]), col = 5, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), ban.fitness ],
+             labels = round(pp[ date == Sys.Date(), ban.fitness ]), col = 5, pos = 4 )
+        # abline(h = max(pp$ban.fatigue, na.rm = T), col = 3, lty = 2)
+        text(pp[ which.max(pp$ban.fatigue), date ], pp[ which.max(pp$ban.fatigue), ban.fatigue ],
+             labels = round(pp[ which.max(pp$ban.fatigue), ban.fatigue]), col = 3, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), ban.fatigue ],
+             labels = round(pp[ date == Sys.Date(), ban.fatigue ]), col = 3, pos = 4 )
+
         title(paste("Banister",days,"days", avar,"best:", best$date),line = 2)
 
 
@@ -352,10 +387,25 @@ for (days in pdays) {
         par(new = T)
 
         plot( pp$date, pp$bus.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
+        # abline(h = max(pp$bus.fatigue, na.rm = T), col = 3, lty = 2)
+        text(pp[ which.max(pp$bus.fatigue), date ], pp[ which.max(pp$bus.fatigue), bus.fatigue ],
+             labels = round(pp[ which.max(pp$bus.fatigue), bus.fatigue]), col = 3, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), bus.fatigue ],
+             labels = round(pp[ date == Sys.Date(), bus.fatigue ]), col = 3, pos = 4 )
         par(new = T)
         plot( pp$date, pp$bus.fitness, lwd = 2.5, "l", col = 5, yaxt="n")
+        # abline(h = max(pp$bus.fitness, na.rm = T), col = 5, lty = 2)
+        text(pp[ which.max(pp$bus.fitness), date ], pp[ which.max(pp$bus.fitness), bus.fitness ],
+             labels = round(pp[ which.max(pp$bus.fitness), bus.fitness]), col = 5, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), bus.fitness ],
+             labels = round(pp[ date == Sys.Date(), bus.fitness ]), col = 5, pos = 4 )
         par(new = T)
         plot( pp$date, pp$bus.perform, lwd = 2.5, "l", col = 6, yaxt="n")
+        # abline(h = max(pp$bus.perform, na.rm = T), col = 6, lty = 2)
+        text(pp[ which.max(pp$bus.perform), date ], pp[ which.max(pp$bus.perform), bus.perform ],
+             labels = round(pp[ which.max(pp$bus.perform), bus.perform]), col = 6, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), bus.perform ],
+             labels = round(pp[ date == Sys.Date(), bus.perform ]), col = 6, pos = 4 )
         legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
                legend = c("Fatigue","Fitness","Performance"),
                col    = c(       3 ,       5 ,           6 ) )
@@ -365,6 +415,7 @@ for (days in pdays) {
         best       <- prediction[which.max(bus.perform)]
         abline(v=best$date, col = "yellow",lty=2)
         abline(h=best$bus.perform, col = "yellow",lty=2)
+
         title(paste("Busson", days,"days", avar,"best:", best$date),line = 2)
     }
 }
@@ -441,23 +492,24 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-
         pp[ value == 0, value:=NA ]
-        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt="n", xaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
         box(col="white")
         par(new = T)
         ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
-        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", yaxt="n", xaxt="n", pch = "-", cex = 2 )
         box(col="white")
         par(new = T)
-        plot(pp$date, pp$ATL2, col = 3, lwd = 1.0, "l", yaxt="n")
+        ylim <- range(pp$ATL2, pp$CTL2, pp$TSB2, na.rm = T)
+        ylim[2] <- ylim[2] * 1.05
+        plot(pp$date, pp$ATL2, col = 3, lwd = 1.0, "l", yaxt="n", ylim = ylim)
         box(col="white")
         abline(v=Sys.Date(),col="green",lty=2)
         par(new = T)
-        plot(pp$date, pp$CTL2, col = 5, lwd = 2.5, "l", yaxt="n")
+        plot(pp$date, pp$CTL2, col = 5, lwd = 2.5, "l", yaxt="n", ylim = ylim)
         box(col="white")
         par(new = T)
-        plot(pp$date, pp$TSB2, col = 6, lwd =   3, "l", yaxt="n")
+        plot(pp$date, pp$TSB2, col = 6, lwd =   3, "l", yaxt="n", ylim = ylim)
         box(col="white")
 
         legend("top", bty = "n", ncol = 3, lty=1, inset=c(0,-0.05), cex = 0.7,
@@ -466,8 +518,24 @@ for (days in pdays) {
 
         prediction <- pp[ date > last$date, ]
         best       <- prediction[which.max(TSB2)]
-        abline(v=best$date, col = "yellow",lty=2)
-        abline(h=best$TSB2, col = "yellow",lty=2)
+        abline(v = best$date, col = "yellow", lty = 2)
+        abline(h = best$TSB2, col = "yellow", lty = 2)
+
+        # abline(h = max(pp$TSB2, na.rm = T), col = 6, lty = 2)
+        text(pp[ which.max(pp$TSB2), date ], pp[ which.max(pp$TSB2), TSB2 ],
+             labels = round(pp[ which.max(pp$TSB2), TSB2]), col = 6, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), TSB2 ],
+             labels = round(pp[ date == Sys.Date(), TSB2 ]), col = 6, pos = 4 )
+        # abline(h = max(pp$CTL2, na.rm = T), col = 5, lty = 2)
+        text(pp[ which.max(pp$CTL2), date ], pp[ which.max(pp$CTL2), CTL2 ],
+             labels = round(pp[ which.max(pp$CTL2), CTL2]), col = 5, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), CTL2 ],
+             labels = round(pp[ date == Sys.Date(), CTL2 ]), col = 5, pos = 4 )
+        # abline(h = max(pp$ATL2, na.rm = T), col = 3, lty = 2)
+        text(pp[ which.max(pp$ATL2), date ], pp[ which.max(pp$ATL2), ATL2 ],
+             labels = round(pp[ which.max(pp$ATL2), ATL2]), col = 3, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), ATL2 ],
+             labels = round(pp[ date == Sys.Date(), ATL2 ]), col = 3, pos = 4 )
 
         legend("topleft",bty = "n",title = paste(avar, best$date),legend = c(""))
 
@@ -482,20 +550,22 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt="n", xaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
         box(col="white")
         par(new = T)
         ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
-        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", yaxt="n", xaxt="n", pch = "-", cex = 2 )
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$ban.fatigue, lwd = 1.0, "l", col = 3, yaxt="n")
+        ylim <- range(pp$ban.fatigue, pp$ban.fitness, pp$ban.perform, na.rm = T)
+        ylim[2] <- ylim[2] * 1.05
+        plot( pp$date, pp$ban.fatigue, lwd = 1.0, "l", col = 3, yaxt="n", ylim = ylim)
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$ban.fitness, lwd = 2.5, "l", col = 5, yaxt="n")
+        plot( pp$date, pp$ban.fitness, lwd = 2.5, "l", col = 5, yaxt="n", ylim = ylim)
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$ban.perform, lwd =   3, "l", col = 6, yaxt="n")
+        plot( pp$date, pp$ban.perform, lwd =   3, "l", col = 6, yaxt="n", ylim = ylim)
         box(col="white")
 
         legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
@@ -507,6 +577,22 @@ for (days in pdays) {
         best       <- prediction[which.max(ban.perform)]
         abline(v=best$date, col = "yellow",lty=2)
         abline(h=best$ban.perform, col = "yellow",lty=2)
+
+        # abline(h = max(pp$ban.perform, na.rm = T), col = 6, lty = 2)
+        text(pp[ which.max(pp$ban.perform), date ], pp[ which.max(pp$ban.perform), ban.perform ],
+             labels = round(pp[ which.max(pp$ban.perform), ban.perform]), col = 6, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), ban.perform ],
+             labels = round(pp[ date == Sys.Date(), ban.perform ]), col = 6, pos = 4 )
+        # abline(h = max(pp$ban.fitness, na.rm = T), col = 5, lty = 2)
+        text(pp[ which.max(pp$ban.fitness), date ], pp[ which.max(pp$ban.fitness), ban.fitness ],
+             labels = round(pp[ which.max(pp$ban.fitness), ban.fitness]), col = 5, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), ban.fitness ],
+             labels = round(pp[ date == Sys.Date(), ban.fitness ]), col = 5, pos = 4 )
+        # abline(h = max(pp$ban.fatigue, na.rm = T), col = 3, lty = 2)
+        text(pp[ which.max(pp$ban.fatigue), date ], pp[ which.max(pp$ban.fatigue), ban.fatigue ],
+             labels = round(pp[ which.max(pp$ban.fatigue), ban.fatigue]), col = 3, pos = 3 )
+        text(Sys.Date(), pp[ date == Sys.Date(), ban.fatigue ],
+             labels = round(pp[ date == Sys.Date(), ban.fatigue ]), col = 3, pos = 4 )
 
         legend("topleft",bty = "n",title = paste(avar, best$date),legend = c(""))
 
@@ -521,11 +607,11 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-        plot(pp$value/4, ylim = range(0,pp$value, na.rm = T), yaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        plot(pp$value/4, ylim = range(0,pp$value, na.rm = T), yaxt="n", xaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
         box(col="white")
         par(new = T)
         ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
-        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", yaxt="n", xaxt="n", pch = "-", cex = 2 )
         box(col="white")
         par(new = TRUE)
         plot( pp$date, pp$bus.fatigue, lwd = 1.0, "l", col = 3, yaxt="n")
