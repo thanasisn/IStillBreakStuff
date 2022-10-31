@@ -291,6 +291,7 @@ for (days in pdays) {
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         par(new = T)
         ylim <- range(pp$ATL2, pp$CTL2, pp$TSB2, na.rm = T)
+        ylim[2] <- ylim[2] * 1.09
         plot(pp$date, pp$ATL2, col = 3, lwd = 1.1, "l", yaxt="n", ylim = ylim)
         abline(v=Sys.Date(),col="green",lty=2)
         par(new = T)
@@ -340,6 +341,7 @@ for (days in pdays) {
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         par(new = T)
         ylim <- range(pp$ban.fatigue, pp$ban.fitness, pp$ban.perform, na.rm = T)
+        ylim[2] <- ylim[2] * 1.09
         plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt="n", ylim = ylim)
         par(new = T)
         plot( pp$date, pp$ban.fitness, lwd = 2.5, "l", col = 5, yaxt="n", ylim = ylim)
@@ -501,7 +503,7 @@ for (days in pdays) {
         box(col="white")
         par(new = T)
         ylim <- range(pp$ATL2, pp$CTL2, pp$TSB2, na.rm = T)
-        ylim[2] <- ylim[2] * 1.05
+        ylim[2] <- ylim[2] * 1.09
         plot(pp$date, pp$ATL2, col = 3, lwd = 1.0, "l", yaxt="n", ylim = ylim)
         box(col="white")
         abline(v=Sys.Date(),col="green",lty=2)
@@ -558,7 +560,7 @@ for (days in pdays) {
         box(col="white")
         par(new = T)
         ylim <- range(pp$ban.fatigue, pp$ban.fitness, pp$ban.perform, na.rm = T)
-        ylim[2] <- ylim[2] * 1.05
+        ylim[2] <- ylim[2] * 1.09
         plot( pp$date, pp$ban.fatigue, lwd = 1.0, "l", col = 3, yaxt="n", ylim = ylim)
         box(col="white")
         par(new = T)
