@@ -156,94 +156,147 @@ git push -f -u origin main
 
 
 
-echo "---------------"
-folder="$HOME/CM_21_GLB/"
-cd ${folder}
-pwd
-rm -f "${folder}/.git/index.lock"
-find . -type f \(    -iname '*.sh'  \
-                  -o -iname '*.py'  \
-                  -o -iname '*.md'  \
-                  -o -iname '*.bas' \
-                  -o -iname '*.gnu' \
-                  -o -iname '*.dot' \
-                  -o -iname '*.frm' \
-                  -o -iname '*.par' \
-                  -o -iname '*.f90' \
-                  -o -iname '*.jl'  \
-                  -o -iname '*.c'   \
-                  -o -iname '*.h'   \
-                  -o -iname '*.gp'  \
-                  -o -iname '*.ex'  \
-                  -o -iname '*.bib' \
-                  -o -iname '*.tex' \
-                  -o -iname '*.Rmd' \
-                  -o -iname '*.md'  \
-                  -o -iname '*.r'   \) -print0 |\
-                  xargs -t -0 git add
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
 
 
+## use full paths
+folders=(
+    "$HOME/CM_21_GLB/"
+    "$HOME/CHP_1_DIR/"
+    "$HOME/TSI"
+)
 
-echo "---------------"
-folder="$HOME/CHP_1_DIR/"
-cd ${folder}
-pwd
-rm -f "${folder}/.git/index.lock"
-find . -type f \(    -iname '*.sh'  \
-                  -o -iname '*.py'  \
-                  -o -iname '*.md'  \
-                  -o -iname '*.bas' \
-                  -o -iname '*.gnu' \
-                  -o -iname '*.dot' \
-                  -o -iname '*.frm' \
-                  -o -iname '*.par' \
-                  -o -iname '*.f90' \
-                  -o -iname '*.jl'  \
-                  -o -iname '*.c'   \
-                  -o -iname '*.h'   \
-                  -o -iname '*.gp'  \
-                  -o -iname '*.ex'  \
-                  -o -iname '*.bib' \
-                  -o -iname '*.tex' \
-                  -o -iname '*.Rmd' \
-                  -o -iname '*.md'  \
-                  -o -iname '*.r'   \) -print0 |\
-                  xargs -t -0 git add
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
+## go through main folder
+for i in "${folders[@]}"; do
+    echo
+    echo "####  $i  ####"
+    echo
+    [ ! -d "$i" ] && echo "Not a folder: $i" && continue
+    ## go through sub folders
+    cd "$i" || return
+    ## in the git folder here
+    pwd
+    ## add files we care about
+    find . -type f \(    -iname '*.R'   \
+                      -o -iname '*.Rmd' \
+                      -o -iname '*.bas' \
+                      -o -iname '*.bib' \
+                      -o -iname '*.c'   \
+                      -o -iname '*.conf'\
+                      -o -iname '*.cpp' \
+                      -o -iname '*.cs'  \
+                      -o -iname '*.css' \
+                      -o -iname '*.dot' \
+                      -o -iname '*.ex'  \
+                      -o -iname '*.f90' \
+                      -o -iname '*.frm' \
+                      -o -iname '*.gnu' \
+                      -o -iname '*.gp'  \
+                      -o -iname '*.h'   \
+                      -o -iname '*.jl'  \
+                      -o -iname '*.list'\
+                      -o -iname '*.md'  \
+                      -o -iname '*.par' \
+                      -o -iname '*.pbs' \
+                      -o -iname '*.py'  \
+                      -o -iname '*.qgs' \
+                      -o -iname '*.sh'  \
+                      -o -iname '*.tex' \
+                      -o -iname '*.txt' \) -print0 |\
+                  xargs -t -0 git add -f
+    ## commit and push
+    git commit -uno -a -m "Commit $(date +'%F %R')"
+    git push -f
+done
 
 
-
-echo "---------------"
-folder="$HOME/TSI"
-cd ${folder}
-pwd
-rm -f "${folder}/.git/index.lock"
-find . -type f \(    -iname '*.sh'  \
-                  -o -iname '*.py'  \
-                  -o -iname '*.md'  \
-                  -o -iname '*.bas' \
-                  -o -iname '*.gnu' \
-                  -o -iname '*.dot' \
-                  -o -iname '*.frm' \
-                  -o -iname '*.par' \
-                  -o -iname '*.f90' \
-                  -o -iname '*.jl'  \
-                  -o -iname '*.c'   \
-                  -o -iname '*.h'   \
-                  -o -iname '*.gp'  \
-                  -o -iname '*.ex'  \
-                  -o -iname '*.bib' \
-                  -o -iname '*.tex' \
-                  -o -iname '*.Rmd' \
-                  -o -iname '*.md'  \
-                  -o -iname '*.r'   \) -print0 |\
-                  xargs -t -0 git add
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
-
+# echo "---------------"
+# folder="$HOME/CM_21_GLB/"
+# cd ${folder}
+# pwd
+# rm -f "${folder}/.git/index.lock"
+# find . -type f \(    -iname '*.sh'  \
+#                   -o -iname '*.py'  \
+#                   -o -iname '*.md'  \
+#                   -o -iname '*.bas' \
+#                   -o -iname '*.gnu' \
+#                   -o -iname '*.dot' \
+#                   -o -iname '*.frm' \
+#                   -o -iname '*.par' \
+#                   -o -iname '*.f90' \
+#                   -o -iname '*.jl'  \
+#                   -o -iname '*.c'   \
+#                   -o -iname '*.h'   \
+#                   -o -iname '*.gp'  \
+#                   -o -iname '*.ex'  \
+#                   -o -iname '*.bib' \
+#                   -o -iname '*.tex' \
+#                   -o -iname '*.Rmd' \
+#                   -o -iname '*.md'  \
+#                   -o -iname '*.r'   \) -print0 |\
+#                   xargs -t -0 git add
+# git commit -uno -a -m "Commit $(date +'%F %R')"
+# git push -f -u origin main
+#
+#
+#
+# echo "---------------"
+# folder="$HOME/CHP_1_DIR/"
+# cd ${folder}
+# pwd
+# rm -f "${folder}/.git/index.lock"
+# find . -type f \(    -iname '*.sh'  \
+#                   -o -iname '*.py'  \
+#                   -o -iname '*.md'  \
+#                   -o -iname '*.bas' \
+#                   -o -iname '*.gnu' \
+#                   -o -iname '*.dot' \
+#                   -o -iname '*.frm' \
+#                   -o -iname '*.par' \
+#                   -o -iname '*.f90' \
+#                   -o -iname '*.jl'  \
+#                   -o -iname '*.c'   \
+#                   -o -iname '*.h'   \
+#                   -o -iname '*.gp'  \
+#                   -o -iname '*.ex'  \
+#                   -o -iname '*.bib' \
+#                   -o -iname '*.tex' \
+#                   -o -iname '*.Rmd' \
+#                   -o -iname '*.md'  \
+#                   -o -iname '*.r'   \) -print0 |\
+#                   xargs -t -0 git add
+# git commit -uno -a -m "Commit $(date +'%F %R')"
+# git push -f -u origin main
+#
+#
+#
+# echo "---------------"
+# folder="$HOME/TSI"
+# cd ${folder}
+# pwd
+# rm -f "${folder}/.git/index.lock"
+# find . -type f \(    -iname '*.sh'  \
+#                   -o -iname '*.py'  \
+#                   -o -iname '*.md'  \
+#                   -o -iname '*.bas' \
+#                   -o -iname '*.gnu' \
+#                   -o -iname '*.dot' \
+#                   -o -iname '*.frm' \
+#                   -o -iname '*.par' \
+#                   -o -iname '*.f90' \
+#                   -o -iname '*.jl'  \
+#                   -o -iname '*.c'   \
+#                   -o -iname '*.h'   \
+#                   -o -iname '*.gp'  \
+#                   -o -iname '*.ex'  \
+#                   -o -iname '*.bib' \
+#                   -o -iname '*.tex' \
+#                   -o -iname '*.Rmd' \
+#                   -o -iname '*.md'  \
+#                   -o -iname '*.r'   \) -print0 |\
+#                   xargs -t -0 git add
+# git commit -uno -a -m "Commit $(date +'%F %R')"
+# git push -f -u origin main
+#
 
 
 
