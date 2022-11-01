@@ -160,8 +160,9 @@ git push -f -u origin main
 
 ## use full paths
 folders=(
-    "$HOME/CM_21_GLB/"
     "$HOME/CHP_1_DIR/"
+    "$HOME/CM_21_GLB/"
+    "$HOME/RAD_QC"
     "$HOME/TSI"
 )
 
