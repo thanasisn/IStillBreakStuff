@@ -308,12 +308,12 @@ for (days in pdays) {
         abline(v=best$date, col = "yellow", lty = 2)
         abline(h=best$TSB2, col = "yellow", lty = 2)
 
-        # abline(h = max(pp$TSB2, na.rm = T), col = 6, lty = 2)
+        abline(h = pp[ date == Sys.Date(), TSB2 ], col = 6, lty = 2)
         text(pp[ which.max(pp$TSB2), date ], pp[ which.max(pp$TSB2), TSB2 ],
              labels = round(pp[ which.max(pp$TSB2), TSB2]), col = 6, pos = 3 )
         text(Sys.Date(), pp[ date == Sys.Date(), TSB2 ],
              labels = round(pp[ date == Sys.Date(), TSB2 ]), col = 6, pos = 4 )
-        # abline(h = max(pp$CTL2, na.rm = T), col = 5, lty = 2)
+        abline(h = pp[ date == Sys.Date(), CTL2 ], col = 5, lty = 2)
         text(pp[ which.max(pp$CTL2), date ], pp[ which.max(pp$CTL2), CTL2 ],
              labels = round(pp[ which.max(pp$CTL2), CTL2]), col = 5, pos = 3 )
         text(Sys.Date(), pp[ date == Sys.Date(), CTL2 ],
@@ -358,12 +358,12 @@ for (days in pdays) {
         abline(v=best$date, col = "yellow",lty=2)
         abline(h=best$ban.perform, col = "yellow",lty=2)
 
-        # abline(h = max(pp$ban.perform, na.rm = T), col = 6, lty = 2)
+        abline(h = pp[ date == Sys.Date(), ban.perform ], col = 6, lty = 2)
         text(pp[ which.max(pp$ban.perform), date ], pp[ which.max(pp$ban.perform), ban.perform ],
              labels = round(pp[ which.max(pp$ban.perform), ban.perform]), col = 6, pos = 3 )
         text(Sys.Date(), pp[ date == Sys.Date(), ban.perform ],
              labels = round(pp[ date == Sys.Date(), ban.perform ]), col = 6, pos = 4 )
-        # abline(h = max(pp$ban.fitness, na.rm = T), col = 5, lty = 2)
+        abline(h = pp[ date == Sys.Date(), ban.fitness ], col = 5, lty = 2)
         text(pp[ which.max(pp$ban.fitness), date ], pp[ which.max(pp$ban.fitness), ban.fitness ],
              labels = round(pp[ which.max(pp$ban.fitness), ban.fitness]), col = 5, pos = 3 )
         text(Sys.Date(), pp[ date == Sys.Date(), ban.fitness ],
@@ -396,14 +396,14 @@ for (days in pdays) {
              labels = round(pp[ date == Sys.Date(), bus.fatigue ]), col = 3, pos = 4 )
         par(new = T)
         plot( pp$date, pp$bus.fitness, lwd = 2.5, "l", col = 5, yaxt="n")
-        # abline(h = max(pp$bus.fitness, na.rm = T), col = 5, lty = 2)
+        abline(h = pp[ date == Sys.Date(), bus.fitness ], col = 5, lty = 2)
         text(pp[ which.max(pp$bus.fitness), date ], pp[ which.max(pp$bus.fitness), bus.fitness ],
              labels = round(pp[ which.max(pp$bus.fitness), bus.fitness]), col = 5, pos = 3 )
         text(Sys.Date(), pp[ date == Sys.Date(), bus.fitness ],
              labels = round(pp[ date == Sys.Date(), bus.fitness ]), col = 5, pos = 4 )
         par(new = T)
         plot( pp$date, pp$bus.perform, lwd = 2.5, "l", col = 6, yaxt="n")
-        # abline(h = max(pp$bus.perform, na.rm = T), col = 6, lty = 2)
+        abline(h = pp[ date == Sys.Date(), bus.perform ], col = 6, lty = 2)
         text(pp[ which.max(pp$bus.perform), date ], pp[ which.max(pp$bus.perform), bus.perform ],
              labels = round(pp[ which.max(pp$bus.perform), bus.perform]), col = 6, pos = 3 )
         text(Sys.Date(), pp[ date == Sys.Date(), bus.perform ],
@@ -506,7 +506,7 @@ for (days in pdays) {
         ylim[2] <- ylim[2] * 1.09
         plot(pp$date, pp$ATL2, col = 3, lwd = 1.0, "l", yaxt="n", ylim = ylim)
         box(col="white")
-        abline(v=Sys.Date(),col="green",lty=2)
+        abline(v = Sys.Date(), col = "green", lty = 2)
         par(new = T)
         plot(pp$date, pp$CTL2, col = 5, lwd = 2.5, "l", yaxt="n", ylim = ylim)
         box(col="white")
@@ -523,12 +523,12 @@ for (days in pdays) {
         abline(v = best$date, col = "yellow", lty = 2)
         abline(h = best$TSB2, col = "yellow", lty = 2)
 
-        # abline(h = max(pp$TSB2, na.rm = T), col = 6, lty = 2)
+        abline(h = pp[ date == Sys.Date(), TSB2 ], col = 6, lty = 2)
         text(pp[ which.max(pp$TSB2), date ], pp[ which.max(pp$TSB2), TSB2 ],
              labels = round(pp[ which.max(pp$TSB2), TSB2]), col = 6, pos = 3 )
         text(Sys.Date(), pp[ date == Sys.Date(), TSB2 ],
              labels = round(pp[ date == Sys.Date(), TSB2 ]), col = 6, pos = 4 )
-        # abline(h = max(pp$CTL2, na.rm = T), col = 5, lty = 2)
+        abline(h = pp[ date == Sys.Date(), CTL2 ], col = 5, lty = 2)
         text(pp[ which.max(pp$CTL2), date ], pp[ which.max(pp$CTL2), CTL2 ],
              labels = round(pp[ which.max(pp$CTL2), CTL2]), col = 5, pos = 3 )
         text(Sys.Date(), pp[ date == Sys.Date(), CTL2 ],
@@ -580,12 +580,12 @@ for (days in pdays) {
         abline(v=best$date, col = "yellow",lty=2)
         abline(h=best$ban.perform, col = "yellow",lty=2)
 
-        # abline(h = max(pp$ban.perform, na.rm = T), col = 6, lty = 2)
+        abline(h = pp[ date == Sys.Date(), ban.perform ], col = 6, lty = 2)
         text(pp[ which.max(pp$ban.perform), date ], pp[ which.max(pp$ban.perform), ban.perform ],
              labels = round(pp[ which.max(pp$ban.perform), ban.perform]), col = 6, pos = 3 )
         text(Sys.Date(), pp[ date == Sys.Date(), ban.perform ],
              labels = round(pp[ date == Sys.Date(), ban.perform ]), col = 6, pos = 4 )
-        # abline(h = max(pp$ban.fitness, na.rm = T), col = 5, lty = 2)
+        abline(h = pp[ date == Sys.Date(), ban.fitness ], col = 5, lty = 2)
         text(pp[ which.max(pp$ban.fitness), date ], pp[ which.max(pp$ban.fitness), ban.fitness ],
              labels = round(pp[ which.max(pp$ban.fitness), ban.fitness]), col = 5, pos = 3 )
         text(Sys.Date(), pp[ date == Sys.Date(), ban.fitness ],
