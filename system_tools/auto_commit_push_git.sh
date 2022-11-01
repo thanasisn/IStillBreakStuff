@@ -155,7 +155,7 @@ git push -f -u origin main
 
 
 
-
+####  Automatically commit to github  ################################
 
 
 ## use full paths
@@ -210,94 +210,13 @@ for i in "${folders[@]}"; do
 done
 
 
-# echo "---------------"
-# folder="$HOME/CM_21_GLB/"
-# cd ${folder}
-# pwd
-# rm -f "${folder}/.git/index.lock"
-# find . -type f \(    -iname '*.sh'  \
-#                   -o -iname '*.py'  \
-#                   -o -iname '*.md'  \
-#                   -o -iname '*.bas' \
-#                   -o -iname '*.gnu' \
-#                   -o -iname '*.dot' \
-#                   -o -iname '*.frm' \
-#                   -o -iname '*.par' \
-#                   -o -iname '*.f90' \
-#                   -o -iname '*.jl'  \
-#                   -o -iname '*.c'   \
-#                   -o -iname '*.h'   \
-#                   -o -iname '*.gp'  \
-#                   -o -iname '*.ex'  \
-#                   -o -iname '*.bib' \
-#                   -o -iname '*.tex' \
-#                   -o -iname '*.Rmd' \
-#                   -o -iname '*.md'  \
-#                   -o -iname '*.r'   \) -print0 |\
-#                   xargs -t -0 git add
-# git commit -uno -a -m "Commit $(date +'%F %R')"
-# git push -f -u origin main
-#
-#
-#
-# echo "---------------"
-# folder="$HOME/CHP_1_DIR/"
-# cd ${folder}
-# pwd
-# rm -f "${folder}/.git/index.lock"
-# find . -type f \(    -iname '*.sh'  \
-#                   -o -iname '*.py'  \
-#                   -o -iname '*.md'  \
-#                   -o -iname '*.bas' \
-#                   -o -iname '*.gnu' \
-#                   -o -iname '*.dot' \
-#                   -o -iname '*.frm' \
-#                   -o -iname '*.par' \
-#                   -o -iname '*.f90' \
-#                   -o -iname '*.jl'  \
-#                   -o -iname '*.c'   \
-#                   -o -iname '*.h'   \
-#                   -o -iname '*.gp'  \
-#                   -o -iname '*.ex'  \
-#                   -o -iname '*.bib' \
-#                   -o -iname '*.tex' \
-#                   -o -iname '*.Rmd' \
-#                   -o -iname '*.md'  \
-#                   -o -iname '*.r'   \) -print0 |\
-#                   xargs -t -0 git add
-# git commit -uno -a -m "Commit $(date +'%F %R')"
-# git push -f -u origin main
-#
-#
-#
-# echo "---------------"
-# folder="$HOME/TSI"
-# cd ${folder}
-# pwd
-# rm -f "${folder}/.git/index.lock"
-# find . -type f \(    -iname '*.sh'  \
-#                   -o -iname '*.py'  \
-#                   -o -iname '*.md'  \
-#                   -o -iname '*.bas' \
-#                   -o -iname '*.gnu' \
-#                   -o -iname '*.dot' \
-#                   -o -iname '*.frm' \
-#                   -o -iname '*.par' \
-#                   -o -iname '*.f90' \
-#                   -o -iname '*.jl'  \
-#                   -o -iname '*.c'   \
-#                   -o -iname '*.h'   \
-#                   -o -iname '*.gp'  \
-#                   -o -iname '*.ex'  \
-#                   -o -iname '*.bib' \
-#                   -o -iname '*.tex' \
-#                   -o -iname '*.Rmd' \
-#                   -o -iname '*.md'  \
-#                   -o -iname '*.r'   \) -print0 |\
-#                   xargs -t -0 git add
-# git commit -uno -a -m "Commit $(date +'%F %R')"
-# git push -f -u origin main
-#
+
+
+
+
+
+
+
 
 
 
