@@ -254,6 +254,7 @@ for (days in pdays) {
         pp[, bus.par2    := 1 ]
 
         for (nr in 2:nrow(pp)) {
+            ## calculate impulse
             pp$ATL1[nr] <- fATL1 * pp$value[nr] + (1-fATL1) * pp$ATL1[nr-1]
             pp$ATL2[nr] <- fATL2 * pp$value[nr] + (1-fATL2) * pp$ATL2[nr-1]
             pp$CTL1[nr] <- fCTL1 * pp$value[nr] + (1-fCTL1) * pp$CTL1[nr-1]
@@ -278,14 +279,20 @@ for (days in pdays) {
         pp[, TSB1 := CTL1 - ATL1]
         pp[, TSB2 := CTL2 - ATL2]
 
+
+
+
+
         ## limit graph to last days
-        pp <- pp[ date >= max(date)-days, ]
+        pp <- pp[ date >= max(date) - days, ]
 
         #### Training Impulse model plot ####
         par("mar" = c(2,0,3,0), xpd = TRUE)
 
-        pp[ value == 0, value:=NA ]
+        pp[ value == 0, value := NA ]
         plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        pp[ is.na(value), value := 0 ]
+        lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
         par(new = T)
         ylim <-range( 45,53, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
@@ -324,10 +331,6 @@ for (days in pdays) {
         text(Sys.Date(), pp[ date == Sys.Date(), ATL2 ],
              labels = round(pp[ date == Sys.Date(), ATL2 ]), col = 3, pos = 4 )
 
-
-        pp[ which.max(pp$TSB2), date ]
-
-
         title(paste(days,"days", avar,"best:", best$date),line = 2)
 
 
@@ -336,6 +339,8 @@ for (days in pdays) {
 
         pp[ value == 0, value:=NA ]
         plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        pp[ is.na(value), value := 0 ]
+        lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
         par(new = T)
         ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
@@ -383,6 +388,8 @@ for (days in pdays) {
 
         pp[ value == 0, value:=NA ]
         plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        pp[ is.na(value), value := 0 ]
+        lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
         par(new = T)
         ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
@@ -495,23 +502,25 @@ for (days in pdays) {
             col.lab  = "white")
 
         pp[ value == 0, value:=NA ]
-        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt="n", xaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt = "n", xaxt = "n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        pp[ is.na(value), value := 0 ]
+        lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
         box(col="white")
         par(new = T)
         ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
-        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", yaxt="n", xaxt="n", pch = "-", cex = 2 )
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", yaxt = "n", xaxt = "n", pch = "-", cex = 2 )
         box(col="white")
         par(new = T)
         ylim <- range(pp$ATL2, pp$CTL2, pp$TSB2, na.rm = T)
         ylim[2] <- ylim[2] * 1.09
-        plot(pp$date, pp$ATL2, col = 3, lwd = 1.0, "l", yaxt="n", ylim = ylim)
+        plot(pp$date, pp$ATL2, col = 3, lwd = 1.0, "l", yaxt = "n", xaxt = "n", ylim = ylim)
         box(col="white")
         abline(v = Sys.Date(), col = "green", lty = 2)
         par(new = T)
-        plot(pp$date, pp$CTL2, col = 5, lwd = 2.5, "l", yaxt="n", ylim = ylim)
+        plot(pp$date, pp$CTL2, col = 5, lwd = 2.5, "l", yaxt = "n", xaxt = "n", ylim = ylim)
         box(col="white")
         par(new = T)
-        plot(pp$date, pp$TSB2, col = 6, lwd =   3, "l", yaxt="n", ylim = ylim)
+        plot(pp$date, pp$TSB2, col = 6, lwd =   3, "l", yaxt = "n", xaxt = "n", ylim = ylim)
         box(col="white")
 
         legend("top", bty = "n", ncol = 3, lty=1, inset=c(0,-0.05), cex = 0.7,
@@ -541,6 +550,8 @@ for (days in pdays) {
 
         legend("topleft",bty = "n",title = paste(avar, best$date),legend = c(""))
 
+        axis.Date(1, at = pp[wday(date) == 2, date ], col = "white" )
+
         dev.off()
 
 
@@ -552,22 +563,24 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt="n", xaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt = "n", xaxt = "n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        pp[ is.na(value), value := 0 ]
+        lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
         box(col="white")
         par(new = T)
         ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
-        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", yaxt="n", xaxt="n", pch = "-", cex = 2 )
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", yaxt = "n", xaxt = "n", pch = "-", cex = 2 )
         box(col="white")
         par(new = T)
         ylim <- range(pp$ban.fatigue, pp$ban.fitness, pp$ban.perform, na.rm = T)
         ylim[2] <- ylim[2] * 1.09
-        plot( pp$date, pp$ban.fatigue, lwd = 1.0, "l", col = 3, yaxt="n", ylim = ylim)
+        plot( pp$date, pp$ban.fatigue, lwd = 1.0, "l", col = 3, yaxt = "n", xaxt = "n", ylim = ylim)
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$ban.fitness, lwd = 2.5, "l", col = 5, yaxt="n", ylim = ylim)
+        plot( pp$date, pp$ban.fitness, lwd = 2.5, "l", col = 5, yaxt = "n", xaxt = "n", ylim = ylim)
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$ban.perform, lwd =   3, "l", col = 6, yaxt="n", ylim = ylim)
+        plot( pp$date, pp$ban.perform, lwd =   3, "l", col = 6, yaxt = "n", xaxt = "n", ylim = ylim)
         box(col="white")
 
         legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
@@ -598,6 +611,8 @@ for (days in pdays) {
 
         legend("topleft",bty = "n",title = paste(avar, best$date),legend = c(""))
 
+        axis.Date(1, at = pp[wday(date) == 2, date ], col = "white" )
+
         dev.off()
 
 
@@ -609,20 +624,22 @@ for (days in pdays) {
             col.axis = "white",
             col.lab  = "white")
 
-        plot(pp$value/4, ylim = range(0,pp$value, na.rm = T), yaxt="n", xaxt="n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        plot(pp$value/4, ylim = range(0,pp$value, na.rm = T), yaxt = "n", xaxt = "n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        pp[ is.na(value), value := 0 ]
+        lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
         box(col="white")
         par(new = T)
         ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
-        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", yaxt="n", xaxt="n", pch = "-", cex = 2 )
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", yaxt = "n", xaxt = "n", pch = "-", cex = 2 )
         box(col="white")
         par(new = TRUE)
-        plot( pp$date, pp$bus.fatigue, lwd = 1.0, "l", col = 3, yaxt="n")
+        plot( pp$date, pp$bus.fatigue, lwd = 1.0, "l", col = 3, yaxt = "n", xaxt = "n")
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$bus.fitness, lwd = 2.5, "l", col = 5, yaxt="n")
+        plot( pp$date, pp$bus.fitness, lwd = 2.5, "l", col = 5, yaxt = "n", xaxt = "n")
         box(col="white")
         par(new = T)
-        plot( pp$date, pp$bus.perform, lwd =   3, "l", col = 6, yaxt="n")
+        plot( pp$date, pp$bus.perform, lwd =   3, "l", col = 6, yaxt = "n", xaxt = "n")
         box(col="white")
 
         legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
@@ -637,11 +654,14 @@ for (days in pdays) {
 
         legend("topleft",bty = "n",title = paste(avar, best$date),legend = c(""))
 
+        axis.Date(1, at = pp[wday(date) == 2, date ], col = "white" )
+
         dev.off()
     }
 }
 
 
+wday(pp$date)
 
 
 
