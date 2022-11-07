@@ -23,10 +23,15 @@ library(jsonlite)
 source("~/CODE/FUNCTIONS/R/data.R")
 
 
+warning("time variable is different between data")
+
 ## data paths
 storagefl <- "~/DATA/Other/GC_json_data.Rds"
 gcfolder  <- "~/TRAIN/GoldenCheetah/Athan/activities/"
 inputdata <- "~/LOGs/GCmetrics.Rds"
+pdfout1    <- "~/LOGs/car_logs/GC_all_plots.pdf"
+pdfout2    <- "~/LOGs/car_logs/GC_all_plots_last.pdf"
+
 
 ## we may read the actual GC database sameday?
 
@@ -240,6 +245,28 @@ metrics <- rm.cols.NA.DT(metrics)
 ### homogenize data
 
 
+####  Calories ####
+## gather$Calories has old problematic replacement values probably
+# ee <- data.frame(metrics$Calories, gather$Calories)
+# gather[!is.na(gather$Calories),time,Calories]
+gather$Calories <- NULL
+
+#### Device:  we don't need that ####
+# gather[ Device == "unknown", Device := NA ]
+# ee <- data.frame(metrics$Device, gather$Device)
+gather$Device  <- NULL
+metrics$Device <- NULL
+
+#### Route ####
+ee <- data.frame(metrics$Route, gather$Route)
+table(ee)
+gather$Route  <- NULL
+metrics$Route <- NULL
+
+#### Bike ####
+gather$Bike <- NULL
+
+
 ## find duplicate names to check
 setorder(gather,  time)
 setorder(metrics, time)
@@ -254,27 +281,22 @@ for (avar in tocheck) {
 }
 
 
-## gather$Calories has old problematic replacement values probably
-# ee <- data.frame(metrics$Calories, gather$Calories)
-# gather[!is.na(gather$Calories),time,Calories]
-gather$Calories <- NULL
+## problems
+metrics$Work
+gather[!is.na(gather$Work)]
 
-## we don't need that
-# gather[ Device == "unknown", Device := NA ]
-# ee <- data.frame(metrics$Device, gather$Device)
-gather$Device  <- NULL
-metrics$Device <- NULL
+## more problems
+metrics$Distance
+gather$Distance
+cbind(gather[, time, Distance],metrics[, time, Distance], all = T)
 
 
 
-
-
-
-stop()
-metrics <- unique(merge(gather, metrics, by = "time"))
+## hope for the best!!! ###
+metrics <- unique(merge(metrics, gather, by = "time", all.x = T))
+setorder(metrics,time)
 
 ## duplicate name columns check
-
 for (avar in tocheck) {
     getit <- grep(paste0(avar, "\\.[xy]"), names(metrics), value = TRUE)
     if (all(metrics[[getit[1]]] == metrics[[getit[2]]], na.rm = TRUE)) {
@@ -298,21 +320,107 @@ for (avar in names(metrics)) {
 dup.vec <- which(duplicated(t(metrics)))
 dup.vec <- names(metrics)[dup.vec]
 
-# create a vector with the checksum for each column (and keep the column names as row names)
+# create a vector with the checksum for each column keeps the column names as row names
 col.checksums <- sapply(metrics, function(x) digest::digest(x, "md5"), USE.NAMES = T)
 dup.cols      <- data.table(col.name = names(col.checksums), hash.value = col.checksums)
 dup.cols      <- dup.cols[dup.cols, on = "hash.value"][col.name != i.col.name,]
 
-##TODO
+if (all(metrics[, Time.Moving == Duration.y ], na.rm = T)) {
+    metrics$Duration.y <- NULL
+}
+
 ## remove manual
 metrics[, DEVICETYPE        := NULL]
+metrics[, RECINTSECS        := NULL]
 metrics[, Device.Info       := NULL]
 metrics[, VO2max.detected   := NULL]
 metrics[, Workout.Title     := NULL]
 metrics[, X1_sec_Peak_Power := NULL]
 metrics[, NP                := NULL]
 metrics[, IF                := NULL]
+metrics[, filemtime         := NULL]
+metrics[, file              := NULL]
 
+
+
+## drop zeros on some columns
+wecare <- c(
+    grep("_in_Zone$",        names(metrics),value = T),
+    grep("_Sustained_Time$", names(metrics),value = T),
+    grep("_Peak_Hr$",        names(metrics),value = T),
+    grep("_W_bal_",          names(metrics),value = T),
+    grep("_HRV$",            names(metrics),value = T),
+    grep("_Peak_Pace$",      names(metrics),value = T),
+    grep("_Peak_Power_HR$",  names(metrics),value = T),
+    "xPower",
+    NULL)
+wecare <- names(metrics)[names(metrics) %in% wecare]
+for (avar in wecare) {
+    metrics[[avar]][metrics[[avar]] == 0] <- NA
+}
+metrics <- rm.cols.dups.DT(metrics)
+metrics <- rm.cols.NA.DT(metrics)
+
+wecare <- names(metrics)
+wecare <- grep("date|
+               notes|
+               time|
+               sport|
+               bike|
+               shoes|
+               filemtime|
+               workout_code",
+            wecare, ignore.case = T,value = T,invert = T)
+
+# wecare <- grep("|_Fatigue|bike|shoes|workout_title|device|Calendar_text|Elevation_Gain_Carrying|heartbeats|Max_Core_Temperature|Checksum|Right_Balance|Percent_in_Zone|Percent_in_Pace_Zone|Best_|Distance_Swim|Equipment_Weight|Average_Core_Temperature|Average_Temp|Max_Cadence|Max_Temp|min_Peak_Pace|_Peak_Pace|_Peak_Pace_HR|_Peak_Power|_Peak_Power_HR|min_Peak_Hr|_Peak_WPK|Min_temp|Average_Cadence|Average_Running_Cadence|Max_Running_Cadence",
+#                wecare, ignore.case = T,value = T,invert = T)
+
+
+if (!interactive()) {
+    pdf(file = pdfout1, width = 8, height = 4)
+}
+
+for (avar in wecare) {
+    ## ignore no data
+    if (all(as.numeric(metrics[[avar]]) %in% c(0, NA))) {
+        metrics[[avar]] <- NULL
+        next()
+    }
+
+    par(mar=c(2,2,1,1))
+    plot(metrics$time, metrics[[avar]],
+         type = "l", xlab = "", ylab = "")
+    title(avar)
+}
+
+dev.off()
+
+
+metrics <- metrics[ as.Date(time) > (Sys.Date() - 700)  ]
+if (!interactive()) {
+    pdf(file = pdfout2, width = 8, height = 4)
+}
+
+for (avar in wecare) {
+    ## ignore no data
+    if (all(as.numeric(metrics[[avar]]) %in% c(0, NA))) {
+        metrics[[avar]] <- NULL
+        next()
+    }
+
+    par(mar=c(2,2,1,1))
+    plot(metrics$time, metrics[[avar]],
+         type = "l", xlab = "", ylab = "")
+    title(avar)
+}
+
+dev.off()
+
+
+
+
+
+summary(metrics)
 
 
 
