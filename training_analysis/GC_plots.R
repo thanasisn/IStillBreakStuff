@@ -49,7 +49,7 @@ fCTL1 <- 1 / 42
 fCTL2 <- 1 - exp(-fCTL1)
 
 ## select metrics for pdf
-wecare <- c("TRIMP_Points", "TRIMP_Zonal_Points", "EPOC")
+wecare <- c("TRIMP_Points", "TRIMP_Zonal_Points", "EPOC", "Session_RPE")
 ## work, calories
 extend <- 30
 pdays  <- c(400, 100)

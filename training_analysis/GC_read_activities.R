@@ -341,6 +341,7 @@ metrics[, NP                := NULL]
 metrics[, IF                := NULL]
 metrics[, filemtime         := NULL]
 metrics[, file              := NULL]
+metrics[, Checksum          := NULL]
 
 
 
