@@ -29,8 +29,9 @@ warning("time variable is different between data")
 storagefl <- "~/DATA/Other/GC_json_data.Rds"
 gcfolder  <- "~/TRAIN/GoldenCheetah/Athan/activities/"
 inputdata <- "~/LOGs/GCmetrics.Rds"
-pdfout1    <- "~/LOGs/car_logs/GC_all_plots.pdf"
-pdfout2    <- "~/LOGs/car_logs/GC_all_plots_last.pdf"
+pdfout1   <- "~/LOGs/car_logs/GC_all_plots.pdf"
+pdfout2   <- "~/LOGs/car_logs/GC_all_plots_last.pdf"
+export    <- "~/DATA/Other/Train_metrics.Rds"
 
 
 ## we may read the actual GC database sameday?
@@ -361,18 +362,29 @@ for (avar in wecare) {
 metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
 
+
+
+####  Export for others  ####
+write_RDS(metrics, file = export, clean = TRUE)
+
+
+
+####  Plot all #####
+
 wecare <- names(metrics)
 wecare <- grep("date|
+               time|
                notes|
                time|
                sport|
                bike|
+               Average_Core_Temperature|
                shoes|
                filemtime|
                workout_code",
             wecare, ignore.case = T,value = T,invert = T)
 
-# wecare <- grep("|_Fatigue|bike|shoes|workout_title|device|Calendar_text|Elevation_Gain_Carrying|heartbeats|Max_Core_Temperature|Checksum|Right_Balance|Percent_in_Zone|Percent_in_Pace_Zone|Best_|Distance_Swim|Equipment_Weight|Average_Core_Temperature|Average_Temp|Max_Cadence|Max_Temp|min_Peak_Pace|_Peak_Pace|_Peak_Pace_HR|_Peak_Power|_Peak_Power_HR|min_Peak_Hr|_Peak_WPK|Min_temp|Average_Cadence|Average_Running_Cadence|Max_Running_Cadence",
+# wecare <- grep("|_Fatigue|bike|shoes|workout_title|device|Calendar_text|Elevation_Gain_Carrying|heartbeats|Max_Core_Temperature|Checksum|Right_Balance|Percent_in_Zone|Percent_in_Pace_Zone|Best_|Distance_Swim|Equipment_Weight||Average_Temp|Max_Cadence|Max_Temp|min_Peak_Pace|_Peak_Pace|_Peak_Pace_HR|_Peak_Power|_Peak_Power_HR|min_Peak_Hr|_Peak_WPK|Min_temp|Average_Cadence|Average_Running_Cadence|Max_Running_Cadence",
 #                wecare, ignore.case = T,value = T,invert = T)
 
 
@@ -415,13 +427,6 @@ for (avar in wecare) {
 }
 
 dev.off()
-
-
-
-
-
-summary(metrics)
-
 
 
 ####_ END _####
