@@ -121,7 +121,7 @@ tocheck <- grep("time",
                 invert = TRUE, ignore.case = TRUE, value = TRUE)
 metrics <- unique(merge(gather, metrics, by = "time"))
 
-## duplicate name colms check
+## duplicate name columns check
 
 for (avar in tocheck) {
     getit <- grep(paste0(avar, "\\.[xy]"), names(metrics), value = TRUE)
