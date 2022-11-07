@@ -154,11 +154,11 @@ for (days in pdays) {
         pp[ is.na(value), value := 0 ]
         lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
         par(new = T)
-        ylim <-range( 45,53, pp$VO2max_detected, na.rm = T)
+        ylim <- range( 45, 53, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", pch = "-", cex = 2 )
         par(new = T)
         ylim <- range(pp$ATL2, pp$CTL2, pp$TSB2, na.rm = T)
-        ylim[2] <- ylim[2] * 1.09
+        ylim[2] <- ylim[2] * 1.1
         plot(pp$date, pp$ATL2, col = 3, lwd = 1.1, "l", yaxt = "n", ylim = ylim)
         abline(v=Sys.Date(),col="green",lty=2)
         par(new = T)
@@ -206,7 +206,7 @@ for (days in pdays) {
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         par(new = T)
         ylim <- range(pp$ban.fatigue, pp$ban.fitness, pp$ban.perform, na.rm = T)
-        ylim[2] <- ylim[2] * 1.09
+        ylim[2] <- ylim[2] * 1.1
         plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt = "n", ylim = ylim)
         par(new = T)
         plot( pp$date, pp$ban.fitness, lwd = 2.5, "l", col = 5, yaxt = "n", ylim = ylim)
@@ -251,7 +251,7 @@ for (days in pdays) {
         pp[ is.na(value), value := 0 ]
         lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
         par(new = T)
-        ylim <-range( 45,65, pp$VO2max_detected, na.rm = T)
+        ylim <-range( 45, 65, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
         par(new = T)
 
@@ -377,7 +377,7 @@ for (days in pdays) {
         box(col="white")
         par(new = T)
         ylim <- range(pp$ATL2, pp$CTL2, pp$TSB2, na.rm = T)
-        ylim[2] <- ylim[2] * 1.09
+        ylim[2] <- ylim[2] * 1.1
         plot(pp$date, pp$ATL2, col = 3, lwd = 1.0, "l", ylim = ylim, xaxt = "n")
         box(col="white")
         abline(v = Sys.Date(), col = "green", lty = 2)
@@ -388,7 +388,8 @@ for (days in pdays) {
         plot(pp$date, pp$TSB2, col = 6, lwd =   3, "l", ylim = ylim, xaxt = "n")
         box(col="white")
 
-        legend("top", bty = "n", ncol = 3, lty=1, inset=c(0,-0.05), cex = 0.7,
+        legend("top", bty = "n", ncol = 3, lty=1, inset = c(0,-0.04),
+               cex = 0.7,  text.col = "grey",
                legend = c("ATL2", "CTL2", "TSB2"),
                col    = c(    3 ,     5 ,     6 ) )
 
@@ -440,7 +441,7 @@ for (days in pdays) {
         box(col="white")
         par(new = T)
         ylim <- range(pp$ban.fatigue, pp$ban.fitness, pp$ban.perform, na.rm = T)
-        ylim[2] <- ylim[2] * 1.09
+        ylim[2] <- ylim[2] * 1.1
         plot( pp$date, pp$ban.fatigue, lwd = 1.0, "l", col = 3, yaxt = "n", xaxt = "n", ylim = ylim)
         box(col="white")
         par(new = T)
@@ -450,7 +451,8 @@ for (days in pdays) {
         plot( pp$date, pp$ban.perform, lwd =   3, "l", col = 6, yaxt = "n", xaxt = "n", ylim = ylim)
         box(col="white")
 
-        legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
+        legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.04),
+               cex = 0.7,  text.col = "grey",
                legend = c("Fatigue","Fitness","Performance"),
                col    = c(       3 ,       5 ,           6 ) )
         abline(v=Sys.Date(),col="green",lty=2)
@@ -500,7 +502,7 @@ for (days in pdays) {
         lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
         box(col="white")
         par(new = T)
-        ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
+        ylim <- range( 45, 55, pp$VO2max_detected, na.rm = T)
         plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", xaxt = "n", pch = "-", cex = 2 )
         box(col="white")
         par(new = TRUE)
@@ -513,7 +515,8 @@ for (days in pdays) {
         plot( pp$date, pp$bus.perform, lwd =   3, "l", col = 6, xaxt = "n")
         box(col="white")
 
-        legend("top", bty = "n", ncol = 3, lty = 1, inset = c(0,-0.05), cex = 0.7,
+        legend("top", bty = "n", ncol = 3, lty = 1, inset = c(0,-0.04),
+               cex = 0.7, text.col = "grey",
                legend = c("Fatigue","Fitness","Performance"),
                col    = c(       3 ,       5 ,           6 ) )
         abline(v = Sys.Date(), col = "green", lty = 2)
