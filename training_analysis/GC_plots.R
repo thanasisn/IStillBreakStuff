@@ -84,210 +84,6 @@ busso <- function(fitness, fatigue, trimp, par2 , k1 = 0.031, k3 = 0.000035, r1 
          par2        = par2)
 }
 
-for (days in pdays) {
-    for (avar in wecare) {
-
-        pp <- data.table(time            = metrics$time,
-                         value           = metrics[[avar]],
-                         VO2max_detected = metrics$VO2max_detected)
-        pp <- pp[, .(value           = sum(value, na.rm = TRUE),
-                     VO2max_detected = mean(VO2max_detected, na.rm = TRUE)),
-                 by = .(date = as.Date(time))]
-        last <- pp[ date == max(date), ]
-        pp <- merge(
-            data.table(date = seq.Date(from = min(pp$date),
-                                       to   = max(pp$date) + extend,
-                                       by   = "day")),
-            pp, all = T)
-        pp[is.na(value), value := 0]
-
-        pp[, ATL1 := pp$value[1]]
-        pp[, ATL2 := pp$value[1]]
-        pp[, CTL1 := pp$value[1]]
-        pp[, CTL2 := pp$value[1]]
-        pp[, ban.fatigue := 0 ]
-        pp[, ban.fitness := 0 ]
-        pp[, ban.perform := 0 ]
-        pp[, bus.fatigue := 0 ]
-        pp[, bus.fitness := 0 ]
-        pp[, bus.perform := 0 ]
-        pp[, bus.par2    := 1 ]
-
-        for (nr in 2:nrow(pp)) {
-            ## calculate impulse
-            pp$ATL1[nr] <- fATL1 * pp$value[nr] + (1 - fATL1) * pp$ATL1[nr - 1]
-            pp$ATL2[nr] <- fATL2 * pp$value[nr] + (1 - fATL2) * pp$ATL2[nr - 1]
-            pp$CTL1[nr] <- fCTL1 * pp$value[nr] + (1 - fCTL1) * pp$CTL1[nr - 1]
-            pp$CTL2[nr] <- fCTL2 * pp$value[nr] + (1 - fCTL2) * pp$CTL2[nr - 1]
-            ## calculate banister
-            res <- banister(fitness = pp$ban.fitness[nr-1],
-                            fatigue = pp$ban.fatigue[nr-1],
-                            trimp   = pp$value[nr] )
-            pp$ban.fatigue[nr] <- res$fatigue
-            pp$ban.fitness[nr] <- res$fitness
-            pp$ban.perform[nr] <- res$performance
-            ## calculate busso
-            res <- busso(fitness = pp$bus.fitness[nr-1],
-                         fatigue = pp$bus.fatigue[nr-1],
-                         par2    = pp$bus.par2[nr-1],
-                         trimp   = pp$value[nr] )
-            pp$bus.fatigue[nr] <- res$fatigue
-            pp$bus.fitness[nr] <- res$fitness
-            pp$bus.perform[nr] <- res$performance
-            pp$bus.par2[nr]    <- res$par2
-        }
-        pp[, TSB1 := CTL1 - ATL1]
-        pp[, TSB2 := CTL2 - ATL2]
-
-
-
-
-
-        ## limit graph to last days
-        pp <- pp[ date >= max(date) - days, ]
-
-        #### Training Impulse model plot ####
-        par("mar" = c(2,0,3,0), xpd = TRUE)
-
-        pp[ value == 0, value := NA ]
-        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
-        pp[ is.na(value), value := 0 ]
-        lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
-        par(new = T)
-        ylim <- range( 45, 53, pp$VO2max_detected, na.rm = T)
-        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", pch = "-", cex = 2 )
-        par(new = T)
-        ylim <- range(pp$ATL2, pp$CTL2, pp$TSB2, na.rm = T)
-        ylim[2] <- ylim[2] * 1.1
-        plot(pp$date, pp$ATL2, col = 3, lwd = 1.1, "l", yaxt = "n", ylim = ylim)
-        abline(v=Sys.Date(),col="green",lty=2)
-        par(new = T)
-        plot(pp$date, pp$CTL2, col = 5, lwd = 2.5, "l", yaxt = "n", ylim = ylim)
-        par(new = T)
-        plot(pp$date, pp$TSB2, col = 6, lwd = 2.5, "l", yaxt = "n", ylim = ylim)
-
-        legend("top",bty = "n",ncol = 3, lty = 1, inset = c(0, -0.05), cex = 0.7,
-               legend = c("ATL2", "CTL2","TSB2"),
-               col    = c(    3 ,     5 ,    6 ) )
-
-        prediction <- pp[ date > last$date, ]
-        best       <- prediction[which.max(TSB2)]
-        abline(v=best$date, col = "yellow", lty = 2)
-        abline(h=best$TSB2, col = "yellow", lty = 2)
-
-        abline(h = pp[ date == Sys.Date(), TSB2 ], col = 6, lty = 2)
-        text(pp[ which.max(pp$TSB2), date ], pp[ which.max(pp$TSB2), TSB2 ],
-             labels = round(pp[ which.max(pp$TSB2), TSB2]), col = 6, pos = 3 )
-        text(Sys.Date(), pp[ date == Sys.Date(), TSB2 ],
-             labels = round(pp[ date == Sys.Date(), TSB2 ]), col = 6, pos = 4 )
-        abline(h = pp[ date == Sys.Date(), CTL2 ], col = 5, lty = 2)
-        text(pp[ which.max(pp$CTL2), date ], pp[ which.max(pp$CTL2), CTL2 ],
-             labels = round(pp[ which.max(pp$CTL2), CTL2]), col = 5, pos = 3 )
-        text(Sys.Date(), pp[ date == Sys.Date(), CTL2 ],
-             labels = round(pp[ date == Sys.Date(), CTL2 ]), col = 5, pos = 4 )
-        # abline(h = max(pp$ATL2, na.rm = T), col = 3, lty = 2)
-        text(pp[ which.max(pp$ATL2), date ], pp[ which.max(pp$ATL2), ATL2 ],
-             labels = round(pp[ which.max(pp$ATL2), ATL2]), col = 3, pos = 3 )
-        text(Sys.Date(), pp[ date == Sys.Date(), ATL2 ],
-             labels = round(pp[ date == Sys.Date(), ATL2 ]), col = 3, pos = 4 )
-
-        title(paste(days,"days", avar,"best:", best$date),line = 2)
-
-
-        #### Banister model plot ####
-        par("mar" = c(2,0,3,0), xpd = TRUE)
-
-        pp[ value == 0, value := NA ]
-        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
-        pp[ is.na(value), value := 0 ]
-        lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
-        par(new = T)
-        ylim <-range( 45,55, pp$VO2max_detected, na.rm = T)
-        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
-        par(new = T)
-        ylim <- range(pp$ban.fatigue, pp$ban.fitness, pp$ban.perform, na.rm = T)
-        ylim[2] <- ylim[2] * 1.1
-        plot( pp$date, pp$ban.fatigue, lwd = 1.1, "l", col = 3, yaxt = "n", ylim = ylim)
-        par(new = T)
-        plot( pp$date, pp$ban.fitness, lwd = 2.5, "l", col = 5, yaxt = "n", ylim = ylim)
-        par(new = T)
-        plot( pp$date, pp$ban.perform, lwd = 2.5, "l", col = 6, yaxt = "n", ylim = ylim)
-
-        legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
-               legend = c("Fatigue","Fitness","Performance"),
-               col    = c(       3 ,       5 ,           6 ) )
-        abline(v=Sys.Date(),col="green",lty=2)
-
-        prediction <- pp[ date > last$date, ]
-        best       <- prediction[which.max(ban.perform)]
-        abline(v=best$date, col = "yellow",lty=2)
-        abline(h=best$ban.perform, col = "yellow",lty=2)
-
-        abline(h = pp[ date == Sys.Date(), ban.perform ], col = 6, lty = 2)
-        text(pp[ which.max(pp$ban.perform), date ], pp[ which.max(pp$ban.perform), ban.perform ],
-             labels = round(pp[ which.max(pp$ban.perform), ban.perform]), col = 6, pos = 3 )
-        text(Sys.Date(), pp[ date == Sys.Date(), ban.perform ],
-             labels = round(pp[ date == Sys.Date(), ban.perform ]), col = 6, pos = 4 )
-        abline(h = pp[ date == Sys.Date(), ban.fitness ], col = 5, lty = 2)
-        text(pp[ which.max(pp$ban.fitness), date ], pp[ which.max(pp$ban.fitness), ban.fitness ],
-             labels = round(pp[ which.max(pp$ban.fitness), ban.fitness]), col = 5, pos = 3 )
-        text(Sys.Date(), pp[ date == Sys.Date(), ban.fitness ],
-             labels = round(pp[ date == Sys.Date(), ban.fitness ]), col = 5, pos = 4 )
-        # abline(h = max(pp$ban.fatigue, na.rm = T), col = 3, lty = 2)
-        text(pp[ which.max(pp$ban.fatigue), date ], pp[ which.max(pp$ban.fatigue), ban.fatigue ],
-             labels = round(pp[ which.max(pp$ban.fatigue), ban.fatigue]), col = 3, pos = 3 )
-        text(Sys.Date(), pp[ date == Sys.Date(), ban.fatigue ],
-             labels = round(pp[ date == Sys.Date(), ban.fatigue ]), col = 3, pos = 4 )
-
-        title(paste("Banister",days,"days", avar,"best:", best$date),line = 2)
-
-
-
-        #### Busson model plot ####
-        par("mar" = c(2,0,3,0), xpd = TRUE)
-
-        pp[ value == 0, value:=NA ]
-        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
-        pp[ is.na(value), value := 0 ]
-        lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
-        par(new = T)
-        ylim <-range( 45, 65, pp$VO2max_detected, na.rm = T)
-        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink",pch = "-", cex = 2 )
-        par(new = T)
-
-        plot( pp$date, pp$bus.fatigue, lwd = 1.1, "l", col = 3, yaxt="n")
-        # abline(h = max(pp$bus.fatigue, na.rm = T), col = 3, lty = 2)
-        text(pp[ which.max(pp$bus.fatigue), date ], pp[ which.max(pp$bus.fatigue), bus.fatigue ],
-             labels = round(pp[ which.max(pp$bus.fatigue), bus.fatigue]), col = 3, pos = 3 )
-        text(Sys.Date(), pp[ date == Sys.Date(), bus.fatigue ],
-             labels = round(pp[ date == Sys.Date(), bus.fatigue ]), col = 3, pos = 4 )
-        par(new = T)
-        plot( pp$date, pp$bus.fitness, lwd = 2.5, "l", col = 5, yaxt="n")
-        abline(h = pp[ date == Sys.Date(), bus.fitness ], col = 5, lty = 2)
-        text(pp[ which.max(pp$bus.fitness), date ], pp[ which.max(pp$bus.fitness), bus.fitness ],
-             labels = round(pp[ which.max(pp$bus.fitness), bus.fitness]), col = 5, pos = 3 )
-        text(Sys.Date(), pp[ date == Sys.Date(), bus.fitness ],
-             labels = round(pp[ date == Sys.Date(), bus.fitness ]), col = 5, pos = 4 )
-        par(new = T)
-        plot( pp$date, pp$bus.perform, lwd = 2.5, "l", col = 6, yaxt="n")
-        abline(h = pp[ date == Sys.Date(), bus.perform ], col = 6, lty = 2)
-        text(pp[ which.max(pp$bus.perform), date ], pp[ which.max(pp$bus.perform), bus.perform ],
-             labels = round(pp[ which.max(pp$bus.perform), bus.perform]), col = 6, pos = 3 )
-        text(Sys.Date(), pp[ date == Sys.Date(), bus.perform ],
-             labels = round(pp[ date == Sys.Date(), bus.perform ]), col = 6, pos = 4 )
-        legend("top",bty = "n",ncol = 3,lty=1, inset=c(0,-0.05), cex = 0.7,
-               legend = c("Fatigue","Fitness","Performance"),
-               col    = c(       3 ,       5 ,           6 ) )
-        abline(v=Sys.Date(),col="green",lty=2)
-
-        prediction <- pp[ date > last$date, ]
-        best       <- prediction[which.max(bus.perform)]
-        abline(v=best$date, col = "yellow",lty=2)
-        abline(h=best$bus.perform, col = "yellow",lty=2)
-
-        title(paste("Busson", days,"days", avar,"best:", best$date),line = 2)
-    }
-}
 
 
 
@@ -367,7 +163,7 @@ for (days in pdays) {
             yaxt     = "n")
 
         pp[ value == 0, value := NA ]
-        plot(pp$date, pp$value/4, ylim = range(0, pp$value, na.rm = T), xaxt = "n", type = "h", lwd = 2, col = "#71717171" )
+        plot(pp$date, pp$value/4, ylim = range(0, pp$value, na.rm = T), xaxt = "n", type = "h", lwd = 3, col = "#71717171" )
         pp[ is.na(value), value := 0 ]
         lines(pp$date, caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
         box(col="white")
@@ -431,7 +227,7 @@ for (days in pdays) {
             col.lab  = "white",
             yaxt     = "n")
 
-        plot(pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt = "n", xaxt = "n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        plot(pp$date, pp$value/4, ylim = range(0, pp$value, na.rm = T), yaxt = "n", xaxt = "n", type = "h", bty = "n", lwd = 3, col = "#71717171" )
         pp[ is.na(value), value := 0 ]
         lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
         box(col="white")
@@ -497,7 +293,7 @@ for (days in pdays) {
             col.lab  = "white",
             yaxt     = "n")
 
-        plot(pp$value/4, ylim = range(0,pp$value, na.rm = T), xaxt = "n", type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        plot(pp$date, pp$value/4, ylim = range(0,pp$value, na.rm = T), yaxt = "n", xaxt = "n", type = "h", bty = "n", lwd = 3, col = "#71717171" )
         pp[ is.na(value), value := 0 ]
         lines(caTools::runmean(pp$value, k = 8, align = "right")/2, col = "#71717171", lwd = 1.1)
         box(col="white")
@@ -536,7 +332,7 @@ for (days in pdays) {
 }
 
 
-
+source("~/CODE/training_analysis/GC_plots_2.R")
 
 ####_ END _####
 tac = Sys.time()
