@@ -1,0 +1,632 @@
+---
+title: "Run report"
+runtime: shiny
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: scroll
+    # vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+```
+
+```{r global, include=FALSE}
+moredata    <- "~/DATA/Other/GC_json_data.Rds"
+datascript  <- "~/CODE/training_analysis/GC_read_activities.R"
+daysback    <- 360*3
+
+
+library(data.table)
+source(datascript)
+metrics <- readRDS("~/DATA/Other/Train_metrics.Rds")
+metrics <- metrics[date > Sys.Date() - daysback, ]
+
+```
+
+
+Load Params {.sidebar}
+-----------------------------------------------------------------------
+
+
+```{r}
+
+sliderInput("BAN_sh", label = "Banister short period",
+             min = 1,  max =  30, step = 1, value = 11)
+sliderInput("BAN_ln", label = "Banister long period",
+             min = 7 , max = 100, step = 1, value = 49)
+
+sliderInput("PMC_sh", label = "PMC short period",
+             min = 1,  max =  30, step = 1, value = 7)
+sliderInput("PMC_ln", label = "PMC long period",
+             min = 7 , max = 100, step = 1, value = 42)
+
+sliderInput("tsi_start", label = "TSI start back",
+            min = 10, max = daysback, value = 120, step = 2)
+
+sliderInput("tsi_forecast", label = "TSI forecast",
+            min = 1, max = 150, value = 30, step = 2)
+
+# input <- list(
+#     BAN_sh = 11,
+#     BAN_ln = 49,
+#     PMC_sh = 7,
+#     PMC_ln = 72,
+#     tsi_start = 122,
+#     tsi_forecast = 33
+# )
+
+```
+
+
+Column 
+-----------------------------------------------------------------------
+
+
+### Training
+
+```{r}
+renderPlot({
+    
+    
+
+fATL1 <- 1 / input$PMC_sh
+fATL2 <- 1 - exp(-fATL1)
+fCTL1 <- 1 / input$PMC_ln
+fCTL2 <- 1 - exp(-fCTL1)
+
+banister <- function(fitness, fatigue, trimp, k1 = 1.0, k2 = 1.8, r1 = input$BAN_ln, r2 = input$BAN_sh) {
+    fitness     <- fitness * exp(-1 / r1) + trimp
+    fatigue     <- fatigue * exp(-1 / r2) + trimp
+    performance <- fitness * k1 - fatigue * k2
+
+    list(fitness     = fitness,
+         fatigue     = fatigue,
+         performance = performance)
+}
+
+busso <- function(fitness, fatigue, trimp, par2 , k1 = 0.031, k3 = 0.000035, r1 = 30.8, r2 = 16.8, r3 = 2.3) {
+    fitness     <- fitness * exp(-1 / r1) + trimp
+    fatigue     <- fatigue * exp(-1 / r2) + trimp
+    par2        <- fatigue * exp(-1 / r3) + par2
+    k2          <- k3      * par2
+    performance <- fitness * k1 - fatigue * k2
+
+    list(fitness     = fitness,
+         fatigue     = fatigue,
+         performance = performance,
+         par2        = par2)
+}
+
+
+
+
+
+
+
+## select metrics for pdf
+wecare <- c("TRIMP_Points", "TRIMP_Zonal_Points", "EPOC", "Session_RPE")
+shortn <- c(          "TP",                 "TZ",   "EP",          "RP")
+extend <- input$tsi_forecast
+
+
+### create metrics for all models
+gather <- data.table()
+for (ii in 1:length(wecare)) {
+    avar <- wecare[ii]
+    snam <- shortn[ii]
+    ## get each variable
+    pp   <- data.table(time            = metrics$time,
+                       value           = metrics[[avar]],
+                       VO2max_detected = metrics$VO2max_detected)
+    pp   <- pp[, .(value             = sum(value, na.rm = TRUE),
+                   VO2max_detected = mean(VO2max_detected, na.rm = TRUE)),
+               by = .(date = as.Date(time))]
+    last <- pp[ date == max(date), ]
+    pp   <- merge(
+        data.table(date = seq.Date(from = min(pp$date),
+                                   to   = max(pp$date) + extend,
+                                   by   = "day")),
+        pp, all = T)
+    pp[is.na(value), value := 0]
+
+    names(pp)[names(pp) == "value"]  <- paste0(snam,".","VAL")
+
+    pp[[paste0(snam,".","PMC_FAT")]] <- pp[[paste0(snam,".","VAL")]][1]
+    pp[[paste0(snam,".","PMC_FIT")]] <- pp[[paste0(snam,".","VAL")]][1]
+    pp[[paste0(snam,".","PMC_PER")]] <- 0
+
+    pp[[paste0(snam,".","BAN_FAT")]] <- 0
+    pp[[paste0(snam,".","BAN_FIT")]] <- 0
+    pp[[paste0(snam,".","BAN_PER")]] <- 0
+
+    pp[[paste0(snam,".","BUS_FAT")]] <- 0
+    pp[[paste0(snam,".","BUS_FIT")]] <- 0
+    pp[[paste0(snam,".","BUS_PER")]] <- 0
+    pp[[paste0(snam,".","BUS_pr2")]] <- 1
+
+    for (nr in 2:nrow(pp)) {
+        ## calculate impulse
+        pp[[paste0(snam,".","PMC_FAT")]][nr] <-
+            fATL1 * pp[[paste0(snam,".","VAL")]][nr] + (1 - fATL1) * pp[[paste0(snam,".","PMC_FAT")]][nr - 1]
+        pp[[paste0(snam,".","PMC_FIT")]][nr] <-
+            fCTL1 * pp[[paste0(snam,".","VAL")]][nr] + (1 - fCTL1) * pp[[paste0(snam,".","PMC_FIT")]][nr - 1]
+        ## calculate banister
+        res <- banister(fitness = pp[[paste0(snam,".","BAN_FIT")]][nr-1],
+                        fatigue = pp[[paste0(snam,".","BAN_FAT")]][nr-1],
+                        trimp   = pp[[paste0(snam,".","VAL")]][nr] )
+        pp[[paste0(snam,".","BAN_FAT")]][nr] <- res$fatigue
+        pp[[paste0(snam,".","BAN_FIT")]][nr] <- res$fitness
+        pp[[paste0(snam,".","BAN_PER")]][nr] <- res$performance
+        ## calculate busso
+        res <- busso(fitness = pp[[paste0(snam,".","BUS_FIT")]][nr-1],
+                     fatigue = pp[[paste0(snam,".","BUS_FAT")]][nr-1],
+                     par2    = pp[[paste0(snam,".","BUS_pr2")]][nr-1],
+                     trimp   = pp[[paste0(snam,".","VAL")]][nr] )
+        pp[[paste0(snam,".","BUS_FAT")]][nr] <- res$fatigue
+        pp[[paste0(snam,".","BUS_FIT")]][nr] <- res$fitness
+        pp[[paste0(snam,".","BUS_PER")]][nr] <- res$performance
+        pp[[paste0(snam,".","BUS_pr2")]][nr] <- res$par2
+    }
+
+    pp[[paste0(snam,".","BAN_VAL")]] <- pp[[paste0(snam,".","VAL")]]
+    pp[[paste0(snam,".","BUS_VAL")]] <- pp[[paste0(snam,".","VAL")]]
+    pp[[paste0(snam,".","PMC_VAL")]] <- pp[[paste0(snam,".","VAL")]]
+    pp[[paste0(snam,".","VAL")]]     <- NULL
+
+    pp[[paste0(snam,".","BUS_pr2")]] <- NULL
+    pp[[paste0(snam,".","PMC_PER")]] <- pp[[paste0(snam,".","PMC_FIT")]] -
+                                        pp[[paste0(snam,".","PMC_FAT")]]
+
+
+    if (ii == 1) {
+        gather <- pp
+    } else {
+        gather <- merge(pp, gather, by = c("date","VO2max_detected") )
+    }
+
+}
+
+days <- input$tsi_start
+
+## limit graph to last days
+gather <- gather[ date >= max(date) - days - extend, ]
+gather <- data.table(gather)
+models <- c("PMC", "BAN", "BUS")
+
+
+for (mo in models) {
+    for (va in shortn) {
+        wp <- c(grep(paste0(va,".",mo), names(gather), value = TRUE),
+                "date", "VO2max_detected")
+        pp <- gather[, ..wp]
+        ## easy names
+        vfit <- grep("FIT",wp,value = T)
+        vfat <- grep("FAT",wp,value = T)
+        vper <- grep("PER",wp,value = T)
+        vval <- grep("VAL",wp,value = T)
+
+
+##todo make it a function
+        #### Training Impulse model plot ####
+        par("mar" = c(2,0,2,0), xpd = TRUE)
+
+        pp[[vval]][pp[[vval]] == 0] <- NA
+        plot(pp$date, pp[[vval]]/4, ylim = range(0, pp[[vval]], na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        pp[[vval]][is.na(pp[[vval]])] <- 0
+        lines(pp$date, caTools::runmean(pp[[vval]], k = 9, align = "right")/2, col = "#71717171", lwd = 1.1)
+        par(new = T)
+        ylim <-range( 45,53, pp$VO2max_detected, na.rm = T)
+        plot( pp$date, pp$VO2max_detected, ylim = ylim, col = "pink", pch = "-", cex = 2 )
+        par(new = T)
+        ylim    <- range(pp[[vfit]], pp[[vfat]], pp[[vper]], na.rm = T)
+        ylim[2] <- ylim[2] * 1.09
+        plot(pp$date, pp[[vfat]], col = 3, lwd = 1.1, "l", yaxt = "n", ylim = ylim)
+        abline(v=Sys.Date(),col="green",lty=2)
+        par(new = T)
+        plot(pp$date, pp[[vfit]], col = 5, lwd = 2.5, "l", yaxt = "n", ylim = ylim)
+        par(new = T)
+        plot(pp$date, pp[[vper]], col = 6, lwd = 2.5, "l", yaxt = "n", ylim = ylim)
+
+        legend("top", bty = "n", ncol = 3, lty = 1, inset = c(0, -0.03),
+               cex = 0.7, text.col = "grey",
+               legend = c("Fatigue", "Fitness","Performance"),
+               col    = c(    3 ,     5 ,    6 ) )
+
+
+        prediction <- pp[ date > last$date, ]
+        best       <- prediction[ which.max(prediction[[vper]]) ]
+        abline(v = best$date, col = "yellow", lty = 2)
+        abline(h = best[[vper]], col = "yellow", lty = 2)
+
+        abline(h = pp[[vper]][ pp$date == Sys.Date() ], col = 6, lty = 2)
+        text(pp[ which.max(pp[[vper]]), date ], pp[[vper]][which.max(pp[[vper]])],
+             labels = round(pp[[vper]][which.max(pp[[vper]])]), col = 6, pos = 3 )
+        text(Sys.Date(), pp[[vper]][pp$date == Sys.Date()],
+             labels = round(pp[[vper]][pp$date == Sys.Date()]), col = 6, pos = 4 )
+
+        abline(h = pp[[vfit]][ pp$date == Sys.Date() ], col = 5, lty = 2)
+        text(pp[ which.max(pp[[vfit]]), date ], pp[[vfit]][which.max(pp[[vfit]])],
+             labels = round(pp[[vfit]][which.max(pp[[vfit]])]), col = 5, pos = 3 )
+        text(Sys.Date(), pp[[vfit]][pp$date == Sys.Date()],
+             labels = round(pp[[vfit]][pp$date == Sys.Date()]), col = 5, pos = 4 )
+
+        # abline(h = pp[[vfat]][ pp$date == Sys.Date() ], col = 3, lty = 2)
+        text(pp[ which.max(pp[[vfat]]), date ], pp[[vfat]][which.max(pp[[vfat]])],
+             labels = round(pp[[vfat]][which.max(pp[[vfat]])]), col = 3, pos = 3 )
+        text(Sys.Date(), pp[[vfat]][pp$date == Sys.Date()],
+             labels = round(pp[[vfat]][pp$date == Sys.Date()]), col = 3, pos = 4 )
+
+
+        title(paste(days,"days",va,mo, avar,"best:", best$date), cex = .7)
+
+        }
+}
+
+
+
+
+
+
+
+
+
+})
+```
+
+
+
+
+
+
+<!-- Column {data-width=650} -->
+<!-- ----------------------------------------------------------------------- -->
+
+<!-- ### TRIMP exertion -->
+<!-- ```{r} -->
+<!-- renderPlot({ -->
+
+<!-- days_back   <- input$tsi_start -->
+<!-- days_future <- input$tsi_forecast -->
+<!-- # days_back   <- 367 -->
+<!-- # days_future <- -1 -->
+
+<!-- cools       <- RColorBrewer::brewer.pal(n = 9, name = "Set1") -->
+
+<!-- km_con                =   1.6    ## bias of longer runs over shorter -->
+<!-- polat_TL_exertion_con =   1.1 -->
+<!-- CTL_con               =  50 -->
+<!-- ATL_con               =  10 -->
+<!-- rest_day              =   0.009 -->
+
+<!-- start_day             = Sys.time() - days_back   * 24 * 3600 -->
+<!-- end_day               = Sys.time() + days_future * 24 * 3600 -->
+
+<!-- alldays <- data.frame( date = (seq(from = start_day, to = end_day, by = "day"))) -->
+
+<!-- ## get part of data with all dates -->
+<!-- df.subruns           <-  feet[ date >= start_day & date<=end_day ] -->
+<!-- df.subruns <- merge(df.subruns,alldays, by = "date", all = T) -->
+
+<!-- df.exp              <- df.subruns[, .( distanse = sum(distanse_old,na.rm = T), -->
+<!--                                        tl_exertion = sum(as.numeric(tl_exertion),na.rm = T)), -->
+<!--                                   by = (Date = as.Date(date))] -->
+<!-- setorder(df.exp,Date) -->
+
+<!-- df.exp$CTL           <- 0 -->
+<!-- df.exp$CTL[1]        <- 1 -->
+<!-- df.exp$ATL           <- 0 -->
+<!-- df.exp$ATL[1]        <- 1 -->
+<!-- df.exp$TSB           <- 0 -->
+<!-- df.exp$polar_TL_exertion <- 0 -->
+<!-- df.exp$kmW           <- 0 -->
+
+<!-- ## create daily weights -->
+<!-- df.exp$polar_TL_exertion <- df.exp$tl_exertion * polat_TL_exertion_con -->
+
+<!-- ## compute training balance for each day -->
+<!-- for (i in 2:nrow(df.exp)) { -->
+<!--   # CTL polar_tl_exert -->
+<!--   df.exp$CTL[i] = df.exp$CTL[i - 1] + ( df.exp$polar_TL_exertion[i] - df.exp$CTL[i - 1] )/CTL_con -->
+<!--   # ATL polar_tl_exert -->
+<!--   df.exp$ATL[i] = df.exp$ATL[i - 1] + ( df.exp$polar_TL_exertion[i] - df.exp$ATL[i - 1] )/ATL_con -->
+
+<!-- } -->
+
+<!-- df.exp$TSB   <- df.exp$CTL   - df.exp$ATL + (mean(df.exp$ATL)) -->
+<!-- df.exp[ polar_TL_exertion == 0, polar_TL_exertion := NA] -->
+
+<!-- amplify = 1 -->
+
+<!-- par(mar = c(0,0,0,0), bty = "n") -->
+
+<!-- ylim   = range(df.exp$ATL, -->
+<!--                df.exp$TSB, -->
+<!--                df.exp$CTL * amplify, -->
+<!--                df.exp$polar_TL_exertion/(max(df.exp$ATL, na.rm = T)/15), -->
+<!--                na.rm = T) -->
+
+<!-- axd    = seq(from = min(df.exp$Date), to = max(df.exp$Date), by = "3 days" ) -->
+
+<!-- par(mar = c(3,0,0,0)) -->
+
+<!-- plot( df.exp$Date, df.exp$ATL, type = "l",                    lwd = lwd.lin,  col = col.ATL, -->
+<!--       ylim = ylim, yaxt = 'n', xaxt = "n", bty = "n" ) -->
+
+<!-- axis(1, axd, format(axd, "%m\n%d"), cex.axis = 1.0, col = col.axs, lwd = lwd.axs,  pos = 0, -->
+<!--      col.axis = col.font, mgp = c(3,2,3) ) -->
+
+<!-- }) -->
+<!-- ``` -->
+
+<!-- Column {data-width=650} -->
+<!-- ----------------------------------------------------------------------- -->
+
+<!-- ### TRIMP distance -->
+
+<!-- ```{r} -->
+<!-- renderPlot({ -->
+
+<!-- #### TRIMP distance #### -->
+<!-- days_back   <- input$tsi_start -->
+<!-- days_future <- input$tsi_forecast -->
+<!-- # days_back   <- 367 -->
+<!-- # days_future <- -1 -->
+
+
+<!-- km_con                =   1.1 -->
+<!-- ## bias of longer runs over shorter -->
+<!-- polat_TL_exertion_con =   1.1 -->
+<!-- CTL_con               =  50 -->
+<!-- ATL_con               =  10 -->
+<!-- rest_day              =   0.009 -->
+
+<!-- start_day             = Sys.time() - days_back   * 24 * 3600 -->
+<!-- end_day               = Sys.time() + days_future * 24 * 3600 -->
+
+<!-- alldays <- data.frame( date = (seq(from = start_day, to = end_day, by = "day"))) -->
+
+<!-- ## get part of data with all dates -->
+<!-- df.subruns           <-  feet[ date >= start_day & date<=end_day ] -->
+<!-- df.subruns <- merge(df.subruns,alldays, by = "date", all = T) -->
+
+<!-- df.exp              <- df.subruns[, .( distanse = sum(distanse_old,na.rm = T), -->
+<!--                                        tl_exertion = sum(as.numeric(tl_exertion),na.rm = T)), -->
+<!--                                   by = (Date = as.Date(date))] -->
+<!-- setorder(df.exp,Date) -->
+
+<!-- df.exp$kmW             <- 0 -->
+<!-- df.exp$CTLKm           <- 0 -->
+<!-- df.exp$CTLKm[1]        <- 0 -->
+<!-- df.exp$ATLKm           <- 0 -->
+<!-- df.exp$ATLKm[1]        <- 0 -->
+<!-- df.exp$TSBKm           <- 0 -->
+
+<!-- ## create daily weights -->
+<!-- df.exp$kmW               <- df.exp$distanse**km_con -->
+<!-- # plot(df.exp$distanse, df.exp$kmW) -->
+
+<!-- ## compute training balance for each day -->
+<!-- for (i in 2:nrow(df.exp)) { -->
+<!--   # CTLkm polar_tl_exert -->
+<!--   df.exp$CTLKm[i] = df.exp$CTLKm[i - 1] + ( df.exp$kmW[i] - df.exp$CTLKm[i - 1] )/CTL_con -->
+<!--   # ATLkm polar_tl_exert -->
+<!--   df.exp$ATLKm[i] = df.exp$ATLKm[i - 1] + ( df.exp$kmW[i] - df.exp$ATLKm[i - 1] )/ATL_con -->
+<!-- } -->
+
+
+<!-- df.exp$TSBKm <- df.exp$CTLKm - df.exp$ATLKm -->
+<!-- df.exp[ kmW == 0, kmW := NA ] -->
+
+<!-- amplify = 1 -->
+
+<!-- axd    = seq(from = min(df.exp$Date), to = max(df.exp$Date), by = "3 days" ) -->
+
+<!-- par(mar = c(3,0,0,0)) -->
+
+<!-- kmbase <- min( df.exp$TSBKm, df.exp$CTLKm, df.exp$ATLKm, na.rm=T) -->
+<!-- kmtop  <- max( df.exp$TSBKm, df.exp$CTLKm, df.exp$ATLKm, na.rm=T) -->
+
+<!-- ss <- df.exp$kmW -->
+<!-- ss <- kmbase -->
+<!-- tt <- kmbase + df.exp$kmW -->
+
+<!-- ttt <- (0.20 * ( tt / max(df.exp$kmW, na.rm = T) ) * (kmtop - kmbase) ) - abs(kmbase) -->
+
+<!-- plot( df.exp$Date, df.exp$TSBKm, type = "l",                  lwd = lwd.lin,  col = col.TSB, -->
+<!--       yaxt = 'n', xaxt = "n", bty = "n" ) -->
+
+<!-- ## vertical lines -->
+<!-- segments( x0 = df.exp$Date, y0 = ss, y1 = ttt, lwd = lwd.bar, col = col.bar ) -->
+
+<!-- lines(df.exp$Date, df.exp$TSBKm, type = "l",                  lwd = lwd.lin,  col = col.TSB) -->
+
+<!-- abline(v = Sys.Date(), lty = 3,                               lwd = lwd.now,  col = col.now ) -->
+
+<!-- axis(side = 1, line = 0, axd, format(axd, "%m\n%d"), cex.axis = 1.0, col = col.axs, lwd = lwd.axs,   -->
+<!--      col.axis = col.font, mgp = c(3,2,3) ) -->
+
+
+<!-- par(new=T) -->
+<!-- plot( df.exp$Date, df.exp$CTLKm, type = "l",                   lwd = lwd.lin,  col = col.CTL, -->
+<!--       yaxt = 'n', xaxt = "n", bty = "n" ) -->
+
+<!-- par(new=T) -->
+<!-- plot( df.exp$Date, df.exp$ATLKm, type = "l",                   lwd = lwd.lin,  col = col.ATL, -->
+<!--       yaxt = 'n', xaxt = "n", bty = "n" ) -->
+
+<!-- }) -->
+<!-- ``` -->
+
+
+
+<!-- Column {data-width=650} -->
+<!-- ----------------------------------------------------------------------- -->
+
+<!-- ### Stats table -->
+
+
+
+
+
+
+<!-- Column {data-width=600} -->
+<!-- ----------------------------------------------------------------------- -->
+
+<!-- ### Monthly graphs -->
+
+
+<!-- ```{r} -->
+<!-- # renderPlot({ -->
+<!-- # nper <- input$nper -->
+<!-- # per  <- input$period -->
+<!-- # per  <- "years" -->
+<!-- per    <- "months" -->
+<!-- nper   <- 1 -->
+<!-- selvec <- lubridate::floor_date(feet$date, unit = paste(nper, per)) -->
+<!-- # range(selvec) -->
+
+
+
+
+<!-- ## plot all variables -->
+
+<!-- allcol <- grep("Date",names(agg),invert = T,value = T) -->
+<!-- types  <- unique(gsub("^S|^m|^M|^A","",allcol)) -->
+
+
+<!-- for (at in types) { -->
+<!--   wecare <- sort(allcol[grep(at,allcol)]) -->
+<!--   temp <- agg[, ..wecare] -->
+
+<!--   ylim <- range(temp,na.rm = T) -->
+<!--   xlim <- range(agg$Date) -->
+
+<!--   par(mar = c(2,2,2,0.5)) -->
+
+<!--   # renderPlot({ -->
+<!--   plot(1, type="n", xlab="", ylab="", xlim=xlim, ylim=ylim, xaxt='n') -->
+<!--   title(at) -->
+<!--   axis.Date(1,agg$Date) -->
+
+<!--   col <- c("green","blue","red","black") -->
+<!--   cc<-1 -->
+<!--   for (pt in unique(wecare)) { -->
+<!--     lines(agg$Date, temp[[pt]], col = col[cc]) -->
+<!--     cc<-cc+1 -->
+<!--   } -->
+
+
+<!--   # }) -->
+<!-- } -->
+<!-- # }) -->
+<!-- ``` -->
+
+
+
+
+
+<!-- ### Yearly graphs -->
+
+
+<!-- ```{r} -->
+<!-- # renderPlot({ -->
+<!-- # nper <- input$nper -->
+<!-- # per  <- input$period -->
+<!-- per  <- "years" -->
+<!-- # per  <- "months" -->
+<!-- nper <- 1 -->
+<!-- selvec <- lubridate::floor_date(feet$date, unit = paste(nper, per)) -->
+<!-- # range(selvec) -->
+
+
+<!-- ## do some data filetering -->
+<!-- feet[ HR_max> 210, HR_max:=NA]  -->
+
+<!-- # hist(feet[,HR_average]) -->
+
+
+
+<!-- ## plot all variables -->
+
+
+<!-- allcol <- grep("Date",names(agg),invert = T,value = T) -->
+<!-- types  <- unique(gsub("^S|^m|^M|^A","",allcol)) -->
+
+
+<!-- for (at in types) { -->
+<!--   wecare <- sort(allcol[grep(at,allcol)]) -->
+<!--   temp <- agg[, ..wecare] -->
+
+<!--   ylim <- range(temp,na.rm = T) -->
+<!--   xlim <- range(agg$Date) -->
+
+<!--   par(mar = c(2,2,2,0.5)) -->
+
+<!--   # renderPlot({ -->
+<!--   plot(1, type="n", xlab="", ylab="", xlim=xlim, ylim=ylim, xaxt='n') -->
+<!--   title(at) -->
+<!--   axis.Date(1,agg$Date) -->
+
+<!--   col <- c("green","blue","red","black") -->
+<!--   cc<-1 -->
+<!--   for (pt in unique(wecare)) { -->
+<!--     lines(agg$Date, temp[[pt]], col = col[cc]) -->
+<!--     cc<-cc+1 -->
+<!--   } -->
+
+<!--   ww <- gsub("^A", "Average ", wecare) -->
+<!--   ww <- gsub("^M","Max ", ww) -->
+<!--   ww <- gsub("^m","Min ", ww) -->
+<!--   ww <- gsub("^S","",     ww) -->
+
+<!--   # }) -->
+<!-- } -->
+<!-- # }) -->
+<!-- ``` -->
+
+
+
+<!-- ### 3 Months graphs -->
+
+<!-- ```{r} -->
+<!-- # renderPlot({ -->
+<!-- # nper <- input$nper -->
+<!-- # per  <- input$period -->
+<!-- # per  <- "years" -->
+<!-- per  <- "months" -->
+<!-- nper <- 3 -->
+<!-- selvec <- lubridate::floor_date(feet$date, unit = paste(nper, per)) -->
+<!-- # range(selvec) -->
+
+
+<!-- ## plot all variables -->
+
+<!-- allcol <- grep("Date",names(agg),invert = T,value = T) -->
+<!-- types  <- unique(gsub("^S|^m|^M|^A","",allcol)) -->
+
+
+<!-- for (at in types) { -->
+<!--   wecare <- sort(allcol[grep(at,allcol)]) -->
+<!--   temp <- agg[, ..wecare] -->
+
+<!--   ylim <- range(temp,na.rm = T) -->
+<!--   xlim <- range(agg$Date) -->
+
+<!--   # renderPlot({ -->
+<!--   plot(1, type="n", xlab="", ylab="", xlim=xlim, ylim=ylim, xaxt='n') -->
+<!--   title(at) -->
+<!--   axis.Date(1,agg$Date) -->
+<!--   col <- c("green","blue","red","black") -->
+<!--   cc<-1 -->
+<!--   for (pt in unique(wecare)) { -->
+<!--     lines(agg$Date, temp[[pt]], col = col[cc]) -->
+<!--     cc<-cc+1 -->
+<!--   } -->
+<!--   # }) -->
+<!-- } -->
+<!-- # }) -->
+<!-- ``` -->
+
