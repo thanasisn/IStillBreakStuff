@@ -69,6 +69,8 @@ shortn <- c(          "TP",                 "TZ",   "EP",          "RP")
 extend <- 30
 pdays  <- c(100, 400, 1000, 100)
 
+if (interactive()) pdays <- c(100)
+
 ### create metrics for all models
 gather <- data.table()
 for (ii in 1:length(wecare)) {
@@ -197,7 +199,7 @@ for (days in pdays) {
             par(new = T)
             plot(pp$date, pp[[vper]], col = 6, lwd = 2.5, "l", yaxt = "n", ylim = ylim)
 
-            legend("top", bty = "n", ncol = 3, lty = 1, inset = c(0, -0.03),
+            legend("top", bty = "n", ncol = 3, lty = 1, inset = c(0, -0.01),
                    cex = 0.7, text.col = "grey",
                    legend = c("Fatigue", "Fitness","Performance"),
                    col    = c(    3 ,     5 ,    6 ) )
