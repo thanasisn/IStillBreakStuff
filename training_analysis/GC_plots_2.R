@@ -228,6 +228,9 @@ for (days in pdays) {
             text(Sys.Date(), pp[[vfat]][pp$date == Sys.Date()],
                  labels = round(pp[[vfat]][pp$date == Sys.Date()]), col = 3, pos = 4 )
 
+            axis(1, at = pp[wday(date) == 2, date ], labels = F, col = "black", col.ticks = "black")
+            axis(1, at = pp[mday(date) == 1, date ], labels = format(pp[mday(date) == 1, date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
+
 
             title(paste(days,"d ", va, " ", mo, "  best:", best$date), cex = .7)
 
