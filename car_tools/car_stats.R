@@ -82,6 +82,8 @@ for (CAR in mycars) {
         gather <- rm.cols.dups.DT(gather)
         gather$Source <- "manual"
         servicemanual <- gather
+    } else {
+        servicemanual <- data.table()
     }
 
 
@@ -151,7 +153,7 @@ for (CAR in mycars) {
     wecare <- grep(paste0("number.",CAR), names(taplog))
     names(taplog)[wecare]              <- sub(paste0("number.",CAR,"_"),"", names(taplog)[wecare])
     names(taplog)[names(taplog)=="km"] <- "Odometer"
-    taplog         <- rm.cols.dups.df(taplog)
+    taplog <- rm.cols.dups.df(taplog)
 
     if (any(names(taplog) %in% "trip_km")) {
 
@@ -446,7 +448,7 @@ for (CAR in mycars) {
     fff$Fuel_car[fff$FillStatus == "Full Tank"] <- FUEL
     fff$Odometer2 <- fff$Odometer
 
-    ids <-c( which(fff[, FillStatus == "Full Tank" ]),nrow(fff))
+    ids <- c( which(fff[, FillStatus == "Full Tank" ]),nrow(fff))
 
     if (length(ids)>2) {
         for (i in 1:(length(ids)-1) ){
@@ -589,4 +591,3 @@ for (CAR in mycars) {
 
 tac = Sys.time();
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-
