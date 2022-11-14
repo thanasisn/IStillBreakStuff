@@ -15,7 +15,7 @@ inputdata   <- "~/LOGs/GCmetrics.Rds"
 moredata    <- "~/DATA/Other/GC_json_data.Rds"
 outputpdf   <- paste0("~/LOGs/car_logs/", basename(sub("\\.R$",".pdf", Script.Name)))
 datascript  <- "~/CODE/training_analysis/GC_read_activities.R"
-daysback    <- 360*3
+daysback    <- 365*3
 hourstriger <- 4
 
 if (!interactive()) {

@@ -15,7 +15,7 @@ Script.Name <- "GC_plots_2.R"
 moredata    <- "~/DATA/Other/GC_json_data.Rds"
 outputpdf   <- paste0("~/LOGs/car_logs/", basename(sub("\\.R$",".pdf", Script.Name)))
 datascript  <- "~/CODE/training_analysis/GC_read_activities.R"
-daysback    <- 360*3
+daysback    <- 365*3
 
 
 library(data.table)
