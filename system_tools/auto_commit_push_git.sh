@@ -163,6 +163,7 @@ folders=(
     "$HOME/CHP_1_DIR/"
     "$HOME/CM_21_GLB/"
     "$HOME/RAD_QC"
+    "$HOME/SUN"
     "$HOME/TSI"
 )
 
