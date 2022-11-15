@@ -240,6 +240,30 @@ for (days in pdays) {
 if (!interactive()) dev.off()
 
 
+capture.output({
+
+    metrics <- metrics[date > Sys.Date() - 500, ]
+
+    pander::pander(
+        metrics[, .(TRIMP_Points       = sum(TRIMP_Points,       na.rm = TRUE),
+                    TRIMP_Zonal_Points = sum(TRIMP_Zonal_Points, na.rm = TRUE),
+                    EPOC               = sum(EPOC,               na.rm = TRUE),
+                    Session_RPE        = sum(Session_RPE,        na.rm = TRUE),
+                    Calories           = sum(Calories,           na.rm = TRUE)),
+                by = .(date = as.Date((as.numeric(date) %/% 7) * 7, origin = "1970-01-01"))]
+    )
+
+    pander::pander(
+        metrics[, .(TRIMP_Points       = sum(TRIMP_Points,       na.rm = TRUE),
+                    TRIMP_Zonal_Points = sum(TRIMP_Zonal_Points, na.rm = TRUE),
+                    EPOC               = sum(EPOC,               na.rm = TRUE),
+                    Session_RPE        = sum(Session_RPE,        na.rm = TRUE),
+                    Calories           = sum(Calories,           na.rm = TRUE)),
+                by = .(Year = year(date), month = month(date))]
+    )
+}, file = "~/LOGs/car_logs/Load_tables.md")
+
+
 ####_ END _####
 tac = Sys.time()
 cat(sprintf("\n%s H:%s U:%s S:%s T:%f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
