@@ -332,7 +332,7 @@ for (days in pdays) {
 }
 
 
-source("~/CODE/training_analysis/GC_plots_2.R")
+# source("~/CODE/training_analysis/GC_plots_2.R")
 source("~/CODE/training_analysis/GC_plots_3.R")
 
 
