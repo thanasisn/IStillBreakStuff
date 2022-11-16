@@ -242,27 +242,47 @@ if (!interactive()) dev.off()
 
 capture.output({
 
-    metrics <- metrics[date > Sys.Date() - 500, ]
+    metrics <- metrics[date > Sys.Date() - 400, ]
 
-    pander::pander(
-        metrics[, .(TRIMP_Points       = sum(TRIMP_Points,       na.rm = TRUE),
-                    TRIMP_Zonal_Points = sum(TRIMP_Zonal_Points, na.rm = TRUE),
-                    EPOC               = sum(EPOC,               na.rm = TRUE),
-                    Session_RPE        = sum(Session_RPE,        na.rm = TRUE),
-                    Calories           = sum(Calories,           na.rm = TRUE)),
-                by = .(date = as.Date((as.numeric(date) %/% 7) * 7, origin = "1970-01-01"))]
-    )
+    weekly  <- metrics[, .(TRIMP_Points       = sum(TRIMP_Points,       na.rm = TRUE),
+                           TRIMP_Zonal_Points = sum(TRIMP_Zonal_Points, na.rm = TRUE),
+                           EPOC               = sum(EPOC,               na.rm = TRUE),
+                           Session_RPE        = sum(Session_RPE,        na.rm = TRUE),
+                           Calories           = sum(Calories,           na.rm = TRUE)),
+                       by = .(Year = year(date), Week = isoweek(date) )]
 
-    pander::pander(
-        metrics[, .(TRIMP_Points       = sum(TRIMP_Points,       na.rm = TRUE),
-                    TRIMP_Zonal_Points = sum(TRIMP_Zonal_Points, na.rm = TRUE),
-                    EPOC               = sum(EPOC,               na.rm = TRUE),
-                    Session_RPE        = sum(Session_RPE,        na.rm = TRUE),
-                    Calories           = sum(Calories,           na.rm = TRUE)),
-                by = .(Year = year(date), month = month(date))]
-    )
+    weekly[ , Date := as.Date(paste(Year, Week, 1, sep="-"), "%Y-%U-%u") ]
+
+
+    montly  <- metrics[, .(TRIMP_Points       = sum(TRIMP_Points,       na.rm = TRUE),
+                           TRIMP_Zonal_Points = sum(TRIMP_Zonal_Points, na.rm = TRUE),
+                           EPOC               = sum(EPOC,               na.rm = TRUE),
+                           Session_RPE        = sum(Session_RPE,        na.rm = TRUE),
+                           Calories           = sum(Calories,           na.rm = TRUE)),
+                       by = .(Year = year(date), month = month(date))]
+
+
+    cat("\n\n## WEEKLY SUMS\n\n")
+
+    pander::panderOptions("table.split.table", 200)
+    pander::pander( weekly )
+
+    cat(paste( names(weekly), collapse = "\t" ), "\n" )
+
+    cat("\n\n## MONTHLY SUMS\n\n")
+
+    pander::pander( montly )
+
+    cat(paste(  names(montly), collapse = "\t" ), "\n" )
+
+
 }, file = "~/LOGs/car_logs/Load_tables.md")
 
+
+ss <- data.table(Date = Sys.Date() + 1:20)
+ss[ , Week     := isoweek(Date) ]
+ss[ , Year     := year(Date) ]
+ss[ , ssss     := as.Date(paste(Year, Week, 1, sep="-"), "%Y-%U-%u") ]
 
 ####_ END _####
 tac = Sys.time()
