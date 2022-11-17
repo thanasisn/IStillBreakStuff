@@ -2,6 +2,8 @@
 
 ####  Display info for *.Rds files
 
+Sys.setenv(TZ = "UTC")
+
 args <- commandArgs(TRUE)
 
 for (fl in args) {
