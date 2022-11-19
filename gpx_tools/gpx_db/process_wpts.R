@@ -96,7 +96,6 @@ wecare <- c("ele", "time", "magvar", "geoidheight", "name", "cmt", "desc", "src"
 ffff <- readRDS(wpt_seed3)
 
 
-
 ####  Get all waypoints from files  ####
 if (length(gpxlist)>0) {
     update <- TRUE
@@ -123,13 +122,11 @@ if (length(gpxlist)>0) {
 
         } else {
             ## keep track of empty files
-            ff <- ffff
-            ff$file   <- af
-            ff$Region <- NA
-            ff$mtime  <- file.mtime(af)
-
+            ff         <- ffff
+            ff$file    <- af
+            ff$Region  <- NA
+            ff$mtime   <- file.mtime(af)
             gather_wpt <- rbind(gather_wpt,  ff)
-
         }
     }
 }
@@ -365,8 +362,8 @@ gather_wpt$desc <- NULL
 names(gather_wpt)[names(gather_wpt)=="file"] <- 'desc'
 
 ## drop data
-gather_wpt$file   <- NULL
-gather_wpt$mtime  <- NULL
+gather_wpt$file  <- NULL
+gather_wpt$mtime <- NULL
 
 ## characterize missing regions
 gather_wpt$Region[ is.na( gather_wpt$Region ) ] <- "Other"
@@ -457,7 +454,7 @@ gather_wpt <- gather_wpt[ grep("hotmail.com",                                  g
 
 gather_wpt <- unique(gather_wpt)
 
-ttt<-table(gather_wpt$name)
+ttt <- table(gather_wpt$name)
 
 cat(paste("\n", nrow(gather_wpt),"waypoints after filtering \n\n" ))
 
@@ -487,8 +484,10 @@ for (ar in unique(gather_wpt$Region)) {
     temp <- unique(temp)
 
     ## export all data for qgis with all metadata
-    if (nrow(temp)<1) { next() }
-    write_sf(temp, paste0("~/LOGs/waypoints/wpt_",ar,".gpx"), driver = "GPX", append = F, overwrite = T)
+    if (nrow(temp) < 1) { next() }
+    write_sf(temp,
+             paste0("~/LOGs/waypoints/wpt_",ar,".gpx"),
+             driver = "GPX", append = F, overwrite = T)
 
     ## remove a lot of data for gpx devices
     ##TODO you are removing useful info!!
@@ -496,14 +495,19 @@ for (ar in unique(gather_wpt$Region)) {
     temp$desc <- NA
     temp$src  <- NA
 
-    write_sf(temp, paste0("~/LOGs/waypoints_etrex//wpt_",ar,".gpx"), driver = "GPX", append = F, overwrite = T)
+    write_sf(temp,
+             paste0("~/LOGs/waypoints_etrex//wpt_",ar,".gpx"),
+             driver = "GPX", append = F, overwrite = T)
 }
 
 ## export all points for qgis
 gather_wpt$Region <- NULL
-write_sf(gather_wpt, '~/GISdata/Layers/Gathered_wpt.gpx', driver = "GPX", append = F, overwrite = T)
+write_sf(gather_wpt, '~/GISdata/Layers/Gathered_wpt.gpx',
+         driver = "GPX", append = F, overwrite = T)
 ## export all with all metadata
-write_sf(gather_wpt, '~/LOGs/waypoints/WPT_ALL.gpx',      driver = "GPX", append = F, overwrite = T)
+write_sf(gather_wpt, '~/LOGs/waypoints/WPT_ALL.gpx',
+         driver = "GPX", append = F, overwrite = T)
+
 
 
 
@@ -565,10 +569,11 @@ myRtools::write_dat(object = suspects[,..wecare],
 
 ## export all points for gps devices
 gather_wpt$Region <- NULL
-gather_wpt$cmt  <- NA
-gather_wpt$desc <- NA
-gather_wpt$src  <- NA
-write_sf(gather_wpt, '~/LOGs/waypoints_etrex/WPT_ALL.gpx', driver = "GPX", append = F, overwrite = T)
+gather_wpt$cmt    <- NA
+gather_wpt$desc   <- NA
+gather_wpt$src    <- NA
+write_sf(gather_wpt, '~/LOGs/waypoints_etrex/WPT_ALL.gpx',
+         driver = "GPX", append = F, overwrite = T)
 
 
 
