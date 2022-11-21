@@ -331,6 +331,11 @@ for (days in pdays) {
     }
 }
 
+system("cp /dev/shm/CONKY/banister_* /home/athan/LOGs/car_logs/")
+system("cp /dev/shm/CONKY/busson_* /home/athan/LOGs/car_logs/")
+system("cp /dev/shm/CONKY/trimp_* /home/athan/LOGs/car_logs/")
+
+
 
 # source("~/CODE/training_analysis/GC_plots_2.R")
 source("~/CODE/training_analysis/GC_plots_3.R")
