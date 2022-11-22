@@ -29,8 +29,8 @@ warning("time variable is different between data")
 storagefl <- "~/DATA/Other/GC_json_data.Rds"
 gcfolder  <- "~/TRAIN/GoldenCheetah/Athan/activities/"
 inputdata <- "~/LOGs/GCmetrics.Rds"
-pdfout1   <- "~/LOGs/car_logs/GC_all_plots.pdf"
-pdfout2   <- "~/LOGs/car_logs/GC_all_plots_last.pdf"
+pdfout1   <- "~/LOGs/training_status/GC_all_plots.pdf"
+pdfout2   <- "~/LOGs/training_status/GC_all_plots_last.pdf"
 export    <- "~/DATA/Other/Train_metrics.Rds"
 
 

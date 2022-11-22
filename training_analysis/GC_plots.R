@@ -13,7 +13,7 @@ Script.Name <- funr::sys.script()
 
 inputdata   <- "~/LOGs/GCmetrics.Rds"
 moredata    <- "~/DATA/Other/GC_json_data.Rds"
-outputpdf   <- paste0("~/LOGs/car_logs/", basename(sub("\\.R$",".pdf", Script.Name)))
+outputpdf   <- paste0("~/LOGs/training_status/", basename(sub("\\.R$",".pdf", Script.Name)))
 datascript  <- "~/CODE/training_analysis/GC_read_activities.R"
 daysback    <- 365*3
 hourstriger <- 4
@@ -330,11 +330,6 @@ for (days in pdays) {
         dev.off()
     }
 }
-
-system("cp /dev/shm/CONKY/banister_* /home/athan/LOGs/car_logs/")
-system("cp /dev/shm/CONKY/busson_* /home/athan/LOGs/car_logs/")
-system("cp /dev/shm/CONKY/trimp_* /home/athan/LOGs/car_logs/")
-
 
 
 # source("~/CODE/training_analysis/GC_plots_2.R")
