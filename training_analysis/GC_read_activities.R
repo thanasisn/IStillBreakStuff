@@ -199,11 +199,6 @@ for (avar in names(metrics)) {
     }
 }
 
-gather$Sport
-gather$Workout.Code
-metrics$Sport
-metrics$Workout_Code
-
 
 ## drop zeros on some columns
 wecare <- c()
@@ -234,7 +229,9 @@ wecare <- unique(wecare, grep("weight",   names(gather), value = TRUE, ignore.ca
 wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
 
 for (avar in wecare) {
-    metrics[[avar]][metrics[[avar]] == 0] <- NA
+    if (!is.character(metrics[[avar]])) {
+        metrics[[avar]][metrics[[avar]] == 0] <- NA
+    }
 }
 metrics <- data.table(metrics)
 metrics[, Notes := NULL]
@@ -245,11 +242,7 @@ metrics <- rm.cols.NA.DT(metrics)
 
 
 
-
-
-
-
-### homogenize data
+### homogenize data ####
 
 
 ####  Calories ####
@@ -283,23 +276,26 @@ tocheck <- grep("time",
 
 for (avar in tocheck) {
     if (all(metrics[[avar]] == gather[[avar]], na.rm = TRUE)) {
-        metrics[[avar]] <- NULL
+        cat(paste(avar, "equal on both"))
     }
 }
 
 
-## problems
-metrics$Work
-gather[!is.na(gather$Work)]
+metrics$Sport
+metrics$Workout_Code
+
 
 ## more problems
 metrics$Distance
 gather$Distance
-cbind(gather[, time, Distance],metrics[, time, Distance], all = T)
+test <- cbind(gather[, time, Distance],metrics[, time, Distance])
+
+
 
 
 
 ## hope for the best!!! ###
+warning("Not the same time!!")
 metrics <- unique(merge(metrics, gather, by = "time", all.x = T))
 setorder(metrics,time)
 
@@ -322,7 +318,6 @@ for (avar in names(metrics)) {
 }
 
 
-
 ## get duplicate columns
 dup.vec <- which(duplicated(t(metrics)))
 dup.vec <- names(metrics)[dup.vec]
@@ -331,10 +326,6 @@ dup.vec <- names(metrics)[dup.vec]
 col.checksums <- sapply(metrics, function(x) digest::digest(x, "md5"), USE.NAMES = T)
 dup.cols      <- data.table(col.name = names(col.checksums), hash.value = col.checksums)
 dup.cols      <- dup.cols[dup.cols, on = "hash.value"][col.name != i.col.name,]
-
-if (all(metrics[, Time.Moving == Duration.y ], na.rm = T)) {
-    metrics$Duration.y <- NULL
-}
 
 ## remove manual
 metrics[, DEVICETYPE        := NULL]
@@ -380,10 +371,14 @@ wecare <- c(
     grep("length",           names(metrics), value = TRUE, ignore.case = TRUE),
     grep("pace",             names(metrics), value = TRUE, ignore.case = TRUE),
     grep("power",            names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("skiba",            names(metrics), value = TRUE, ignore.case = TRUE),
+
     grep("time",             names(metrics), value = TRUE, ignore.case = TRUE),
     grep("watts",            names(metrics), value = TRUE, ignore.case = TRUE),
     grep("work",             names(metrics), value = TRUE, ignore.case = TRUE),
     NULL)
+
+
 
 wecare <- names(metrics)[names(metrics) %in% wecare]
 for (avar in wecare) {
@@ -392,6 +387,9 @@ for (avar in wecare) {
 metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
 
+
+metrics$Sport
+metrics$Workout_Code
 
 
 
@@ -416,14 +414,42 @@ metrics[, Recovery.Time             := NULL ]
 metrics[, Performance.Condition     := NULL ]
 metrics[, Duration.y                := NULL ]
 metrics[, OVRD_workout_time         := NULL ]
+# metrics[, Workout.Code              := NULL ]
+metrics[, Workout_Title             := NULL ]
 
 
 
 ## set colors
-str(metrics, list.len = 1000)
 
-metrics$sport
+table( metrics$Sport )
+table( metrics$Workout_Code)
 
+metrics[ Sport == "Bike", Col := "red"  ]
+metrics[ Sport == "Run",  Col := "blue" ]
+table(metrics$Col)
+
+metrics[,  Pch :=  1 ]
+
+metrics[ Sport == "Bike", Pch := 18 ]
+metrics[ Sport == "Run",  Pch :=  1 ]
+
+metrics[ Workout_Code == "Bike Road",       Pch := 18 ]
+metrics[ Workout_Code == "Bike Dirt",       Pch := 20 ]
+metrics[ Workout_Code == "Run Hills",       Pch :=  1 ]
+metrics[ Workout_Code == "Run Track",       Pch :=  6 ]
+metrics[ Workout_Code == "Run Trail",       Pch :=  8 ]
+metrics[ Workout_Code == "Run Race",        Pch :=  9 ]
+metrics[ Workout_Code == "Walk",            Pch :=  0 ]
+metrics[ Workout_Code == "Walk Hike Heavy", Pch :=  7 ]
+metrics[ Workout_Code == "Walk Hike",       Pch := 12 ]
+
+
+
+table(metrics$Pch)
+
+grep("Run|Walk", unique(metrics$Workout_Code), ignore.case = T , value = T)
+
+grep("Bike", unique(metrics$Workout_Code), ignore.case = T , value = T)
 
 
 ####  Export for others  ####
@@ -438,13 +464,15 @@ wecare <- grep("date|
                time|
                notes|
                time|
+               Col|
+               Pch|
                sport|
                bike|
                Average_Core_Temperature|
                shoes|
                filemtime|
                workout_code",
-            wecare, ignore.case = T,value = T,invert = T)
+            wecare, ignore.case = T, value = T, invert = T)
 
 
 
@@ -455,13 +483,16 @@ if (!interactive()) {
 for (avar in wecare) {
     ## ignore no data
     if (all(as.numeric(metrics[[avar]]) %in% c(0, NA))) {
-        metrics[[avar]] <- NULL
+        cat(paste("Skip plot", avar),"\n")
         next()
     }
 
     par(mar=c(2,2,1,1))
     plot(metrics$time, metrics[[avar]],
-         type = "l", xlab = "", ylab = "")
+         col = metrics$Col,
+         pch = metrics$Pch,
+         cex  = 0.8,
+         xlab = "", ylab = "")
     title(avar)
 }
 
@@ -476,13 +507,16 @@ if (!interactive()) {
 for (avar in wecare) {
     ## ignore no data
     if (all(as.numeric(metrics[[avar]]) %in% c(0, NA))) {
-        metrics[[avar]] <- NULL
+        cat(paste("Skip plot", avar),"\n")
         next()
     }
 
     par(mar=c(2,2,1,1))
     plot(metrics$time, metrics[[avar]],
-         type = "l", xlab = "", ylab = "")
+         col = metrics$Col,
+         pch = metrics$Pch,
+         cex  = 0.8,
+         xlab = "", ylab = "")
     title(avar)
 }
 
