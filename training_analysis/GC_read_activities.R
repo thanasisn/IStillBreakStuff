@@ -47,9 +47,9 @@ check      <- data.table(file, filesmtime)
 if (file.exists(storagefl)) {
     gather <- readRDS(storagefl)
     ## find files to read
-    test  <- gather[, file, filemtime]
-    test2 <- merge(test, check , by = "file", all = T)
-    files <- test2[ filemtime != filesmtime | is.na(filemtime) , file ]
+    test   <- gather[, file, filemtime]
+    test2  <- merge(test, check , by = "file", all = T)
+    files  <- test2[ filemtime != filesmtime | is.na(filemtime) , file ]
     ## drop preexisting files
     gather <- gather[ ! file %in% files ]
 } else {
@@ -199,6 +199,12 @@ for (avar in names(metrics)) {
     }
 }
 
+gather$Sport
+gather$Workout.Code
+metrics$Sport
+metrics$Workout_Code
+
+
 ## drop zeros on some columns
 wecare <- c()
 wecare <- c(
@@ -226,10 +232,6 @@ wecare <- unique(wecare, grep("effect",   names(gather), value = TRUE, ignore.ca
 wecare <- unique(wecare, grep("distance", names(gather), value = TRUE, ignore.case = TRUE))
 wecare <- unique(wecare, grep("weight",   names(gather), value = TRUE, ignore.case = TRUE))
 wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
-
-
-
-stop()
 
 for (avar in wecare) {
     metrics[[avar]][metrics[[avar]] == 0] <- NA
@@ -346,26 +348,81 @@ metrics[, IF                := NULL]
 metrics[, filemtime         := NULL]
 metrics[, file              := NULL]
 metrics[, Checksum          := NULL]
-
-
+metrics[, Calendar_Text     := NULL]
+metrics[, Athlete           := NULL]
+metrics[, Weekday           := NULL]
 
 ## drop zeros on some columns
+
+wecare <- grep("temp", names(metrics), value = TRUE, ignore.case = TRUE)
+for (avar in wecare) {
+    metrics[[avar]][metrics[[avar]] < -200] <- NA
+}
+
 wecare <- c(
-    grep("_in_Zone$",        names(metrics),value = T),
-    grep("_Sustained_Time$", names(metrics),value = T),
-    grep("_Peak_Hr$",        names(metrics),value = T),
-    grep("_W_bal_",          names(metrics),value = T),
-    grep("_HRV$",            names(metrics),value = T),
-    grep("_Peak_Pace$",      names(metrics),value = T),
-    grep("_Peak_Power_HR$",  names(metrics),value = T),
-    "xPower",
+    grep("RPE",              names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("Weight",           names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_HRV$",            names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_Peak_Hr$",        names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_Peak_Pace$",      names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_Peak_Power_HR$",  names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_Peak_WPK$",       names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_Sustained_Time$", names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_W_bal_",          names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_in_Zone$",        names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_in_zone$",        names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("balance",          names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("best",             names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("cadence",          names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("carrying",         names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("detected",         names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("effect",           names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("length",           names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("pace",             names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("power",            names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("time",             names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("watts",            names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("work",             names(metrics), value = TRUE, ignore.case = TRUE),
     NULL)
+
 wecare <- names(metrics)[names(metrics) %in% wecare]
 for (avar in wecare) {
     metrics[[avar]][metrics[[avar]] == 0] <- NA
 }
 metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
+
+
+
+
+## get duplicate columns
+dup.vec <- which(duplicated(t(metrics)))
+dup.vec <- names(metrics)[dup.vec]
+if (length(dup.vec) > 0) {
+    cat("\n\nDuplicate columns exist\n\n")
+}
+
+# create a vector with the checksum for each column keeps the column names as row names
+col.checksums <- sapply(metrics, function(x) digest::digest(x, "md5"), USE.NAMES = T)
+dup.cols      <- data.table(col.name = names(col.checksums), hash.value = col.checksums)
+dup.cols      <- dup.cols[dup.cols, on = "hash.value"][col.name != i.col.name,]
+dup.cols
+
+metrics[, Weight                    := NULL ]
+metrics[, Equipment.Weight          := NULL ]
+metrics[, Aerobic.Training.Effect   := NULL ]
+metrics[, Anaerobic.Training.Effect := NULL ]
+metrics[, Recovery.Time             := NULL ]
+metrics[, Performance.Condition     := NULL ]
+metrics[, Duration.y                := NULL ]
+metrics[, OVRD_workout_time         := NULL ]
+
+
+
+## set colors
+str(metrics, list.len = 1000)
+
+metrics$sport
 
 
 
@@ -389,8 +446,6 @@ wecare <- grep("date|
                workout_code",
             wecare, ignore.case = T,value = T,invert = T)
 
-# wecare <- grep("|_Fatigue|bike|shoes|workout_title|device|Calendar_text|Elevation_Gain_Carrying|heartbeats|Max_Core_Temperature|Checksum|Right_Balance|Percent_in_Zone|Percent_in_Pace_Zone|Best_|Distance_Swim|Equipment_Weight||Average_Temp|Max_Cadence|Max_Temp|min_Peak_Pace|_Peak_Pace|_Peak_Pace_HR|_Peak_Power|_Peak_Power_HR|min_Peak_Hr|_Peak_WPK|Min_temp|Average_Cadence|Average_Running_Cadence|Max_Running_Cadence",
-#                wecare, ignore.case = T,value = T,invert = T)
 
 
 if (!interactive()) {
