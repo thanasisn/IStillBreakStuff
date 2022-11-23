@@ -126,32 +126,31 @@ if (length(files) != 0) {
     }
 
     ## drop zeros on some columns
+    wecare <- c()
     wecare <- c(
-        "Aerobic.Training.Effect",
-        "Anaerobic.Training.Effect",
         "Average.Heart.Rate",
-        "Average.Speed",
         "CP",
         "Calories",
         "Daniels.Points",
-        "Distance",
         "Duration",
-        "Equipment.Weight",
         "OVRD_time_riding",
-        "OVRD_total_distance",
         "RECINTSECS",
         "RPE",
         "Recovery.Time",
         "Time.Moving",
-        "V02max.detected",
-        "V02max_detected",
-        "VO2max.detected",
-        "VO2max_detected",
         "Work",
         "cc",
         "xPower",
         NULL)
-    wecare <- names(gather)[names(gather)%in%wecare]
+    wecare <- names(gather)[names(gather) %in% wecare]
+
+    wecare <- unique(wecare, grep("detected", names(gather), value = TRUE, ignore.case = TRUE))
+    wecare <- unique(wecare, grep("speed",    names(gather), value = TRUE, ignore.case = TRUE))
+    wecare <- unique(wecare, grep("effect",   names(gather), value = TRUE, ignore.case = TRUE))
+    wecare <- unique(wecare, grep("distance", names(gather), value = TRUE, ignore.case = TRUE))
+    wecare <- unique(wecare, grep("weight",   names(gather), value = TRUE, ignore.case = TRUE))
+    wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
+
     for (avar in wecare) {
         gather[[avar]][gather[[avar]] == 0] <- NA
     }
@@ -201,32 +200,37 @@ for (avar in names(metrics)) {
 }
 
 ## drop zeros on some columns
+wecare <- c()
 wecare <- c(
-    "Aerobic.Training.Effect",
-    "Anaerobic.Training.Effect",
     "Average.Heart.Rate",
-    "Average.Speed",
     "CP",
     "Calories",
     "Daniels.Points",
     "Distance",
     "Duration",
-    "Equipment.Weight",
     "OVRD_time_riding",
     "OVRD_total_distance",
     "RECINTSECS",
     "RPE",
     "Recovery.Time",
     "Time.Moving",
-    "V02max.detected",
-    "V02max_detected",
-    "VO2max.detected",
-    "VO2max_detected",
     "Work",
     "cc",
     "xPower",
     NULL)
 wecare <- names(metrics)[names(metrics) %in% wecare]
+
+wecare <- unique(wecare, grep("detected", names(gather), value = TRUE, ignore.case = TRUE))
+wecare <- unique(wecare, grep("speed",    names(gather), value = TRUE, ignore.case = TRUE))
+wecare <- unique(wecare, grep("effect",   names(gather), value = TRUE, ignore.case = TRUE))
+wecare <- unique(wecare, grep("distance", names(gather), value = TRUE, ignore.case = TRUE))
+wecare <- unique(wecare, grep("weight",   names(gather), value = TRUE, ignore.case = TRUE))
+wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
+
+
+
+stop()
+
 for (avar in wecare) {
     metrics[[avar]][metrics[[avar]] == 0] <- NA
 }
