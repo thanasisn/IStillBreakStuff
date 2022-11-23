@@ -276,13 +276,11 @@ tocheck <- grep("time",
 
 for (avar in tocheck) {
     if (all(metrics[[avar]] == gather[[avar]], na.rm = TRUE)) {
-        cat(paste(avar, "equal on both"))
+        cat(paste(avar, "equal on both"),"\n")
     }
 }
 
 
-metrics$Sport
-metrics$Workout_Code
 
 
 ## more problems
@@ -359,6 +357,7 @@ wecare <- c(
     grep("_Peak_Power_HR$",  names(metrics), value = TRUE, ignore.case = TRUE),
     grep("_Peak_WPK$",       names(metrics), value = TRUE, ignore.case = TRUE),
     grep("_Sustained_Time$", names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_core_temperatur", names(metrics), value = TRUE, ignore.case = TRUE),
     grep("_W_bal_",          names(metrics), value = TRUE, ignore.case = TRUE),
     grep("_in_Zone$",        names(metrics), value = TRUE, ignore.case = TRUE),
     grep("_in_zone$",        names(metrics), value = TRUE, ignore.case = TRUE),
@@ -409,8 +408,6 @@ metrics <- rm.cols.dups.DT(metrics)
 metrics <- rm.cols.NA.DT(metrics)
 
 
-metrics$Sport
-metrics$Workout_Code
 
 
 
@@ -451,11 +448,11 @@ table(metrics$Col)
 
 metrics[,  Pch :=  1 ]
 
-metrics[ Sport == "Bike", Pch := 18 ]
-metrics[ Sport == "Run",  Pch :=  1 ]
+metrics[ Sport == "Bike", Pch := 1 ]
+metrics[ Sport == "Run",  Pch := 1 ]
 
-metrics[ Workout_Code == "Bike Road",       Pch := 18 ]
-metrics[ Workout_Code == "Bike Dirt",       Pch := 20 ]
+metrics[ Workout_Code == "Bike Road",       Pch :=  6 ]
+metrics[ Workout_Code == "Bike Dirt",       Pch :=  1 ]
 metrics[ Workout_Code == "Run Hills",       Pch :=  1 ]
 metrics[ Workout_Code == "Run Track",       Pch :=  6 ]
 metrics[ Workout_Code == "Run Trail",       Pch :=  8 ]
@@ -495,11 +492,11 @@ for (avar in wecare) {
         next()
     }
 
-    par(mar=c(2,2,1,1))
+    par(mar = c(2,2,1,1))
     plot(metrics$time, metrics[[avar]],
-         col = metrics$Col,
-         pch = metrics$Pch,
-         cex  = 0.8,
+         col  = metrics$Col,
+         pch  = metrics$Pch,
+         cex  = 0.6,
          xlab = "", ylab = "")
     title(avar)
 }
@@ -519,11 +516,11 @@ for (avar in wecare) {
         next()
     }
 
-    par(mar=c(2,2,1,1))
+    par(mar = c(2,2,1,1))
     plot(metrics$time, metrics[[avar]],
-         col = metrics$Col,
-         pch = metrics$Pch,
-         cex  = 0.8,
+         col  = metrics$Col,
+         pch  = metrics$Pch,
+         cex  = 0.6,
          xlab = "", ylab = "")
     title(avar)
 }
