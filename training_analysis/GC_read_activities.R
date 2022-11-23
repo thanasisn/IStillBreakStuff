@@ -375,8 +375,19 @@ wecare <- c(
     grep("_ratio",           names(metrics), value = TRUE, ignore.case = TRUE),
     grep("time",             names(metrics), value = TRUE, ignore.case = TRUE),
     grep("Heart",            names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("fatigue_index",    names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("pacing_index",     names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("distance",         names(metrics), value = TRUE, ignore.case = TRUE),
     grep("relative",         names(metrics), value = TRUE, ignore.case = TRUE),
     grep("RTP",              names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("TISS",             names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("response",         names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("bikeintensity",    names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("daniels",          names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("LNP",              names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("iwf",              names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("govss",            names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("EOA",              names(metrics), value = TRUE, ignore.case = TRUE),
     grep("bikescore",        names(metrics), value = TRUE, ignore.case = TRUE),
     grep("IF",               names(metrics), value = TRUE, ignore.case = TRUE),
     grep("bikestress",       names(metrics), value = TRUE, ignore.case = TRUE),
@@ -470,21 +481,8 @@ write_RDS(metrics, file = export, clean = TRUE)
 ####  Plot all #####
 
 wecare <- names(metrics)
-wecare <- grep("date|
-               time|
-               notes|
-               time|
-               Col|
-               Pch|
-               sport|
-               bike|
-               Average_Core_Temperature|
-               shoes|
-               filemtime|
-               workout_code",
+wecare <- grep("date|time|notes|time|Col|Pch|sport|bike|shoes|filemtime|workout_code",
             wecare, ignore.case = T, value = T, invert = T)
-
-
 
 if (!interactive()) {
     pdf(file = pdfout1, width = 8, height = 4)
