@@ -2,7 +2,7 @@
 
 #### Lock screen with a custom image
 
-BASE_IMG="$HOME/Media/IMAGES/debian_Vader.png"
+BASE_IMG="$HOME/MISC/Media/IMAGES/debian_Vader.png"
 TARGET="/dev/shm/CONKY/lockimage.png"
 COLOR="black"
 
