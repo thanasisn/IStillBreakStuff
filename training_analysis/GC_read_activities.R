@@ -476,7 +476,6 @@ write_RDS(metrics, file = export, clean = TRUE)
 
 
 ####  Plot all #####
-
 wecare <- names(metrics)
 wecare <- grep("date|time|notes|time|Col|Pch|sport|bike|shoes|filemtime|workout_code",
             wecare, ignore.case = T, value = T, invert = T)
@@ -485,6 +484,11 @@ if (!interactive()) {
     pdf(file = pdfout1, width = 8, height = 4)
 }
 
+
+
+
+
+stop()
 for (avar in wecare) {
     ## ignore no data
     if (all(as.numeric(metrics[[avar]]) %in% c(0, NA))) {
