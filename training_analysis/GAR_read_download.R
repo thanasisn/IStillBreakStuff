@@ -63,7 +63,11 @@ for (ag in groups) {
     for (af in pfiles) {
         cat(basename(af),"\n")
         tmp    <- fromJSON(af, flatten = TRUE)
-        if (is.list(tmp)) tmp <- list2DF(tmp)
+        if (is.list(tmp)) {
+            tmp$preferredLocale <- NULL
+            tmp$handedness      <- NULL
+            tmp <- list2DF(tmp)
+        }
         gather <- rbind(gather, tmp, fill = TRUE)
     }
     assign(ag, gather)
