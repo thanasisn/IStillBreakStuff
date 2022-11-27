@@ -485,10 +485,47 @@ if (!interactive()) {
 }
 
 
+## investigate load metrics
+par(mar = c(4,4,1,1))
+
+plot(metrics$EPOC, metrics$TRIMP_Points,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,
+     xlab = "EPOC", ylab = "TRIMP")
+
+plot(metrics$EPOC, metrics$TRIMP_Zonal_Points,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,
+     xlab = "EPOC", ylab = "TRIMP Zonal")
+
+plot(metrics$TRIMP_Points, metrics$TRIMP_Zonal_Points,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,
+     xlab = "TRIMP", ylab = "TRIMP Zonal")
+
+plot(metrics$Calories, metrics$TRIMP_Points,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+plot(metrics$Calories, metrics$TRIMP_Zonal_Points,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+plot(metrics$Calories, metrics$EPOC,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+
+plot(metrics$Duration.x, metrics$TRIMP_Points/metrics$EPOC,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+
+plot(metrics$Distance.x, metrics$TRIMP_Points/metrics$EPOC,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+
+plot(metrics$Distance.x, metrics$Distance.y,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+plot(metrics$Duration.x, metrics$Time_Recording,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+plot(metrics$Duration.x, metrics$Time_Carrying,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+plot(metrics$Duration.x, metrics$Time_Moving,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+plot(metrics$Duration.x, metrics$Time.Moving,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
 
 
 
-stop()
 for (avar in wecare) {
     ## ignore no data
     if (all(as.numeric(metrics[[avar]]) %in% c(0, NA))) {
@@ -512,6 +549,50 @@ metrics <- metrics[ as.Date(time) > (Sys.Date() - 700)  ]
 if (!interactive()) {
     pdf(file = pdfout2, width = 8, height = 4)
 }
+
+
+## investigate load metrics
+par(mar = c(4,4,1,1))
+
+plot(metrics$EPOC, metrics$TRIMP_Points,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,
+     xlab = "EPOC", ylab = "TRIMP")
+
+plot(metrics$EPOC, metrics$TRIMP_Zonal_Points,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,
+     xlab = "EPOC", ylab = "TRIMP Zonal")
+
+plot(metrics$TRIMP_Points, metrics$TRIMP_Zonal_Points,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,
+     xlab = "TRIMP", ylab = "TRIMP Zonal")
+
+plot(metrics$Calories, metrics$TRIMP_Points,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+plot(metrics$Calories, metrics$TRIMP_Zonal_Points,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+plot(metrics$Calories, metrics$EPOC,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+
+plot(metrics$Duration.x, metrics$TRIMP_Points/metrics$EPOC,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+
+plot(metrics$Distance.x, metrics$TRIMP_Points/metrics$EPOC,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+
+plot(metrics$Distance.x, metrics$Distance.y,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+plot(metrics$Duration.x, metrics$Time_Recording,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+plot(metrics$Duration.x, metrics$Time_Carrying,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+plot(metrics$Duration.x, metrics$Time_Moving,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+plot(metrics$Duration.x, metrics$Time.Moving,
+     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
+
+
+
+
 
 for (avar in wecare) {
     ## ignore no data
