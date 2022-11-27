@@ -49,7 +49,7 @@ General system and file tools for linux systems.
 ## [templates](https://github.com/thanasisn/IStillBreakStuff/tree/main/templates)
 Scripts templates and snippets.
 
-## [text_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/text_tools)kj
+## [text_tools](https://github.com/thanasisn/IStillBreakStuff/tree/main/text_tools)
 Tools for processing text or text files and creating documents.:W
 
 ## [training_analysis](https://github.com/thanasisn/IStillBreakStuff/tree/main/training_analysis)
