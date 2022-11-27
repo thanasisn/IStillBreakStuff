@@ -51,7 +51,8 @@ for (ag in groups) {
     gather <- data.table()
     for (af in pfiles) {
         cat(basename(af),"\n")
-        tmp    <- fromJSON(af, flatten = TRUE, simplifyDataFrame = T)
+        tmp    <- fromJSON(af, flatten = TRUE)
+        if (is.list(tmp)) tmp <- list2DF(tmp)
         gather <- rbind(gather, tmp, fill = TRUE)
     }
     assign(ag, gather)
