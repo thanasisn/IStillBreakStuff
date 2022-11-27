@@ -21,13 +21,12 @@ library(jsonlite)
 
 
 allfiles <- list.files(datalocation, recursive = TRUE, full.names = TRUE)
-
+## drop empty files
 allfiles <- allfiles[file.size(allfiles) > 10]
 
-
-
-## file types
+## show file types
 table(sub( ".*\\.", "" , basename(allfiles)))
+
 
 
 ####  parse json  ####
@@ -35,13 +34,25 @@ jsonfls <- grep(".json$", allfiles, ignore.case = TRUE, value = TRUE)
 
 jsonfls[file.size(jsonfls) <= 300]
 
-
+## check and remove some files
 fromJSON(grep("user_profile", jsonfls, value = T), flatten = F)
 jsonfls <- grep("user_profile", jsonfls, value = T, invert = T)
 
-groups <- unique(sub( "__", "", sub(".json","", gsub( "[-[:digit:]]+", "", basename( jsonfls )))))
+
+fromJSON(grep("social-profile", jsonfls, value = T), flatten = F)
+jsonfls <- grep("social-profile", jsonfls, value = T, invert = T)
 
 
+fromJSON(grep("user_settings", jsonfls, value = T), flatten = F)
+
+
+
+
+
+## groups of similar files
+groups <- unique(sub("__", "", sub(".json", "", gsub( "[-[:digit:]]+", "", basename( jsonfls )))))
+
+## parse all files
 for (ag in groups) {
     pfiles <- agrep(ag, jsonfls, value = T)
 
