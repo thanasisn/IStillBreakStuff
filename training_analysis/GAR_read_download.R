@@ -48,8 +48,13 @@ for (ag in groups) {
     cat("\n\nGroup:", ag, length(pfiles),"\n")
     cat(pfiles,"\n")
 
-
-
+    gather <- data.table()
+    for (af in pfiles) {
+        cat(basename(af),"\n")
+        tmp    <- fromJSON(af, flatten = TRUE)
+        gather <- rbind(gather, tmp, fill = TRUE)
+    }
+    assign(ag, gather)
 
 
 }
