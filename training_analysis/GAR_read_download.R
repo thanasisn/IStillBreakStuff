@@ -42,15 +42,20 @@ jsonfls <- grep("user_profile", jsonfls, value = T, invert = T)
 fromJSON(grep("social-profile", jsonfls, value = T), flatten = F)
 jsonfls <- grep("social-profile", jsonfls, value = T, invert = T)
 
+fromJSON(grep("user_contact", jsonfls, value = T), flatten = F)
+jsonfls <- grep("user_contact", jsonfls, value = T, invert = T)
 
-fromJSON(grep("user_settings", jsonfls, value = T), flatten = F)
-
+fromJSON(grep("UserGoal", jsonfls, value = T), flatten = F)
+jsonfls <- grep("UserGoal", jsonfls, value = T, invert = T)
 
 
 
 
 ## groups of similar files
 groups <- unique(sub("__", "", sub(".json", "", gsub( "[-[:digit:]]+", "", basename( jsonfls )))))
+groups <- sub("_$","", sub("^_","", groups))
+
+
 
 ## parse all files
 for (ag in groups) {
