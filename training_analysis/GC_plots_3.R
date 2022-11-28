@@ -448,28 +448,56 @@ legend("topleft", bty = "n", lty = 1, lwd = 2, cex = .8,
 
 if (!interactive()) dev.off()
 
+capture.output({
+    wecare <- names(metrics)
+    wecare <- grep("Average.Heart.Rate", wecare, invert = TRUE, value = T)
+    wecare <- grep("Average_Temp",       wecare, invert = TRUE, value = T)
+    wecare <- grep("Change.History",     wecare, invert = TRUE, value = T)
+    wecare <- grep("Device",             wecare, invert = TRUE, value = T)
+    wecare <- grep("Elevation.Gain",     wecare, invert = TRUE, value = T)
+    wecare <- grep("Equipment_Weight",   wecare, invert = TRUE, value = T)
+    wecare <- grep("Feel",               wecare, invert = TRUE, value = T)
+    wecare <- grep("File.Format",        wecare, invert = TRUE, value = T)
+    wecare <- grep("Filename",           wecare, invert = TRUE, value = T)
+    wecare <- grep("GPS.errors",         wecare, invert = TRUE, value = T)
+    wecare <- grep("Left.Right",         wecare, invert = TRUE, value = T)
+    wecare <- grep("Month",              wecare, invert = TRUE, value = T)
+    wecare <- grep("Notes",              wecare, invert = TRUE, value = T)
+    wecare <- grep("Spike.Time",         wecare, invert = TRUE, value = T)
+    wecare <- grep("Swim",               wecare, invert = TRUE, value = T)
+    wecare <- grep("Temperature",        wecare, invert = TRUE, value = T)
+    wecare <- grep("W_bal",              wecare, invert = TRUE, value = T)
+    wecare <- grep("Year",               wecare, invert = TRUE, value = T)
+    wecare <- grep("^Best",              wecare, invert = TRUE, value = T)
+    wecare <- grep("^Bike",              wecare, invert = TRUE, value = T)
+    wecare <- grep("^HI",                wecare, invert = TRUE, value = T)
+    wecare <- grep("^H[0-9]",            wecare, invert = TRUE, value = T)
+    wecare <- grep("^LI",                wecare, invert = TRUE, value = T)
+    wecare <- grep("^L[0-9]",            wecare, invert = TRUE, value = T)
+    wecare <- grep("^PI",                wecare, invert = TRUE, value = T)
+    wecare <- grep("^P[0-9]",            wecare, invert = TRUE, value = T)
+    wecare <- grep("^Pch|^Col",          wecare, invert = TRUE, value = T)
+    wecare <- grep("^Spikes",            wecare, invert = TRUE, value = T)
+    wecare <- grep("^W[0-9]",            wecare, invert = TRUE, value = T)
+    wecare <- grep("^X[0-9]",            wecare, invert = TRUE, value = T)
+    wecare <- grep("^pN",                wecare, invert = TRUE, value = T)
+    wecare <- grep("_Carrying",          wecare, invert = TRUE, value = T)
+    wecare <- grep("date",               wecare, invert = TRUE, value = T)
+    wecare <- grep("xPower",             wecare, invert = TRUE, value = T)
 
-wecare <- names(metrics)
-wecare <- grep("^L[0-9]",   wecare, invert = TRUE, value = T)
-wecare <- grep("^X[0-9]",   wecare, invert = TRUE, value = T)
-wecare <- grep("^W[0-9]",   wecare, invert = TRUE, value = T)
-wecare <- grep("^P[0-9]",   wecare, invert = TRUE, value = T)
-wecare <- grep("^H[0-9]",   wecare, invert = TRUE, value = T)
-wecare <- grep("^HI",       wecare, invert = TRUE, value = T)
-wecare <- grep("^PI",       wecare, invert = TRUE, value = T)
-wecare <- grep("^LI",       wecare, invert = TRUE, value = T)
-wecare <- grep("Filename",  wecare, invert = TRUE, value = T)
-wecare <- grep("Month",     wecare, invert = TRUE, value = T)
-wecare <- grep("Year",      wecare, invert = TRUE, value = T)
-wecare <- grep("^Pch|^Col", wecare, invert = TRUE, value = T)
-wecare <- grep("^Bike",     wecare, invert = TRUE, value = T)
-wecare <- grep("^pN",       wecare, invert = TRUE, value = T)
+    wecare
 
-wecare
+    export <- metrics[, ..wecare]
+    export <- rm.cols.dups.DT(export)
+    export <- rm.cols.NA.DT(export)
+    names(export)
 
-metrics[, ..wecare]
-names(metrics)
+    cat("\n\n## Activities\n\n")
+    pander::panderOptions("table.split.table", 2000)
+    pander::pander( export )
+    cat(paste( names(export), collapse = "\t" ), "\n" )
 
+}, file = "~/LOGs/training_status/Last_Activities.md")
 
 
 

@@ -476,10 +476,15 @@ grep("Run|Walk", unique(metrics$Workout_Code), ignore.case = T , value = T)
 
 grep("Bike", unique(metrics$Workout_Code), ignore.case = T , value = T)
 
+## create some new metrics
+metrics$Intensity_TRIMP       <- metrics$TRIMP_Points       / metrics$Duration.x
+metrics$Intensity_TRIMP_Zonal <- metrics$TRIMP_Zonal_Points / metrics$Duration.x
+metrics$Intensity_EPOC        <- metrics$EPOC               / metrics$Duration.x
+metrics$Intensity_Calories    <- metrics$Calories           / metrics$Duration.x
+
 
 ####  Export for others  ####
 write_RDS(metrics, file = export, clean = TRUE)
-
 
 
 ####  Plot all #####
