@@ -34,12 +34,11 @@ jsonfls <- grep(".json$", allfiles, ignore.case = TRUE, value = TRUE)
 
 jsonfls[file.size(jsonfls) <= 300]
 
-## check and remove some files
-fromJSON(grep("user_profile", jsonfls, value = T), flatten = F)
+## check and remove some files we don't care for
+fromJSON(grep("user_profile", jsonfls, value = T), flatten = T)
 jsonfls <- grep("user_profile", jsonfls, value = T, invert = T)
 
-
-fromJSON(grep("social-profile", jsonfls, value = T), flatten = F)
+fromJSON(grep("social-profile", jsonfls, value = T), flatten = T)
 jsonfls <- grep("social-profile", jsonfls, value = T, invert = T)
 
 fromJSON(grep("user_contact", jsonfls, value = T), flatten = F)
@@ -48,13 +47,28 @@ jsonfls <- grep("user_contact", jsonfls, value = T, invert = T)
 fromJSON(grep("UserGoal", jsonfls, value = T), flatten = F)
 jsonfls <- grep("UserGoal", jsonfls, value = T, invert = T)
 
+fromJSON(grep("_courses", jsonfls, value = T), flatten = F)
+jsonfls <- grep("_courses", jsonfls, value = T, invert = T)
+
+fromJSON(grep("_gear", jsonfls, value = T), flatten = T)
+jsonfls <- grep("_gear", jsonfls, value = T, invert = T)
+
+fromJSON(grep("_goal", jsonfls, value = T), flatten = T)
+jsonfls <- grep("_goal", jsonfls, value = T, invert = T)
+
+fromJSON(grep("_personalRecord", jsonfls, value = T), flatten = T)
+jsonfls <- grep("_personalRecord", jsonfls, value = T, invert = T)
+
+fromJSON(grep("_workout", jsonfls, value = T), flatten = T)
+jsonfls <- grep("_workout", jsonfls, value = T, invert = T)
+
 
 
 
 ## groups of similar files
 groups <- unique(sub("__", "", sub(".json", "", gsub( "[-[:digit:]]+", "", basename( jsonfls )))))
 groups <- sub("_$","", sub("^_","", groups))
-
+groups <- sub("dangas","", groups)
 
 
 ## parse all files
@@ -68,14 +82,21 @@ for (ag in groups) {
     for (af in pfiles) {
         cat(basename(af),"\n")
         tmp    <- fromJSON(af, flatten = TRUE)
+## if only one element unlist it
+        stop()
         if (is.list(tmp)) {
             tmp$preferredLocale <- NULL
             tmp$handedness      <- NULL
             tmp <- list2DF(tmp)
+            # tmp <- as.data.frame(do.call(cbind, tmp))
+            # tmp <- as.data.frame(do.call(rbind, tmp))
+            # tmp <- rbindlist(tmp, fill = T)
         }
         gather <- rbind(gather, tmp, fill = TRUE)
     }
+    # gather <- unique(gather)
     assign(ag, gather)
+    rm(gather, tmp)
 
 
 }

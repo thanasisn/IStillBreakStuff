@@ -4,7 +4,7 @@
 Tools for processing my training data.
 
 Training load analysis and other statistics.
-Implementing human performance models like TSB, Banister, Busso.
+Implementing human performance models like TSB/PMC, Banister, Busso.
 
 Output of graphs for desktop with conky, smartphone as background image,
 pdf for computer and smartphone and maybe an html page. Everything is meant to
