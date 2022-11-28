@@ -50,6 +50,11 @@ library(data.table)
 source("~/FUNCTIONS/R/data.R")
 
 
+## NEw data input dont work
+# datascript  <- "~/CODE/training_analysis/GC_read_activities.R"
+# source(datascript)
+# metricsM <- readRDS("~/DATA/Other/Train_metrics.Rds")
+
 
 metricsM <- readRDS("~/LOGs/GCmetrics.Rds")
 metricsM <- data.table(metricsM)
@@ -64,7 +69,7 @@ for (asp in unique(metricsM$Sport)) {
     metrics  <- rm.cols.dups.DT(metrics)
     cat(paste("\n\nNrow:", nrow(metrics),"\n\n"))
 
-    if (nrow(metrics)<=1) next()
+    if (nrow(metrics) <= 1) next()
 
     wecare  <- names(Filter(is.numeric, metrics))
     wecare  <- grep("Time_in_Zone",      wecare, value = T, invert = T )
