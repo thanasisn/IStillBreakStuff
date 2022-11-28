@@ -175,6 +175,8 @@ if (length(files) != 0) {
 } else {
     cat(paste("\nNo new activities\n"))
 }
+tail(gather)
+
 
 
 ####  Read data from GC exports  ###############################################
@@ -281,7 +283,8 @@ for (avar in tocheck) {
 }
 
 
-
+gather$Sport
+metrics$Sport
 
 ## more problems
 metrics$Distance
@@ -292,9 +295,10 @@ test <- cbind(gather[, time, Distance],metrics[, time, Distance])
 
 
 
-## hope for the best!!! ###
+###  merge and hope for the best!!!  ####
 warning("Not the same time!!")
-metrics <- unique(merge(metrics, gather, by = "time", all.x = T))
+## due to local time and summer time differences
+metrics <- unique(merge(metrics, gather, by = "time", all = T))
 setorder(metrics,time)
 
 ## duplicate name columns check
@@ -314,7 +318,7 @@ for (avar in names(metrics)) {
         metrics[[avar]] <- NULL
     }
 }
-
+setorder(metrics, time)
 
 ## get duplicate columns
 dup.vec <- which(duplicated(t(metrics)))
@@ -410,7 +414,6 @@ metrics <- rm.cols.NA.DT(metrics)
 
 
 
-
 ## get duplicate columns
 dup.vec <- which(duplicated(t(metrics)))
 dup.vec <- names(metrics)[dup.vec]
@@ -435,6 +438,11 @@ metrics[, OVRD_workout_time         := NULL ]
 # metrics[, Workout.Code              := NULL ]
 metrics[, Workout_Title             := NULL ]
 
+if (all(metrics$Sport.x == metrics$Sport.y, na.rm = T)) {
+    metrics$Sport <- metrics$Sport.x
+    metrics$Sport.x <- NULL
+    metrics$Sport.y <- NULL
+}
 
 
 ## set colors
@@ -453,6 +461,7 @@ metrics[ Sport == "Run",  Pch := 1 ]
 
 metrics[ Workout_Code == "Bike Road",       Pch :=  6 ]
 metrics[ Workout_Code == "Bike Dirt",       Pch :=  1 ]
+metrics[ Workout_Code == "Bike Static",     Pch :=  4 ]
 metrics[ Workout_Code == "Run Hills",       Pch :=  1 ]
 metrics[ Workout_Code == "Run Track",       Pch :=  6 ]
 metrics[ Workout_Code == "Run Trail",       Pch :=  8 ]
@@ -460,8 +469,6 @@ metrics[ Workout_Code == "Run Race",        Pch :=  9 ]
 metrics[ Workout_Code == "Walk",            Pch :=  0 ]
 metrics[ Workout_Code == "Walk Hike Heavy", Pch :=  7 ]
 metrics[ Workout_Code == "Walk Hike",       Pch := 12 ]
-
-
 
 table(metrics$Pch)
 

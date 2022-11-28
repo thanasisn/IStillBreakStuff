@@ -177,7 +177,7 @@ for (days in pdays) {
     legend("top", bty = "n", ncol = 4, lty = 1, inset = c(0, -0.01),
            cex = 0.7, text.col = "black",
            legend = c("EPOC", "TRIMP ZN", "TRIMP", "RP"),
-           col    = c(    2 ,           3 ,      4 ,   5) )
+           col    = c(    2 ,           3 ,    4 ,   5) )
     abline(h = pretty(ylim, n = 15), col = "grey", lty = 3)
     axis(4)
 
@@ -198,7 +198,7 @@ for (days in pdays) {
     legend("top", bty = "n", ncol = 4, lty = 1, inset = c(0, -0.01),
            cex = 0.7, text.col = "black",
            legend = c("EPOC", "TRIMP ZN", "TRIMP", "RP"),
-           col    = c(    2 ,           3 ,      4 ,   5) )
+           col    = c(    2 ,         3 ,      4 ,   5) )
     abline(h = pretty(ylim, n = 15), col = "grey", lty = 3)
     abline(v = weekly$Date - 0.5,    col = "grey", lty = 2)
     axis(4)
@@ -247,7 +247,7 @@ for (days in pdays) {
             legend("top", bty = "n", ncol = 3, lty = 1, inset = c(0, -0.01),
                    cex = 0.7, text.col = "grey",
                    legend = c("Fatigue", "Fitness","Performance"),
-                   col    = c(    3 ,     5 ,    6 ) )
+                   col    = c(       3 ,        5 ,           6 ) )
 
             ## decoration on plots
             prediction <- pp[ date > last$date, ]
@@ -353,7 +353,7 @@ for (days in pdays) {
     for (met in c("BUS","BAN","PMC")) {
         for (mod in c("PER","FAT","FIT")) {
             wem <- grep(paste0(met,"_",mod), names(pppppp), value = T)
-            unifid[[paste0(met,"_",mod)]] <- rowMeans( pppppp[,  ..wem ] )
+            unifid[[paste0(met,"_",mod)]] <- rowMeans(pppppp[, ..wem])
         }
     }
 
@@ -446,12 +446,38 @@ legend("topleft", bty = "n", lty = 1, lwd = 2, cex = .8,
        legend = c("TRIMP", "TRIMP Zoned", "EPOC", "Calories / 10"),
        col    = c(      4,             3,      2,               6))
 
-
-
-
-
-
 if (!interactive()) dev.off()
+
+
+wecare <- names(metrics)
+wecare <- grep("^L[0-9]",   wecare, invert = TRUE, value = T)
+wecare <- grep("^X[0-9]",   wecare, invert = TRUE, value = T)
+wecare <- grep("^W[0-9]",   wecare, invert = TRUE, value = T)
+wecare <- grep("^P[0-9]",   wecare, invert = TRUE, value = T)
+wecare <- grep("^H[0-9]",   wecare, invert = TRUE, value = T)
+wecare <- grep("^HI",       wecare, invert = TRUE, value = T)
+wecare <- grep("^PI",       wecare, invert = TRUE, value = T)
+wecare <- grep("^LI",       wecare, invert = TRUE, value = T)
+wecare <- grep("Filename",  wecare, invert = TRUE, value = T)
+wecare <- grep("Month",     wecare, invert = TRUE, value = T)
+wecare <- grep("Year",      wecare, invert = TRUE, value = T)
+wecare <- grep("^Pch|^Col", wecare, invert = TRUE, value = T)
+wecare <- grep("^Bike",     wecare, invert = TRUE, value = T)
+wecare <- grep("^pN",       wecare, invert = TRUE, value = T)
+
+wecare
+
+metrics[, ..wecare]
+names(metrics)
+
+
+
+
+
+
+
+
+
 
 
 
