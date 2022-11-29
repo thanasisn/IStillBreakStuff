@@ -106,10 +106,75 @@ for (ag in groups) {
 
 
 
+GData_RunRacePredictions$timestamp <- NULL
+GData_RunRacePredictions <- unique(GData_RunRacePredictions)
+GData_RunRacePredictions$calendarDate <- as.Date( GData_RunRacePredictions$calendarDate )
+
+wecare <- grep("Date" , names(GData_RunRacePredictions), value = T, invert = T)
+for (av in wecare) {
+    plot(GData_RunRacePredictions$calendarDate , GData_RunRacePredictions[[av]],
+    xlab = "", ylab = "", main = av )
+
+}
+
+
+
+GData_FitnessAgeData$rhrLastEntryDate.date <- as.POSIXct(strptime(GData_FitnessAgeData$rhrLastEntryDate.date, "%b %d, %Y %r"))
+GData_FitnessAgeData$asOfDateGmt.date <- as.POSIXct(strptime(GData_FitnessAgeData$asOfDateGmt.date, "%b %d, %Y %r"))
+
+plot(GData_FitnessAgeData$rhrLastEntryDate.date, GData_FitnessAgeData$rhr )
+plot(GData_FitnessAgeData$asOfDateGmt.date,      GData_FitnessAgeData$rhr )
+plot(GData_FitnessAgeData$asOfDateGmt.date,      GData_FitnessAgeData$vo2MaxForHealthyBmiFat )
+plot(GData_FitnessAgeData$asOfDateGmt.date,      GData_FitnessAgeData$biometricVo2Max )
+plot(GData_FitnessAgeData$asOfDateGmt.date,      GData_FitnessAgeData$currentBioAge )
+plot(GData_FitnessAgeData$asOfDateGmt.date,      GData_FitnessAgeData$vo2MaxForHealthyActive )
+plot(GData_FitnessAgeData$asOfDateGmt.date,      GData_FitnessAgeData$healthyActiveBioAge )
+
+
+
+names(GData_sleepData)
+
+names(GData_summarizedActivities)
+
+names(GData_TrainingHistory)
+
+GData_TrainingHistory$timestamp <- as.POSIXct(strptime( GData_TrainingHistory$timestamp, "%FT%R" ))
+
+
+ylim <- range(GData_TrainingHistory$loadTunnelMin,
+              GData_TrainingHistory$loadTunnelMax,
+              GData_TrainingHistory$weeklyTrainingLoadSum)
+
+plot(GData_TrainingHistory$timestamp, GData_TrainingHistory$weeklyTrainingLoadSum,
+     ylim = ylim, col = "green")
+lines(GData_TrainingHistory$timestamp, GData_TrainingHistory$loadTunnelMin, col = "blue")
+lines(GData_TrainingHistory$timestamp, GData_TrainingHistory$loadTunnelMax, col = "red")
 
 
 
 
+grep("date|time" ,names(GData_UDSFile), ignore.case = T, value = T)
+
+
+table(GData_UDSFile$source,exclude = T)
+## keep only garmin collected data
+GData_UDSFile <- GData_UDSFile[ !is.na(source) ]
+
+
+
+GData_UDSFile$restingHeartRateTimestamp <- as.POSIXct(strptime(GData_UDSFile$restingHeartRateTimestamp, "%b %d, %Y %r"))
+
+GData_UDSFile$calendarDate.date <- as.POSIXct(strptime(GData_UDSFile$calendarDate.date, "%b %d, %Y %r"))
+
+
+plot(GData_UDSFile$calendarDate.date, GData_UDSFile$minHeartRate  )
+plot(GData_UDSFile$calendarDate.date, GData_UDSFile$maxHeartRate  )
+
+plot(GData_FitnessAgeData$asOfDateGmt.date,  GData_FitnessAgeData$rhr )
+plot(GData_UDSFile$calendarDate.date, GData_UDSFile$restingHeartRate  )
+
+plot(GData_UDSFile$calendarDate.date, GData_UDSFile$minAvgHeartRate  )
+plot(GData_UDSFile$calendarDate.date, GData_UDSFile$maxAvgHeartRate  )
 
 
 
