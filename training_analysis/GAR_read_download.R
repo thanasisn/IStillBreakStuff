@@ -2,6 +2,8 @@
 
 #### Read data from Garmin Connect data dump
 
+#+ include=T, echo=F
+
 
 ####_ Set environment _####
 closeAllConnections()
@@ -18,6 +20,9 @@ datalocation <- "~/ZHOST/ggg/504717a5-34a4-46c7-aa2c-3e34d7581984_1/DI_CONNECT/"
 library(data.table)
 library(jsonlite)
 source("~/FUNCTIONS/R/data.R")
+source("~/CODE/R_myRtools/myRtools/R/write_.R")
+
+outbase <- "~/DATA/Other/Garmin/"
 
 
 allfiles <- list.files(datalocation, recursive = TRUE, full.names = TRUE)
@@ -118,24 +123,29 @@ for (av in wecare) {
 }
 
 
+
+
+# ---------------------------------------------------------------------------- #
 #'
 #' ## Fitness Age Data
 #'
-GData_FitnessAgeData[, createTimestamp.date         := NULL ]
-GData_FitnessAgeData[, weightDataLastEntryDate.date := NULL ]
-GData_FitnessAgeData[, rhrLastEntryDate.date        := NULL ]
+#+ include=T, echo=F
+GData_FitnessAgeData$asOfDateGmt.date             <- as.POSIXct(strptime(GData_FitnessAgeData$asOfDateGmt.date,             "%b %d, %Y %r"))
+GData_FitnessAgeData$createTimestamp.date         <- as.POSIXct(strptime(GData_FitnessAgeData$createTimestamp.date,         "%b %d, %Y %r"))
+GData_FitnessAgeData$weightDataLastEntryDate.date <- as.POSIXct(strptime(GData_FitnessAgeData$weightDataLastEntryDate.date, "%b %d, %Y %r"))
+GData_FitnessAgeData$rhrLastEntryDate.date        <- as.POSIXct(strptime(GData_FitnessAgeData$rhrLastEntryDate.date,        "%b %d, %Y %r"))
 
-
-# GData_FitnessAgeData[, asOfDateGmt.date := as.POSIXct(strptime(asOfDateGmt.date, "%b %d, %Y %r"))]
-GData_FitnessAgeData[, asOfDateGmt.date := as.POSIXct(asOfDateGmt.date, "%b %d, %Y %r")]
-
-
-for (av in names(GData_FitnessAgeData)) {
+wecare <- names(GData_FitnessAgeData)
+wecare <- grep("date", wecare, ignore.case = T, invert = T, value = T)
+for (av in wecare) {
     par(mar = c(2,2,2,1))
-    plot(GData_FitnessAgeData$asOfDateGmt.date,   GData_FitnessAgeData[[av]],
-         ylab = "", xlab = "", cex = 0.6)
+    plot(GData_FitnessAgeData$asOfDateGmt.date, GData_FitnessAgeData[[av]],
+         ylab = "", xlab = "", cex = 0.6, type = "o")
     title(av)
 }
+write_RDS(object = GData_FitnessAgeData,
+          file   = paste0(outbase, "/", "Garmin_Fitness_Age_Data") )
+# ---------------------------------------------------------------------------- #
 
 
 
