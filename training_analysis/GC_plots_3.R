@@ -63,8 +63,10 @@ if (!interactive()) pdf(paste0("~/LOGs/training_status/",
                                "_all_models",".pdf"), width = 9, height = 4)
 
 ## select metrics for pdf
-wecare <- c("TRIMP_Points", "TRIMP_Zonal_Points", "EPOC", "Session_RPE")
-shortn <- c(          "TP",                 "TZ",   "EP",          "RP")
+# wecare <- c("TRIMP_Points", "TRIMP_Zonal_Points", "EPOC", "Session_RPE")
+# shortn <- c(          "TP",                 "TZ",   "EP",          "RP")
+wecare <- c("TRIMP_Points", "TRIMP_Zonal_Points", "EPOC")
+shortn <- c(          "TP",                 "TZ",   "EP")
 extend <- 30
 pdays  <- c(100, 450, daysback)
 
@@ -166,26 +168,25 @@ for (days in pdays) {
     models <- c("PMC", "BAN", "BUS")
 
     ####  each day bar plot of metrics  ####
-    wwca <- c("EP.BAN_VAL", "TZ.BAN_VAL", "TP.BAN_VAL", "RP.BAN_VAL")
+    wwca <- c("EP.BAN_VAL", "TZ.BAN_VAL", "TP.BAN_VAL")
     ylim <- range(pppppp[ , ..wwca ], na.rm = T)
 
     par("mar" = c(2,2,0.1,2), xpd = FALSE)
     plot( as.POSIXct(pppppp$date)            , pppppp$EP.BAN_VAL, type = "h", col = 2, ylim = ylim, xlab = "", ylab = "")
     lines(as.POSIXct(pppppp$date) +  3 * 3600, pppppp$TZ.BAN_VAL, type = "h", col = 3)
     lines(as.POSIXct(pppppp$date) +  9 * 3600, pppppp$TP.BAN_VAL, type = "h", col = 4)
-    lines(as.POSIXct(pppppp$date) + 12 * 3600, pppppp$RP.BAN_VAL, type = "h", col = 5)
+    # lines(as.POSIXct(pppppp$date) + 12 * 3600, pppppp$RP.BAN_VAL, type = "h", col = 5)
     legend("top", bty = "n", ncol = 4, lty = 1, inset = c(0, -0.01),
            cex = 0.7, text.col = "black",
-           legend = c("EPOC", "TRIMP ZN", "TRIMP", "RP"),
-           col    = c(    2 ,           3 ,    4 ,   5) )
+           legend = c("EPOC", "TRIMP ZN", "TRIMP"),
+           col    = c(    2 ,           3 ,    4 ) )
     abline(h = pretty(ylim, n = 15), col = "grey", lty = 3)
     axis(4)
 
     ####  each week metrics bar plot  ####
     weekly  <- pppppp[, .(EP.BAN_VAL = sum(EP.BAN_VAL, na.rm = TRUE),
                           TZ.BAN_VAL = sum(TZ.BAN_VAL, na.rm = TRUE),
-                          TP.BAN_VAL = sum(TP.BAN_VAL, na.rm = TRUE),
-                          RP.BAN_VAL = sum(RP.BAN_VAL, na.rm = TRUE)),
+                          TP.BAN_VAL = sum(TP.BAN_VAL, na.rm = TRUE)),
                        by = .(Year = year(date), Week = isoweek(date) )]
     weekly[ , Date := as.Date(paste(Year, Week, 1, sep="-"), "%Y-%U-%u") ]
 
@@ -194,11 +195,11 @@ for (days in pdays) {
     plot( weekly$Date    , weekly$EP.BAN_VAL, lwd = 2, type = "h", col = 2, ylim = ylim, xlab = "", ylab = "")
     lines(weekly$Date + 1, weekly$TZ.BAN_VAL, lwd = 2, type = "h", col = 3)
     lines(weekly$Date + 2, weekly$TP.BAN_VAL, lwd = 2, type = "h", col = 4)
-    lines(weekly$Date + 3, weekly$RP.BAN_VAL, lwd = 2, type = "h", col = 5)
+    # lines(weekly$Date + 3, weekly$RP.BAN_VAL, lwd = 2, type = "h", col = 5)
     legend("top", bty = "n", ncol = 4, lty = 1, inset = c(0, -0.01),
            cex = 0.7, text.col = "black",
-           legend = c("EPOC", "TRIMP ZN", "TRIMP", "RP"),
-           col    = c(    2 ,         3 ,      4 ,   5) )
+           legend = c("EPOC", "TRIMP ZN", "TRIMP"),
+           col    = c(    2 ,         3 ,      4 ) )
     abline(h = pretty(ylim, n = 15), col = "grey", lty = 3)
     abline(v = weekly$Date - 0.5,    col = "grey", lty = 2)
     axis(4)
