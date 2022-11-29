@@ -82,7 +82,10 @@ for (ag in groups) {
     for (af in pfiles) {
         cat(basename(af),"\n")
         tmp    <- fromJSON(af, flatten = TRUE)
-## if only one element unlist it
+        if (length(tmp) == 1) {
+            tmp <- tmp[[1]]
+        }
+
         stop()
         if (is.list(tmp)) {
             tmp$preferredLocale <- NULL
