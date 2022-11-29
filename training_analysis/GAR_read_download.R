@@ -118,17 +118,26 @@ for (av in wecare) {
 }
 
 
+#'
+#' ## Fitness Age Data
+#'
+GData_FitnessAgeData[, createTimestamp.date         := NULL ]
+GData_FitnessAgeData[, weightDataLastEntryDate.date := NULL ]
+GData_FitnessAgeData[, rhrLastEntryDate.date        := NULL ]
 
-GData_FitnessAgeData$rhrLastEntryDate.date <- as.POSIXct(strptime(GData_FitnessAgeData$rhrLastEntryDate.date, "%b %d, %Y %r"))
-GData_FitnessAgeData$asOfDateGmt.date <- as.POSIXct(strptime(GData_FitnessAgeData$asOfDateGmt.date, "%b %d, %Y %r"))
 
-plot(GData_FitnessAgeData$rhrLastEntryDate.date, GData_FitnessAgeData$rhr )
-plot(GData_FitnessAgeData$asOfDateGmt.date,      GData_FitnessAgeData$rhr )
-plot(GData_FitnessAgeData$asOfDateGmt.date,      GData_FitnessAgeData$vo2MaxForHealthyBmiFat )
-plot(GData_FitnessAgeData$asOfDateGmt.date,      GData_FitnessAgeData$biometricVo2Max )
-plot(GData_FitnessAgeData$asOfDateGmt.date,      GData_FitnessAgeData$currentBioAge )
-plot(GData_FitnessAgeData$asOfDateGmt.date,      GData_FitnessAgeData$vo2MaxForHealthyActive )
-plot(GData_FitnessAgeData$asOfDateGmt.date,      GData_FitnessAgeData$healthyActiveBioAge )
+# GData_FitnessAgeData[, asOfDateGmt.date := as.POSIXct(strptime(asOfDateGmt.date, "%b %d, %Y %r"))]
+GData_FitnessAgeData[, asOfDateGmt.date := as.POSIXct(asOfDateGmt.date, "%b %d, %Y %r")]
+
+
+for (av in names(GData_FitnessAgeData)) {
+    par(mar = c(2,2,2,1))
+    plot(GData_FitnessAgeData$asOfDateGmt.date,   GData_FitnessAgeData[[av]],
+         ylab = "", xlab = "", cex = 0.6)
+    title(av)
+}
+
+
 
 
 
