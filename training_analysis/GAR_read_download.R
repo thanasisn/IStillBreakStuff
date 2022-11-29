@@ -17,7 +17,7 @@ datalocation <- "~/ZHOST/ggg/504717a5-34a4-46c7-aa2c-3e34d7581984_1/DI_CONNECT/"
 
 library(data.table)
 library(jsonlite)
-
+source("~/FUNCTIONS/R/data.R")
 
 
 allfiles <- list.files(datalocation, recursive = TRUE, full.names = TRUE)
@@ -62,7 +62,8 @@ jsonfls <- grep("_personalRecord", jsonfls, value = T, invert = T)
 fromJSON(grep("_workout", jsonfls, value = T), flatten = T)
 jsonfls <- grep("_workout", jsonfls, value = T, invert = T)
 
-
+fromJSON(grep("user_settings", jsonfls, value = T), flatten = T)
+jsonfls <- grep("user_settings", jsonfls, value = T, invert = T)
 
 
 ## groups of similar files
@@ -74,20 +75,17 @@ groups <- sub("dangas","", groups)
 ## parse all files
 for (ag in groups) {
     pfiles <- agrep(ag, jsonfls, value = T)
-
     cat("\n\nGroup:", ag, length(pfiles),"\n")
     cat(pfiles,"\n")
-
     gather <- data.table()
     for (af in pfiles) {
         cat(basename(af),"\n")
         tmp    <- fromJSON(af, flatten = TRUE)
-        if (length(tmp) == 1) {
+        ## unwrap lists
+        while (length(tmp) == 1) {
             tmp <- tmp[[1]]
         }
-
-        stop()
-        if (is.list(tmp)) {
+        if (typeof(tmp) == "list") {
             tmp$preferredLocale <- NULL
             tmp$handedness      <- NULL
             tmp <- list2DF(tmp)
@@ -98,11 +96,17 @@ for (ag in groups) {
         gather <- rbind(gather, tmp, fill = TRUE)
     }
     # gather <- unique(gather)
+    gather <- rm.cols.NA.DT(gather)
+    gather <- rm.cols.dups.DT(gather)
+    ag     <- paste0("GData_", ag)
     assign(ag, gather)
     rm(gather, tmp)
-
-
 }
+
+
+
+
+
 
 
 
