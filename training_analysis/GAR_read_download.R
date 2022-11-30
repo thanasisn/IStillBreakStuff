@@ -1,4 +1,30 @@
 #!/usr/bin/env Rscript
+#' ---
+#' title: "Study of Global radiation enhancement over Thessaloniki"
+#' date: "`r format(Sys.time(), '%F')`"
+#'
+#' documentclass: article
+#' classoption:   a4paper,oneside
+#' fontsize:      11pt
+#' geometry:      "left=1in,right=1in,top=1in,bottom=1in"
+#'
+#' header-includes:
+#' - \usepackage{caption}
+#' - \usepackage{placeins}
+#' - \captionsetup{font=small}
+#' - \usepackage{multicol}
+#' - \setlength{\columnsep}{1cm}
+#'
+#' output:
+#'   bookdown::pdf_document2:
+#'     number_sections:  no
+#'     fig_caption:      no
+#'     keep_tex:         yes
+#'     keep_md:          yes
+#'     latex_engine:     xelatex
+#'     toc:              yes
+#' ---
+
 
 #### Read data from Garmin Connect data dump
 
@@ -14,7 +40,7 @@ Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
                             return("Garmin_read_dump") })
 
-datalocation <- "~/ZHOST/ggg/504717a5-34a4-46c7-aa2c-3e34d7581984_1/DI_CONNECT/"
+datalocation <- "~/ZHOST/ggg/6d2aff5b-0e5a-4608-9799-f5e304c02b77_1/"
 
 
 library(data.table)
@@ -110,22 +136,27 @@ for (ag in groups) {
 
 
 
-
-GData_RunRacePredictions$timestamp <- NULL
-GData_RunRacePredictions <- unique(GData_RunRacePredictions)
+#'
+#' ## Run Race Predictions
+#'
+#+ include=T, echo=F
+GData_RunRacePredictions$timestamp    <- NULL
+GData_RunRacePredictions              <- unique(GData_RunRacePredictions)
 GData_RunRacePredictions$calendarDate <- as.Date( GData_RunRacePredictions$calendarDate )
 
 wecare <- grep("Date" , names(GData_RunRacePredictions), value = T, invert = T)
 for (av in wecare) {
+    par(mar = c(2,2,2,1))
     plot(GData_RunRacePredictions$calendarDate , GData_RunRacePredictions[[av]],
-    xlab = "", ylab = "", main = av )
-
+    xlab = "", ylab = "", main = av, cex = 0.6 )
 }
+write_RDS(object = GData_RunRacePredictions,
+          file   = paste0(outbase, "/", "Garmin_Run_Race_Predictions"))
 
 
 
 
-# ---------------------------------------------------------------------------- #
+
 #'
 #' ## Fitness Age Data
 #'
@@ -144,8 +175,7 @@ for (av in wecare) {
     title(av)
 }
 write_RDS(object = GData_FitnessAgeData,
-          file   = paste0(outbase, "/", "Garmin_Fitness_Age_Data") )
-# ---------------------------------------------------------------------------- #
+          file   = paste0(outbase, "/", "Garmin_Fitness_Age_Data"))
 
 
 
@@ -163,7 +193,7 @@ GData_TrainingHistory$timestamp <- as.POSIXct(strptime( GData_TrainingHistory$ti
 
 ylim <- range(GData_TrainingHistory$loadTunnelMin,
               GData_TrainingHistory$loadTunnelMax,
-              GData_TrainingHistory$weeklyTrainingLoadSum)
+              GData_TrainingHistory$weeklyTrainingLoadSum, na.rm = T)
 
 plot(GData_TrainingHistory$timestamp, GData_TrainingHistory$weeklyTrainingLoadSum,
      ylim = ylim, col = "green")
