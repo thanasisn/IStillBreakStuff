@@ -2,6 +2,8 @@
 
 #### Read data from Garmin Connect data dump
 
+#+ include=T, echo=F
+
 
 ####_ Set environment _####
 closeAllConnections()
@@ -17,7 +19,10 @@ datalocation <- "~/ZHOST/ggg/504717a5-34a4-46c7-aa2c-3e34d7581984_1/DI_CONNECT/"
 
 library(data.table)
 library(jsonlite)
+source("~/FUNCTIONS/R/data.R")
+source("~/CODE/R_myRtools/myRtools/R/write_.R")
 
+outbase <- "~/DATA/Other/Garmin/"
 
 
 allfiles <- list.files(datalocation, recursive = TRUE, full.names = TRUE)
@@ -62,7 +67,8 @@ jsonfls <- grep("_personalRecord", jsonfls, value = T, invert = T)
 fromJSON(grep("_workout", jsonfls, value = T), flatten = T)
 jsonfls <- grep("_workout", jsonfls, value = T, invert = T)
 
-
+fromJSON(grep("user_settings", jsonfls, value = T), flatten = T)
+jsonfls <- grep("user_settings", jsonfls, value = T, invert = T)
 
 
 ## groups of similar files
@@ -74,18 +80,17 @@ groups <- sub("dangas","", groups)
 ## parse all files
 for (ag in groups) {
     pfiles <- agrep(ag, jsonfls, value = T)
-
     cat("\n\nGroup:", ag, length(pfiles),"\n")
     cat(pfiles,"\n")
-
     gather <- data.table()
     for (af in pfiles) {
         cat(basename(af),"\n")
         tmp    <- fromJSON(af, flatten = TRUE)
-        tmp
-
-        stop()
-        if (is.list(tmp)) {
+        ## unwrap lists
+        while (length(tmp) == 1) {
+            tmp <- tmp[[1]]
+        }
+        if (typeof(tmp) == "list") {
             tmp$preferredLocale <- NULL
             tmp$handedness      <- NULL
             tmp <- list2DF(tmp)
@@ -96,14 +101,100 @@ for (ag in groups) {
         gather <- rbind(gather, tmp, fill = TRUE)
     }
     # gather <- unique(gather)
+    gather <- rm.cols.NA.DT(gather)
+    gather <- rm.cols.dups.DT(gather)
+    ag     <- paste0("GData_", ag)
     assign(ag, gather)
     rm(gather, tmp)
+}
 
+
+
+
+GData_RunRacePredictions$timestamp <- NULL
+GData_RunRacePredictions <- unique(GData_RunRacePredictions)
+GData_RunRacePredictions$calendarDate <- as.Date( GData_RunRacePredictions$calendarDate )
+
+wecare <- grep("Date" , names(GData_RunRacePredictions), value = T, invert = T)
+for (av in wecare) {
+    plot(GData_RunRacePredictions$calendarDate , GData_RunRacePredictions[[av]],
+    xlab = "", ylab = "", main = av )
 
 }
 
 
 
+
+# ---------------------------------------------------------------------------- #
+#'
+#' ## Fitness Age Data
+#'
+#+ include=T, echo=F
+GData_FitnessAgeData$asOfDateGmt.date             <- as.POSIXct(strptime(GData_FitnessAgeData$asOfDateGmt.date,             "%b %d, %Y %r"))
+GData_FitnessAgeData$createTimestamp.date         <- as.POSIXct(strptime(GData_FitnessAgeData$createTimestamp.date,         "%b %d, %Y %r"))
+GData_FitnessAgeData$weightDataLastEntryDate.date <- as.POSIXct(strptime(GData_FitnessAgeData$weightDataLastEntryDate.date, "%b %d, %Y %r"))
+GData_FitnessAgeData$rhrLastEntryDate.date        <- as.POSIXct(strptime(GData_FitnessAgeData$rhrLastEntryDate.date,        "%b %d, %Y %r"))
+
+wecare <- names(GData_FitnessAgeData)
+wecare <- grep("date", wecare, ignore.case = T, invert = T, value = T)
+for (av in wecare) {
+    par(mar = c(2,2,2,1))
+    plot(GData_FitnessAgeData$asOfDateGmt.date, GData_FitnessAgeData[[av]],
+         ylab = "", xlab = "", cex = 0.6, type = "o")
+    title(av)
+}
+write_RDS(object = GData_FitnessAgeData,
+          file   = paste0(outbase, "/", "Garmin_Fitness_Age_Data") )
+# ---------------------------------------------------------------------------- #
+
+
+
+
+
+
+names(GData_sleepData)
+
+names(GData_summarizedActivities)
+
+names(GData_TrainingHistory)
+
+GData_TrainingHistory$timestamp <- as.POSIXct(strptime( GData_TrainingHistory$timestamp, "%FT%R" ))
+
+
+ylim <- range(GData_TrainingHistory$loadTunnelMin,
+              GData_TrainingHistory$loadTunnelMax,
+              GData_TrainingHistory$weeklyTrainingLoadSum)
+
+plot(GData_TrainingHistory$timestamp, GData_TrainingHistory$weeklyTrainingLoadSum,
+     ylim = ylim, col = "green")
+lines(GData_TrainingHistory$timestamp, GData_TrainingHistory$loadTunnelMin, col = "blue")
+lines(GData_TrainingHistory$timestamp, GData_TrainingHistory$loadTunnelMax, col = "red")
+
+
+
+
+grep("date|time" ,names(GData_UDSFile), ignore.case = T, value = T)
+
+
+table(GData_UDSFile$source,exclude = T)
+## keep only garmin collected data
+GData_UDSFile <- GData_UDSFile[ !is.na(source) ]
+
+
+
+GData_UDSFile$restingHeartRateTimestamp <- as.POSIXct(strptime(GData_UDSFile$restingHeartRateTimestamp, "%b %d, %Y %r"))
+
+GData_UDSFile$calendarDate.date <- as.POSIXct(strptime(GData_UDSFile$calendarDate.date, "%b %d, %Y %r"))
+
+
+plot(GData_UDSFile$calendarDate.date, GData_UDSFile$minHeartRate  )
+plot(GData_UDSFile$calendarDate.date, GData_UDSFile$maxHeartRate  )
+
+plot(GData_FitnessAgeData$asOfDateGmt.date,  GData_FitnessAgeData$rhr )
+plot(GData_UDSFile$calendarDate.date, GData_UDSFile$restingHeartRate  )
+
+plot(GData_UDSFile$calendarDate.date, GData_UDSFile$minAvgHeartRate  )
+plot(GData_UDSFile$calendarDate.date, GData_UDSFile$maxAvgHeartRate  )
 
 
 
