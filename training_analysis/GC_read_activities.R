@@ -151,6 +151,7 @@ if (length(files) != 0) {
     wecare <- unique(wecare, grep("weight",   names(gather), value = TRUE, ignore.case = TRUE))
     wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
 
+    stop()
     for (avar in wecare) {
         gather[[avar]][gather[[avar]] == 0] <- NA
     }

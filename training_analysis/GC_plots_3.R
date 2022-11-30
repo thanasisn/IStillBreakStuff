@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-#### Golden Cheetah plots
+#### Human Performance plots and data
 ## This is incorporated to conky
 
 
@@ -405,7 +405,6 @@ capture.output({
     weekly  <- metrics[, .(TRIMP_Points       = sum(TRIMP_Points,       na.rm = TRUE),
                            TRIMP_Zonal_Points = sum(TRIMP_Zonal_Points, na.rm = TRUE),
                            EPOC               = sum(EPOC,               na.rm = TRUE),
-                           Session_RPE        = sum(Session_RPE,        na.rm = TRUE),
                            Calories           = sum(Calories,           na.rm = TRUE)),
                        by = .(Year = year(date), Week = isoweek(date) )]
     weekly[ , Date := as.Date(paste(Year, Week, 1, sep="-"), "%Y-%U-%u") ]
@@ -414,7 +413,6 @@ capture.output({
     montly  <- metrics[, .(TRIMP_Points       = sum(TRIMP_Points,       na.rm = TRUE),
                            TRIMP_Zonal_Points = sum(TRIMP_Zonal_Points, na.rm = TRUE),
                            EPOC               = sum(EPOC,               na.rm = TRUE),
-                           Session_RPE        = sum(Session_RPE,        na.rm = TRUE),
                            Calories           = sum(Calories,           na.rm = TRUE)),
                        by = .(Year = year(date), month = month(date))]
     montly[ , Date := as.Date(paste(Year, month, 1, sep="-"), "%Y-%m-%d") ]
@@ -440,8 +438,8 @@ ylim   <- range(0, weekly$TRIMP_Points, weekly$TRIMP_Zonal_Points, weekly$EPOC,
 plot( weekly$Date,  weekly$TRIMP_Points, "l",  lwd = 2, col = 4, ylim = ylim)
 lines(weekly$Date,  weekly$TRIMP_Zonal_Points, lwd = 2, col = 3 )
 lines(weekly$Date,  weekly$EPOC,               lwd = 2, col = 2 )
-# lines(weekly$Date,  weekly$Session_RPE,        lwd = 2, col = 5 )
 lines(weekly$Date,  weekly$Calories/10,        lwd = 2, col = 6 )
+# abline(v = Sys.Date(), lty = 2, col = "green")
 
 legend("topleft", bty = "n", lty = 1, lwd = 2, cex = .8,
        legend = c("TRIMP", "TRIMP Zoned", "EPOC", "Calories / 10"),
