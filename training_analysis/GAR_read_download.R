@@ -1,19 +1,20 @@
-#!/usr/bin/env Rscript
+# /* #!/usr/bin/env Rscript  */
 #' ---
-#' title: "Study of Global radiation enhancement over Thessaloniki"
-#' date: "`r format(Sys.time(), '%F')`"
+#' title: "Parse of Garmin data dump"
+#' date:  "`r format(Sys.time(), '%F')`"
 #'
-#' documentclass: article
-#' classoption:   a4paper,oneside
-#' fontsize:      11pt
-#' geometry:      "left=1in,right=1in,top=1in,bottom=1in"
+#' documentclass:   article
+#' classoption:     a4paper,oneside
+#' fontsize:        10pt
+#' geometry:        "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+#'
+#' link-citations:  yes
+#' colorlinks:      yes
 #'
 #' header-includes:
 #' - \usepackage{caption}
 #' - \usepackage{placeins}
 #' - \captionsetup{font=small}
-#' - \usepackage{multicol}
-#' - \setlength{\columnsep}{1cm}
 #'
 #' output:
 #'   bookdown::pdf_document2:
@@ -23,16 +24,21 @@
 #'     keep_md:          yes
 #'     latex_engine:     xelatex
 #'     toc:              yes
+#'     fig_width:        8
+#'     fig_height:       3
+#'   html_document:
+#'     toc:              true
+#'     fig_width:        8
+#'     fig_height:       4
 #' ---
-
+#+ echo=F, include=T
 
 #### Read data from Garmin Connect data dump
 
-#+ include=T, echo=F
 
 
 ####_ Set environment _####
-closeAllConnections()
+# closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
@@ -102,7 +108,7 @@ groups <- unique(sub("__", "", sub(".json", "", gsub( "[-[:digit:]]+", "", basen
 groups <- sub("_$","", sub("^_","", groups))
 groups <- sub("dangas","", groups)
 
-
+#+ echo=F, include=T
 ## parse all files
 for (ag in groups) {
     pfiles <- agrep(ag, jsonfls, value = T)
@@ -152,7 +158,7 @@ for (av in wecare) {
 }
 write_RDS(object = GData_RunRacePredictions,
           file   = paste0(outbase, "/", "Garmin_Run_Race_Predictions"))
-
+rm(GData_RunRacePredictions)
 
 
 
@@ -176,8 +182,7 @@ for (av in wecare) {
 }
 write_RDS(object = GData_FitnessAgeData,
           file   = paste0(outbase, "/", "Garmin_Fitness_Age_Data"))
-
-
+rm(GData_FitnessAgeData)
 
 
 
@@ -197,25 +202,29 @@ GData_MetricsAcuteTrainingLoad$acwrStatus <- factor(GData_MetricsAcuteTrainingLo
 wecare <- grep("Date|time" , names(GData_MetricsAcuteTrainingLoad), value = T, invert = T, ignore.case = T)
 for (av in wecare) {
     par(mar = c(3,2,2,1))
-
     if (is.character(GData_MetricsAcuteTrainingLoad[[av]])) {
         GData_MetricsAcuteTrainingLoad[[av]] <- factor(GData_MetricsAcuteTrainingLoad[[av]])
     }
     plot(GData_MetricsAcuteTrainingLoad$Date, GData_MetricsAcuteTrainingLoad[[av]],
          ylab = "", xlab = "", cex = 0.6, type = "o", col = GData_MetricsAcuteTrainingLoad$acwrStatus)
     title(av)
-
     legend("top", pch = 1, cex = 0.7, bty = "n", ncol = 2,
            legend = levels(GData_MetricsAcuteTrainingLoad$acwrStatus),
            col    = 1:4 )
 }
 write_RDS(object = GData_MetricsAcuteTrainingLoad,
           file   = paste0(outbase, "/", "Garmin_Metrics_Acute_Training_Load"))
+rm(GData_MetricsAcuteTrainingLoad)
 
 
 
+#'
+#' ## Hydration Log
+#'
+#+ include=T, echo=F
 
-
+GData_HydrationLogFile <- GData_HydrationLogFile[ duration != 0 ]
+GData_HydrationLogFile <- rm.cols.NA.DT(GData_HydrationLogFile)
 
 
 names(GData_sleepData)
@@ -256,7 +265,6 @@ GData_UDSFile$calendarDate.date <- as.POSIXct(strptime(GData_UDSFile$calendarDat
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$minHeartRate  )
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$maxHeartRate  )
 
-plot(GData_FitnessAgeData$asOfDateGmt.date,  GData_FitnessAgeData$rhr )
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$restingHeartRate  )
 
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$minAvgHeartRate  )
@@ -264,6 +272,8 @@ plot(GData_UDSFile$calendarDate.date, GData_UDSFile$maxAvgHeartRate  )
 
 
 
-####_ END _####
+#'
+#' **END**
+#+ include=T, echo=F
 tac <- Sys.time()
-cat(sprintf("\n%s H:%s U:%s S:%s T:%f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

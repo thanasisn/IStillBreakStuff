@@ -138,6 +138,8 @@ if (length(files) != 0) {
         "RPE",
         "Recovery.Time",
         "Time.Moving",
+        "RPE",
+        "Feel",
         "Work",
         "cc",
         "xPower",
@@ -150,8 +152,8 @@ if (length(files) != 0) {
     wecare <- unique(wecare, grep("distance", names(gather), value = TRUE, ignore.case = TRUE))
     wecare <- unique(wecare, grep("weight",   names(gather), value = TRUE, ignore.case = TRUE))
     wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
+    wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
 
-    stop()
     for (avar in wecare) {
         gather[[avar]][gather[[avar]] == 0] <- NA
     }
@@ -219,6 +221,8 @@ wecare <- c(
     "Recovery.Time",
     "Time.Moving",
     "Work",
+    "RPE",
+    "Feel",
     "cc",
     "xPower",
     NULL)
@@ -230,6 +234,7 @@ wecare <- unique(wecare, grep("effect",   names(gather), value = TRUE, ignore.ca
 wecare <- unique(wecare, grep("distance", names(gather), value = TRUE, ignore.case = TRUE))
 wecare <- unique(wecare, grep("weight",   names(gather), value = TRUE, ignore.case = TRUE))
 wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
+
 
 for (avar in wecare) {
     if (!is.character(metrics[[avar]])) {
@@ -354,7 +359,15 @@ for (avar in wecare) {
 }
 
 wecare <- c(
+    grep("EOA",              names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("Feel",             names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("Heart",            names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("IF",               names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("LNP",              names(metrics), value = TRUE, ignore.case = TRUE),
     grep("RPE",              names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("RTP",              names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("TISS",             names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("VI$",              names(metrics), value = TRUE, ignore.case = TRUE),
     grep("Weight",           names(metrics), value = TRUE, ignore.case = TRUE),
     grep("_HRV$",            names(metrics), value = TRUE, ignore.case = TRUE),
     grep("_Peak_Hr$",        names(metrics), value = TRUE, ignore.case = TRUE),
@@ -362,48 +375,41 @@ wecare <- c(
     grep("_Peak_Power_HR$",  names(metrics), value = TRUE, ignore.case = TRUE),
     grep("_Peak_WPK$",       names(metrics), value = TRUE, ignore.case = TRUE),
     grep("_Sustained_Time$", names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("_core_temperatur", names(metrics), value = TRUE, ignore.case = TRUE),
     grep("_W_bal_",          names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_core_temperatur", names(metrics), value = TRUE, ignore.case = TRUE),
     grep("_in_Zone$",        names(metrics), value = TRUE, ignore.case = TRUE),
     grep("_in_zone$",        names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_ratio",           names(metrics), value = TRUE, ignore.case = TRUE),
     grep("balance",          names(metrics), value = TRUE, ignore.case = TRUE),
     grep("best",             names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("bikeintensity",    names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("bikescore",        names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("bikestress",       names(metrics), value = TRUE, ignore.case = TRUE),
     grep("cadence",          names(metrics), value = TRUE, ignore.case = TRUE),
     grep("carrying",         names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("daniels",          names(metrics), value = TRUE, ignore.case = TRUE),
     grep("detected",         names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("distance",         names(metrics), value = TRUE, ignore.case = TRUE),
     grep("effect",           names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("efficiency",       names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("estimated",        names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("fatigue_index",    names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("govss",            names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("iwf",              names(metrics), value = TRUE, ignore.case = TRUE),
     grep("length",           names(metrics), value = TRUE, ignore.case = TRUE),
     grep("pace",             names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("power",            names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("skiba",            names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("_ratio",           names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("time",             names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("Heart",            names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("fatigue_index",    names(metrics), value = TRUE, ignore.case = TRUE),
     grep("pacing_index",     names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("distance",         names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("power",            names(metrics), value = TRUE, ignore.case = TRUE),
     grep("relative",         names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("RTP",              names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("TISS",             names(metrics), value = TRUE, ignore.case = TRUE),
     grep("response",         names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("bikeintensity",    names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("daniels",          names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("LNP",              names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("iwf",              names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("govss",            names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("EOA",              names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("bikescore",        names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("IF",               names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("bikestress",       names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("VI$",              names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("efficiency",       names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("skiba",            names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("speed",            names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("time",             names(metrics), value = TRUE, ignore.case = TRUE),
     grep("vdot",             names(metrics), value = TRUE, ignore.case = TRUE),
-    grep("estimated",        names(metrics), value = TRUE, ignore.case = TRUE),
     grep("watts",            names(metrics), value = TRUE, ignore.case = TRUE),
+    grep("_W_",              names(metrics), value = TRUE, ignore.case = TRUE),
     grep("work",             names(metrics), value = TRUE, ignore.case = TRUE),
     NULL)
-
-
 
 wecare <- names(metrics)[names(metrics) %in% wecare]
 for (avar in wecare) {
@@ -446,7 +452,7 @@ if (all(metrics$Sport.x == metrics$Sport.y, na.rm = T)) {
 }
 
 
-## set colors
+## set color and symbol for each activity type
 
 table( metrics$Sport )
 table( metrics$Workout_Code)
@@ -463,6 +469,7 @@ metrics[ Sport == "Run",  Pch := 1 ]
 metrics[ Workout_Code == "Bike Road",       Pch :=  6 ]
 metrics[ Workout_Code == "Bike Dirt",       Pch :=  1 ]
 metrics[ Workout_Code == "Bike Static",     Pch :=  4 ]
+metrics[ Workout_Code == "Bike Elliptical", Pch :=  4 ]
 metrics[ Workout_Code == "Run Hills",       Pch :=  1 ]
 metrics[ Workout_Code == "Run Track",       Pch :=  6 ]
 metrics[ Workout_Code == "Run Trail",       Pch :=  8 ]
