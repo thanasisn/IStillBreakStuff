@@ -169,7 +169,7 @@ GData_FitnessAgeData$rhrLastEntryDate.date        <- as.POSIXct(strptime(GData_F
 wecare <- names(GData_FitnessAgeData)
 wecare <- grep("date", wecare, ignore.case = T, invert = T, value = T)
 for (av in wecare) {
-    par(mar = c(2,2,2,1))
+    par(mar = c(3,2,2,1))
     plot(GData_FitnessAgeData$asOfDateGmt.date, GData_FitnessAgeData[[av]],
          ylab = "", xlab = "", cex = 0.6, type = "o")
     title(av)
@@ -180,13 +180,40 @@ write_RDS(object = GData_FitnessAgeData,
 
 
 
-as.POSIXct( GData_MetricsAcuteTrainingLoad$timestamp/1000 , origin = "1970-01-01")
-as.POSIXct( GData_MetricsAcuteTrainingLoad$calendarDate/1000 , origin = "1970-01-01")
+
+
+#'
+#' ## Metrics Acute Training Load
+#'
+#+ include=T, echo=F
+GData_MetricsAcuteTrainingLoad[, Date   := as.POSIXct(timestamp/1000, origin = "1970-01-01")]
+GData_MetricsAcuteTrainingLoad[, Date_2 := as.POSIXct(calendarDate/1000, origin = "1970-01-01")]
+
+stopifnot(length(unique(GData_MetricsAcuteTrainingLoad$acwrStatus)) == 4)
+GData_MetricsAcuteTrainingLoad$acwrStatus <- factor(GData_MetricsAcuteTrainingLoad$acwrStatus,
+                                                    levels  = c("LOW", "OPTIMAL", "HIGH", "VERY_HIGH" ),
+                                                    ordered = TRUE)
+
+wecare <- grep("Date|time" , names(GData_MetricsAcuteTrainingLoad), value = T, invert = T, ignore.case = T)
+for (av in wecare) {
+    par(mar = c(3,2,2,1))
+
+    if (is.character(GData_MetricsAcuteTrainingLoad[[av]])) {
+        GData_MetricsAcuteTrainingLoad[[av]] <- factor(GData_MetricsAcuteTrainingLoad[[av]])
+    }
+    plot(GData_MetricsAcuteTrainingLoad$Date, GData_MetricsAcuteTrainingLoad[[av]],
+         ylab = "", xlab = "", cex = 0.6, type = "o", col = GData_MetricsAcuteTrainingLoad$acwrStatus)
+    title(av)
+
+    legend("top", pch = 1, cex = 0.7, bty = "n", ncol = 2,
+           legend = levels(GData_MetricsAcuteTrainingLoad$acwrStatus),
+           col    = 1:4 )
+}
+write_RDS(object = GData_MetricsAcuteTrainingLoad,
+          file   = paste0(outbase, "/", "Garmin_Metrics_Acute_Training_Load"))
 
 
 
-GData_MetricsAcuteTrainingLoad[ , Date := as.POSIXct(timestamp/1000, origin = "1970-01-01")]
-GData_MetricsAcuteTrainingLoad[ , Date2 := as.POSIXct(calendarDate/1000, origin = "1970-01-01")]
 
 
 
