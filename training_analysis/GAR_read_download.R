@@ -180,6 +180,15 @@ write_RDS(object = GData_FitnessAgeData,
 
 
 
+as.POSIXct( GData_MetricsAcuteTrainingLoad$timestamp/1000 , origin = "1970-01-01")
+as.POSIXct( GData_MetricsAcuteTrainingLoad$calendarDate/1000 , origin = "1970-01-01")
+
+
+
+GData_MetricsAcuteTrainingLoad[ , Date := as.POSIXct(timestamp/1000, origin = "1970-01-01")]
+GData_MetricsAcuteTrainingLoad[ , Date2 := as.POSIXct(calendarDate/1000, origin = "1970-01-01")]
+
+
 
 
 names(GData_sleepData)
