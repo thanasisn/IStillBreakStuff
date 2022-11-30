@@ -222,9 +222,29 @@ rm(GData_MetricsAcuteTrainingLoad)
 #' ## Hydration Log
 #'
 #+ include=T, echo=F
-
 GData_HydrationLogFile <- GData_HydrationLogFile[ duration != 0 ]
 GData_HydrationLogFile <- rm.cols.NA.DT(GData_HydrationLogFile)
+GData_HydrationLogFile[, calendarDate.date := NULL ]
+GData_HydrationLogFile[, uuid.id           := NULL ]
+GData_HydrationLogFile$Date       <- as.POSIXct(strptime(GData_HydrationLogFile$persistedTimestampGMT.date, "%b %d, %Y %r"), tz = "UTC")
+GData_HydrationLogFile$Date_local <- as.POSIXct(strptime(GData_HydrationLogFile$timestampLocal.date,        "%b %d, %Y %r", tz = "Europe/Athens"), tz = "Europe/Athens")
+GData_HydrationLogFile[, persistedTimestampGMT.date := NULL ]
+GData_HydrationLogFile[, timestampLocal.date := NULL ]
+
+
+wecare <- grep("Date|time" , names(GData_HydrationLogFile), value = T, invert = T, ignore.case = T)
+for (av in wecare) {
+    par(mar = c(3,2,2,1))
+    plot(GData_HydrationLogFile$Date, GData_HydrationLogFile[[av]],
+         ylab = "", xlab = "", cex = 0.6, type = "o")
+    title(av)
+}
+write_RDS(object = GData_HydrationLogFile,
+          file   = paste0(outbase, "/", "Garmin_Hydration_Log_File"))
+# rm(GData_MetricsAcuteTrainingLoad)
+
+
+
 
 
 names(GData_sleepData)
