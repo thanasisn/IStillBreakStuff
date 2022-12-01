@@ -495,6 +495,37 @@ metrics$Intensity_Calories    <- metrics$Calories           / metrics$Duration.x
 write_RDS(metrics, file = export, clean = TRUE)
 
 
+#### compare all columns ####
+relations <- data.table()
+comb <- names(metrics)
+for (ii in 1:(length(comb) - 1)) {
+    for (jj in (ii + 1):length(comb)) {
+        cat(ii, jj, comb[ii], comb[jj], "\n")
+        mean   = mean(  as.numeric(metrics[[comb[ii]]]) / as.numeric(metrics[[comb[jj]]]), na.rm = T)
+        median = median(as.numeric(metrics[[comb[ii]]]) / as.numeric(metrics[[comb[jj]]]), na.rm = T)
+        cov    = cov(x = as.numeric(metrics[[comb[ii]]]), y = as.numeric(metrics[[comb[jj]]]), use = "pairwise.complete.obs")
+        cor    = cor(x = as.numeric(metrics[[comb[ii]]]), y = as.numeric(metrics[[comb[jj]]]), use = "pairwise.complete.obs")
+
+        relations <- rbind(relations,
+                           data.table(Acol = comb[ii],
+                                      Bcol = comb[jj],
+                                      mean = mean,
+                                      median = median,
+                                      cov = cov,
+                                      cor = cor))
+    }
+}
+relations <- relations[ !(is.na(mean) & is.na(median) & is.na(cor) & is.na(cov)) ]
+
+
+stop()
+
+
+
+
+
+
+
 ####  Plot all #####
 wecare <- names(metrics)
 wecare <- grep("date|time|notes|time|Col|Pch|sport|bike|shoes|filemtime|workout_code",
@@ -612,8 +643,6 @@ plot(metrics$Duration.x, metrics$Time.Moving,
 
 
 
-
-
 for (avar in wecare) {
     ## ignore no data
     if (all(as.numeric(metrics[[avar]]) %in% c(0, NA))) {
@@ -631,6 +660,14 @@ for (avar in wecare) {
 }
 
 dev.off()
+
+
+
+
+
+
+
+
 
 
 ####_ END _####
