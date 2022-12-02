@@ -2,49 +2,55 @@
 ## created on 2020-11-08
 ## https://github.com/thanasisn <lapauththanasis@gmail.com>
 
-
 #### Gather S.M.A.R.T. info on all system drives
 
-if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root"
-   exit 1
+if sudo true; then
+    true
+else
+    echo 'Root privileges required'
+    exit 1
 fi
 
 set +x
 
 ## Variables
 USER="athan"
-LOGDIR="/home/$USER/LOGs/SYSTEM_LOGS"
+LOGDIR="$HOME/LOGs/SYSTEM_LOGS"
 
 mkdir -p "$LOGDIR"
 
 
-## Main ##
-
+## Loop all devices
 find "/dev/" -name "*sd?" | while read ad; do
     echo "Doing: $ad"
 
     ## get info we need
-    data="$(/usr/sbin/smartctl -a $ad)"
+    data="$(sudo smartctl -a "$ad")"
     ## prepare data
-    model="$(echo "$data" | grep -i "device model:"  | sed 's/[ ]\+/ /g' | cut -d":" -f2- | sed 's/^ //' | sed 's/ /_/g')"
-    serial="$(  echo "$data" | grep -i "serial number:"   | sed 's/[ ]\+//g'  | cut -d":" -f2-)"
-    hourson="$( echo "$data" | grep -i "Power_On_Hours"   | sed 's/[ ]\+/ /g' | cut -d" " -f11)"
-    minhoron="$(echo "$data" | grep -i "Power_On_Minutes" | sed 's/[ ]\+/ /g' | cut -d" " -f11 | sed 's/h.*//g')"
+    model="$(   echo "$data" | grep -i "device model:"    | sed 's/[ ]\+/ /g' | cut -d":" -f2- | sed 's/^[ ]*//' | sed 's/[ ]\+/-/')"
+    serial="$(  echo "$data" | grep -i "serial number:"   | sed 's/[ ]\+//g'  | cut -d":" -f2- | sed 's/^[ ]*//' | sed 's/[ ]\+/-/')"
+    hourson="$( echo "$data" | grep -i "Power_On_Hours"   | sed 's/[ ]\+/ /g' )"
+    minhoron="$(echo "$data" | grep -i "Power_On_Minutes" | sed 's/[ ]\+/ /g' )"
 
     outfile="${LOGDIR}/${model}_${serial}.smart"
 
     (
         echo ""
-        echo "Mount on: $(hostname)"
-        echo "Power on: $(( hourson / 24 )) days"
-        echo "Mins on?: $minhoron hours?"
+        date +"====  %F %R  ===="
+        echo ""
+        echo "Mounted on: $(hostname)"
+        echo ""
+        echo "$hourson"
+        echo "$minhoron"
+        echo ""
+        echo "** smartctl -H **"
+        sudo smartctl -H "$ad"
         echo ""
         echo "** smartctl -a **"
-        /usr/sbin/smartctl -a $ad
+        sudo smartctl -a "$ad"
         echo ""
         echo "** smartctl -x **"
-        /usr/sbin/smartctl -x $ad
+        sudo smartctl -x "$ad"
         echo ""
     ) | tee "$outfile"
 
