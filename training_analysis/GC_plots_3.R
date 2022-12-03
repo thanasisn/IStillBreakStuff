@@ -420,12 +420,15 @@ capture.output({
 
     cat("\n\n## WEEKLY SUMS\n\n")
     pander::panderOptions("table.split.table", 200)
-    pander::pander( weekly )
-    cat(paste( names(weekly), collapse = "\t" ), "\n" )
+    pander::panderOptions("table.style", "simple")
+    pander::pander(weekly)
+    pander::pander(weekly[1,])
+    # cat(paste( names(weekly), collapse = "\t" ), "\n" )
 
     cat("\n\n## MONTHLY SUMS\n\n")
-    pander::pander( montly )
-    cat(paste(  names(montly), collapse = "\t" ), "\n" )
+    pander::pander(montly)
+    pander::pander(montly[1,])
+    # cat(paste(  names(montly), collapse = "\t" ), "\n" )
 
 }, file = "~/LOGs/training_status/Load_tables.md")
 
@@ -463,6 +466,8 @@ capture.output({
     wecare <- grep("Month",              wecare, invert = TRUE, value = T)
     wecare <- grep("Notes",              wecare, invert = TRUE, value = T)
     wecare <- grep("Spike.Time",         wecare, invert = TRUE, value = T)
+    wecare <- grep("SubSport",           wecare, invert = TRUE, value = T)
+    wecare <- grep("RPE",                wecare, invert = TRUE, value = T)
     wecare <- grep("Swim",               wecare, invert = TRUE, value = T)
     wecare <- grep("Temperature",        wecare, invert = TRUE, value = T)
     wecare <- grep("W_bal",              wecare, invert = TRUE, value = T)
@@ -493,8 +498,9 @@ capture.output({
 
     cat("\n\n## Activities\n\n")
     pander::panderOptions("table.split.table", 2000)
-    pander::pander( export )
-    cat(paste( names(export), collapse = "\t" ), "\n" )
+    pander::panderOptions("table.style", "simple")
+    pander::pander(export)
+    pander::pander(export[1,])
 
 }, file = "~/LOGs/training_status/Last_Activities.md")
 
