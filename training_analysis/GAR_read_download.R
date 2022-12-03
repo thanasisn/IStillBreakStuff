@@ -241,7 +241,10 @@ for (av in wecare) {
 }
 write_RDS(object = GData_HydrationLogFile,
           file   = paste0(outbase, "/", "Garmin_Hydration_Log_File"))
-# rm(GData_MetricsAcuteTrainingLoad)
+rm(GData_HydrationLogFile)
+
+
+
 
 
 
@@ -285,11 +288,20 @@ GData_UDSFile$calendarDate.date <- as.POSIXct(strptime(GData_UDSFile$calendarDat
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$minHeartRate  )
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$maxHeartRate  )
 
-plot(GData_UDSFile$calendarDate.date, GData_UDSFile$restingHeartRate  )
+plot(GData_UDSFile$calendarDate.date, GData_UDSFile$maxHeartRate  )
+
+ylim <- range(GData_UDSFile$restingHeartRate, GData_UDSFile$currentDayRestingHeartRate, na.rm = T)
+plot(GData_UDSFile$calendarDate.date, GData_UDSFile$restingHeartRate , ylim = ylim )
+points(GData_UDSFile$calendarDate.date, GData_UDSFile$currentDayRestingHeartRate , col = "blue"  )
+
+
+write.csv( GData_UDSFile[ !is.na(restingHeartRate) , calendarDate.date, restingHeartRate ] ,
+           "resting_heartrate.csv")
 
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$minAvgHeartRate  )
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$maxAvgHeartRate  )
 
+grep( "Heart" ,names(GData_UDSFile), value = T)
 
 
 #'

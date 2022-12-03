@@ -491,6 +491,22 @@ metrics$Intensity_EPOC        <- metrics$EPOC               / metrics$Duration.x
 metrics$Intensity_Calories    <- metrics$Calories           / metrics$Duration.x
 
 
+## TODO
+## Hear rate at rest
+## MAx heart rate
+grep("heart|hr" ,names(metrics), value = T, ignore.case = T)
+
+
+
+
+
+
+
+
+
+
+
+
 ####  Export for others  ####
 write_RDS(metrics, file = export, clean = TRUE)
 
