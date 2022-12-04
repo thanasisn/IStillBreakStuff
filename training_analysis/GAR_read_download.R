@@ -231,7 +231,6 @@ GData_HydrationLogFile$Date_local <- as.POSIXct(strptime(GData_HydrationLogFile$
 GData_HydrationLogFile[, persistedTimestampGMT.date := NULL ]
 GData_HydrationLogFile[, timestampLocal.date := NULL ]
 
-
 wecare <- grep("Date|time" , names(GData_HydrationLogFile), value = T, invert = T, ignore.case = T)
 for (av in wecare) {
     par(mar = c(3,2,2,1))
@@ -245,6 +244,29 @@ rm(GData_HydrationLogFile)
 
 
 
+
+#'
+#' ## Metrics Max Met Data
+#'
+#+ include=T, echo=F
+GData_MetricsMaxMetData <- rm.cols.NA.DT(GData_MetricsMaxMetData)
+GData_MetricsMaxMetData$calendarDate <- NULL
+GData_MetricsMaxMetData$Date       <- as.POSIXct(strptime(GData_MetricsMaxMetData$updateTimestamp, "%FT%T"))
+GData_MetricsMaxMetData$fitnessAge <- as.numeric(GData_MetricsMaxMetData$fitnessAge)
+GData_MetricsMaxMetData$fitnessAgeDescription <- as.numeric(GData_MetricsMaxMetData$fitnessAgeDescription)
+GData_MetricsMaxMetData$sport      <- as.factor(GData_MetricsMaxMetData$sport)
+GData_MetricsMaxMetData$subSport   <- as.factor(GData_MetricsMaxMetData$subSport)
+
+wecare <- grep("Date|time" , names(GData_MetricsMaxMetData), value = T, invert = T, ignore.case = T)
+for (av in wecare) {
+    par(mar = c(3,2,2,1))
+    plot(GData_MetricsMaxMetData$Date, GData_MetricsMaxMetData[[av]],
+         ylab = "", xlab = "", cex = 0.6, type = "o")
+    title(av)
+}
+write_RDS(object = GData_MetricsMaxMetData,
+          file   = paste0(outbase, "/", "Garmin_Metrics_Max_Met_Data"))
+rm(GData_MetricsMaxMetData)
 
 
 
@@ -295,7 +317,8 @@ plot(GData_UDSFile$calendarDate.date, GData_UDSFile$restingHeartRate , ylim = yl
 points(GData_UDSFile$calendarDate.date, GData_UDSFile$currentDayRestingHeartRate , col = "blue"  )
 
 
-write.csv( GData_UDSFile[ !is.na(restingHeartRate) , calendarDate.date, restingHeartRate ] ,
+write.csv( GData_UDSFile[ !is.na(restingHeartRate) ,
+                          .(calendarDate.date, restingHeartRate) ] ,
            "resting_heartrate.csv")
 
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$minAvgHeartRate  )
