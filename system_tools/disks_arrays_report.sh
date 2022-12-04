@@ -3,7 +3,7 @@
 ## https://github.com/thanasisn <lapauththanasis@gmail.com>
 
 
-#### Gather information for disks arrays
+#### Gather information for hard disks and arrays
 ## For btrfs and raid arrays
 
 if [[ $EUID -ne 0 ]]; then
@@ -103,6 +103,24 @@ echo ""
 sudo mount -l
 echo ""
 echo "--------------------------------------------------------"
+echo ""
+echo " ** ls -lF /dev/disk/by-id/ ** "
+echo ""
+sudo ls -lF /dev/disk/by-id/ 
+echo ""
+echo "--------------------------------------------------------"
+echo ""
+echo " ** lshw -short -C disk ** "
+echo ""
+sudo lshw -short -C disk 
+echo ""
+echo "--------------------------------------------------------"
+
+
+
+
+
+
 
 
 

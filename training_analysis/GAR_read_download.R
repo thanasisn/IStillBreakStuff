@@ -20,8 +20,8 @@
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
-#'     keep_tex:         yes
-#'     keep_md:          yes
+#'     keep_tex:         no
+#'     keep_md:          no
 #'     latex_engine:     xelatex
 #'     toc:              yes
 #'     fig_width:        8
