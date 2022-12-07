@@ -6,7 +6,7 @@
 ## external kill switch
 #####################################################################
 killfile="/dev/shm/KILL_SWITCH/$(basename "$0")"
-[[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 999
+[[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 99
 #####################################################################
 
 ## no need to run without a Xserver or headless
@@ -37,7 +37,10 @@ set +e
 "$SCRIPTS"transact_plot.R  &
 "$HOME/CODE/training_analysis/GC_plots.R" &
 
-
+(
+    "$HOME/BASH/mail_auto/gmailr_get_accounts_alerts.R" 
+    "$HOME/BASH/mail_auto/parse_accounts_alerts.R"
+) &
 
 ## don't ignore errors
 set -e

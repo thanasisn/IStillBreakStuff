@@ -11,7 +11,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- funr::sys.script()
 
-inputdata   <- "~/LOGs/GCmetrics.Rds"
+# inputdata   <- "~/LOGs/GCmetrics.Rds"
 moredata    <- "~/DATA/Other/GC_json_data.Rds"
 outputpdf   <- paste0("~/LOGs/training_status/", basename(sub("\\.R$",".pdf", Script.Name)))
 datascript  <- "~/CODE/training_analysis/GC_read_activities.R"
@@ -22,7 +22,7 @@ if (!interactive()) {
     ## check if we have to run
     if (!file.exists(outputpdf) |
         !file.exists("/dev/shm/CONKY/banister_EPOC_400.png") |
-        file.mtime(inputdata) > file.mtime(outputpdf) |
+        # file.mtime(inputdata) > file.mtime(outputpdf) |
         file.mtime(outputpdf) < Sys.time() - hourstriger * 3600) {
         cat(paste("will run"))
     } else {

@@ -34,7 +34,7 @@ pdfout2   <- "~/LOGs/training_status/GC_all_plots_last.pdf"
 export    <- "~/DATA/Other/Train_metrics.Rds"
 
 
-## we may read the actual GC database sameday?
+## we may read the actual GC database same-day?
 
 ####  Read data from json activities files  ####################################
 file       <- list.files( path       = gcfolder,
@@ -266,8 +266,8 @@ gather$Device  <- NULL
 metrics$Device <- NULL
 
 #### Route ####
-ee <- data.frame(metrics$Route, gather$Route)
-table(ee)
+# ee <- data.frame(metrics$Route, gather$Route)
+# table(ee)
 gather$Route  <- NULL
 metrics$Route <- NULL
 
