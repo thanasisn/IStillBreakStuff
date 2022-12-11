@@ -612,7 +612,7 @@ for (avar in wecare) {
 dev.off()
 
 
-metrics <- metrics[ as.Date(time) > (Sys.Date() - 700)  ]
+metrics <- metrics[ as.Date(time) > (Sys.Date() - 400)  ]
 if (!interactive()) {
     pdf(file = pdfout2, width = 8, height = 4)
 }
