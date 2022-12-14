@@ -37,6 +37,7 @@ for i in "${folders[@]}"; do
         ## add files we care about
         find . -type f \(    -iname '*.R'   \
                           -o -iname '*.Rmd' \
+                          -o -iname '*.qmd' \
                           -o -iname '*.bas' \
                           -o -iname '*.bib' \
                           -o -iname '*.c'   \

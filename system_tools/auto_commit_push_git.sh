@@ -115,6 +115,7 @@ pwd
 find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.py'  \
                   -o -iname '*.md'  \
+                  -o -iname '*.qmd' \
                   -o -iname '*.bas' \
                   -o -iname '*.gnu' \
                   -o -iname '*.dot' \
@@ -191,6 +192,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.ex'  \
                       -o -iname '*.f90' \
                       -o -iname '*.frm' \
+                      -o -iname '*.qmd' \
                       -o -iname '*.gnu' \
                       -o -iname '*.gp'  \
                       -o -iname '*.h'   \
@@ -239,6 +241,7 @@ find . -type f \(  -iname '*.sh'  \
                 -o -iname '*.par' \
                 -o -iname '*.f90' \
                 -o -iname '*.gnu' \
+                -o -iname '*.qmd' \
                 -o -iname '*.dot' \
                 -o -iname '*.jl'  \
                 -o -iname '*.frm' \
@@ -376,6 +379,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.c'   \
                   -o -iname '*.h'   \
                   -o -iname '*.gp'  \
+                  -o -iname '*.qmd' \
                   -o -iname '*.ex'  \
                   -o -iname '*.bib' \
                   -o -iname '*.tex' \
@@ -413,6 +417,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.f90' \
                   -o -iname '*.c'   \
                   -o -iname '*.h'   \
+                  -o -iname '*.qmd' \
                   -o -iname '*.gp'  \
                   -o -iname '*.ex'  \
                   -o -iname '*.bib' \
@@ -456,6 +461,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.c'   \
                   -o -iname '*.h'   \
                   -o -iname '*.gp'  \
+                  -o -iname '*.qmd' \
                   -o -iname '*.ex'  \
                   -o -iname '*.bib' \
                   -o -iname '*.tex' \
@@ -484,6 +490,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.md'  \
                   -o -iname '*.gnu' \
                   -o -iname '*.dot' \
+                  -o -iname '*.qmd' \
                   -o -iname '*.jl'  \
                   -o -iname '*.frm' \
                   -o -iname '*.pbs' \
@@ -512,6 +519,7 @@ find . -type f \(    -iname '*.sh'   \
                   -o -iname '*.c'    \
                   -o -iname '*.conf' \
                   -o -iname '*.dot'  \
+                  -o -iname '*.qmd'  \
                   -o -iname '*.frm'  \
                   -o -iname '*.gnu'  \
                   -o -iname '*.jl'   \
@@ -570,6 +578,7 @@ find . -type f \(    -iname '*.sh'  \
                   -o -iname '*.dot' \
                   -o -iname '*.ex'  \
                   -o -iname '*.f90' \
+                  -o -iname '*.qmd' \
                   -o -iname '*.frm' \
                   -o -iname '*.gnu' \
                   -o -iname '*.jl'  \
