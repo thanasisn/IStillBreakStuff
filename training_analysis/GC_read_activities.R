@@ -43,6 +43,7 @@ file       <- list.files( path       = gcfolder,
 filesmtime <- file.mtime(file)
 check      <- data.table(file, filesmtime)
 
+
 ## start with read data
 if (file.exists(storagefl)) {
     gather <- readRDS(storagefl)
@@ -57,6 +58,7 @@ if (file.exists(storagefl)) {
     files  <- check$file
 }
 
+files <- sort(files,decreasing = T)
 
 ####  Parse chosen files  ####
 if (length(files) != 0) {
@@ -67,7 +69,7 @@ if (length(files) != 0) {
         ride <- fromJSON(af)
         ride <- ride$RIDE
         cat(paste(basename(af)),"\n")
-
+stop()
         stopifnot(
             all(names(ride) %in%
                     c("STARTTIME",
@@ -164,7 +166,7 @@ if (length(files) != 0) {
             gather[[avar]] <- NULL
         }
     }
-    gather[, Year := NULL ]
+    gather[, Year  := NULL]
     gather[, Data  := NULL]
     gather[, color := NULL]
 
