@@ -84,8 +84,8 @@ jsonfls <- grep("user_contact", jsonfls, value = T, invert = T)
 fromJSON(grep("UserGoal", jsonfls, value = T), flatten = F)
 jsonfls <- grep("UserGoal", jsonfls, value = T, invert = T)
 
-fromJSON(grep("_courses", jsonfls, value = T), flatten = F)
-jsonfls <- grep("_courses", jsonfls, value = T, invert = T)
+# fromJSON(grep("_courses", jsonfls, value = T), flatten = F)
+# jsonfls <- grep("_courses", jsonfls, value = T, invert = T)
 
 fromJSON(grep("_gear", jsonfls, value = T), flatten = T)
 jsonfls <- grep("_gear", jsonfls, value = T, invert = T)
@@ -158,7 +158,7 @@ for (av in wecare) {
 }
 write_RDS(object = GData_RunRacePredictions,
           file   = paste0(outbase, "/", "Garmin_Run_Race_Predictions"))
-rm(GData_RunRacePredictions)
+# rm(GData_RunRacePredictions)
 
 
 
@@ -182,7 +182,7 @@ for (av in wecare) {
 }
 write_RDS(object = GData_FitnessAgeData,
           file   = paste0(outbase, "/", "Garmin_Fitness_Age_Data"))
-rm(GData_FitnessAgeData)
+# rm(GData_FitnessAgeData)
 
 
 
@@ -191,7 +191,7 @@ rm(GData_FitnessAgeData)
 #' ## Metrics Acute Training Load
 #'
 #+ include=T, echo=F
-GData_MetricsAcuteTrainingLoad[, Date   := as.POSIXct(timestamp/1000, origin = "1970-01-01")]
+GData_MetricsAcuteTrainingLoad[, Date   := as.POSIXct(timestamp/1000,    origin = "1970-01-01")]
 GData_MetricsAcuteTrainingLoad[, Date_2 := as.POSIXct(calendarDate/1000, origin = "1970-01-01")]
 
 stopifnot(length(unique(GData_MetricsAcuteTrainingLoad$acwrStatus)) == 4)
@@ -214,7 +214,7 @@ for (av in wecare) {
 }
 write_RDS(object = GData_MetricsAcuteTrainingLoad,
           file   = paste0(outbase, "/", "Garmin_Metrics_Acute_Training_Load"))
-rm(GData_MetricsAcuteTrainingLoad)
+# rm(GData_MetricsAcuteTrainingLoad)
 
 
 
@@ -240,7 +240,7 @@ for (av in wecare) {
 }
 write_RDS(object = GData_HydrationLogFile,
           file   = paste0(outbase, "/", "Garmin_Hydration_Log_File"))
-rm(GData_HydrationLogFile)
+# rm(GData_HydrationLogFile)
 
 
 
@@ -266,15 +266,59 @@ for (av in wecare) {
 }
 write_RDS(object = GData_MetricsMaxMetData,
           file   = paste0(outbase, "/", "Garmin_Metrics_Max_Met_Data"))
-rm(GData_MetricsMaxMetData)
+# rm(GData_MetricsMaxMetData)
 
 
 
+
+
+#'
+#' ## Summarized Activities Data
+#'
+#+ include=T, echo=F
+GData_summarizedActivities <- rm.cols.NA.DT(GData_summarizedActivities)
+GData_summarizedActivities[, timeZoneId := NULL ]
+GData_summarizedActivities[, startTimeGmt   := as.POSIXct(startTimeGmt/1000,   origin = "1970-01-01", tz = "UTC")]
+GData_summarizedActivities[, startTimeLocal := as.POSIXct(startTimeLocal/1000, origin = "1970-01-01", tz = "Europe/Athens")]
+GData_summarizedActivities[, beginTimestamp := as.POSIXct(beginTimestamp/1000, origin = "1970-01-01", tz = "UTC")]
+
+wecare <- grep("startTimeGmt", names(GData_summarizedActivities), value = T, invert = T, ignore.case = T)
+for (av in wecare) {
+    par(mar = c(3,2,2,1))
+    if (is.character(GData_summarizedActivities[[av]])) next()
+    if (is.list(GData_summarizedActivities[[av]]))      next()
+    plot(GData_summarizedActivities$startTimeGmt, GData_summarizedActivities[[av]],
+         ylab = "", xlab = "", cex = 0.6, type = "o")
+    title(av)
+}
+write_RDS(object = GData_summarizedActivities,
+          file   = paste0(outbase, "/", "Garmin_Summarized_Activities_Data"))
+
+
+
+
+
+#'
+#' ## UDS File Data
+#'
+#+ include=T, echo=F
+## keep only garmin collected data
+GData_UDSFile <- GData_UDSFile[ !is.na(source) ]
+GData_UDSFile[, restingHeartRateTimestamp := as.POSIXct(strptime(restingHeartRateTimestamp, "%b %d, %Y %r")) ]
+GData_UDSFile[, calendarDate.date         := as.POSIXct(strptime(calendarDate.date, "%b %d, %Y %r")) ]
+
+
+
+
+
+
+
+
+
+## TODO
 
 
 names(GData_sleepData)
-
-names(GData_summarizedActivities)
 
 names(GData_TrainingHistory)
 
@@ -296,15 +340,8 @@ lines(GData_TrainingHistory$timestamp, GData_TrainingHistory$loadTunnelMax, col 
 grep("date|time" ,names(GData_UDSFile), ignore.case = T, value = T)
 
 
-table(GData_UDSFile$source,exclude = T)
-## keep only garmin collected data
-GData_UDSFile <- GData_UDSFile[ !is.na(source) ]
 
 
-
-GData_UDSFile$restingHeartRateTimestamp <- as.POSIXct(strptime(GData_UDSFile$restingHeartRateTimestamp, "%b %d, %Y %r"))
-
-GData_UDSFile$calendarDate.date <- as.POSIXct(strptime(GData_UDSFile$calendarDate.date, "%b %d, %Y %r"))
 
 
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$minHeartRate  )
@@ -325,6 +362,24 @@ plot(GData_UDSFile$calendarDate.date, GData_UDSFile$minAvgHeartRate  )
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$maxAvgHeartRate  )
 
 grep( "Heart" ,names(GData_UDSFile), value = T)
+
+
+## combine some for export
+
+export <- GData_FitnessAgeData[, asOfDateGmt.date, rhr ]
+part   <- GData_summarizedActivities[, .(startTimeGmt ,avgHr, maxHr)]
+export <- merge(export, part, by.x = "asOfDateGmt.date", by.y = "startTimeGmt", all = T)
+
+
+plot(GData_UDSFile[, minHeartRate])
+plot(GData_UDSFile[, minAvgHeartRate])
+plot(GData_UDSFile[, maxHeartRate])
+plot(GData_UDSFile[, maxAvgHeartRate])
+plot(GData_UDSFile[, restingHeartRate])
+
+
+
+plot(GData_user_biometrics[, functionalThresholdPower])
 
 
 #'
