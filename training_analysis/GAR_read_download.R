@@ -307,8 +307,19 @@ GData_UDSFile <- GData_UDSFile[ !is.na(source) ]
 GData_UDSFile[, restingHeartRateTimestamp := as.POSIXct(strptime(restingHeartRateTimestamp, "%b %d, %Y %r")) ]
 GData_UDSFile[, calendarDate.date         := as.POSIXct(strptime(calendarDate.date, "%b %d, %Y %r")) ]
 
+grep("date|time" ,names(GData_UDSFile), ignore.case = T, value = T)
 
-
+wecare <- grep("calendarDate.date", names(GData_UDSFile), value = T, invert = T, ignore.case = T)
+for (av in wecare) {
+    par(mar = c(3,2,2,1))
+    if (is.character(GData_UDSFile[[av]])) next()
+    if (is.list(GData_UDSFile[[av]]))      next()
+    plot(GData_UDSFile$calendarDate.date, GData_UDSFile[[av]],
+         ylab = "", xlab = "", cex = 0.6, type = "o")
+    title(av)
+}
+write_RDS(object = GData_UDSFile,
+          file   = paste0(outbase, "/", "Garmin_UDS_File_Data"))
 
 
 
@@ -337,7 +348,6 @@ lines(GData_TrainingHistory$timestamp, GData_TrainingHistory$loadTunnelMax, col 
 
 
 
-grep("date|time" ,names(GData_UDSFile), ignore.case = T, value = T)
 
 
 
@@ -354,9 +364,7 @@ plot(GData_UDSFile$calendarDate.date, GData_UDSFile$restingHeartRate , ylim = yl
 points(GData_UDSFile$calendarDate.date, GData_UDSFile$currentDayRestingHeartRate , col = "blue"  )
 
 
-write.csv( GData_UDSFile[ !is.na(restingHeartRate) ,
-                          .(calendarDate.date, restingHeartRate) ] ,
-           "resting_heartrate.csv")
+
 
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$minAvgHeartRate  )
 plot(GData_UDSFile$calendarDate.date, GData_UDSFile$maxAvgHeartRate  )
@@ -369,6 +377,31 @@ grep( "Heart" ,names(GData_UDSFile), value = T)
 export <- GData_FitnessAgeData[, asOfDateGmt.date, rhr ]
 part   <- GData_summarizedActivities[, .(startTimeGmt ,avgHr, maxHr)]
 export <- merge(export, part, by.x = "asOfDateGmt.date", by.y = "startTimeGmt", all = T)
+part   <- GData_UDSFile[!is.na(restingHeartRate), .(restingHeartRate, restingHeartRateTimestamp)]
+export <- merge(export, part, by.x = "asOfDateGmt.date", by.y = "restingHeartRateTimestamp", all = T)
+
+wecare <- grep("Date", names(export), value = T, invert = T)
+
+export <- export[rowSums(!is.na(export[, ..wecare]))>0, ]
+
+
+
+exporte <-
+export[, .(avgHr            = mean(avgHr, na.rm = T),
+           rhr              = mean(rhr,   na.rm = T),
+           restingHeartRate = mean(restingHeartRate,   na.rm = T),
+           maxHr            = mean(maxHr, na.rm = T)),
+       by = .(Date = as.Date(asOfDateGmt.date)-1)]
+
+xlim <- range(exporte[!is.na(rhr), Date], exporte[!is.na(restingHeartRate), Date] )
+ylim <- range(exporte[, rhr, restingHeartRate], na.rm = T)
+
+plot(exporte$Date,  exporte$rhr, "l", xlim = xlim, col = "blue", ylim = ylim)
+lines(exporte$Date, exporte$restingHeartRate, col = "green")
+
+write.csv( exporte,
+           "resting_heartrate.csv")
+
 
 
 plot(GData_UDSFile[, minHeartRate])
