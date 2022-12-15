@@ -335,6 +335,8 @@ col.checksums <- sapply(metrics, function(x) digest::digest(x, "md5"), USE.NAMES
 dup.cols      <- data.table(col.name = names(col.checksums), hash.value = col.checksums)
 dup.cols      <- dup.cols[dup.cols, on = "hash.value"][col.name != i.col.name,]
 
+
+
 ## remove manual
 metrics[, DEVICETYPE        := NULL]
 metrics[, RECINTSECS        := NULL]
@@ -421,6 +423,8 @@ metrics <- rm.cols.NA.DT(metrics)
 
 
 
+
+
 ## get duplicate columns
 dup.vec <- which(duplicated(t(metrics)))
 dup.vec <- names(metrics)[dup.vec]
@@ -444,6 +448,8 @@ metrics[, Duration.y                := NULL ]
 metrics[, OVRD_workout_time         := NULL ]
 # metrics[, Workout.Code              := NULL ]
 metrics[, Workout_Title             := NULL ]
+metrics[, Activities                := NULL ]
+
 
 if (all(metrics$Sport.x == metrics$Sport.y, na.rm = T)) {
     metrics$Sport <- metrics$Sport.x
@@ -499,7 +505,23 @@ grep("heart|hr" ,names(metrics), value = T, ignore.case = T)
 
 
 
+for (an in names(metrics)) {
+    uni <- unique(metrics[[an]])
+    uni <- uni[!is.na(uni)]
+    if (length(uni) == 1) {
+        metrics[[an]] <- NULL
+    }
+}
 
+
+for (an in names(metrics)) {
+    uni <- unique(metrics[[an]])
+    uni <- uni[!is.na(uni)]
+    if (length(uni) < 3 ) {
+        cat(an,"\n")
+        cat(uni,"\n\n")
+    }
+}
 
 
 
@@ -544,7 +566,7 @@ write_RDS(metrics, file = export, clean = TRUE)
 
 ####  Plot all #####
 wecare <- names(metrics)
-wecare <- grep("date|time|notes|time|Col|Pch|sport|bike|shoes|filemtime|workout_code",
+wecare <- grep("date|time|notes|time|Col|Pch|sport|bike|shoes|CP_setting|filemtime|workout_code",
             wecare, ignore.case = T, value = T, invert = T)
 
 if (!interactive()) {
