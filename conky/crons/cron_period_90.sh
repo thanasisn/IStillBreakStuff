@@ -35,7 +35,9 @@ SCRIPTS="$HOME/CODE/conky/scripts/"
 set +e
 
 "$SCRIPTS"transact_plot.R  &
-"$HOME/CODE/training_analysis/GC_plots.R" &
+# "$HOME/CODE/training_analysis/GC_plots.R" &
+"$HOME/CODE/training_analysis/GC_read_rides.R" 
+"$HOME/CODE/training_analysis/GC_plots_b.R" &
 
 (
     "$HOME/BASH/mail_auto/gmailr_get_accounts_alerts.R" 
