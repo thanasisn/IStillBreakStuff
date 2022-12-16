@@ -67,17 +67,20 @@ if (length(files) != 0) {
     for (af in files) {
         ## get file
 
-        readLines()
-        cat(system(paste("sed '1 s/^\xef\xbb\xbf//'", af), ignore.stdout = F, intern = T ))
+        ## filterout bad json character
+        # ridejson <- fromJSON(
+        #     paste(
+        #         system(
+        #             paste("sed '1 s/^\xef\xbb\xbf//'", af),
+        #             ignore.stdout = F, intern = T ),
+        #         collapse = "\n")
+        # )
 
         ride <- fromJSON(af)
-
-        # sed '1 s/^\xef\xbb\xbf//'
-
-
         ride <- ride$RIDE
         cat(paste(basename(af)),"\n")
-stop()
+
+        ## check data structure
         stopifnot(
             all(names(ride) %in%
                     c("STARTTIME",
@@ -92,15 +95,18 @@ stop()
         )
 
         temp <- data.frame(
+            ## get general meta data
             file       = af,
             filemtime  = file.mtime(af),
             time       = as.POSIXct(ride$STARTTIME),
             RECINTSECS = ride$RECINTSECS,
             DEVICETYPE = ride$DEVICETYPE,
             IDENTIFIER = ride$IDENTIFIER,
+            ## get metrics
             data.frame(ride$TAGS)
         )
 
+        ## read manual edited values
         if (!is.null( ride$OVERRIDES )) {
             ss        <- data.frame(t(diag(as.matrix(ride$OVERRIDES))))
             names(ss) <- paste0("OVRD_", names(ride$OVERRIDES))
@@ -121,6 +127,13 @@ stop()
                 }
             }
         }
+
+        ## we ignore intervals for now
+        # ride$INTERVALS
+
+        ## recorded data
+        # ride$SAMPLES
+        # ride$XDATA
 
         gather <- rbind(gather, temp, fill = T)
         rm(temp)
