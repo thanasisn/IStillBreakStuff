@@ -66,7 +66,15 @@ if (length(files) != 0) {
     ## read files
     for (af in files) {
         ## get file
+
+        readLines()
+        cat(system(paste("sed '1 s/^\xef\xbb\xbf//'", af), ignore.stdout = F, intern = T ))
+
         ride <- fromJSON(af)
+
+        # sed '1 s/^\xef\xbb\xbf//'
+
+
         ride <- ride$RIDE
         cat(paste(basename(af)),"\n")
 stop()
@@ -180,7 +188,7 @@ stop()
 } else {
     cat(paste("\nNo new activities\n"))
 }
-tail(gather)
+
 
 
 
