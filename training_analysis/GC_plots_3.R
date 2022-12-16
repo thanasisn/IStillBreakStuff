@@ -488,6 +488,8 @@ capture.output({
     wecare <- grep("_Carrying",          wecare, invert = TRUE, value = T)
     wecare <- grep("date",               wecare, invert = TRUE, value = T)
     wecare <- grep("xPower",             wecare, invert = TRUE, value = T)
+    wecare <- grep("aPower",             wecare, invert = TRUE, value = T)
+    wecare <- grep("aBike",              wecare, invert = TRUE, value = T)
 
     wecare
 
