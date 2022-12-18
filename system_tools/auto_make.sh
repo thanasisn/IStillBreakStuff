@@ -16,8 +16,7 @@ info "START :: $0 :: $* ::"
 
 
 folders=(
-    "$HOME/MISC/Notes/pandocnotes"
-    "/dfds/dfsf/dfs/"
+    "$HOME/PANDOC/Notes"
     "$HOME/MANUSCRIPTS/2022_sdr_trends"
 )
 
@@ -32,7 +31,7 @@ for af in "${folders[@]}"; do
     fi  
     ## run make with default
     make -C "$af"
-    echo "=========================="
+    echo "================================="
 done        
 
 

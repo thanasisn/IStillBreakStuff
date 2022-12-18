@@ -259,6 +259,34 @@ git commit -uno -a -m "Commit $(date +'%F %R')"
 echo
 
 
+folder="$HOME/PANDOC/Notes/"
+echo ${folder}
+cd ${folder}
+rm -f "${folder}/.git/index.lock"
+
+find . -type f \(  -iname '*.sh'  \
+                -o -iname '*.py'  \
+                -o -iname '*.md'  \
+                -o -iname '*.Rmd' \
+                -o -iname '*.qgs' \
+                -o -iname '*.bas' \
+                -o -iname '*.par' \
+                -o -iname '*.qmd' \
+                -o -iname '*.dot' \
+                -o -iname '*.jl'  \
+                -o -iname '*.frm' \
+                -o -iname '*.gp'  \
+                -o -iname '*.ex'  \
+                -o -iname '*.bib' \
+                -o -iname '*.tex' \
+                -o -iname '*.md'  \
+                -o -iname '*.r'   \) -print0  |\
+                xargs -0 git add
+
+git commit -uno -a -m "Commit $(date +'%F %R')"
+echo
+
+
 
 folder="$HOME/TEX/"
 echo ${folder}
