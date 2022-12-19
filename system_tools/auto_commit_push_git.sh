@@ -227,6 +227,59 @@ done
 ##  Autocommit in local repos  ##
 
 
+## use full paths
+folders=(
+    "$HOME/PANDOC/Notes/"
+    "$HOME/PANDOC/Journal/"
+)
+
+## go through main folder
+for i in "${folders[@]}"; do
+    echo
+    echo "####  $i  ####"
+    echo
+    [ ! -d "$i" ] && echo "Not a folder: $i" && continue
+    ## go through sub folders
+    cd "$i" || return
+    ## in the git folder here
+    pwd
+    ## always break lock
+    rm -f "${i}/.git/index.lock"
+    ## add files we care about
+    find . -type f \(    -iname '*.R'   \
+                      -o -iname '*.Rmd' \
+                      -o -iname '*.bas' \
+                      -o -iname '*.bib' \
+                      -o -iname '*.c'   \
+                      -o -iname '*.conf'\
+                      -o -iname '*.cpp' \
+                      -o -iname '*.cs'  \
+                      -o -iname '*.css' \
+                      -o -iname '*.dot' \
+                      -o -iname '*.ex'  \
+                      -o -iname '*.f90' \
+                      -o -iname '*.frm' \
+                      -o -iname '*.gnu' \
+                      -o -iname '*.gp'  \
+                      -o -iname '*.h'   \
+                      -o -iname '*.jl'  \
+                      -o -iname '*.list'\
+                      -o -iname '*.md'  \
+                      -o -iname '*.par' \
+                      -o -iname '*.pbs' \
+                      -o -iname '*.py'  \
+                      -o -iname '*.qgs' \
+                      -o -iname '*.qmd' \
+                      -o -iname '*.sh'  \
+                      -o -iname '*.tex' \
+                      -o -iname '*.txt' \) -print0 |\
+                  xargs -t -0 git add 
+    ## commit to local repo
+    git commit -uno -a -m "Commit $(date +'%F %R')"
+done
+
+
+
 folder="$HOME/PROJECTS/"
 echo ${folder}
 cd ${folder}
@@ -259,38 +312,68 @@ git commit -uno -a -m "Commit $(date +'%F %R')"
 echo
 
 
-folder="$HOME/PANDOC/Notes/"
-echo ${folder}
-cd ${folder}
-rm -f "${folder}/.git/index.lock"
 
-find . -type f \(  -iname '*.sh'  \
-                -o -iname '*.py'  \
-                -o -iname '*.md'  \
-                -o -iname '*.Rmd' \
-                -o -iname '*.qgs' \
-                -o -iname '*.bas' \
-                -o -iname '*.par' \
-                -o -iname '*.qmd' \
-                -o -iname '*.dot' \
-                -o -iname '*.jl'  \
-                -o -iname '*.frm' \
-                -o -iname '*.gp'  \
-                -o -iname '*.ex'  \
-                -o -iname '*.bib' \
-                -o -iname '*.tex' \
-                -o -iname '*.md'  \
-                -o -iname '*.r'   \) -print0  |\
-                xargs -0 git add
-
-git commit -uno -a -m "Commit $(date +'%F %R')"
-echo
+# folder="$HOME/PANDOC/Notes/"
+# echo ${folder}
+# cd ${folder}
+# rm -f "${folder}/.git/index.lock"
+# 
+# find . -type f \(  -iname '*.sh'  \
+#                 -o -iname '*.py'  \
+#                 -o -iname '*.md'  \
+#                 -o -iname '*.Rmd' \
+#                 -o -iname '*.qgs' \
+#                 -o -iname '*.bas' \
+#                 -o -iname '*.par' \
+#                 -o -iname '*.qmd' \
+#                 -o -iname '*.dot' \
+#                 -o -iname '*.jl'  \
+#                 -o -iname '*.frm' \
+#                 -o -iname '*.gp'  \
+#                 -o -iname '*.ex'  \
+#                 -o -iname '*.bib' \
+#                 -o -iname '*.tex' \
+#                 -o -iname '*.md'  \
+#                 -o -iname '*.r'   \) -print0  |\
+#                 xargs -0 git add
+# 
+# git commit -uno -a -m "Commit $(date +'%F %R')"
+# echo
+# 
+# 
+# 
+# folder="$HOME/PANDOC/Journal/"
+# echo "${folder}"
+# cd "${folder}"
+# rm -f "${folder}/.git/index.lock"
+# 
+# find . -type f \(  -iname '*.sh'  \
+#                 -o -iname '*.py'  \
+#                 -o -iname '*.md'  \
+#                 -o -iname '*.Rmd' \
+#                 -o -iname '*.qgs' \
+#                 -o -iname '*.bas' \
+#                 -o -iname '*.par' \
+#                 -o -iname '*.qmd' \
+#                 -o -iname '*.dot' \
+#                 -o -iname '*.jl'  \
+#                 -o -iname '*.frm' \
+#                 -o -iname '*.gp'  \
+#                 -o -iname '*.ex'  \
+#                 -o -iname '*.bib' \
+#                 -o -iname '*.tex' \
+#                 -o -iname '*.md'  \
+#                 -o -iname '*.r'   \) -print0  |\
+#                 xargs -0 git add
+# 
+# git commit -uno -a -m "Commit $(date +'%F %R')"
+# echo
 
 
 
 folder="$HOME/TEX/"
-echo ${folder}
-cd ${folder}
+echo "${folder}"
+cd "${folder}"
 rm -f "${folder}/.git/index.lock"
 
 find . -type f \( -iname '*.sh' \
@@ -316,8 +399,8 @@ echo
 
 ## python 2 folder
 folder="$HOME/PYTHON2"
-echo ${folder}
-cd ${folder}
+echo "${folder}"
+cd "${folder}"
 rm -f "$HOME/PYTHON2/.git/index.lock"
 
 find . -type f \(    -iname '*.sh'   \
