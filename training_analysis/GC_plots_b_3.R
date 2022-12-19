@@ -500,7 +500,11 @@ capture.output({
     wecare <- grep("Calendar Text",      wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
     wecare <- grep("Weekday",            wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
     wecare <- grep("Calories",           wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
-
+    wecare <- grep("_temp",              wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("pace_row",           wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("_V2$",               wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("_V3$",               wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("compatibility_",     wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
 
     wecare
 
