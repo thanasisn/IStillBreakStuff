@@ -13,9 +13,11 @@ filename="${1}.md"
 
 stamp="$(date +"%s")"
 datestr="$(date -d@${stamp} +"%Y %b %d %A  #timestamp:'%F %T'")"
+goto="6"
 
 if [[ -f "$filename" ]] ; then
     echo "File $filename exist"
+    vim -c "$goto" "$filename"
     echo "exit"
     exit 0
 fi
@@ -28,10 +30,10 @@ touch "$filename"
     echo "## ${1}"
     echo "Created: ${datestr}"
     echo ""
+    echo "[//]: # (Keywords: #key_1, #key_2)"
     echo ""
 ) > "$filename"
 
-vim "$filename"
-
+vim -c "$goto" "$filename"
 
 exit 0
