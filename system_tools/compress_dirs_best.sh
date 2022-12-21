@@ -218,11 +218,11 @@ for af in "$@" ; do
 
     ## print stats table
     if [[ $SHOW_TABLE =~ ^[Yy] ]]; then
-        paste <(printf "%s\n" "${Scodecs[@]}") \
-              <(printf "%s\n" "${Sclevel[@]}") \
-              <(printf "%s\n" "${Sfsizes[@]}") \
-              <(printf "%s %%\n" "${Scratio[@]}") \
-              <(printf "%s s\n" "${Scdurat[@]}")
+        paste <(printf "%s\n"   "${Scodecs[@]}") \
+              <(printf "%s\n"   "${Sclevel[@]}") \
+              <(printf "%s\n"   "${Sfsizes[@]}") \
+              <(printf "%s%%\n" "${Scratio[@]}") \
+              <(printf "%ss\n"  "${Scdurat[@]}")
     fi
 
     ## compression logic
