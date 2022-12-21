@@ -15,6 +15,7 @@ REMOVE_ORIGINAL="no"
 INTERACTIVE="yes"
 BYTES_REDUCTION="1024"
 OVERWRITE="yes"
+PROGRESS="yes"
 
 ALGO=( bzip2 gzip xz )
 
@@ -35,6 +36,7 @@ $*
         --show-table      [yes/no] ($SHOW_TABLE) Show stats table for all tests
         --threshold-bytes [yes/no] ($BYTES_REDUCTION) Don't compress if benefit is less than $BYTES_REDUCTION bytes
         --overwrite       [yes/no] ($OVERWRITE) Overwrite existing files
+        --show-progress   [yes/no] ($PROGRESS) Show some progress info while trying to find the best
         --help            Show this message and exit.
 
     Notes:
@@ -45,7 +47,7 @@ $*
     Examples:
         $(basename "${0}") ./data 
         $(basename "${0}") --show-table=yes ./data 
-        $(basename "${0}") --compress no ./data 
+        $(basename "${0}") --compress y ./data 
 
 EOF
 }
@@ -59,6 +61,7 @@ ARGUMENT_LIST=(
     "remove-source"
     "show-table"
     "threshold-bytes"
+    "show-progress"
 )
 
 bytesToHuman() {
@@ -87,37 +90,39 @@ eval set --$opts
 ##TODO check if input is no or yes
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --algorithm  )     ALGO=( $2 );            shift 2 ;;
-        --show-table )     SHOW_TABLE="$2";        shift 2 ;;
-        --compress   )     APPLY_COMPRESSION="$2"; shift 2 ;;
-        --remove-source )  REMOVE_ORIGINAL="$2";   shift 2 ;;
-        --ask-human )      INTERACTIVE="$2";       shift 2 ;;
-        --overwrite )      OVERWRITE="$2";         shift 2 ;;
-        --threshold-bytes) BYTES_REDUCTION="$2";   shift 2
-                            if [ "$BYTES_REDUCTION" -eq "$BYTES_REDUCTION" ] 2>/dev/null; then
-                                : #echo "$BYTES_REDUCTION : is a number"
-                            else
-                                _usage " >>> threshold-bytes: $BYTES_REDUCTION NOT A NUMBER <<< "&& exit
-                            fi ;;
-        --help )          _usage && exit ;;
-        -- ) shift ;;
-        * ) break ;;
+        --algorithm       )  ALGO=( $2 );            shift 2 ;;
+        --show-table      )  SHOW_TABLE="$2";        shift 2 ;;
+        --show-progress   )  PROGRESS="$2";          shift 2 ;;
+        --compress        )  APPLY_COMPRESSION="$2"; shift 2 ;;
+        --remove-source   )  REMOVE_ORIGINAL="$2";   shift 2 ;;
+        --ask-human       )  INTERACTIVE="$2";       shift 2 ;;
+        --overwrite       )  OVERWRITE="$2";         shift 2 ;;
+        --threshold-bytes )  BYTES_REDUCTION="$2";   shift 2
+                             if [ "$BYTES_REDUCTION" -eq "$BYTES_REDUCTION" ] 2>/dev/null; then
+                                 : #echo "$BYTES_REDUCTION : is a number"
+                             else
+                                 _usage " >>> threshold-bytes: $BYTES_REDUCTION NOT A NUMBER <<< "&& exit
+                             fi ;;
+        --help            )  _usage && exit ;;
+        --                )  shift          ;;
+        *                 )  break          ;;
     esac
 done
-echo $#
+# echo $#
 [ $# = 0 ] && _usage " >>> NO TARGET GIVEN <<<  " && exit
 
 echo
 echo "$@"
 echo
 echo "THE ABOVE PATHS WILL BE PROCESSED!"
-echo "ALGORITHM:          ${ALGO[@]}"
-echo "SHOW TABLE:         $SHOW_TABLE"
-echo "APPLY_COMPRESSION:  $APPLY_COMPRESSION"
-echo "REMOVE_ORIGINAL:    $REMOVE_ORIGINAL"
-echo "ASK HUMAN:          $INTERACTIVE"
-echo "BYTES GAIN LIMIT:   $BYTES_REDUCTION"
-echo "OVERWRITE:          $OVERWRITE"
+echo "Algorithm:          ${ALGO[*]}"
+echo "Show table:         $SHOW_TABLE"
+echo "Show progress:      $PROGRESS"
+echo "Apply compression:  $APPLY_COMPRESSION"
+echo "Remove original:    $REMOVE_ORIGINAL"
+echo "Ask human:          $INTERACTIVE"
+echo "Bytes gain limit:   $BYTES_REDUCTION"
+echo "Overwrite:          $OVERWRITE"
 echo
 ## to enter interactive mode
 if [[ ! "$INTERACTIVE" == "no" ]]; then
@@ -125,6 +130,7 @@ if [[ ! "$INTERACTIVE" == "no" ]]; then
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo ""
     else
+        echo ""
         echo "EXIT"
         exit 0
     fi
@@ -165,6 +171,7 @@ for af in "$@" ; do
     codecs=()
     clevel=()
     cratio=()
+    cdurat=()
     echo "--------------------------------------------------"
     echo "SIZE:     $FILESIZE  $af"
 
@@ -174,14 +181,19 @@ for af in "$@" ; do
         ## compression levels to test
         for cl in {1..9}; do
             ## test compression command
+            tic=$SECONDS
             size=$(tar -cf - "$af" 2> >(grep -v "Removing leading") | $com -c -"$cl" - | wc -c)
-            ## stop when no further improvement
-            [[ $size -ge $bsize ]] && break
+            tac=$((SECONDS - tic))
+            ## info 
+            [[ $PROGRESS =~ ^[Yy] ]] && echo "Tested: $com $cl in $((tac/60)):$((tac%60))"
             ## keep stats in arrays
+            cdurat+=( "$tac"  )
             codecs+=( "$com"  )
             fsizes+=( "$size" )
             clevel+=( "$cl"   )
             cratio+=( "$(echo "scale=3; 100*($size - $FILESIZE)/$FILESIZE" | bc | sed -e 's/^-\./-0./' -e 's/^\./0./')" )
+            ## stop when no further improvement
+            [[ $size -ge $bsize ]] && break
             ## remember previous values
             bsize=$size
         done
@@ -201,11 +213,16 @@ for af in "$@" ; do
         Scodecs+=( "${codecs[$i]}" )
         Sclevel+=( "${clevel[$i]}" )
         Scratio+=( "${cratio[$i]}" )
+        Scdurat+=( "${cdurat[$i]}" )
     done
 
     ## print stats table
-    if [[ $SHOW_TABLE == "yes" ]]; then
-        paste <(printf "%s\n" "${Scodecs[@]}") <(printf "%s\n" "${Sclevel[@]}") <(printf "%s\n" "${Sfsizes[@]}") <(printf "%s %%\n" "${Scratio[@]}")
+    if [[ $SHOW_TABLE =~ ^[Yy] ]]; then
+        paste <(printf "%s\n" "${Scodecs[@]}") \
+              <(printf "%s\n" "${Sclevel[@]}") \
+              <(printf "%s\n" "${Sfsizes[@]}") \
+              <(printf "%s %%\n" "${Scratio[@]}") \
+              <(printf "%s s\n" "${Scdurat[@]}")
     fi
 
     ## compression logic
@@ -235,7 +252,7 @@ for af in "$@" ; do
 
     newfile="${af%/}.tar.${ext}"
     ## apply best compression to file
-    if [[ $APPLY_COMPRESSION == "yes" ]]; then
+    if [[ $APPLY_COMPRESSION =~ ^[Yy] ]]; then
         ## avoid overwrite
         if [[ $OVERWRITE == "no" ]] && [[ -e "$newfile" ]] ; then
             echo "SKIP:     File exist:  $newfile"
@@ -247,7 +264,7 @@ for af in "$@" ; do
         newsize=$(stat -c%s "$newfile")
         ## remove original file if new non empty
         if [ "$newsize" -gt 0 ]; then
-            if [[  $REMOVE_ORIGINAL == "yes" ]]; then
+            if [[  $REMOVE_ORIGINAL =~ ^[Yy] ]]; then
                 [[ $status -eq 0 ]] && trash "$af"
                 echo "REMOVED:  $af"
             fi
