@@ -42,6 +42,11 @@ $*
         Will ignore folders.
         Will not try to compress an already compressed file.
 
+    Examples:
+        $(basename "${0}") ./data 
+        $(basename "${0}") --show-table=yes ./data 
+        $(basename "${0}") --compress no ./data 
+
 EOF
 }
 

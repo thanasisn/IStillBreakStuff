@@ -16,6 +16,7 @@ REMOVE_ORIGINAL="no"
 INTERACTIVE="yes"
 BYTES_REDUCTION="10"
 OVERWRITE="yes"
+PROGRESS="yes"
 
 ALGO=( bzip2 gzip xz )
 
@@ -36,12 +37,17 @@ $*
         --show-table      [yes/no] ($SHOW_TABLE) Show stats table for all tests
         --threshold-bytes [yes/no] ($BYTES_REDUCTION) Don't compress if benefit is less than $BYTES_REDUCTION bytes
         --overwrite       [yes/no] ($OVERWRITE) Overwrite existing files
+        --show-progress   [yes/no] ($PROGRESS) Show some progress info while trying to find the best
         --help            Show this message and exit.
 
     Notes:
         Will try  ${ALGO[@]}  compressions with all levels add will stop when it finds the best.
         Will ignore folders.
         Will not try to compress an already compressed file.
+
+    Example:
+        $(basename "${0}") --show-table=yes ./file
+        $(basename "${0}") --compress yes ./file
 
 EOF
 }
@@ -82,18 +88,19 @@ eval set --$opts
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --algorithm  )     ALGO=( $2 );            shift 2 ;;
-        --show-table )     SHOW_TABLE="$2";        shift 2 ;;
-        --compress   )     APPLY_COMPRESSION="$2"; shift 2 ;;
-        --remove-source )  REMOVE_ORIGINAL="$2";   shift 2 ;;
-        --ask-human )      INTERACTIVE="$2";       shift 2 ;;
-        --overwrite )      OVERWRITE="$2";         shift 2 ;;
-        --threshold-bytes) BYTES_REDUCTION="$2";   shift 2
-                            if [ "$BYTES_REDUCTION" -eq "$BYTES_REDUCTION" ] 2>/dev/null; then
-                                : #echo "$BYTES_REDUCTION : is a number"
-                            else
-                                _usage " >>> threshold-bytes: $BYTES_REDUCTION NOT A NUMBER <<< "&& exit
-                            fi ;;
+        --algorithm       )  ALGO=( $2 );            shift 2 ;;
+        --show-table      )  SHOW_TABLE="$2";        shift 2 ;;
+        --show-progress   )  PROGRESS="$2";          shift 2 ;;
+        --compress        )  APPLY_COMPRESSION="$2"; shift 2 ;;
+        --remove-source   )  REMOVE_ORIGINAL="$2";   shift 2 ;;
+        --ask-human       )  INTERACTIVE="$2";       shift 2 ;;
+        --overwrite       )  OVERWRITE="$2";         shift 2 ;;
+        --threshold-bytes )  BYTES_REDUCTION="$2";   shift 2
+                             if [ "$BYTES_REDUCTION" -eq "$BYTES_REDUCTION" ] 2>/dev/null; then
+                                 : #echo "$BYTES_REDUCTION : is a number"
+                             else
+                                 _usage " >>> threshold-bytes: $BYTES_REDUCTION NOT A NUMBER <<< "&& exit
+                             fi ;;
         --help )          _usage && exit ;;
         -- ) shift ;;
         * ) break ;;
@@ -105,8 +112,9 @@ echo
 echo "$@"
 echo
 echo "THE ABOVE PATHS WILL BE PROCESSED!"
-echo "ALGORITHM:          ${ALGO[@]}"
+echo "ALGORITHM:          ${ALGO[*]}"
 echo "SHOW TABLE:         $SHOW_TABLE"
+echo "SHOW PROGRESS:      $PROGRESS"
 echo "APPLY_COMPRESSION:  $APPLY_COMPRESSION"
 echo "REMOVE_ORIGINAL:    $REMOVE_ORIGINAL"
 echo "ASK HUMAN:          $INTERACTIVE"
@@ -167,6 +175,7 @@ for af in "$@" ; do
         bsize=$FILESIZE
         ## compression levels to test
         for cl in {1..9}; do
+            [[ $PROGRESS =~ ^[Yy]$ ]] && echo "Trying: $con $cl"
             ## test compression command
             size=$($com -c "$af" -"$cl" | wc -c)
             ## stop when no further improvement
@@ -198,7 +207,7 @@ for af in "$@" ; do
     done
 
     ## print stats table
-    if [[ $SHOW_TABLE == "yes" ]]; then
+    if [[ $SHOW_TABLE =~ ^[Yy]$ ]]; then
         paste <(printf "%s\n" "${Scodecs[@]}") <(printf "%s\n" "${Sclevel[@]}") <(printf "%s\n" "${Sfsizes[@]}") <(printf "%s %%\n" "${Scratio[@]}")
     fi
 
