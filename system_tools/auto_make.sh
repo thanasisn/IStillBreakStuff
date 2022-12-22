@@ -17,6 +17,7 @@ info "START :: $0 :: $* ::"
 
 folders=(
     "$HOME/PANDOC/Notes"
+    "$HOME/PANDOC/Notes_Aerosols"
     "$HOME/PANDOC/Journal"
     "$HOME/MANUSCRIPTS/2022_sdr_trends"
 )
