@@ -239,9 +239,13 @@ done
 ## use full paths
 folders=(
     "$HOME/Aerosols/"
+    "$HOME/BASH"
+    "$HOME/Ecotime_machine/Scripts/"
     "$HOME/PANDOC/Journal/"
     "$HOME/PANDOC/Notes/"
+    "$HOME/PANDOC/Notes_Aerosols/"
     "$HOME/PROJECTS/"
+    "$HOME/PROJECTS/UVindex_Production"
     "$HOME/PYTHON2"
     "$HOME/TEX/"
 )
@@ -259,7 +263,8 @@ for i in "${folders[@]}"; do
     ## always break lock
     rm -f "${i}/.git/index.lock"
     ## add files we care about
-    find . -type f \(    -iname '*.r'    \
+    find . -type f \(    -iname '*.bas'  \
+                      -o -iname '*.Rmd'  \
                       -o -iname '*.bas'  \
                       -o -iname '*.bib'  \
                       -o -iname '*.c'    \
@@ -282,6 +287,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.py'   \
                       -o -iname '*.qgs'  \
                       -o -iname '*.qmd'  \
+                      -o -iname '*.r'    \
                       -o -iname '*.rmd'  \
                       -o -iname '*.sh'   \
                       -o -iname '*.tex'  \
@@ -296,82 +302,9 @@ done
 
 
 
-
-
-
-
 #TODO
 
 
-
-
-folder="$HOME/UVindex_prod"
-echo ${folder}
-cd  ${folder}
-rm -f "$HOME/UVindex_prod/.git/index.lock"
-
-find . -type f \(  -iname '*.sh'   \
-                -o -iname '*.r'    \
-                -o -iname '*.gnu'  \
-                -o -iname '*.dot'  \
-                -o -iname '*.jl'   \
-                -o -iname '*.frm'  \
-                -o -iname '*.py'   \
-                -o -iname '*.frm' \) -print0  |\
-        xargs -0 git add
-
-git commit -uno -a -m "Commit $(date +'%F %R')"
-echo
-
-
-
-
-
-
-
-####    ALL HOSTS    ##########################################################
-
-
-
-#-----------------------------------------------------------------------------#
-
-folder="$HOME/Ecotime_machine/Scripts/"
-
-echo ""
-echo " vvvv START vvvv ${folder}"
-echo ""
-
-cd ${folder}
-rm -f "${folder}/.git/index.lock"
-
-find . -type f \(    -iname '*.sh'  \
-                  -o -iname '*.py'  \
-                  -o -iname '*.md'  \
-                  -o -iname '*.bas' \
-                  -o -iname '*.gnu' \
-                  -o -iname '*.dot' \
-                  -o -iname '*.frm' \
-                  -o -iname '*.jl'  \
-                  -o -iname '*.par' \
-                  -o -iname '*.f90' \
-                  -o -iname '*.c'   \
-                  -o -iname '*.h'   \
-                  -o -iname '*.qmd' \
-                  -o -iname '*.gp'  \
-                  -o -iname '*.ex'  \
-                  -o -iname '*.bib' \
-                  -o -iname '*.tex' \
-                  -o -iname '*.Rmd' \
-                  -o -iname '*.md'  \
-                  -o -iname '*.r'   \) -print0 |\
-                  xargs -0 git add
-
-git commit -uno -a -m "Commit $(date +'%F %R')"
-
-echo ""
-echo " ^^^^ FINISH ^^^^ ${folder}"
-
-#-----------------------------------------------------------------------------#
 
 
 
@@ -443,40 +376,7 @@ echo " ^^^^ FINISH ^^^^ ${folder}"
 
 #-----------------------------------------------------------------------------#
 
-folder="$HOME/BASH"
 
-echo ""
-echo " vvvv START vvvv ${folder}"
-echo ""
-
-cd ${folder}
-rm -f "${folder}/.git/index.lock"
-
-find . -type f \(    -iname '*.sh'   \
-                  -o -iname '*.R'    \
-                  -o -iname '*.Rmd'  \
-                  -o -iname '*.c'    \
-                  -o -iname '*.conf' \
-                  -o -iname '*.dot'  \
-                  -o -iname '*.qmd'  \
-                  -o -iname '*.frm'  \
-                  -o -iname '*.gnu'  \
-                  -o -iname '*.jl'   \
-                  -o -iname '*.gp'   \
-                  -o -iname '*.jl'   \
-                  -o -iname '*.list' \
-                  -o -iname '*.md'   \
-                  -o -iname '*.par'  \
-                  -o -iname '*.py'   \
-                  -o -iname '*.ex'   \) -print0 |\
-                  xargs -0 git add
-
-git commit -uno -a -m "Commit $(date +'%F %R')"
-
-echo ""
-echo " ^^^^ FINISH ^^^^ ${folder}"
-
-#-----------------------------------------------------------------------------#
 
 folder="$HOME/Formal/CV"
 
