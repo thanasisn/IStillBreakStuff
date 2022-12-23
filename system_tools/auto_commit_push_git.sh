@@ -198,6 +198,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.cs'  \
                       -o -iname '*.css' \
                       -o -iname '*.dot' \
+                      -o -iname '*.dia' \
                       -o -iname '*.ex'  \
                       -o -iname '*.f90' \
                       -o -iname '*.frm' \
