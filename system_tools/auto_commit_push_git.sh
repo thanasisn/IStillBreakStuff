@@ -102,7 +102,7 @@ cd ".."
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
 ## will include to thesis
-# git push -f -u origin main
+git push -f -u origin main
 
 
 
@@ -116,34 +116,6 @@ pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 
-
-
-echo "---------------"
-cd "$HOME/PANDOC/Thesis"
-pwd
-find . -type f \(    -iname '*.sh'  \
-                  -o -iname '*.py'  \
-                  -o -iname '*.md'  \
-                  -o -iname '*.qmd' \
-                  -o -iname '*.bas' \
-                  -o -iname '*.gnu' \
-                  -o -iname '*.dot' \
-                  -o -iname '*.frm' \
-                  -o -iname '*.par' \
-                  -o -iname '*.f90' \
-                  -o -iname '*.jl'  \
-                  -o -iname '*.c'   \
-                  -o -iname '*.h'   \
-                  -o -iname '*.gp'  \
-                  -o -iname '*.ex'  \
-                  -o -iname '*.bib' \
-                  -o -iname '*.tex' \
-                  -o -iname '*.Rmd' \
-                  -o -iname '*.md'  \
-                  -o -iname '*.r'   \) -print0 |\
-                  xargs -t -0 git add -f
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
 
 
 
@@ -167,11 +139,11 @@ git push -f -u origin main
 
 ####  Automatically commit to github  ################################
 
-
 ## use full paths
 folders=(
     "$HOME/CHP_1_DIR/"
     "$HOME/CM_21_GLB/"
+    "$HOME/PANDOC/Thesis"
     "$HOME/RAD_QC"
     "$HOME/SUN"
     "$HOME/TSI"
@@ -188,34 +160,35 @@ for i in "${folders[@]}"; do
     ## in the git folder here
     pwd
     ## add files we care about
-    find . -type f \(    -iname '*.R'   \
-                      -o -iname '*.Rmd' \
-                      -o -iname '*.bas' \
-                      -o -iname '*.bib' \
-                      -o -iname '*.c'   \
-                      -o -iname '*.conf'\
-                      -o -iname '*.cpp' \
-                      -o -iname '*.cs'  \
-                      -o -iname '*.css' \
-                      -o -iname '*.dot' \
-                      -o -iname '*.dia' \
-                      -o -iname '*.ex'  \
-                      -o -iname '*.f90' \
-                      -o -iname '*.frm' \
-                      -o -iname '*.qmd' \
-                      -o -iname '*.gnu' \
-                      -o -iname '*.gp'  \
-                      -o -iname '*.h'   \
-                      -o -iname '*.jl'  \
-                      -o -iname '*.list'\
-                      -o -iname '*.md'  \
-                      -o -iname '*.par' \
-                      -o -iname '*.pbs' \
-                      -o -iname '*.py'  \
-                      -o -iname '*.qgs' \
-                      -o -iname '*.sh'  \
-                      -o -iname '*.tex' \
-                      -o -iname '*.txt' \) -print0 |\
+    find . -type f \(    -iname '*.bas'      \
+                      -o -iname '*.bib'      \
+                      -o -iname '*.c'        \
+                      -o -iname '*.conf'     \
+                      -o -iname '*.cpp'      \
+                      -o -iname '*.cs'       \
+                      -o -iname '*.css'      \
+                      -o -iname '*.dia'      \
+                      -o -iname '*.dot'      \
+                      -o -iname '*.ex'       \
+                      -o -iname '*.f90'      \
+                      -o -iname '*.frm'      \
+                      -o -iname '*.gnu'      \
+                      -o -iname '*.gp'       \
+                      -o -iname '*.h'        \
+                      -o -iname '*.jl'       \
+                      -o -iname '*.list'     \
+                      -o -iname '*.makefile' \
+                      -o -iname '*.md'       \
+                      -o -iname '*.par'      \
+                      -o -iname '*.pbs'      \
+                      -o -iname '*.py'       \
+                      -o -iname '*.qgs'      \
+                      -o -iname '*.qmd'      \
+                      -o -iname '*.r'        \
+                      -o -iname '*.rmd'      \
+                      -o -iname '*.sh'       \
+                      -o -iname '*.tex'      \
+                      -o -iname '*.txt'      \) -print0 |\
                   xargs -t -0 git add -f
     ## commit and push
     git commit -uno -a -m "Commit $(date +'%F %R')"
@@ -234,20 +207,21 @@ done
 
 
 ##  COMMIT PUSH to local repos  ################################################
-##  Autocommit in local repos  ##
 
 
 ## use full paths
 folders=(
     "$HOME/Aerosols/"
-    "$HOME/BASH"
+    "$HOME/BASH/"
     "$HOME/Ecotime_machine/Scripts/"
     "$HOME/PANDOC/Journal/"
     "$HOME/PANDOC/Notes/"
     "$HOME/PANDOC/Notes_Aerosols/"
+    "$HOME/Improved_Aerosols_O3/"
     "$HOME/PROJECTS/"
-    "$HOME/PROJECTS/UVindex_Production"
-    "$HOME/PYTHON2"
+    "$HOME/PROJECTS/UVindex_Production/"
+    "$HOME/PYTHON2/"
+    "$HOME/PYTHON3/"
     "$HOME/TEX/"
 )
 
@@ -264,35 +238,35 @@ for i in "${folders[@]}"; do
     ## always break lock
     rm -f "${i}/.git/index.lock"
     ## add files we care about
-    find . -type f \(    -iname '*.bas'  \
-                      -o -iname '*.Rmd'  \
-                      -o -iname '*.bas'  \
-                      -o -iname '*.bib'  \
-                      -o -iname '*.c'    \
-                      -o -iname '*.conf' \
-                      -o -iname '*.cpp'  \
-                      -o -iname '*.cs'   \
-                      -o -iname '*.css'  \
-                      -o -iname '*.dot'  \
-                      -o -iname '*.ex'   \
-                      -o -iname '*.f90'  \
-                      -o -iname '*.frm'  \
-                      -o -iname '*.gnu'  \
-                      -o -iname '*.gp'   \
-                      -o -iname '*.h'    \
-                      -o -iname '*.jl'   \
-                      -o -iname '*.list' \
-                      -o -iname '*.md'   \
-                      -o -iname '*.par'  \
-                      -o -iname '*.pbs'  \
-                      -o -iname '*.py'   \
-                      -o -iname '*.qgs'  \
-                      -o -iname '*.qmd'  \
-                      -o -iname '*.r'    \
-                      -o -iname '*.rmd'  \
-                      -o -iname '*.sh'   \
-                      -o -iname '*.tex'  \
-                      -o -iname '*.txt'  \) -print0 |\
+    find . -type f \(    -iname '*.bas'      \
+                      -o -iname '*.bib'      \
+                      -o -iname '*.c'        \
+                      -o -iname '*.conf'     \
+                      -o -iname '*.cpp'      \
+                      -o -iname '*.cs'       \
+                      -o -iname '*.css'      \
+                      -o -iname '*.dia'      \
+                      -o -iname '*.dot'      \
+                      -o -iname '*.ex'       \
+                      -o -iname '*.f90'      \
+                      -o -iname '*.frm'      \
+                      -o -iname '*.gnu'      \
+                      -o -iname '*.gp'       \
+                      -o -iname '*.h'        \
+                      -o -iname '*.jl'       \
+                      -o -iname '*.list'     \
+                      -o -iname '*.makefile' \
+                      -o -iname '*.md'       \
+                      -o -iname '*.par'      \
+                      -o -iname '*.pbs'      \
+                      -o -iname '*.py'       \
+                      -o -iname '*.qgs'      \
+                      -o -iname '*.qmd'      \
+                      -o -iname '*.r'        \
+                      -o -iname '*.rmd'      \
+                      -o -iname '*.sh'       \
+                      -o -iname '*.tex'      \
+                      -o -iname '*.txt'      \) -print0 |\
                   xargs -t -0 git add 
     ## commit to local repo
     git commit -uno -a -m "Commit $(date +'%F %R')"
@@ -302,51 +276,9 @@ done
 
 
 
-
 #TODO
 
 
-
-
-
-#-----------------------------------------------------------------------------#
-
-folder="$HOME/Improved_Aerosols_O3"
-
-echo ""
-echo " vvvv START vvvv ${folder}"
-echo ""
-
-cd ${folder}
-rm -f "${folder}/.git/index.lock"
-
-find . -type f \(    -iname '*.sh'  \
-                  -o -iname '*.py'  \
-                  -o -iname '*.md'  \
-                  -o -iname '*.Rmd' \
-                  -o -iname '*.bas' \
-                  -o -iname '*.par' \
-                  -o -iname '*.gnu' \
-                  -o -iname '*.dot' \
-                  -o -iname '*.jl'  \
-                  -o -iname '*.frm' \
-                  -o -iname '*.f90' \
-                  -o -iname '*.c'   \
-                  -o -iname '*.h'   \
-                  -o -iname '*.gp'  \
-                  -o -iname '*.qmd' \
-                  -o -iname '*.ex'  \
-                  -o -iname '*.bib' \
-                  -o -iname '*.tex' \
-                  -o -iname '*.Rmd' \
-                  -o -iname '*.md'  \
-                  -o -iname '*.r'   \) -print0  |\
-                  xargs -0 git add
-
-git commit -uno -a -m "Commit $(date +'%F %R')"
-
-echo ""
-echo " ^^^^ FINISH ^^^^ ${folder}"
 
 #-----------------------------------------------------------------------------#
 
