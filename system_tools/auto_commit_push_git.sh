@@ -2,16 +2,13 @@
 ## created on 2013-05-07
 ## https://github.com/thanasisn <lapauththanasis@gmail.com>
 
-
 #### Auto commit and push all git repos
-
 
 exec 9>"/dev/shm/$(basename $0).lock"
 if ! flock -n 9  ; then
     echo "another instance of $0 is running";
     exit 1
 fi
-
 
 info() { echo "$(date +%F_%T) ${SECONDS}s :: $* ::" >&1; }
 LOG_FILE="/dev/shm/$(basename "$0")_$(date +%F).log"
@@ -21,7 +18,6 @@ exec  > >(tee -i "${LOG_FILE}")
 exec 2> >(tee -i "${ERR_FILE}" >&2)
 trap 'echo $( date +%F_%T ) ${SECONDS}s :: $0 interrupted ::  >&2;' INT TERM
 info "START :: $0 :: $* ::"
-
 
 set +e
 
