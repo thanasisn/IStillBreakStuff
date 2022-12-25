@@ -33,7 +33,7 @@ for af in "${folders[@]}"; do
         continue
     fi  
     ## run make with default
-    make -C "$af"
+    make -f *[Mm]akefile -C "$af"
     echo "================================="
 done        
 
