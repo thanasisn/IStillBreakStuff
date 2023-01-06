@@ -124,12 +124,11 @@ fi
 export BORG_REPO="$BORG_REPO"
 export BORG_RSH="$BORG_RSH"
 export BORG_PASSPHRASE="$BORG_PASSPHRASE"
-
+export BORG_RELOCATED_REPO_ACCESS_IS_OK=yes
 
 ## print configuration variables
 # cat "$CONF_FILE" | sed '/^#/d'
 # set
-
 
 ## check whether the variables are set and not null
 : "${BORG_REPO:?}"

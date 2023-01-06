@@ -35,8 +35,8 @@ AT_IP   <- FALSE
 
 #' Create columns if not exist
 fncols <- function(data, cname) {
-    add <-cname[!cname%in%names(data)]
-    if(length(add)!=0) data[add] <- NA
+    add <- cname[!cname %in% names(data)]
+    if (length(add) != 0) data[add] <- NA
     data
 }
 
@@ -46,17 +46,21 @@ fncols <- function(data, cname) {
 try({
     res <- "Nothing"
     ## have to drop vnc devices from results
-    res <- system('sudo arp -a ', intern = TRUE, ignore.stderr = T)
+    res <- system('sudo arp -a ',
+                  intern        = TRUE,
+                  ignore.stderr = TRUE,
+                  timeout       = 10)
 
     ## we got something useful to process
-    if ( !is.null(res) && length(res) > 0  ) {
+    if ( !is.null(res) && length(res) > 0 ) {
         AT_HOME <- any(apply(LOCs[1],1, grepl, res))
         if (AT_HOME) {
-            loc_H  <- LOCs[ apply(LOCs[1],1, function(x) { any(grepl(x, res)) } ),  ]
+            loc_H <- LOCs[ apply(LOCs[1],1, function(x) { any(grepl(x, res)) } ),  ]
             cat(paste("Known location Access Point\n"))
         }
         rm(res)
     }
+    cat(paste("Wifi AP says:", c(AT_HOME, loc_H)), sep = "\n")
 })
 
 
@@ -64,29 +68,33 @@ try({
 try({
     if (!AT_HOME) {
         res <- "Nothing"
-        res <- system('ip addr show', intern = TRUE, ignore.stderr = T)
+        res <- system('ip addr show',
+                  intern        = TRUE,
+                  ignore.stderr = TRUE,
+                  timeout       = 10)
 
         if ( !is.null(res) && length(res) > 0  ) {
             AT_HOME <- any(apply(LOCs[1],1, grepl, res))
 
             if (AT_HOME) {
-                loc_H  <- LOCs[ apply(LOCs[1],1, function(x) { any(grepl(x, res)) } ),  ]
+                loc_H <- LOCs[ apply(LOCs[1],1, function(x) { any(grepl(x, res)) } ),  ]
                 cat(paste("Known location static ip\n"))
             }
             rm(res)
         }
+        cat(paste("Known static ip says:", c(AT_HOME, loc_H)),sep = "\n")
     }
 })
 
 
 ##  IP only method  ############################################################
-## use if google failed
+## use this if google failed
 try({
     if (!AT_HOME) {
         x <- readLines("https://www.geodatatool.com/")
         y <- grep("City:|lat:|lng:|title:", x,value = T)
-        y <- gsub("\t|,",  "", y )
-        y <- gsub(" +",   " ", y )
+        y <- gsub("\t|,",  "", y)
+        y <- gsub(" +",   " ", y)
 
         lat_0 <- as.numeric(unlist(strsplit(x = unique(grep("[Ll][Aa][Tt]: [-0-9.]+$",y,value = T))[1], " " ))[2])
         lng_0 <- as.numeric(unlist(strsplit(x = unique(grep("[Ll][Nn][Gg]: [-0-9.]+$",y,value = T))[1], " " ))[2])
@@ -105,7 +113,7 @@ try({
 
         if (is.numeric( loc_0$Lat )) {
             AT_IP = TRUE
-            cat(paste("Location from public ip\n"))
+            cat(paste("Location from public ip says:", c(AT_HOME, loc_0)),sep = "\n")
         }
     }
 })
@@ -115,19 +123,27 @@ try({
 try({
     if (!AT_HOME) {
         ## get current radio status and turn it on for retrieval
-        wifi_OFF <- system('nmcli radio wifi', intern = TRUE) == "disabled"
+        wifi_OFF <- system('nmcli radio wifi',
+                           intern = TRUE,
+                           timeout = 10) == "disabled"
         if ( wifi_OFF & ALLOW_SWITCH_WIFI) {
             ## try to start wifi
-            system('nmcli radio wifi on', intern = TRUE)
+            system('nmcli radio wifi on',
+                   intern = TRUE,
+                   timeout = 10)
             system('sleep 2')
         }
 
         ## get wifi name
-        wif <- system('sudo iw dev | awk \'$1==\"Interface\"{print $2}\'', intern = TRUE)
+        wif <- system('sudo iw dev | awk \'$1==\"Interface\"{print $2}\'',
+                      intern  = TRUE,
+                      timeout = 10)
         # cat(paste(wif))
 
         ## get access point data
-        scan_res <- system( paste('sudo iw dev', wif , 'scan'), intern = TRUE)
+        scan_res <- system(paste('sudo iw dev', wif, 'scan'),
+                           intern = TRUE,
+                           timeout = 10)
 
         ## prepare a json to send
         AP     <- grep("BSS|signal", scan_res, ignore.case = T, value = T)
@@ -165,7 +181,8 @@ try({
         ## use a system call to google
         output <- system(
             paste0('curl -d @/dev/shm/CONKY/ap.json -H "Content-Type: application/json" -i "', url,'"'),
-            intern = T)
+            intern  = TRUE,
+            timeout = 10)
 
         ## parse output data
         geol <- gsub('"',  "", output)
@@ -188,11 +205,13 @@ try({
         ## check data
         if (is.numeric( loc_1$Lat )) {
             AT_WIFI = TRUE
-            cat(paste("Location from wifi signals and google\n"))
+            cat(paste("Location from wifi and google says:", c(AT_HOME, loc_1)),sep = "\n")
         }
         ## set wifi to previous power state
         if ( wifi_OFF & ALLOW_SWITCH_WIFI) {
-            system('nmcli radio wifi off', intern = TRUE)
+            system('nmcli radio wifi off',
+                   intern = TRUE,
+                   timeout = 10)
         }
     }
 })
@@ -226,10 +245,10 @@ Location_data  <- Location_data[ , c("Dt", "Lat", "Lng", "Elv", "City", "Acc", "
 ## store location data
 Location_data <- Location_data[ order(Location_data$Dt ), ]
 write.table(Location_data, keep_file,
-            sep = ",",
-            append = T,
-            col.names = F,
-            row.names = F)
+            sep       = ",",
+            append    = TRUE,
+            col.names = FALSE,
+            row.names = FALSE)
 ## for desktop use
 write.csv(x    = tail(Location_data, 4 ),
           file = "/dev/shm/CONKY/last_location.dat", quote = F, row.names = F )
