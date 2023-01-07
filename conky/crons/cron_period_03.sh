@@ -39,7 +39,7 @@ set +e
 "${SCRIPTS}broadband_plot.R"   &
 
 ## TODO  plot graphs of my cluster
-"${SCRIPTS}Cnk_collectd_img.sh"
+# "${SCRIPTS}Cnk_collectd_img.sh"
 
 ## don't ignore errors
 set -e
