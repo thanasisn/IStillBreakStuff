@@ -5,8 +5,8 @@
 
 
 info() { echo "$(date +%F_%T) ${SECONDS}s :: $* ::" >&1; }
-LOG_FILE="/dev/shm/$(basename "$0")_$(date +%F_%T).log"
-ERR_FILE="/dev/shm/$(basename "$0")_$(date +%F_%T).err"
+LOG_FILE="/dev/shm/$(basename "$0")_$(date +%F).log"
+ERR_FILE="/dev/shm/$(basename "$0")_$(date +%F).err"
 touch "$LOG_FILE" "$ERR_FILE"
 exec  > >(tee -i "${LOG_FILE}")
 exec 2> >(tee -i "${ERR_FILE}" >&2)

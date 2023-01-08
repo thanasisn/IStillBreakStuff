@@ -9,12 +9,14 @@ SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 daemonize="$HOME/CODE/system_tools/daemonize.sh"
 
+display="$(w -hs | awk '{print $3}' | sort -u | grep ":[0-9]\+")"
+
+
 kill_run () {
     killall -s "$@"
     pkill   -9 "$@"
     setsid     "$@" &
 }
-
 
 
 
@@ -36,15 +38,8 @@ numlockx on
 ## -------------------
 
 
-
-
-# killall -9  skypeforlinux
-# nohup       skypeforlinux &
-
-
 # for java
 wmname LG3D
-
 
 
 kill_run  nm-tray
@@ -54,7 +49,7 @@ kill_run  dunst
 kill_run  kdeconnect-indicator
 kill_run  volumeicon
 kill_run  sxhkd
-kill_run  "python3 $HOME/PROGRAMS/noisy/noisy.py --config $HOME/PROGRAMS/noisy/config.json"
+# kill_run  "python3 $HOME/PROGRAMS/noisy/noisy.py --config $HOME/PROGRAMS/noisy/config.json"
 
 
 ## restart sycnthing server
@@ -73,12 +68,7 @@ kill_run syncthing-gtk --minimized --home "$HOME/.config/syncthing_$(hostname)"
 if [[ $(hostname) == "crane" ]]; then
     ## make menu key for logitek keyboard
     /usr/bin/xmodmap -e "keysym ISO_Level3_Shift = Menu"
-#     /usr/bin/xmodmap -e "keysym 0xff67 = Menu"
-#     /usr/bin/xmodmap -e "keycode 108 = Menu"
-
 fi
-
-
 
 numlockx on
 
@@ -94,7 +84,6 @@ numlockx on
 # nohup $HOME/BASH/deamonize.sh "evolution" &
 
 
-
 # killall -s 9 stalonetray
 # nohup $daemonize "stalonetray --sticky -bg black --window-strut right --icon-size 19 --grow-gravity W --skip-taskbar --geometry  4x1-650-6 --icon-gravity W --kludges fix_window_pos" &
 
@@ -103,10 +92,10 @@ numlockx on
 
 ## start conky
 # export DISPLAY=0 && $HOME/BASH/STARTUP/conky_chooser.sh
-export DISPLAY=:0 ; $HOME/CODE/conky/conky_choose_bigger.sh &
+export DISPLAY=$display ; $HOME/CODE/conky/conky_choose_bigger.sh &
 
 ## update backgrounds on all screens
-export DISPLAY=:0 ; $HOME/CODE/conky/scripts/update_background.sh &
+export DISPLAY=$display ; $HOME/CODE/conky/scripts/update_background.sh &
 
 ## start all conky cron scripts and truncate status logs
 $HOME/CODE/conky/crons/run_all_crons.sh &
@@ -118,22 +107,6 @@ xrandr --listactivemonitors | sed 's/^.* //' | sed 1d | while read screen; do
     polybar -c $HOME/.config/polybar/config -r example &
 done
 
-
-
-# zeitgeist-daemon --quit
-# killall zeitgeist-daemon
-# export ZEITGEIST_DATABASE_PATH="$HOME/.config/zeitgeist/$(hostname)/activity.sqlite" && nohup   zeitgeist-daemon -r &
-# killall -9 zeitgeist-datahub
-# nohup      zeitgeist-datahub -r &
-
-
-# pkill -f "$HOME/BASH/Desktop_App/main/desktop_app.py"
-# "$HOME/BASH/Desktop_App/main/desktop_app.py"
-
-
-# mkdir -p "$HOME/.config/zeitgeist/$(hostname)/activity.sqlite"
-# export ZEITGEIST_DATABASE_PATH="$HOME/.config/zeitgeist/$(hostname)/activity.sqlite"
-# exec "$@" &
 
 
 exit 0

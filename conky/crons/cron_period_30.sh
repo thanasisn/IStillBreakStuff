@@ -43,9 +43,8 @@ set +e
 "/home/athan/CODE/conky/scripts/meteoblue_get.sh" &
 
 
-
 ## corona virus plot
-"${SCRIPTS}wikipd.R"    &
+"${SCRIPTS}wikipd.R"              &
 
 "${SCRIPTS}rls_choose.sh" 90      &
 
