@@ -7,12 +7,13 @@
 
 
 ## executable path
-BORG="$HOME/PROGRAMS/borgtest/borg-1.2.0a7"
-BORG="/usr/local/bin/borg"
+BORG="$(command -v borg)"
+
 
 ## requires some commands:
 command -v nc    >/dev/null 2>&1 || { echo >&2 "nc NOT INSTALLED. Aborting."; exit 1; }
 command -v $BORG >/dev/null 2>&1 || { echo >&2 "borg NOT INSTALLED. Aborting."; exit 1; }
+
 
 ##-------------------------##
 ##   logging definitions   ##
