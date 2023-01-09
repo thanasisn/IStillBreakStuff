@@ -3,7 +3,7 @@
 #### Get system location through wifi or google AP probing.
 ## uses 'sudo iw dev' and other system commands to collect data
 
-rm(list = (ls()[ls() != ""]))
+# rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 
 library(jsonlite)
