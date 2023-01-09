@@ -41,6 +41,7 @@ set +e
 
 ## plot weather
 "$HOME/CODE/conky/scripts/plot_weather2.R" &
+"$HOME/CODE/conky/scripts/plot_weather3.R" &
 
 ## output backup status
 "${SCRIPTS}status_logs_parse.R" &
