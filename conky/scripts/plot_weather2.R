@@ -211,8 +211,11 @@ testa <- lapd[ lapd$dateTime > Sys.Date() - 10 * 3600 * 24, ]
 #### Start plotting ####
  # x11()
 Sys.setlocale(locale = "el_GR.utf8")
+
+if (!interactive()) {
 png( OUTPUT_01, bg = "transparent", family = "Liberation Sans",
      width = 540, height = 255, units = "px", pointsize = 15, type = "cairo")
+}
 {
     how_graphs = sum(has_temp, has_rain, has_wind)
     if ( how_graphs == 3 ) {
@@ -229,7 +232,9 @@ png( OUTPUT_01, bg = "transparent", family = "Liberation Sans",
     ## set ranges to plot
     next_day <- Sys.time() + 24*3600
     drange <- range( dt_start,        Temp$dt,                         na.rm = T )
-    trange <- range( Temp$Temp,       Temp$Temp_feel, Temp$feels_like, na.rm = T )
+    trange <- range( Temp$Temp,       Temp$Temp_feel, Temp$feels_like,
+                     blue$temperature_max, blue$temperature_min,
+                     blue$felttemperature_max, blue$felttemperature_min, na.rm = T )
     rrange <- range( Rain$Rain.1h,    Rain$Rain.3h, 0, MIN_SCALE_RAIN, na.rm = T )
     wrange <- range( Wind$wind_speed, Wind$windSpeed                 , na.rm = T )
     name   <- as.character(tail(curr$name[!is.na(curr$name)],1))
@@ -294,7 +299,10 @@ png( OUTPUT_01, bg = "transparent", family = "Liberation Sans",
     segments(x0 = blue$From, x1 = blue$Until,
              y0 = blue$temperature_min,     col = "cyan" , lwd = 2 )
     segments(x0 = blue$From, x1 = blue$Until,
-             y0 = blue$temperature_mean, col = "cyan" , lwd = 2 , lty = 3 )
+             y0 = blue$felttemperature_min, col = "cyan" , lwd = 2 , lty = 3 )
+    segments(x0 = blue$From, x1 = blue$Until,
+             y0 = blue$felttemperature_max, col = "green", lwd = 2, lty = 3 )
+
 
 
     ## plot temperature lines
@@ -504,9 +512,8 @@ png( OUTPUT_01, bg = "transparent", family = "Liberation Sans",
               col = col_other, lwd = 2, col.axis = col_other )
     }
 }
-# dev.copy(png, OUTPUT_01, bg = "transparent",
-#          width = 530, height = 240, units = "px", pointsize = 15, type = "cairo")
-dev.off()
+
+if (!interactive()) {dev.off()}
 Sys.setlocale(locale = "en_US.utf8")
 
 

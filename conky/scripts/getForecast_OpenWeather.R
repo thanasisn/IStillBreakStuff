@@ -23,18 +23,19 @@ loc <- tail(geo,1)
 
 
 # get forecast for current location
-res_fr <- get_forecast(lat  = loc$Lat, lon = loc$Lng, units = "metric")
+res_fr        <- get_forecast(lat  = loc$Lat, lon = loc$Lng, units = "metric")
 
 stopifnot(length(res_fr) > 3) ## should be 12
 stopifnot( res_fr$cnt > 5   ) ## should be 40
 
 
 ## parse and format data
-currFR           <- owmr_as_tibble(res_fr)
-currFR           <- data.frame( currFR )
+currFR        <- owmr_as_tibble(res_fr)
+currFR        <- data.frame( currFR )
 
 ## use always UTC
-currFR$dt <- as.POSIXct(currFR$dt_txt, tz = "UTC" )
+currFR$dt        <- as.POSIXct(currFR$dt_txt, tz = "UTC" )
+currFR$Data_time <- as.POSIXct(Sys.time(),    tz = "UTC")
 
 ## drop some data
 wecare        <- grep( "id$|icon$|weather$|dt_txt", names(currFR),
