@@ -39,12 +39,17 @@ echo "$DATE  $LATI  $LONG  $ELEV  $CITY  $ACCU  $TYPE"
 : "${LONG:?}"
 : "${METEOBLUE_API:?}"
 
+# https://my.meteoblue.com/packages/basic-1h_basic-day_clouds-1h?apikey=R6m9gVqJDQbMtcfu&lat=39.0061&lon=21.9953&asl=796&format=json&history_days=2
+
 ## meteogram url call
 urlm="http://my.meteoblue.com/visimage/meteogram_web?apikey=${METEOBLUE_API}&lat=${LATI}&lon=${LONG}"
 ## data url call
-urld="http://my.meteoblue.com/packages/basic-day?apikey=${METEOBLUE_API}&lat=${LATI}&lon=${LONG}"
+# urld="http://my.meteoblue.com/packages/basic-day?apikey=${METEOBLUE_API}&lat=${LATI}&lon=${LONG}"
 ## multi model
 # urlmm="http://my.meteoblue.com/visimage/meteogram_multiSimple?apikey=${METEOBLUE_API}&lat=${LATI}&lon=${LONG}"
+
+## new api
+urld="https://my.meteoblue.com/packages/basic-1h_basic-day_clouds-1h?apikey=${METEOBLUE_API}&lat=${LATI}&lon=${LONG}&format=json&history_days=2"
 
 echo "$urlm"
 echo "$urld"

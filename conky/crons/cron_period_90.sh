@@ -39,11 +39,6 @@ set +e
 "$HOME/CODE/training_analysis/GC_read_rides.R" 
 "$HOME/CODE/training_analysis/GC_plots_b.R" &
 
-(
-    "$HOME/BASH/mail_auto/gmailr_get_accounts_alerts.R" 
-    "$HOME/BASH/mail_auto/parse_accounts_alerts.R"
-) &
-
 ## don't ignore errors
 set -e
 kill "$watchdogpid"

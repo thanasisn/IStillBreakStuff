@@ -40,13 +40,20 @@ set +e
 #"${BASEPATH}Cnk_amazfit_bip.R"  &
 #"${BASEPATH}Cnk_Body_meas.R"    &
 
-"/home/athan/CODE/conky/scripts/meteoblue_get.sh" &
-
+(
+"$HOME/CODE/conky/scripts/meteoblue_get.sh" 
+"$HOME/CODE/conky/scripts/getForecast_DarkSkyNet.R" 
+) &
 
 ## corona virus plot
-"${SCRIPTS}wikipd.R"              &
+#"${SCRIPTS}wikipd.R"              &
+#"${SCRIPTS}rls_choose.sh" 90      &
 
-"${SCRIPTS}rls_choose.sh" 90      &
+
+(
+    "$HOME/BASH/mail_auto/gmailr_get_accounts_alerts.R" 
+    "$HOME/BASH/mail_auto/parse_accounts_alerts.R"
+) &
 
 
 

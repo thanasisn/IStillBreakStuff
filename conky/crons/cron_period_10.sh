@@ -37,7 +37,7 @@ set +e
 # "${SCRIPTS}Cnk_gcal_reader.sh"  &
 
 ## get image from meteoblue
-"$HOME/CODE/conky/scripts/meteoblue_get.sh" &
+
 
 ## plot weather
 "$HOME/CODE/conky/scripts/plot_weather2.R" &
