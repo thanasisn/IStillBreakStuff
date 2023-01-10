@@ -5,7 +5,7 @@
 ## external kill switch
 #####################################################################
 killfile="/dev/shm/KILL_SWITCH/$(basename "$0")"
-[[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 999
+[[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 99
 #####################################################################
 
 ## no need to run without a Xserver or headless
