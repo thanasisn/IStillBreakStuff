@@ -6,7 +6,7 @@
 ## external kill switch
 #####################################################################
 killfile="/dev/shm/KILL_SWITCH/$(basename "$0")"
-[[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 999
+[[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 99
 #####################################################################
 
 ## no need to run without a Xserver or headless
@@ -32,30 +32,27 @@ SCRIPTS="$HOME/CODE/conky/scripts/"
 
 ## ignore errors
 set +e
+pids=()
 
-## TODO get calendar
+## get calendar
 # "${SCRIPTS}Cnk_gcal_reader.sh"  &
 
-## get image from meteoblue
-
-
 ## plot weather
-"$HOME/CODE/conky/scripts/plot_weather2.R" &
-"$HOME/CODE/conky/scripts/plot_weather3.R" &
+"$HOME/CODE/conky/scripts/plot_weather2.R" & pids+=($!)
+"$HOME/CODE/conky/scripts/plot_weather3.R" & pids+=($!)
 
 ## output backup status
-"${SCRIPTS}status_logs_parse.R" &
+"$HOME/CODE/conky/scripts/status_logs_parse.R" & pids+=($!)
 
 ## check ip of our hosts
-"${SCRIPTS}Cnk_ip_watch.sh"     &
+# "${SCRIPTS}Cnk_ip_watch.sh"     &
 
 ## check external ips and ports of our hosts
-"${SCRIPTS}ext_ip_watch.sh"     &
+"$HOME/CODE/conky/scripts/ext_ip_watch.sh"     & pids+=($!)
 
 
-wait; wait; wait; wait; wait;
 
-## don't ignore errors
+wait "${pids[@]}"; pids=()
 set -e
 echo "took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"

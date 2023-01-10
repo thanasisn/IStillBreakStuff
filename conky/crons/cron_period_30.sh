@@ -6,22 +6,19 @@
 ## external kill switch
 #####################################################################
 killfile="/dev/shm/KILL_SWITCH/$(basename "$0")"
-[[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 999
+[[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 99
 #####################################################################
 
-## no need to run without a Xserver or headless
-#####################################################################
-xsessions="$(w | grep -o " :[0-9]\+ " | sort -u | wc -l)"
-if [[ $xsessions -gt 0 ]]; then
-    echo "Display exists $xsessions"
-else
-    echo "No X server at \$DISPLAY [$DISPLAY] $xsessions" >&2
-    exit 11
-fi
-#####################################################################
-
-
-
+# ## no need to run without a Xserver or headless
+# #####################################################################
+# xsessions="$(w | grep -o " :[0-9]\+ " | sort -u | wc -l)"
+# if [[ $xsessions -gt 0 ]]; then
+#     echo "Display exists $xsessions"
+# else
+#     echo "No X server at \$DISPLAY [$DISPLAY] $xsessions" >&2
+#     exit 11
+# fi
+# #####################################################################
 
 
 mkdir -p "/dev/shm/CONKY"
@@ -31,19 +28,23 @@ mainpid=$$
 (sleep $((60*20)); kill $mainpid) &
 watchdogpid=$!
 
-SCRIPTS="$HOME/CODE/conky/scripts/"
 
 ## ignore errors
 set +e
+pids=()
 
-## TODO create running diagrams and plots
-#"${BASEPATH}Cnk_amazfit_bip.R"  &
-#"${BASEPATH}Cnk_Body_meas.R"    &
 
 (
-"$HOME/CODE/conky/scripts/meteoblue_get.sh" 
-"$HOME/CODE/conky/scripts/getForecast_DarkSkyNet.R" 
-) &
+    "$HOME/CODE/conky/scripts/meteoblue_get.sh" 
+    "$HOME/CODE/conky/scripts/getForecast_DarkSkyNet.R" 
+) & pids+=($!)
+
+
+(
+    "$HOME/CODE/conky/scripts/getCurrent_OpenWeather.R" 
+    "$HOME/CODE/conky/scripts/getForecast_OpenWeather.R" 
+) & pids+=($!)
+
 
 ## corona virus plot
 #"${SCRIPTS}wikipd.R"              &
@@ -53,10 +54,10 @@ set +e
 (
     "$HOME/BASH/mail_auto/gmailr_get_accounts_alerts.R" 
     "$HOME/BASH/mail_auto/parse_accounts_alerts.R"
-) &
+) & pids+=($!)
 
 
-
+wait "${pids[@]}"; pids=()
 echo "took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"
 exit 0

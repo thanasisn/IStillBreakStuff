@@ -115,12 +115,12 @@ notify_send <- function(summary,
     if (wait) command <- c(command, " -w ")
     ## transient
     if (transient) command <- c(command, " -e ")
-    ## summary is mandatory
-    command <- c(command, paste0("\"",summary,"\""))
+    ## summary is mandatory keep a space incase strint starts with '-'
+    command <- c(command, paste0("\" ",summary,"\""))
     ## body
-    command <- c(command, paste0("\"",body,"\""))
+    command <- c(command, paste0("\" ",body,"\""))
     ## show command
-    cat(command,"\n")
+    cat(command, "\n")
     ## run it
     system(paste(command,collapse = " "))
 }
