@@ -79,7 +79,7 @@ WAPI_hourly$source <- "OpenMeteo"
 
 
 
-####  Plot all open meto varaiables ####
+####  Plot all open meteo variables ####
 
 pdffile <- paste0(outdir,"/Open_Meteo_Variables_",tail(curr$name,1),"_",WAPI_metadata$City, ".pdf")
 
