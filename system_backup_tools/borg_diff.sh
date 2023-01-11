@@ -19,7 +19,7 @@ command -v $BORG >/dev/null 2>&1 || { echo >&2 "borg NOT INSTALLED. Aborting."; 
 ##   logging definitions   ##
 ##-------------------------##
 
-ldir="$HOME/LOGs/SYSTEM_LOGS/"
+ldir="/home/athan/LOGs/SYSTEM_LOGS/"
 mkdir -p "$ldir"
 
 ID="$1"
@@ -39,7 +39,7 @@ info "Script root $SCRIPT_ROOT"
 
 PROFILE="$1"
 PROFILE="${PROFILE%.*}"
-PROFILE_FOLDER="$HOME/BASH/CRON/borg_profiles"
+PROFILE_FOLDER="/home/athan/BASH/CRON/borg_profiles"
 
 CONF_FILE="${PROFILE_FOLDER}/${PROFILE}.conf"
 CONF_SECU="${PROFILE_FOLDER}/.${PROFILE}.conf"
