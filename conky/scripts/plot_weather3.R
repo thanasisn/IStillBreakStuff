@@ -78,6 +78,10 @@ WAPI_hourly$dt <- as.POSIXct(strptime(WAPI_hourly$time, format = "%FT%R", tz = W
 WAPI_hourly$source <- "OpenMeteo"
 
 
+## remove stale files anyway
+outfiles <- list.files(outdir, "*.pdf", full.names = T)
+file.remove(outfiles[file.mtime(outfiles) < Sys.time() -  5*24*3600])
+
 
 ####  Plot all open meteo variables ####
 
