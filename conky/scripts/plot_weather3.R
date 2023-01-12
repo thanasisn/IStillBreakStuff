@@ -78,10 +78,33 @@ WAPI_hourly$dt <- as.POSIXct(strptime(WAPI_hourly$time, format = "%FT%R", tz = W
 WAPI_hourly$source <- "OpenMeteo"
 
 
+## fix data
+wecare <- grep("time|source|dt", names(WAPI_hourly), invert = T, value = T )
+for (av in wecare) {
+
+    if (is.null(unlist( WAPI_hourly[[av]] ))) {
+        WAPI_hourly[[av]] <- NULL
+        next
+    }
+
+    if ( is.list( WAPI_hourly[[av]] ) ) {
+        res <- unlist( WAPI_hourly[[av]] )
+        res <- c(res, rep(NA, nrow(WAPI_hourly) - length(res)))
+        WAPI_hourly[[av]] <- res
+    }
+
+    if ( all( unique(WAPI_hourly[[av]]) %in% c(NA,0))) {
+        cat("remove non info",av,"\n")
+        WAPI_hourly[[av]] <- NULL
+        next()
+    }
+}
+
+
+
 ## remove stale files anyway
 outfiles <- list.files(outdir, "*.pdf", full.names = T)
 file.remove(outfiles[file.mtime(outfiles) < Sys.time() -  5*24*3600])
-
 
 
 
@@ -99,39 +122,158 @@ pdffile <- paste0(outdir,"/Open_Meteo_Variables_",tail(curr$name,1),"_",WAPI_met
 
 if (!interactive() && (!file.exists(pdffile) || WAPI_metadata$Data_time > file.mtime(pdffile) + 3600)) {
     cat("Create new ", pdffile,"\n")
-    pdf(pdffile, width = 9, height = 4)
+    pdf(pdffile, width = 9, height = 5)
 }
 
 WAPI_hourly <- WAPI_hourly[ WAPI_hourly$dt > dt_start, ]
-wecare      <- sort(grep("time|source|dt", names(WAPI_hourly), invert = T, value = T ))
+
+#### all models together  ####
+models <- sub("temperature_2m_", "", grep("temperature_2m_", names(WAPI_hourly), value = T))
+varab  <- grep(paste0(models,collapse = "|") ,names(WAPI_hourly), value = T)
+uvarab <- unique(sub("_$", "", sub(pattern = paste0(models,collapse = "|"), "", varab)))
+
+#### as lines ####
+for (av in uvarab) {
+
+    wecare <- names(WAPI_hourly)[names(WAPI_hourly) %in% paste0(av, "_", models)]
+    wecare <- sort(wecare,decreasing = T)
+    ylim   <- range(unlist( WAPI_hourly[wecare]), na.rm = T )
+    xlim   <- range(WAPI_hourly$dt)
+
+    # cat(wecare,sep = "\n", "\n\n")
+    par(mar = c(2,3,2,0.5))
+
+    plot(1, type = "n", axes = F,
+         xlab = "", ylab = "",
+         # yaxs = "i",
+         xlim = xlim,
+         ylim = ylim )
+
+    ## plot sun
+    rect(WAPI_daily$sunrise, ylim[1] - 100,
+         WAPI_daily$sunset,  ylim[2] + 100,
+         col = alpha("#E0DC35", 0.2 ), border = NA, lwd = 1 )
+
+    box()
+
+    ## x axis below
+    axis.POSIXct( side = 1, at = seq( xlim[1], xlim[2], by = "day"), format = "%m-%d",
+                  lwd.ticks = 1,  font = 2 )
+    axis.POSIXct( side = 1, at = seq( xlim[1], xlim[2], by = "3 hour"), labels = F ,
+                  lwd.ticks = 1, tcl = -0.2 )
+
+    ## y axis
+    axis(side = 2, at = pretty(unlist( WAPI_hourly[wecare])))
+
+    abline(h = pretty(unlist( WAPI_hourly[wecare])), lty = 3, col = "lightgrey")
+    abline(v = seq( xlim[1], xlim[2], by = "day"),   lty = 3, col = "lightgrey")
+    abline(v = Sys.time(), lty = 2 , col = "green" )
+
+    cc <- 0
+    mm <- c()
+    for (mv in wecare) {
+        cc <- cc + 1
+        if (is.null(unlist( WAPI_hourly[[mv]] ))) { next }
+        if (mv == tail(wecare,1)) { asi = 3 } else { asi = 2 }
+        mm <- c(mm, sub("^_", "", sub(av, "", mv)))
+        lines(WAPI_hourly$dt, WAPI_hourly[[mv]], col = cc, lwd = asi )
+    }
+
+    legend("top",
+           legend = mm,
+           lty = 1,
+           col = 1:length(mm),
+           ncol = 3,
+           bty = "n")
+
+    title(main = av)
+}
+
+
+
+#### as points ####
+for (av in uvarab) {
+
+    wecare <- names(WAPI_hourly)[names(WAPI_hourly) %in% paste0(av, "_", models)]
+    wecare <- sort(wecare,decreasing = T)
+    ylim   <- range(unlist( WAPI_hourly[wecare]), na.rm = T )
+    xlim   <- range(WAPI_hourly$dt)
+
+    # cat(wecare,sep = "\n", "\n\n")
+    par(mar = c(2,3,2,1))
+
+    plot(1, type = "n", axes = F,
+         xlab = "", ylab = "",
+         # yaxs = "i",
+         xlim = xlim,
+         ylim = ylim )
+
+    ## plot sun
+    rect(WAPI_daily$sunrise, ylim[1] - 100,
+         WAPI_daily$sunset,  ylim[2] + 100,
+         col = alpha("#E0DC35", 0.2 ), border = NA, lwd = 1 )
+
+    box()
+
+    ## x axis below
+    axis.POSIXct( side = 1, at = seq( xlim[1], xlim[2], by = "day"), format = "%m-%d",
+                  lwd.ticks = 1,  font = 2 )
+    axis.POSIXct( side = 1, at = seq( xlim[1], xlim[2], by = "3 hour"), labels = F ,
+                  lwd.ticks = 1, tcl = -0.2 )
+
+    ## y axis
+    axis(side = 2, at = pretty(unlist( WAPI_hourly[wecare])))
+
+    abline(h = pretty(unlist( WAPI_hourly[wecare])), lty = 3, col = "lightgrey")
+    abline(v = seq( xlim[1], xlim[2], by = "day"),   lty = 3, col = "lightgrey")
+    abline(v = Sys.time(), lty = 2 , col = "green" )
+
+    cc <- 0
+    pp <- 0
+    mm <- c()
+    for (mv in wecare) {
+        cc <- cc + 1
+        pp <- pp + 1
+        if (is.null(unlist( WAPI_hourly[[mv]] ))) { next }
+        if (mv == tail(wecare,1)) { asi = 3 } else { asi = 2 }
+        mm <- c(mm, sub("^_", "", sub(av, "", mv)))
+        points(WAPI_hourly$dt, WAPI_hourly[[mv]], col = cc , pch = pp, cex = asi)
+    }
+
+    legend("top",
+           legend = mm,
+           col = 1:length(mm),
+           pch = 1:length(mm),
+           ncol = 3,
+           bty = "n")
+
+    title(main = av)
+}
+
+
+
+#### plot each variable ####
+wecare  <- sort(grep("time|source|dt", names(WAPI_hourly), invert = T, value = T ))
 for (av in wecare) {
 
     par(mar = c(3,3,2,1))
 
-    if (is.null(unlist( WAPI_hourly[[av]] ))) { next }
-
-    if ( is.list( WAPI_hourly[[av]] ) ) {
-        res <- unlist( WAPI_hourly[[av]] )
-        res <- c(res, rep(NA, nrow(WAPI_hourly) - length(res)))
-        WAPI_hourly[[av]] <- res
-    }
-
-    # if ( length(unique(WAPI_hourly[[av]])) < 4) {
-    #     cat(unique(WAPI_hourly[[av]]),"\n")
-    #     cat(av,"\n")
+    # if (is.null(unlist( WAPI_hourly[[av]] ))) { next }
+    #
+    # if ( is.list( WAPI_hourly[[av]] ) ) {
+    #     res <- unlist( WAPI_hourly[[av]] )
+    #     res <- c(res, rep(NA, nrow(WAPI_hourly) - length(res)))
+    #     WAPI_hourly[[av]] <- res
+    # }
+    #
+    # if ( all( unique(WAPI_hourly[[av]]) %in% c(NA,0))) {
+    #     cat("skip",av,"\n")
+    #     next()
     # }
 
-    if ( all( unique(WAPI_hourly[[av]]) %in% c(NA,0))) {
-        cat("skip",av,"\n")
-        next()
-    }
+    ylim <- range(WAPI_hourly[[av]], na.rm = T)
 
     plot(WAPI_hourly$dt, WAPI_hourly[[av]], xlab = "", ylab = "", "l", lwd = 3)
-
-    ## plot sun
-    rect(WAPI_daily$sunrise, trange[1] - 10,
-         WAPI_daily$sunset,  trange[2] + 10,
-         col = col_sun, border = NA, lwd = 1 )
 
 
     abline(v = Sys.time(), col = "green", lty = 3, lwd = 3)
@@ -146,45 +288,9 @@ for (av in wecare) {
     abline( h = pretty(WAPI_hourly[[av]], min.n = 1), lty = 2, col = "grey" )
 }
 
-## group by model
-models <- sub("temperature_2m_", "", grep("temperature_2m_", names(WAPI_hourly), value = T))
-
-varab  <- grep(paste0(models,collapse = "|") ,names(WAPI_hourly), value = T)
-uvarab <- unique(sub("_$", "", sub(pattern = paste0(models,collapse = "|"), "", varab)))
-
-
-for (av in uvarab) {
-    wecare <- grep(av, names(WAPI_hourly), value = T)
-    ylim   <- range(unlist( WAPI_hourly[wecare]), na.rm = T )
-    xlim   <- range(WAPI_hourly$dt)
-
-    plot(1, type = "n", axes = F,
-         xlab = "", ylab = "",
-         # yaxs = "i",
-         xlim = xlim,
-         ylim = ylim )
-
-    box()
-
-    ## x axis below
-    axis.POSIXct( side = 1, at = seq( xlim[1], xlim[2], by = "day"), format = "%m-%d",
-                  lwd.ticks = 1,  font = 2 )
-    axis.POSIXct( side = 1, at = seq( xlim[1], xlim[2], by = "3 hour"), labels = F ,
-                  lwd.ticks = 1, tcl = -0.2 )
-
-    cc <- 0
-    mm <- c()
-    for (mv in wecare) {
-        cc <- cc + 1
-        if (is.null(unlist( WAPI_hourly[[mv]] ))) { next }
-        mm <- c(mm, sub("^_", "", sub(av, "", mv)))
-        lines(WAPI_hourly$dt, WAPI_hourly[[mv]], col = cc )
-    }
 
 
 
-
-}
 
 
 if (!interactive()) { dev.off() }
