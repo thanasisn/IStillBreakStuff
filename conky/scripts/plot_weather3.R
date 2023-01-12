@@ -83,6 +83,16 @@ outfiles <- list.files(outdir, "*.pdf", full.names = T)
 file.remove(outfiles[file.mtime(outfiles) < Sys.time() -  5*24*3600])
 
 
+
+
+#### Prepare daily value from meteo blue ####
+WAPI_daily$sunrise <- as.POSIXct(strptime(WAPI_daily$sunrise, "%FT%R" , tz = WAPI_metadata$timezone ))
+WAPI_daily$sunset  <- as.POSIXct(strptime(WAPI_daily$sunset,  "%FT%R" , tz = WAPI_metadata$timezone ))
+
+WAPI_daily$From  <- as.POSIXct(strptime( paste(WAPI_daily$time, "00:00"), "%F %R" ), tz = "Europe/Athens")
+WAPI_daily$Until <- as.POSIXct(strptime( paste(WAPI_daily$time, "23:59"), "%F %R" ), tz = "Europe/Athens")
+
+
 ####  Plot all open meteo variables ####
 
 pdffile <- paste0(outdir,"/Open_Meteo_Variables_",tail(curr$name,1),"_",WAPI_metadata$City, ".pdf")
@@ -118,6 +128,12 @@ for (av in wecare) {
 
     plot(WAPI_hourly$dt, WAPI_hourly[[av]], xlab = "", ylab = "", "l", lwd = 3)
 
+    ## plot sun
+    rect(WAPI_daily$sunrise, trange[1] - 10,
+         WAPI_daily$sunset,  trange[2] + 10,
+         col = col_sun, border = NA, lwd = 1 )
+
+
     abline(v = Sys.time(), col = "green", lty = 3, lwd = 3)
 
     str_date <- strftime( WAPI_metadata$Data_time, tz = "Europe/Athens", format = "%F %R" )
@@ -133,8 +149,42 @@ for (av in wecare) {
 ## group by model
 models <- sub("temperature_2m_", "", grep("temperature_2m_", names(WAPI_hourly), value = T))
 
+varab  <- grep(paste0(models,collapse = "|") ,names(WAPI_hourly), value = T)
+uvarab <- unique(sub("_$", "", sub(pattern = paste0(models,collapse = "|"), "", varab)))
 
 
+for (av in uvarab) {
+    wecare <- grep(av, names(WAPI_hourly), value = T)
+    ylim   <- range(unlist( WAPI_hourly[wecare]), na.rm = T )
+    xlim   <- range(WAPI_hourly$dt)
+
+    plot(1, type = "n", axes = F,
+         xlab = "", ylab = "",
+         # yaxs = "i",
+         xlim = xlim,
+         ylim = ylim )
+
+    box()
+
+    ## x axis below
+    axis.POSIXct( side = 1, at = seq( xlim[1], xlim[2], by = "day"), format = "%m-%d",
+                  lwd.ticks = 1,  font = 2 )
+    axis.POSIXct( side = 1, at = seq( xlim[1], xlim[2], by = "3 hour"), labels = F ,
+                  lwd.ticks = 1, tcl = -0.2 )
+
+    cc <- 0
+    mm <- c()
+    for (mv in wecare) {
+        cc <- cc + 1
+        if (is.null(unlist( WAPI_hourly[[mv]] ))) { next }
+        mm <- c(mm, sub("^_", "", sub(av, "", mv)))
+        lines(WAPI_hourly$dt, WAPI_hourly[[mv]], col = cc )
+    }
+
+
+
+
+}
 
 
 if (!interactive()) { dev.off() }
@@ -307,12 +357,7 @@ has_wind <- any(!is.na(c(Wind$wind_speed, Wind$windSpeed)), na.rm = TRUE)
 # has_rain = F
 
 
-#### Prepare daily value from meteo blue ####
-WAPI_daily$sunrise <- as.POSIXct(strptime(WAPI_daily$sunrise, "%FT%R" , tz = WAPI_metadata$timezone ))
-WAPI_daily$sunset  <- as.POSIXct(strptime(WAPI_daily$sunset,  "%FT%R" , tz = WAPI_metadata$timezone ))
 
-WAPI_daily$From  <- as.POSIXct(strptime( paste(WAPI_daily$time, "00:00"), "%F %R" ), tz = "Europe/Athens")
-WAPI_daily$Until <- as.POSIXct(strptime( paste(WAPI_daily$time, "23:59"), "%F %R" ), tz = "Europe/Athens")
 WAPI_daily       <- WAPI_daily[ WAPI_daily$From <= dt_end, ]
 
 
