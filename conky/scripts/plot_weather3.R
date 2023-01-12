@@ -130,6 +130,13 @@ for (av in wecare) {
     abline( h = pretty(WAPI_hourly[[av]], min.n = 1), lty = 2, col = "grey" )
 }
 
+## group by model
+models <- sub("temperature_2m_", "", grep("temperature_2m_", names(WAPI_hourly), value = T))
+
+
+
+
+
 if (!interactive()) { dev.off() }
 
 
