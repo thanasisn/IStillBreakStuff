@@ -26,14 +26,12 @@ mainpid=$$
 (sleep $((60*30)); kill $mainpid) &
 watchdogpid=$!
 
+# init
 mkdir -p "/dev/shm/CONKY"
-
-SCRIPTS="$HOME/CODE/conky/scripts/"
-
-
-## ignore errors
 set +e
 pids=()
+
+
 
 "$HOME/CODE/conky/scripts/transact_plot.R"  & pids+=($!)
 
