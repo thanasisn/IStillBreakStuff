@@ -46,6 +46,9 @@ pids=()
 ) & pids+=($!)
 
 
+"$HOME/CODE/conky/scripts/get_open_meteo_api.R"  & pids+=($!)
+
+
 ## corona virus plot
 #"${SCRIPTS}wikipd.R"              &
 #"${SCRIPTS}rls_choose.sh" 90      &

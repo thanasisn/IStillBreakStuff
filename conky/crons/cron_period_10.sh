@@ -9,16 +9,16 @@ killfile="/dev/shm/KILL_SWITCH/$(basename "$0")"
 [[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 99
 #####################################################################
 
-## no need to run without a Xserver or headless
-#####################################################################
-xsessions="$(w | grep -o " :[0-9]\+ " | sort -u | wc -l)"
-if [[ $xsessions -gt 0 ]]; then
-    echo "Display exists $xsessions"
-else
-    echo "No X server at \$DISPLAY [$DISPLAY] $xsessions" >&2
-    exit 11
-fi
-#####################################################################
+# ## no need to run without a Xserver or headless
+# #####################################################################
+# xsessions="$(w | grep -o " :[0-9]\+ " | sort -u | wc -l)"
+# if [[ $xsessions -gt 0 ]]; then
+#     echo "Display exists $xsessions"
+# else
+#     echo "No X server at \$DISPLAY [$DISPLAY] $xsessions" >&2
+#     exit 11
+# fi
+# #####################################################################
 
 
 mkdir -p "/dev/shm/CONKY"

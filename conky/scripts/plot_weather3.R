@@ -112,8 +112,8 @@ file.remove(outfiles[file.mtime(outfiles) < Sys.time() -  5*24*3600])
 WAPI_daily$sunrise <- as.POSIXct(strptime(WAPI_daily$sunrise, "%FT%R" , tz = WAPI_metadata$timezone ))
 WAPI_daily$sunset  <- as.POSIXct(strptime(WAPI_daily$sunset,  "%FT%R" , tz = WAPI_metadata$timezone ))
 
-WAPI_daily$From  <- as.POSIXct(strptime( paste(WAPI_daily$time, "00:00"), "%F %R" ), tz = "Europe/Athens")
-WAPI_daily$Until <- as.POSIXct(strptime( paste(WAPI_daily$time, "23:59"), "%F %R" ), tz = "Europe/Athens")
+WAPI_daily$From  <- as.POSIXct(strptime( paste(WAPI_daily$time, "00:00"), "%F %R" ), tz = WAPI_metadata$timezone)
+WAPI_daily$Until <- as.POSIXct(strptime( paste(WAPI_daily$time, "23:59"), "%F %R" ), tz = WAPI_metadata$timezone)
 
 
 ####  Plot all open meteo variables ####
@@ -128,9 +128,11 @@ if (!interactive() && (!file.exists(pdffile) || WAPI_metadata$Data_time > file.m
 WAPI_hourly <- WAPI_hourly[ WAPI_hourly$dt > dt_start, ]
 
 #### all models together  ####
-models <- sub("temperature_2m_", "", grep("temperature_2m_", names(WAPI_hourly), value = T))
-varab  <- grep(paste0(models,collapse = "|") ,names(WAPI_hourly), value = T)
-uvarab <- unique(sub("_$", "", sub(pattern = paste0(models,collapse = "|"), "", varab)))
+models   <- sub("temperature_2m_", "", grep("temperature_2m_", names(WAPI_hourly), value = T))
+varab    <- grep(paste0(models,collapse = "|") ,names(WAPI_hourly), value = T)
+uvarab   <- unique(sub("_$", "", sub(pattern = paste0(models,collapse = "|"), "", varab)))
+str_date <- strftime( WAPI_metadata$Data_time, tz = "Europe/Athens", format = "%F %R" )
+
 
 #### as lines ####
 for (av in uvarab) {
@@ -167,7 +169,14 @@ for (av in uvarab) {
 
     abline(h = pretty(unlist( WAPI_hourly[wecare])), lty = 3, col = "lightgrey")
     abline(v = seq( xlim[1], xlim[2], by = "day"),   lty = 3, col = "lightgrey")
+    ## now line
     abline(v = Sys.time(), lty = 2 , col = "green" )
+    ## data parsed line
+    # abline(v = WAPI_metadata$Data_time, lty = 2 , col = "grey" )
+    ## model update every 1, 3, 6 hours
+    abline(v = WAPI_metadata$Data_time - as.numeric(WAPI_metadata$Data_time) %%      3600,  lty = 2 , col = "grey" )
+    abline(v = WAPI_metadata$Data_time - as.numeric(WAPI_metadata$Data_time) %% (3 * 3600), lty = 2 , col = "grey")
+    abline(v = WAPI_metadata$Data_time - as.numeric(WAPI_metadata$Data_time) %% (6 * 3600), lty = 2 , col = "grey")
 
     cc <- 0
     mm <- c()
@@ -186,7 +195,7 @@ for (av in uvarab) {
            ncol = 3,
            bty = "n")
 
-    title(main = av)
+    title(paste(WAPI_metadata$City, "  ", str_date, "  ", av), cex.main = 1.2 )
 }
 
 
@@ -226,7 +235,14 @@ for (av in uvarab) {
 
     abline(h = pretty(unlist( WAPI_hourly[wecare])), lty = 3, col = "lightgrey")
     abline(v = seq( xlim[1], xlim[2], by = "day"),   lty = 3, col = "lightgrey")
+    ## now line
     abline(v = Sys.time(), lty = 2 , col = "green" )
+    ## data parsed line
+    # abline(v = WAPI_metadata$Data_time, lty = 2 , col = "grey" )
+    ## model update every 1, 3, 6 hours
+    abline(v = WAPI_metadata$Data_time - as.numeric(WAPI_metadata$Data_time) %%      3600,  lty = 2 , col = "grey" )
+    abline(v = WAPI_metadata$Data_time - as.numeric(WAPI_metadata$Data_time) %% (3 * 3600), lty = 2 , col = "grey")
+    abline(v = WAPI_metadata$Data_time - as.numeric(WAPI_metadata$Data_time) %% (6 * 3600), lty = 2 , col = "grey")
 
     cc <- 0
     pp <- 0
@@ -235,7 +251,7 @@ for (av in uvarab) {
         cc <- cc + 1
         pp <- pp + 1
         if (is.null(unlist( WAPI_hourly[[mv]] ))) { next }
-        if (mv == tail(wecare,1)) { asi = 3 } else { asi = 2 }
+        if (mv == tail(wecare,1)) { asi = 2 } else { asi = 1 }
         mm <- c(mm, sub("^_", "", sub(av, "", mv)))
         points(WAPI_hourly$dt, WAPI_hourly[[mv]], col = cc , pch = pp, cex = asi)
     }
@@ -247,7 +263,8 @@ for (av in uvarab) {
            ncol = 3,
            bty = "n")
 
-    title(main = av)
+    title(paste(WAPI_metadata$City, "  ", str_date, "  ", av), cex.main = 1.2,  )
+
 }
 
 
@@ -258,27 +275,11 @@ for (av in wecare) {
 
     par(mar = c(3,3,2,1))
 
-    # if (is.null(unlist( WAPI_hourly[[av]] ))) { next }
-    #
-    # if ( is.list( WAPI_hourly[[av]] ) ) {
-    #     res <- unlist( WAPI_hourly[[av]] )
-    #     res <- c(res, rep(NA, nrow(WAPI_hourly) - length(res)))
-    #     WAPI_hourly[[av]] <- res
-    # }
-    #
-    # if ( all( unique(WAPI_hourly[[av]]) %in% c(NA,0))) {
-    #     cat("skip",av,"\n")
-    #     next()
-    # }
-
     ylim <- range(WAPI_hourly[[av]], na.rm = T)
 
     plot(WAPI_hourly$dt, WAPI_hourly[[av]], xlab = "", ylab = "", "l", lwd = 3)
 
-
     abline(v = Sys.time(), col = "green", lty = 3, lwd = 3)
-
-    str_date <- strftime( WAPI_metadata$Data_time, tz = "Europe/Athens", format = "%F %R" )
 
     title(paste(WAPI_metadata$City, str_date, av), cex.main = 0.8,  )
 
