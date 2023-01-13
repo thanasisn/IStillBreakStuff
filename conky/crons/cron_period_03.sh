@@ -32,8 +32,11 @@ SCRIPTS="$HOME/CODE/conky/scripts/"
 ## ignore errors
 set +e
 
+## plot number of processes
+"${SCRIPTS}plot_ps.gp"         &
+
 ## create tinc network image map
-"${SCRIPTS}tinc_diagram.sh"
+"${SCRIPTS}tinc_diagram.sh"    &
 
 ## plot radiation from broadband
 "${SCRIPTS}broadband_plot.R"   &
