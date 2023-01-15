@@ -29,8 +29,8 @@ unset ylabel
 
 set output "/dev/shm/CONKY/processes.png"
 
-plot "/dev/shm/CONKY/logps.dat" using 1:2 t "Process" w lines linewidth 2 lt 2,\
-     "/dev/shm/CONKY/logps.dat" using 1:3 t "Athan"   w lines linewidth 2 lt 3,\
+plot "/dev/shm/CONKY/logps.dat" using 1:3 t "Athan"   w lines linewidth 2 lt 3,\
      "/dev/shm/CONKY/logps.dat" using 1:4 t "Tasks"   w lines linewidth 2 lt 4
 
+    # "/dev/shm/CONKY/logps.dat" using 1:2 t "Process" w lines linewidth 2 lt 2,\
 
