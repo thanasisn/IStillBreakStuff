@@ -16,7 +16,7 @@ fi
 ## ask for each lock
 for afile in "$KILLDIR"*; do
     echo "" ; input=0
-    echo    "LOCK         : $(basename "$afile") "
+    echo    "BLOCKED      : $(basename "$afile") "
     echo -n "remove (y/n)?: "
     read -n 1 input
     if [ "$input" == "y" -o "$input" == "Y" ] ; then
