@@ -3,6 +3,11 @@
 #### Human Performance plots and data
 ## This is incorporated to conky
 
+stop("Don't use this")
+
+## Read all activities
+## plot unified and normal
+## plot for mobile
 
 ####_ Set environment _####
 closeAllConnections()
@@ -388,8 +393,6 @@ for (days in pdays) {
     axis(1, at = pp[wday(date) == 2, date ], labels = F, col = "black", col.ticks = "black")
     axis(1, at = pp[mday(date) == 1, date ], labels = format(pp[mday(date) == 1, date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
 
-
-
 }
 
 
@@ -452,44 +455,59 @@ if (!interactive()) dev.off()
 
 capture.output({
     wecare <- names(metrics)
-    wecare <- grep("Average.Heart.Rate", wecare, invert = TRUE, value = T)
-    wecare <- grep("Average_Temp",       wecare, invert = TRUE, value = T)
-    wecare <- grep("Change.History",     wecare, invert = TRUE, value = T)
-    wecare <- grep("Device",             wecare, invert = TRUE, value = T)
-    wecare <- grep("Elevation.Gain",     wecare, invert = TRUE, value = T)
-    wecare <- grep("Equipment_Weight",   wecare, invert = TRUE, value = T)
-    wecare <- grep("Feel",               wecare, invert = TRUE, value = T)
-    wecare <- grep("File.Format",        wecare, invert = TRUE, value = T)
-    wecare <- grep("Filename",           wecare, invert = TRUE, value = T)
-    wecare <- grep("GPS.errors",         wecare, invert = TRUE, value = T)
-    wecare <- grep("Left.Right",         wecare, invert = TRUE, value = T)
-    wecare <- grep("Month",              wecare, invert = TRUE, value = T)
-    wecare <- grep("Notes",              wecare, invert = TRUE, value = T)
-    wecare <- grep("Spike.Time",         wecare, invert = TRUE, value = T)
-    wecare <- grep("SubSport",           wecare, invert = TRUE, value = T)
-    wecare <- grep("RPE",                wecare, invert = TRUE, value = T)
-    wecare <- grep("Swim",               wecare, invert = TRUE, value = T)
-    wecare <- grep("Temperature",        wecare, invert = TRUE, value = T)
-    wecare <- grep("W_bal",              wecare, invert = TRUE, value = T)
-    wecare <- grep("Year",               wecare, invert = TRUE, value = T)
-    wecare <- grep("^Best",              wecare, invert = TRUE, value = T)
-    wecare <- grep("^Bike",              wecare, invert = TRUE, value = T)
-    wecare <- grep("^HI",                wecare, invert = TRUE, value = T)
-    wecare <- grep("^H[0-9]",            wecare, invert = TRUE, value = T)
-    wecare <- grep("^LI",                wecare, invert = TRUE, value = T)
-    wecare <- grep("^L[0-9]",            wecare, invert = TRUE, value = T)
-    wecare <- grep("^PI",                wecare, invert = TRUE, value = T)
-    wecare <- grep("^P[0-9]",            wecare, invert = TRUE, value = T)
-    wecare <- grep("^Pch|^Col",          wecare, invert = TRUE, value = T)
-    wecare <- grep("^Spikes",            wecare, invert = TRUE, value = T)
-    wecare <- grep("^W[0-9]",            wecare, invert = TRUE, value = T)
-    wecare <- grep("^X[0-9]",            wecare, invert = TRUE, value = T)
-    wecare <- grep("^pN",                wecare, invert = TRUE, value = T)
-    wecare <- grep("_Carrying",          wecare, invert = TRUE, value = T)
-    wecare <- grep("date",               wecare, invert = TRUE, value = T)
-    wecare <- grep("xPower",             wecare, invert = TRUE, value = T)
-    wecare <- grep("aPower",             wecare, invert = TRUE, value = T)
-    wecare <- grep("aBike",              wecare, invert = TRUE, value = T)
+    wecare <- grep("Average.Heart.Rate", wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Average.Temp",       wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Change.History",     wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Device",             wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Elevation.Gain",     wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Equipment.Weight",   wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Feel",               wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("File.Format",        wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Filename",           wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("GPS.errors",         wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Left.Right",         wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Month",              wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Notes",              wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Spike.Time",         wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("SubSport",           wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("RPE",                wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Swim",               wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Temperature",        wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("W.bal",              wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Year",               wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^Best",              wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^Bike",              wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^HI",                wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^H[0-9]",            wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^LI",                wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^L[0-9]",            wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^PI",                wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^P[0-9]",            wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^Pch|^Col",          wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^Spikes",            wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^W[0-9]",            wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^X[0-9]",            wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("^pN",                wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep(".Carrying",          wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("xPower",             wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("aPower",             wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("aBike",              wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("parsed",             wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("critical",           wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("peak",               wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("time.in",            wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("in.zone",            wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("dropout",            wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("present",            wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("overrides",          wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Calendar Text",      wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Weekday",            wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("Calories",           wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("_temp",              wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("pace_row",           wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("_V2$",               wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("_V3$",               wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
+    wecare <- grep("compatibility_",     wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
 
     wecare
 
@@ -505,10 +523,6 @@ capture.output({
     pander::pander(export[1,])
 
 }, file = "~/LOGs/training_status/Last_Activities.md")
-
-
-
-
 
 
 

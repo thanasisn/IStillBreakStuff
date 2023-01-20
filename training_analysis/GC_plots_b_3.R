@@ -3,6 +3,10 @@
 #### Human Performance plots and data
 ## This is incorporated to conky
 
+# Data from main json
+# Normal plots
+# Unified plots
+# Mobile phone plot
 
 ####_ Set environment _####
 closeAllConnections()

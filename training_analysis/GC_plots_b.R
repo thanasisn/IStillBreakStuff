@@ -1,7 +1,10 @@
 #!/usr/bin/env Rscript
 
 #### Golden Cheetah plots
-## This is incorporated to conky
+
+## read data from json files
+## Create conky plots
+
 
 
 ####_ Set environment _####
