@@ -40,6 +40,10 @@ OUTPUT_01  = "/dev/shm/WHEATHER/Loc_Weather.png"
 LAPDAV_FL  = "/home/athan/LOGs/LAP_AUTH_davis.csv"
 
 
+outdir        <- "~/LOGs/Weather"
+
+dir.create(outdir, showWarnings = F)
+
 fore <- readRDS(FORECAS_FL)
 dark <- readRDS(DARKSKY_FL)
 blue <- readRDS(METEOBL_FL)
@@ -216,6 +220,7 @@ if (!interactive()) {
 png( OUTPUT_01, bg = "transparent", family = "Liberation Sans",
      width = 540, height = 255, units = "px", pointsize = 15, type = "cairo")
 }
+
 {
     how_graphs = sum(has_temp, has_rain, has_wind)
     if ( how_graphs == 3 ) {
@@ -390,7 +395,6 @@ png( OUTPUT_01, bg = "transparent", family = "Liberation Sans",
              adj = c(0,1.1),
              cex = 1.3, font = 2, col = "magenta")
 
-
         Rain$Rain.1h[Rain$Rain.1h == 0] <- NA
         Rain$Rain.3h[Rain$Rain.3h == 0] <- NA
 
@@ -516,43 +520,8 @@ png( OUTPUT_01, bg = "transparent", family = "Liberation Sans",
 if (!interactive()) {dev.off()}
 Sys.setlocale(locale = "en_US.utf8")
 
-
-
-
-# # xaxt = "n"
-# # png("/dev/shm/WHEATHER/temp.png", bg = "transparent",
-# #          width = 530, height = 240, units = "px", pointsize = 15)
-# {
-#     Sys.setlocale(locale = "el_GR.utf8")
-#     par(mar = c(2,1.1,1,2.1))
-#     par(bg = "transparent")
-#
-#     range02 <- function(x){ (x - min(x,na.rm = T))/(max(x,na.rm = T) - min(x,na.rm = T)) * (xx[2] - xx[1]) + xx[1] }
-#
-#     ## add fake record for scaling
-#     fore <- rbind(fore,fake_rec)
-#
-#     fore$rain.3h[is.na(fore$rain.3h)] <- 0
-#
-#     rain   <- range02(fore$rain.3h)
-#     rlabes <- pretty(fore$rain.3h, n = 5, min.n = 0)
-#     rat    <- range02(rlabes)
-#     ## for clouds
-#     fore$cloud_cover[fore$cloud_cover == 0] <- NA
-#     cloud <- range02(fore$cloud_cover)/3
-#
-#     magic = temp_range[1] - min(rain, na.rm = T)
-#
-#     if ( length(rat) > 0 &&  !is.nan(rat)) {
-#         axis( side = 4 , line = -1,
-#               at = rat - magic , labels = rlabes, col = col_rain,
-#               lwd = 3, col.axis = col_rain, font = 2)
-#
-#         mtext("mm", side = 4, line = 1, col = col_rain, font = 2)
-#     }
-#
-# }
-# dev.copy(png, "/dev/shm/WHEATHER/temp.png", bg = "transparent",
-#          width = 530, height = 240, units = "px", pointsize = 15)
-# dev.off()
+## copy conky image to log
+if (Sys.info()["nodename"] == "tyler") {
+    file.copy(OUTPUT_01, outdir, overwrite = TRUE )
+}
 

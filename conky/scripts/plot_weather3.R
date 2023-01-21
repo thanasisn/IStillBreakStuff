@@ -38,8 +38,8 @@ LAPDAV_FL  <- "/home/athan/LOGs/LAP_AUTH_davis.csv"
 
 
 open_meteo_fl <- "/dev/shm/WHEATHER/open_meteo_dump.Rds"
+outdir        <- "~/LOGs/Weather"
 
-outdir <- "~/LOGs/Weather"
 dir.create(outdir, showWarnings = F)
 
 
@@ -421,6 +421,7 @@ wind02 <- WAPI_hourly[ , grep( "dt$|wind|source", names(WAPI_hourly), value = T)
 Wind <- merge( wind01, wind02, all = T )
 # rm(wind01, wind02)
 
+## conver to km/h
 # Wind$wind_speed <- Wind$wind_speed * (10/36)
 # Wind$wind_gust  <- Wind$wind_gust  * (10/36)
 # Wind$windGust   <- Wind$windGust * (10/36)
@@ -644,7 +645,6 @@ png( OUTPUT_01, bg = "transparent", family = "Liberation Sans",
              WAPI_daily$sunset,  trange[2] + 10,
              col = col_sun, border = NA, lwd = 1 )
 
-
         ## add decoration
         abline( v = seq( drange[1], drange[2], by = "day"), lwd = 2 , lty = 2, col = col_grid )
         abline( v = seq( drange[1], drange[2], by = "day") + 12*3600, lty = 3, col = col_grid )
@@ -786,10 +786,12 @@ png( OUTPUT_01, bg = "transparent", family = "Liberation Sans",
               col = col_other, lwd = 2, col.axis = col_other )
     }
 }
-# dev.copy(png, OUTPUT_01, bg = "transparent",
-#          width = 530, height = 240, units = "px", pointsize = 15, type = "cairo")
 
-if (!interactive()) dev.off()
+if (!interactive()) {dev.off()}
 Sys.setlocale(locale = "en_US.utf8")
 
+## copy conky image to log
+if (Sys.info()["nodename"] == "tyler") {
+    file.copy(OUTPUT_01, outdir, overwrite = TRUE )
+}
 
