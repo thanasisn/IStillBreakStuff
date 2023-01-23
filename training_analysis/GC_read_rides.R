@@ -26,12 +26,10 @@ pdfout2   <- "~/LOGs/training_status/GC_all_plots_last.pdf"
 if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
     cat("\nHave to parse", gccache, "\n")
 
-
     ## read the whole data base
     data <- fromJSON(gccache, flatten = F)
     stopifnot( length(data) == 2 )
     data <- data$RIDES
-
 
     #### Basic info for activities ####
     wecare <- grep("METRICS|TAGS|INTERVALS|XDATA",names(data), invert = TRUE, value = TRUE)
@@ -367,6 +365,8 @@ if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
     plot(a$workout_time, a$`Time Moving`,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+
+
 
 
     for (avar in wecare) {
