@@ -11,7 +11,7 @@ NP=2
 ## Original library
 IN="/home/folder/Music/"
 
-## Trascoded library
+## Transcoded library
 OUT="/media/barel/Music_img"
 
 ## Transcode quality target
@@ -23,8 +23,8 @@ BIT=220
 ## duration of non silence
 sl_start_duration="2"
 
-## silense volume
-sl_start_threshold="-27dB"
+## silence volume
+sl_start_threshold="-25dB"
 
 ## detection method "rms" or "peak"
 sl_detection="rms"
@@ -40,7 +40,7 @@ ldir="/home/athan/LOGs/SYSTEM_LOGS/"
 mkdir -p "$ldir"
 
 ID="$1"
-: ${ID:=$(hostname)}
+: "${ID:=$(hostname)}"
 SCRIPT="$(basename "$0")"
 
 fsta="${ldir}/$(basename "$0")_$ID.status"
@@ -71,7 +71,7 @@ echo
 
 
 
-info "Transcode lossless to mp3"
+info "Transcode loss less to mp3"
 cc=0
 (
 find "$IN" -type f -iname "*.flac"
@@ -129,7 +129,7 @@ find "$IN" -type f -iname "*.wma"
 
                 ## replace original file
                 if [ -e "$tmpfl" ]; then
-                    echo "Removed silense"
+                    echo "Removed silence"
                     mv "$tmpfl" "$OF"
                 fi
             else
@@ -238,12 +238,12 @@ find "$IN" -type f -iname "*.mp3" | while read mfile; do
 
             ## replace original file
             if [ -e "$tmpfl" ]; then
-                echo "Removed silense"
+                echo "Removed silence"
                 mv "$tmpfl" "$OF"
             fi
         fi
     else
-        echo "Missing source $mdile"
+        echo "Missing source $mfile"
     fi
 
     cc=$((cc+1))
