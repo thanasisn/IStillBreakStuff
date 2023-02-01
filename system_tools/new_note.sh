@@ -13,18 +13,19 @@ filename="${1}.md"
 
 stamp="$(date +"%s")"
 datestr="$(date -d@${stamp} +"%Y %b %d %A  #timestamp:'%F %T'")"
-goto="6"
+goto="7"
 
+## open existing file
 if [[ -f "$filename" ]] ; then
     echo "File $filename exist"
-    vim -c "$goto" "$filename"
+    vim  "$filename"
     echo "exit"
     exit 0
 fi
 
+## create new file and open
 echo  "Creating: $filename"
 touch "$filename"
-
 (
     echo ""
     echo "## $(basename "${1}" | sed 's/_/ /g')"
@@ -32,8 +33,8 @@ touch "$filename"
     echo ""
     echo "[//]: # (Keywords: #key_1, #key_2)"
     echo ""
+    echo ""
 ) > "$filename"
-
 vim -c "$goto" "$filename"
 
 exit 0

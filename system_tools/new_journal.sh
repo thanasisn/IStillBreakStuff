@@ -26,18 +26,19 @@ datenme="$(date -d@"${stamp}" +"%Y%m%d_%H%M")"
 year="$(date -d@"${stamp}" +"%Y")"
 goto="6"
 
-## create the file and/of folder
-
+## create the folder
 mkdir -p "./${year}"
 filename="./${year}/${datenme}.md"
 
+## open existing file
 if [[ -f "$filename" ]] ; then
     echo "File $filename exist"
-    vim -c "$goto" "$filename"
+    vim "$filename"
     echo "exit"
     exit 0
 fi
 
+## open a new file
 echo  "Creating: $filename"
 touch "$filename"
 (
@@ -48,7 +49,6 @@ touch "$filename"
     echo ""
     echo ""
 ) > "$filename"
-
 vim -c "$goto" "$filename"
 
 exit 0
