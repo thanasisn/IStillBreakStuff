@@ -32,6 +32,7 @@ for af in "${folders[@]}"; do
         info "$af don't exist SKIP!!"
         continue
     fi  
+    cd "$af"
     ## run make with default
     make -f *[Mm]akefile -C "$af"
     echo "================================="
