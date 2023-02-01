@@ -27,7 +27,7 @@ touch "$filename"
 
 (
     echo ""
-    echo "## ${1}"
+    echo "## $(basename "${1}" | sed 's/_/ /g')"
     echo "Created: ${datestr}"
     echo ""
     echo "[//]: # (Keywords: #key_1, #key_2)"
