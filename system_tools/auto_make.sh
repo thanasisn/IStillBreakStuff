@@ -20,6 +20,7 @@ folders=(
     "$HOME/PANDOC/Notes_Aerosols"
     "$HOME/PANDOC/Thesis"
     "$HOME/PANDOC/Journal"
+    "$HOME/MISC/Redmi7_internal/documents"
     "$HOME/MANUSCRIPTS/2022_sdr_trends"
 )
 
