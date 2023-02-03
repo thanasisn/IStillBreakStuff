@@ -11,13 +11,11 @@ IGNORE="$HOME/BASH/PARAMS/ignore_sites.list"
 BROWSER="brave"
 BRWSHIS="$HOME/.local/bin/browser-history"
 
-
-command -v browser-history >/dev/null 2>&1 || { echo >&2 "browser-history NOT INSTALLED. Aborting."; exit 1; }
+command -v "$BRWSHIS" >/dev/null 2>&1 || { echo >&2 "browser-history NOT INSTALLED. Aborting."; exit 1; }
 
 ## send bookmarks to dmenu
 ANS=$(
-$BRWSHIS -t history    \
-         -t bookmarks  \
+$BRWSHIS -t bookmarks  \
          -b "$BROWSER" \
          -f csv                         |\
         sed "1d"                        |\
