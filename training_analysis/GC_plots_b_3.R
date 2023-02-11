@@ -27,6 +27,9 @@ library(data.table)
 source(datascript)
 metrics    <- readRDS(storagefl)
 metrics    <- metrics[as.Date(date) > Sys.Date() - daysback, ]
+metrics    <- metrics[ sport != "Measurement" & !is.na(sport) ]
+
+
 
 epoc_extra <- fread("~/CODE/training_analysis/epoc.next", col.names = "value")
 
@@ -90,7 +93,7 @@ for (ii in 1:length(wecare)) {
                        value           = metrics[[avar]],
                        VO2max_detected = metrics$`VO2max detected`,
                        Pch             = round(mean(metrics$Pch)))
-    pp   <- pp[, .(value             = sum(value, na.rm = TRUE),
+    pp   <- pp[, .(value           = sum(value, na.rm = TRUE),
                    VO2max_detected = mean(VO2max_detected, na.rm = TRUE)),
                by = .(date = as.Date(time))]
     last <- pp[ date == max(date), ]

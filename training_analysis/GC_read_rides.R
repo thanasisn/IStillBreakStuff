@@ -19,6 +19,7 @@ source("~/CODE/FUNCTIONS/R/data.R")
 ## data paths
 gccache   <- "~/TRAIN/GoldenCheetah/Athan/cache/rideDB.json"
 storagefl <- "~/DATA/Other/GC_json_ride_data.Rds"
+
 pdfout1   <- "~/LOGs/training_status/GC_all_plots.pdf"
 pdfout2   <- "~/LOGs/training_status/GC_all_plots_last.pdf"
 
@@ -208,6 +209,9 @@ if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
         a[[avar]][a[[avar]] < -250 ] <- NA
     }
 
+    #### Fill missing data from other field ------
+    a[ is.na(average_hr_V1) & !is.na(`Average Heart Rate`) , average_hr_V1 := `Average Heart Rate` ]
+    ## FIXME should we overwrite all with `Average Heart Rate`?
 
     ####  remove duplicate columns  ####
     col.checksums <- sapply(a, function(x) digest::digest(x, "md5"), USE.NAMES = T)
@@ -257,8 +261,8 @@ if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
     a$Intensity_EPOC        <- a$EPOC               / a$workout_time
     a$Intensity_Calories    <- a$total_kcalories    / a$workout_time
 
-
-
+    ## another load calculation
+    a[, Load_2 := 0.418 * (( (workout_time / 3600) * average_hr_V1 ) + (2.5 * average_hr_V1)) ]
 
 
 

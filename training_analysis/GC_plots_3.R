@@ -17,7 +17,7 @@ tic <- Sys.time()
 Script.Name <- "GC_plots_3.R"
 
 
-moredata    <- "~/DATA/Other/GC_json_data.Rds"
+
 datascript  <- "~/CODE/training_analysis/GC_read_activities.R"
 daysback    <- 370*4
 
