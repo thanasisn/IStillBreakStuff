@@ -1,7 +1,13 @@
 #!/usr/bin/env Rscript
 
-#### Golden Cheetah read activities summary directly from db
+#### Golden Cheetah read activities summary directly from rideDB.json
 
+## - Runs if it is needed
+## - Read raw data
+## - Apply some filtering
+## - Create some new variables
+## - Store parsed data
+## - Plots all variables
 
 ####_ Set environment _####
 Sys.setenv(TZ = "UTC")
@@ -23,16 +29,16 @@ pdfout1   <- "~/LOGs/training_status/GC_all_plots.pdf"
 pdfout2   <- "~/LOGs/training_status/GC_all_plots_last.pdf"
 
 
-if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
+if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     cat("\nHave to parse", gccache, "\n")
 
     ## read the whole data base
-    data <- fromJSON(gccache, flatten = F)
-    stopifnot( length(data) == 2 )
+    data <- fromJSON(gccache, flatten = FALSE)
+    stopifnot(length(data) == 2)
     data <- data$RIDES
 
     #### Basic info for activities ####
-    wecare <- grep("METRICS|TAGS|INTERVALS|XDATA",names(data), invert = TRUE, value = TRUE)
+    wecare <- grep("METRICS|TAGS|INTERVALS|XDATA", names(data), invert = TRUE, value = TRUE)
     a <- data.table(data[, wecare])
     a <- rm.cols.dups.DT(a)
     a[, date := as.POSIXct(date) ]
@@ -91,7 +97,6 @@ if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
     }
     b <- data.table(b)
     b <- rm.cols.dups.DT(b)
-
 
     #### Ignore all intervals data ####
     #  data$INTERVALS
@@ -207,21 +212,21 @@ if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
     }
 
 
-    stop()
+    #### Fill missing data from other field ------------------------------------
+    ## We assume the manual override values are always more correct
+    a[!is.na(Average_Heart_Rate), average_hr_V1   := Average_Heart_Rate ]
+    a[!is.na(Calories),           total_kcalories := Calories           ]
+    a[ , Average_Heart_Rate := NULL]
+    a[ , Calories           := NULL]
 
-    test <- a[!is.na(Average_Heart_Rate)]
 
-    #### Fill missing data from other field ------
-    a[ is.na(average_hr_V1) & !is.na(`Average Heart Rate`) , average_hr_V1 := `Average Heart Rate` ]
-    ## FIXME should we overwrite all with `Average Heart Rate`?
-
-    ####  remove duplicate columns  ####
+    ####  Remove duplicate columns  --------------------------------------------
     col.checksums <- sapply(a, function(x) digest::digest(x, "md5"), USE.NAMES = T)
     dup.cols      <- data.table(col.name = names(col.checksums), hash.value = col.checksums)
 
     for (hh in unique(dup.cols$hash.value)) {
         dups <- dup.cols[hash.value == hh]
-        if (nrow(dups)>1) {
+        if (nrow(dups) > 1) {
             cat(dups$col.name,"\n")
             dnames <- dups$col.name
             ## arrange priority to keep
@@ -230,14 +235,15 @@ if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
             ## keep the first
             remove <- dnames[2:length(dnames)]
             ## drop the rest
-            for (re in remove) { a[[re]] <- NULL}
+            for (re in remove) { a[[re]] <- NULL }
         }
     }
 
-    ####  remove columns without data variation  ####
+
+    ####  Remove columns without data variation  -------------------------------
     for (at in names(a)) {
         uni1 <- unique(a[[at]])
-        uni  <- uni1[!uni1 %in% c(NA,0)]
+        uni  <- uni1[!uni1 %in% c(NA, 0)]
         ## only containing the same value except NA and 0
         if (length(uni) <= 1) {
             cat("Remove column with no variation:",at,"\n")
@@ -245,19 +251,20 @@ if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
         }
     }
 
-    ####  info on low variation columns  ####
+
+    ####  Info on low variation columns  ---------------------------------------
     noplot <- c()
     for (at in names(a)) {
         uni1 <- unique(a[[at]])
-        uni  <- uni1[!uni1 %in% c(NA,0)]
+        uni  <- uni1[!uni1 %in% c(NA, 0)]
         if (length(uni) < 5) {
-            cat("Column with low variation:",at,"\n")
+            cat("Column with low variation:", at, "\n")
             noplot <- c(noplot, at)
         }
     }
 
 
-    ####  create some new metrics  ####
+    ####  create some new metrics  ---------------------------------------------
     a$Intensity_TRIMP       <- a$trimp_points       / a$workout_time
     a$Intensity_TRIMP_Zonal <- a$trimp_zonal_points / a$workout_time
     a$Intensity_EPOC        <- a$EPOC               / a$workout_time
@@ -266,62 +273,59 @@ if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
     ## another load calculation
     a[, Load_2 := 0.418 * (( (workout_time / 3600) * average_hr_V1 ) + (2.5 * average_hr_V1)) ]
 
-stop()
 
-    ####  set color and symbol for each activity type  ####
-
-    ## check sport consistency
-
+    ####  Set color and symbol for each activity type  -------------------------
 
     ## replace column if not exist
     if (is.null(a$Sport)) {
-        a$Sport <- a$sport
+        names(a)[names(a) == "sport"] <- "Sport"
     }
 
-    a[grepl("bike", `Workout Code`) & Sport == "Bike" ]
+    ## TODO check sport consistency
 
-    a[ Sport == sport, .(date, total_distance, total_kcalories, Sport,sport, `Workout Code`)]
-    a[ Sport != sport, .(date, total_distance, total_kcalories, Sport,sport, `Workout Code`)]
-    a[ is.na(Sport) | is.na(sport), .(date, total_distance, total_kcalories, Sport,sport, `Workout Code`)]
+    a[grepl("bike", Workout_Code) & Sport == "Bike" ]
 
-    a[ Sport == "Bike" | sport == "Bike", .(date, total_distance, total_kcalories, Sport,sport, `Workout Code`)]
-    a[ Sport == "Run"  | sport == "Run", .(date, total_distance, total_kcalories, Sport,sport, `Workout Code`)]
-
+    a[ Sport == "Bike", .(date, total_distance, total_kcalories, Sport, Workout_Code)]
+    a[ Sport == "Run" , .(date, total_distance, total_kcalories, Sport, Workout_Code)]
 
     table(a$Sport)
-    table(a$sport)
-    table(a$`Workout Code`)
+    table(a$Workout_Code)
+    table(a$Workout_Title)
 
-    ## set colors
+
+    ## Add graph options -------------------------------------------------------
+
+    ## Set colors
     a[ Sport == "Bike", Col := "red"  ]
     a[ Sport == "Run",  Col := "blue" ]
 
     ## set points
     a[, Pch :=  1 ]
 
-    a[ `Workout Code` == "Bike Road",       Pch :=  6 ]
-    a[ `Workout Code` == "Bike Dirt",       Pch :=  1 ]
-    a[ `Workout Code` == "Bike Static",     Pch :=  4 ]
-    a[ `Workout Code` == "Bike Elliptical", Pch :=  4 ]
-    a[ `Workout Code` == "Run Hills",       Pch :=  1 ]
-    a[ `Workout Code` == "Run Track",       Pch :=  6 ]
-    a[ `Workout Code` == "Run Trail",       Pch :=  8 ]
-    a[ `Workout Code` == "Run Race",        Pch :=  9 ]
-    a[ `Workout Code` == "Walk",            Pch :=  0 ]
-    a[ `Workout Code` == "Walk Hike Heavy", Pch :=  7 ]
-    a[ `Workout Code` == "Walk Hike",       Pch := 12 ]
+    a[Workout_Code == "Bike Road",       Pch :=  6 ]
+    a[Workout_Code == "Bike Dirt",       Pch :=  1 ]
+    a[Workout_Code == "Bike Static",     Pch :=  4 ]
+    a[Workout_Code == "Bike Elliptical", Pch :=  4 ]
+    a[Workout_Code == "Run Hills",       Pch :=  1 ]
+    a[Workout_Code == "Run Track",       Pch :=  6 ]
+    a[Workout_Code == "Run Trail",       Pch :=  8 ]
+    a[Workout_Code == "Run Race",        Pch :=  9 ]
+    a[Workout_Code == "Walk",            Pch :=  0 ]
+    a[Workout_Code == "Walk Hike Heavy", Pch :=  7 ]
+    a[Workout_Code == "Walk Hike",       Pch := 12 ]
 
     table(a$Pch)
 
-    grep("Run|Walk", unique(a$`Workout Code`), ignore.case = T , value = T)
-    grep("Bike",     unique(a$`Workout Code`), ignore.case = T , value = T)
+    grep("Run|Walk", unique(a$Workout_Code), ignore.case = T , value = T)
+    grep("Bike",     unique(a$Workout_Code), ignore.case = T , value = T)
 
 
-    ####  STORE DATA  ####
+
+    ####  STORE DATA  ----------------------------------------------------------
     write_RDS(a, file = storagefl, clean = TRUE)
 
-    ####  PLOT ALL DATA  ####
 
+    ####  PLOT ALL DATA  -------------------------------------------------------
 
     wecare <- names(a)[!sapply(a, is.character)]
     wecare <- grep("date|filename|parsed|Col|Pch|sport|bike|shoes|CP_setting|workout_code|Year",
@@ -355,10 +359,10 @@ stop()
     plot(a$total_kcalories, a$EPOC,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
 
-    plot(a$workout_time, a$trimp_points/a$EPOC,
+    plot(a$workout_time, a$trimp_points / a$EPOC,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
 
-    plot(a$total_distance, a$trimp_points/a$EPOC,
+    plot(a$total_distance, a$trimp_points / a$EPOC,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
 
     plot(a$total_distance, a$Distance,
@@ -441,11 +445,11 @@ stop()
     for (avar in wecare) {
         ## ignore no data
         if (all(as.numeric(a[[avar]]) %in% c(0, NA))) {
-            cat(paste("Skip plot", avar),"\n")
+            cat(paste("Skip plot", avar), "\n")
             next()
         }
 
-        par(mar = c(2,2,1,1))
+        par(mar = c(2, 2, 1, 1))
         plot(a$date, a[[avar]],
              col  = a$Col,
              pch  = a$Pch,

@@ -1,7 +1,13 @@
 #!/usr/bin/env Rscript
 
-#### Golden Cheetah read activities summary directly from db
+#### Golden Cheetah read activities summary directly from rideDB.json
 
+## - Runs if it is needed
+## - Read raw data
+## - Apply some filtering
+## - Create some new variables
+## - Store parsed data
+## - Plots all variables
 
 ####_ Set environment _####
 Sys.setenv(TZ = "UTC")
@@ -15,7 +21,6 @@ library(jsonlite)
 source("~/CODE/FUNCTIONS/R/data.R")
 
 
-
 ## data paths
 gccache   <- "~/TRAIN/GoldenCheetah/Athan/cache/rideDB.json"
 storagefl <- "~/DATA/Other/GC_json_ride_data.Rds"
@@ -24,16 +29,16 @@ pdfout1   <- "~/LOGs/training_status/GC_all_plots.pdf"
 pdfout2   <- "~/LOGs/training_status/GC_all_plots_last.pdf"
 
 
-if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
+if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     cat("\nHave to parse", gccache, "\n")
 
     ## read the whole data base
-    data <- fromJSON(gccache, flatten = F)
-    stopifnot( length(data) == 2 )
+    data <- fromJSON(gccache, flatten = FALSE)
+    stopifnot(length(data) == 2)
     data <- data$RIDES
 
     #### Basic info for activities ####
-    wecare <- grep("METRICS|TAGS|INTERVALS|XDATA",names(data), invert = TRUE, value = TRUE)
+    wecare <- grep("METRICS|TAGS|INTERVALS|XDATA", names(data), invert = TRUE, value = TRUE)
     a <- data.table(data[, wecare])
     a <- rm.cols.dups.DT(a)
     a[, date := as.POSIXct(date) ]
@@ -93,14 +98,11 @@ if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
     b <- data.table(b)
     b <- rm.cols.dups.DT(b)
 
-
     #### Ignore all intervals data ####
     #  data$INTERVALS
 
-
     #### TAGS data ####
     c <- rm.cols.dups.DT(c)
-
 
     ## combine data
     stopifnot( length(intersect(names(a),names(b))) == 0 )
@@ -114,7 +116,6 @@ if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
     ## proper date
     a$activity_date <- NULL
     a$activity_crc  <- NULL
-
 
     ## covert types
     for (ac in names(a)[sapply(a, is.character)]) {
@@ -203,23 +204,29 @@ if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
     }
     a <- rm.cols.dups.DT(a)
 
-    #### fix temperatures NA ####
+
+    #### Fix temperatures NA ---------------------------------------------------
     wecare <- grep("_temp", names(a), value = T)
     for (avar in wecare) {
         a[[avar]][a[[avar]] < -250 ] <- NA
     }
 
-    #### Fill missing data from other field ------
-    a[ is.na(average_hr_V1) & !is.na(`Average Heart Rate`) , average_hr_V1 := `Average Heart Rate` ]
-    ## FIXME should we overwrite all with `Average Heart Rate`?
 
-    ####  remove duplicate columns  ####
+    #### Fill missing data from other field ------------------------------------
+    ## We assume the manual override values are always more correct
+    a[!is.na(Average_Heart_Rate), average_hr_V1   := Average_Heart_Rate ]
+    a[!is.na(Calories),           total_kcalories := Calories           ]
+    a[ , Average_Heart_Rate := NULL]
+    a[ , Calories           := NULL]
+
+
+    ####  Remove duplicate columns  --------------------------------------------
     col.checksums <- sapply(a, function(x) digest::digest(x, "md5"), USE.NAMES = T)
     dup.cols      <- data.table(col.name = names(col.checksums), hash.value = col.checksums)
 
     for (hh in unique(dup.cols$hash.value)) {
         dups <- dup.cols[hash.value == hh]
-        if (nrow(dups)>1) {
+        if (nrow(dups) > 1) {
             cat(dups$col.name,"\n")
             dnames <- dups$col.name
             ## arrange priority to keep
@@ -228,14 +235,15 @@ if (!file.exists(storagefl) | file.mtime(gccache) > file.mtime(storagefl)) {
             ## keep the first
             remove <- dnames[2:length(dnames)]
             ## drop the rest
-            for (re in remove) { a[[re]] <- NULL}
+            for (re in remove) { a[[re]] <- NULL }
         }
     }
 
-    ####  remove columns without data variation  ####
+
+    ####  Remove columns without data variation  -------------------------------
     for (at in names(a)) {
         uni1 <- unique(a[[at]])
-        uni  <- uni1[!uni1 %in% c(NA,0)]
+        uni  <- uni1[!uni1 %in% c(NA, 0)]
         ## only containing the same value except NA and 0
         if (length(uni) <= 1) {
             cat("Remove column with no variation:",at,"\n")
