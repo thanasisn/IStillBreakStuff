@@ -214,10 +214,10 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
 
     #### Fill missing data from other field ------------------------------------
     ## We assume the manual override values are always more correct
-    a[!is.na(Average_Heart_Rate), average_hr_V1   := Average_Heart_Rate ]
+    a[!is.na(`Average Heart Rate`), average_hr_V1   := `Average Heart Rate` ]
     a[!is.na(Calories),           total_kcalories := Calories           ]
-    a[ , Average_Heart_Rate := NULL]
-    a[ , Calories           := NULL]
+    a[ , `Average Heart Rate` := NULL]
+    a[ , Calories             := NULL]
 
 
     ####  Remove duplicate columns  --------------------------------------------

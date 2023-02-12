@@ -23,7 +23,7 @@ source("~/CODE/FUNCTIONS/R/data.R")
 
 ## data paths
 gccache   <- "~/TRAIN/GoldenCheetah/Athan/cache/rideDB.json"
-storagefl <- "~/DATA/Other/GC_json_ride_data.Rds"
+storagefl <- "~/DATA/Other/GC_json_ride_data_2.Rds"
 
 pdfout1   <- "~/LOGs/training_status/GC_all_plots.pdf"
 pdfout2   <- "~/LOGs/training_status/GC_all_plots_last.pdf"
