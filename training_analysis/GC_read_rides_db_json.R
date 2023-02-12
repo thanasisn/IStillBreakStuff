@@ -218,7 +218,12 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     a[!is.na(Calories),           total_kcalories := Calories           ]
     a[ , Average_Heart_Rate := NULL]
     a[ , Calories           := NULL]
+    a[ , Weekday            := NULL]
+    a[ , Year               := NULL]
+    a[ , Weight             := NULL]
 
+
+    grep("dista", names(a), value=T )
 
     ####  Remove duplicate columns  --------------------------------------------
     col.checksums <- sapply(a, function(x) digest::digest(x, "md5"), USE.NAMES = T)
