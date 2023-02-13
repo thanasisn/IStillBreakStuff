@@ -50,7 +50,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
 
     ## breakup data sets
     b <- data$METRIC
-    c <- data.table( data$TAGS )
+    c <- data.table(data$TAGS)
     rm(data)
 
     #### METRICS for activities ####
@@ -132,10 +132,6 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     }
 
 
-    ## Make uniform names ------------------------------------------------------
-    names(a) <- gsub(" ","_",names(a))
-
-
     ## Drop zeros on some columns ----------------------------------------------
     wecare <- unique(c(
         grep("EOA",             names(a), value = TRUE, ignore.case = TRUE),
@@ -212,7 +208,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     }
 
 
-    #### Fill missing data from other field ------------------------------------
+    #### Fill missing data from other fields -----------------------------------
     ## We assume the manual override values are always more correct
     a[!is.na(Average_Heart_Rate), average_hr_V1   := Average_Heart_Rate ]
     a[!is.na(Calories),           total_kcalories := Calories           ]
@@ -223,7 +219,26 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     a[ , Weight             := NULL]
 
 
-    grep("dista", names(a), value=T )
+
+
+
+    stop()
+
+    ## Make uniform names ------------------------------------------------------
+    # remove spaces from names
+    names(a) <- gsub(" ", "_", names(a))
+    # capitalize first letter
+    names(a) <- sub('^(\\w?)', '\\U\\1', names(a), perl = TRUE)
+    # capitalize words after _
+    names(a) <- gsub('_(\\w?)', '_\\U\\1', names(a), perl = TRUE)
+
+
+    grep("dista", names(a), value=T, ignore.case = T )
+
+    plot(a$Distance - a$total_distance)
+    plot(a$Distance, a$total_distance)
+
+    test1 <- a[Distance > total_distance, c("date","Sport","Distance","total_distance")]
 
     ####  Remove duplicate columns  --------------------------------------------
     col.checksums <- sapply(a, function(x) digest::digest(x, "md5"), USE.NAMES = T)
