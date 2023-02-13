@@ -238,7 +238,11 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     plot(a$Distance - a$total_distance)
     plot(a$Distance, a$total_distance)
 
-    test1 <- a[Distance > total_distance, c("date","Sport","Distance","total_distance")]
+    test1 <- a[Distance > total_distance, c("date","Sport","Distance","total_distance","overrides")]
+    test2 <- a[Distance < total_distance, c("date","Sport","Distance","total_distance","overrides")]
+
+    test3 <- a[grepl("total_distance",overrides),c("date","Sport","Distance","total_distance","overrides")]
+
 
     ####  Remove duplicate columns  --------------------------------------------
     col.checksums <- sapply(a, function(x) digest::digest(x, "md5"), USE.NAMES = T)
