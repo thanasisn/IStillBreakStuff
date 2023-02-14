@@ -317,18 +317,17 @@ stop()
 
     a[grepl("bike", Workout_Code) & Sport == "Bike" ]
 
-    a[ Sport == "Bike", .(Date, Total_Distance, Total_Kcalories, Sport, Workout_Code)]
-    a[ Sport == "Run" , .(Date, total_distance, total_kcalories, Sport, Workout_Code)]
+    a[Sport == "Bike", .(Date, Total_Distance, Total_Kcalories, Sport, Workout_Code)]
+    a[Sport == "Run" , .(Date, total_distance, total_kcalories, Sport, Workout_Code)]
 
-    a[ Sport == "Bike" & !grepl("Bike",Workout_Code), .(Date, Total_Distance, Total_Kcalories, Sport, Workout_Code)]
+    a[Sport == "Bike" & !grepl("Bike",Workout_Code), .(Date, Total_Distance, Total_Kcalories, Sport, Workout_Code)]
 
-    a[ Sport == "Bike", table(Workout_Code, exclude = F) ]
-    a[ Sport == "Run",  table(Workout_Code, exclude = F) ]
+    a[Sport == "Bike", table(Workout_Code, exclude = F)]
+    a[Sport == "Run",  table(Workout_Code, exclude = F)]
+    a[Sport == "Run",  table(Shoes,        exclude = F)]
 
-    a[ Sport == "Run",  table(Shoes, exclude = F) ]
-
-    a[ Sport == "Run" & is.na(Shoes), .(Date, Total_Distance, Shoes, Sport, Workout_Code)]
-    a[ Sport == "Run" & Shoes == "?", .(Date, Total_Distance, Shoes, Sport, Workout_Code)]
+    a[Sport == "Run" & is.na(Shoes), .(Date, Total_Distance, Shoes, Sport, Workout_Code)]
+    a[Sport == "Run" & Shoes == "?", .(Date, Total_Distance, Shoes, Sport, Workout_Code)]
 
     table(a$Sport)
     table(a$Workout_Code)
