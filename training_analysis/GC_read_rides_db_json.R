@@ -117,7 +117,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     a$activity_date <- NULL
     a$activity_crc  <- NULL
 
-    ## covert types
+    ## covert types to numeric -------------------------------------------------
     for (ac in names(a)[sapply(a, is.character)]) {
         ## clean text first
         a[[ac]] <- sub("[ ]*$",        "", a[[ac]])
@@ -206,6 +206,10 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     for (avar in wecare) {
         a[[avar]][a[[avar]] < -250 ] <- NA
     }
+
+
+    stop()
+
 
 
     #### Fill missing data from other fields -----------------------------------
