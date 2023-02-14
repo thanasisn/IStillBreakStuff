@@ -19,7 +19,7 @@ for i in {1..30}; do echo "sleep 1"; done | xargs -i -t -P 10 sh -c "{}"
 
 ## test serial usage, execute each piped line one by one
 
-## timnig the execution
+## timing the execution
 time for i in {1..30}; do echo "sleep 1"; done | xargs -i -t -P 1 sh -c "{}"
 
 ## without timing

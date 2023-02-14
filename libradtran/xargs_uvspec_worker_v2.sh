@@ -5,7 +5,7 @@
 ## This is to be used by another script for parallel execution of uvspec
 
 
-## get arguments
+## get arguments from outside
 OUTDIR="${1}"
 ERRDIR="${2}"
 total="${3}"
@@ -39,13 +39,13 @@ printf " %5s %5s/$total %5s%%  ETA: %4s min\n" $((total-cntt))  $cntt $TOT $ETA
 ## keep a log of what happened
 echo "$(date +"%F %T") $fname $cntt" >> "${logfile}"
 
-## HERE PUT THE HEAVY LOAD ##
+## HERE PUT THE HEAVY LOAD !! ##
 
-####TEST#### First try this to check
+####TEST#### First try this to check what is going to run
 echo "( ( "${UVSPEC}" < "${INPUTF}" ) | gzip > "${OUTFIL}.gz" )  2> ${ERRFIL}"
 sleep $((RANDOM%5+2))
 
-## Then use this to run the load
+## Then use this to run the actual load
 # ( ( "${UVSPEC}" < "${INPUTF}" ) | gzip > "${OUTFIL}.gz" )  2> ${ERRFIL}
 
 
