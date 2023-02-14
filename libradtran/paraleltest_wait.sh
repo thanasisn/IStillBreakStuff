@@ -7,10 +7,10 @@
 ## use 'killall paraleltest.sh' to kill it
 ## or any other method
 
-prs=0
-cores=8
+prs=0        ## counter of parallel executions
+cores=8      ## number of available cores
 
-((cores--))  ## we count from zero
+((cores--))  ## we count from zero so we remove one
              ## maths can be done inside (( ))
              ## bash maths are always integer
 

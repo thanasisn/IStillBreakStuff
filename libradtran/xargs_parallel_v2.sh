@@ -16,7 +16,7 @@ ERRDIR="/path/to/files/for/error/"
 ## This may make people un-friend you
 cores=8
 
-####TEST#### DELETE THIS VARIABLE
+####TEST#### CHANCE THIS VARIABLE
 INPDIR="$HOME/LibRadTranM/clear_H2O_LAP/DATA"
 
 ## initial files count
@@ -33,19 +33,19 @@ else
 fi
 
 ## set some variables
-Tic="$(date +%s%N)"    ## keep time
-Tac="$(date +"%F %T")" ## keep time
+Tic="$(date +%s%N)"    ## keep start time
+Tac="$(date +"%F %T")" ## keep start time
 cntt=0
 
 
-#### THIS IS THE PARALLEL TRICK ####
+#### THIS IS THE PARALLEL TRICK!! ####
 ## run all input files in inptut folder through the WORKER_sh
 find "${INPDIR}" -type f -iname "*.inp"  | sort | while read line; do
     echo "$line" "$((++cntt))"
 done | xargs -n 2 -P "$cores" "$WORKER_sh" "${OUTDIR}" "${ERRDIR}" "$total" "$Tic"
 
 
-## you are done, end report
+## you are done, report stats at the end
 T="$(($(date +%s%N)-Tic))"
 S="$((T/1000000000))"
 M="$((T%1000000000/1000000))"
