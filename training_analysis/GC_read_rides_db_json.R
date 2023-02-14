@@ -230,11 +230,17 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     # test2  <- a[!is.na(Distance), ..wecare]
 
     ## ??
+    # wecare <- c("Date","Sport",grep("work" ,names(a),ignore.case = T, value = T),"Overrides")
+    # test   <- a[ grepl("total_work", Overrides), ..wecare]
+    # test2  <- a[!is.na(Work), ..wecare]
+
+    ## ??
     # wecare <- c("Date","Sport",grep("_time|duration" ,names(a),ignore.case = T, value = T),"Overrides")
     # test   <- a[ grepl("workout_time", Overrides), ..wecare]
     # test2  <- a[!is.na(Duration), ..wecare]
     # plot(a$Duration, a$Workout_Time)
 
+    # unique(unlist(strsplit(unique(a$Overrides), ",")))
 
     ## We assume the manual override values are always more correct
     ## I am not sure about GC logic of this field, may be is not in use in 3.6
@@ -306,23 +312,30 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
 
 stop()
 
-    ####  Set color and symbol for each activity type  -------------------------
 
-    ## replace column if not exist
-    if (is.null(a$Sport)) {
-        names(a)[names(a) == "sport"] <- "Sport"
-    }
-
-    ## TODO check sport consistency
+    #### check sport consistency -----------------------------------------------
 
     a[grepl("bike", Workout_Code) & Sport == "Bike" ]
 
-    a[ Sport == "Bike", .(date, total_distance, total_kcalories, Sport, Workout_Code)]
-    a[ Sport == "Run" , .(date, total_distance, total_kcalories, Sport, Workout_Code)]
+    a[ Sport == "Bike", .(Date, Total_Distance, Total_Kcalories, Sport, Workout_Code)]
+    a[ Sport == "Run" , .(Date, total_distance, total_kcalories, Sport, Workout_Code)]
+
+    a[ Sport == "Bike" & !grepl("Bike",Workout_Code), .(Date, Total_Distance, Total_Kcalories, Sport, Workout_Code)]
+
+    a[ Sport == "Bike", table(Workout_Code, exclude = F) ]
+    a[ Sport == "Run",  table(Workout_Code, exclude = F) ]
+
+    a[ Sport == "Run",  table(Shoes, exclude = F) ]
+
+    a[ Sport == "Run" & is.na(Shoes), .(Date, Total_Distance, Shoes, Sport, Workout_Code)]
+    a[ Sport == "Run" & Shoes == "?", .(Date, Total_Distance, Shoes, Sport, Workout_Code)]
 
     table(a$Sport)
     table(a$Workout_Code)
     table(a$Workout_Title)
+
+
+    ####  Set color and symbol for each activity type  -------------------------
 
 
     ## Add graph options -------------------------------------------------------
