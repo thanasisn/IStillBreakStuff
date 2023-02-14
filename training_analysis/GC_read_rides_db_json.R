@@ -79,7 +79,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
                 tmp[[at]] <- as.numeric(tmp[[at]])
             }
             ## only one column to replace
-            if (ncol(tmp)==1) {
+            if (ncol(tmp) == 1) {
                 names(tmp) <- av
                 b[[av]] <- tmp[[av]]
             }
@@ -89,7 +89,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
                 b <- cbind(b, tmp)
                 b[[av]] <- NULL
             }
-            ## assume not usefull data
+            ## assume not useful data
             if (ncol(tmp) < 1) {
                 b[[av]] <- NULL
             }
@@ -105,11 +105,11 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     c <- rm.cols.dups.DT(c)
 
     ## combine data
-    stopifnot( length(intersect(names(a),names(b))) == 0 )
+    stopifnot(length(intersect(names(a), names(b))) == 0 )
     a <- cbind(a,b)
     rm(b)
 
-    stopifnot( length(intersect(names(a),names(c))) == 0 )
+    stopifnot(length(intersect(names(a), names(c))) == 0 )
     a <- cbind(a,c)
     rm(c)
 
