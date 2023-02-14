@@ -208,24 +208,6 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     }
 
 
-    stop()
-
-
-
-    #### Fill missing data from other fields -----------------------------------
-    ## We assume the manual override values are always more correct
-    a[!is.na(Average_Heart_Rate), average_hr_V1   := Average_Heart_Rate ]
-    a[!is.na(Calories),           total_kcalories := Calories           ]
-    a[ , Average_Heart_Rate := NULL]
-    a[ , Calories           := NULL]
-    a[ , Weekday            := NULL]
-    a[ , Year               := NULL]
-    a[ , Weight             := NULL]
-
-
-
-    stop()
-
     ## Make uniform names ------------------------------------------------------
     # remove spaces from names
     names(a) <- gsub(" ", "_", names(a))
@@ -235,15 +217,37 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     names(a) <- gsub('_(\\w?)', '_\\U\\1', names(a), perl = TRUE)
 
 
-    grep("dista", names(a), value=T, ignore.case = T )
+    #### Fill missing data from other fields -----------------------------------
 
-    plot(a$Distance - a$total_distance)
-    plot(a$Distance, a$total_distance)
+    # wecare <- c("Date","Sport",grep("heart|_hr_" ,names(a),ignore.case = T, value = T),"Overrides")
+    # test <- a[ grepl("average_hr", Overrides), ..wecare]
 
-    test1 <- a[Distance > total_distance, c("date","Sport","Distance","total_distance","overrides")]
-    test2 <- a[Distance < total_distance, c("date","Sport","Distance","total_distance","overrides")]
+    # wecare <- c("Date","Sport",grep("calories" ,names(a),ignore.case = T, value = T),"Overrides")
+    # test <- a[ grepl("total_kcalories", Overrides), ..wecare]
 
-    test3 <- a[grepl("total_distance",overrides),c("date","Sport","Distance","total_distance","overrides")]
+    # wecare <- c("Date","Sport",grep("distance" ,names(a),ignore.case = T, value = T),"Overrides")
+    # test   <- a[ grepl("total_distance", Overrides), ..wecare]
+    # test2  <- a[!is.na(Distance), ..wecare]
+
+    ## ??
+    # wecare <- c("Date","Sport",grep("_time|duration" ,names(a),ignore.case = T, value = T),"Overrides")
+    # test   <- a[ grepl("workout_time", Overrides), ..wecare]
+    # test2  <- a[!is.na(Duration), ..wecare]
+    # plot(a$Duration, a$Workout_Time)
+
+
+    ## We assume the manual override values are always more correct
+    ## I am not sure about GC logic of this field, may be is not in use in 3.6
+    a[!is.na(Average_Heart_Rate) & grepl("average_hr", Overrides), Average_Hr_V1   := Average_Heart_Rate ]
+    a[ , Average_Heart_Rate := NULL]
+    a[!is.na(Calories)      & grepl("total_kcalories", Overrides), Total_Kcalories := Calories           ]
+    a[ , Calories           := NULL]
+    a[!is.na(Distance)      & grepl("total_distance",  Overrides), Total_Distance  := Distance           ]
+    a[ , Distance           := NULL]
+
+    a[ , Weekday            := NULL]
+    a[ , Year               := NULL]
+    a[ , Weight             := NULL]
 
 
     ####  Remove duplicate columns  --------------------------------------------
@@ -284,21 +288,23 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
         uni1 <- unique(a[[at]])
         uni  <- uni1[!uni1 %in% c(NA, 0)]
         if (length(uni) < 5) {
-            cat("Column with low variation:", at, "\n")
+            cat("\nColumn with low variation:", at, "\n")
+            print(table(a[[at]]))
             noplot <- c(noplot, at)
         }
     }
 
 
     ####  create some new metrics  ---------------------------------------------
-    a$Intensity_TRIMP       <- a$trimp_points       / a$workout_time
-    a$Intensity_TRIMP_Zonal <- a$trimp_zonal_points / a$workout_time
-    a$Intensity_EPOC        <- a$EPOC               / a$workout_time
-    a$Intensity_Calories    <- a$total_kcalories    / a$workout_time
+    a$Intensity_TRIMP       <- a$Trimp_Points       / a$Workout_Time
+    a$Intensity_TRIMP_Zonal <- a$Trimp_Zonal_Points / a$Workout_Time
+    a$Intensity_EPOC        <- a$EPOC               / a$Workout_Time
+    a$Intensity_Calories    <- a$Total_Kcalories    / a$Workout_Time
 
     ## another load calculation
-    a[, Load_2 := 0.418 * (( (workout_time / 3600) * average_hr_V1 ) + (2.5 * average_hr_V1)) ]
+    a[, Load_2 := 0.418 * (( (Workout_Time / 3600) * Average_Hr_V1 ) + (2.5 * Average_Hr_V1)) ]
 
+stop()
 
     ####  Set color and symbol for each activity type  -------------------------
 
@@ -322,23 +328,23 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     ## Add graph options -------------------------------------------------------
 
     ## Set colors
-    a[ Sport == "Bike", Col := "red"  ]
-    a[ Sport == "Run",  Col := "blue" ]
+    a[Sport == "Bike", Col := "red" ]
+    a[Sport == "Run",  Col := "blue"]
 
     ## set points
     a[, Pch :=  1 ]
 
-    a[Workout_Code == "Bike Road",       Pch :=  6 ]
-    a[Workout_Code == "Bike Dirt",       Pch :=  1 ]
-    a[Workout_Code == "Bike Static",     Pch :=  4 ]
-    a[Workout_Code == "Bike Elliptical", Pch :=  4 ]
-    a[Workout_Code == "Run Hills",       Pch :=  1 ]
-    a[Workout_Code == "Run Track",       Pch :=  6 ]
-    a[Workout_Code == "Run Trail",       Pch :=  8 ]
-    a[Workout_Code == "Run Race",        Pch :=  9 ]
-    a[Workout_Code == "Walk",            Pch :=  0 ]
-    a[Workout_Code == "Walk Hike Heavy", Pch :=  7 ]
-    a[Workout_Code == "Walk Hike",       Pch := 12 ]
+    a[Workout_Code == "Bike Road",       Pch :=  6]
+    a[Workout_Code == "Bike Dirt",       Pch :=  1]
+    a[Workout_Code == "Bike Static",     Pch :=  4]
+    a[Workout_Code == "Bike Elliptical", Pch :=  4]
+    a[Workout_Code == "Run Hills",       Pch :=  1]
+    a[Workout_Code == "Run Track",       Pch :=  6]
+    a[Workout_Code == "Run Trail",       Pch :=  8]
+    a[Workout_Code == "Run Race",        Pch :=  9]
+    a[Workout_Code == "Walk",            Pch :=  0]
+    a[Workout_Code == "Walk Hike Heavy", Pch :=  7]
+    a[Workout_Code == "Walk Hike",       Pch := 12]
 
     table(a$Pch)
 
