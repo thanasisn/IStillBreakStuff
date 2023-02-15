@@ -17,6 +17,7 @@ Script.Name <- funr::sys.script()
 
 library(myRtools)
 library(data.table)
+library(segmented)
 library(jsonlite)
 source("~/CODE/FUNCTIONS/R/data.R")
 
@@ -369,7 +370,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
         a[[av]] <- NULL
     }
 
-
+stop()
     ####  STORE DATA  ----------------------------------------------------------
     write_RDS(a, file = storagefl, clean = TRUE)
 
@@ -379,8 +380,8 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     wecare <- names(a)[!sapply(a, is.character)]
     wecare <- grep("date|filename|parsed|Col|Pch|sport|bike|shoes|CP_setting|workout_code|Year",
                    wecare, ignore.case = T, value = T, invert = T)
+    wecare <- grep("_V2$|_V3$", wecare, value = T, invert = T)
     wecare <- unique(wecare[!wecare %in% noplot])
-
 
     ## Plot all variables ------------------------------------------------------
     if (!interactive()) {
@@ -442,11 +443,20 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
         ## TODO add lm by month
 
         par(mar = c(2,2,1,1))
+
+        rm   <- frollmean(a[[avar]], n = 30, hasNA = T, na.rm = T, algo = "exact" )
+        ylim <- range(rm,a[[avar]], na.rm = T)
+
+        lms <- a[, .(model1 = list(lm( Date ~ get(avar), .SD)) ), by = .(year(Date), month(Date)) ]
+
         plot(a$Date, a[[avar]],
              col  = a$Col,
              pch  = a$Pch,
              cex  = 0.6,
              xlab = "", ylab = "")
+
+        lines(a$Date, rm, col = "green")
+
 
         abline(v=as.numeric(unique(round(a$Date, "month"))),
                lty = 3, col = "lightgray")
@@ -515,11 +525,17 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
         }
 
         par(mar = c(2, 2, 1, 1))
+
+        rm   <- frollmean(a[[avar]], n = 20, hasNA = T, na.rm = T, algo = "exact" )
+        ylim <- range(rm,a[[avar]], na.rm = T)
+
         plot(a$Date, a[[avar]],
              col  = a$Col,
              pch  = a$Pch,
              cex  = 0.6,
              xlab = "", ylab = "")
+
+        lines(a$Date, rm, col = "green")
 
         abline(v=as.numeric(unique(round(a$Date, "month"))),
                lty = 3, col = "lightgray")
