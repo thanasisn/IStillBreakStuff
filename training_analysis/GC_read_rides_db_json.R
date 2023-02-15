@@ -213,9 +213,9 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     # remove spaces from names
     names(a) <- gsub(" ", "_", names(a))
     # capitalize first letter
-    names(a) <- sub('^(\\w?)',   '\\U\\1', names(a), perl = TRUE)
+    names(a) <- sub("^(\\w?)",   "\\U\\1", names(a), perl = TRUE)
     # capitalize words after _
-    names(a) <- gsub('_(\\w?)', '_\\U\\1', names(a), perl = TRUE)
+    names(a) <- gsub("_(\\w?)", "_\\U\\1", names(a), perl = TRUE)
 
 
     #### Fill missing data from other fields -----------------------------------
@@ -246,15 +246,15 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     ## We assume the manual override values are always more correct
     ## I am not sure about GC logic of this field, may be is not in use in 3.6
     a[!is.na(Average_Heart_Rate) & grepl("average_hr", Overrides), Average_Hr_V1   := Average_Heart_Rate ]
-    a[ , Average_Heart_Rate := NULL]
+    a[, Average_Heart_Rate := NULL]
     a[!is.na(Calories)      & grepl("total_kcalories", Overrides), Total_Kcalories := Calories           ]
-    a[ , Calories           := NULL]
+    a[, Calories           := NULL]
     a[!is.na(Distance)      & grepl("total_distance",  Overrides), Total_Distance  := Distance           ]
-    a[ , Distance           := NULL]
+    a[, Distance           := NULL]
 
-    a[ , Weekday            := NULL]
-    a[ , Year               := NULL]
-    a[ , Weight             := NULL]
+    a[, Weekday            := NULL]
+    a[, Year               := NULL]
+    a[, Weight             := NULL]
 
 
     ####  Remove duplicate columns  --------------------------------------------
@@ -371,7 +371,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
 
 
     ####  STORE DATA  ----------------------------------------------------------
-    # write_RDS(a, file = storagefl, clean = TRUE)
+    write_RDS(a, file = storagefl, clean = TRUE)
 
 
     ####  PLOT ALL DATA  -------------------------------------------------------
@@ -402,24 +402,24 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
          xlab = "TRIMP", ylab = "TRIMP Zonal")
 
     plot(a$Total_Kcalories, a$Trimp_Points,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+         col  = a$Col, pch  = a$Pch, cex  = 0.6)
     plot(a$Total_Kcalories, a$Trimp_Zonal_Points,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+         col  = a$Col, pch  = a$Pch, cex  = 0.6)
     plot(a$Total_Kcalories, a$EPOC,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+         col  = a$Col, pch  = a$Pch, cex  = 0.6)
 
     plot(a$Workout_Time,   a$Trimp_Points / a$EPOC,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+         col  = a$Col, pch  = a$Pch, cex  = 0.6)
 
     plot(a$Total_Distance, a$Trimp_Points / a$EPOC,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+         col  = a$Col, pch  = a$Pch, cex  = 0.6)
 
 
 
     ### how column exist?
     grep("istanc",names(a),ignore.case = T,value = T)
     plot(a$Total_Distance, a$Distance,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+         col  = a$Col, pch  = a$Pch, cex  = 0.6)
 
     # plot(a$Workout_Time, a$Time_Recording,
     #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
@@ -474,7 +474,6 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
             }
         }
 
-
         abline(v = as.numeric(unique(round(a$Date, "month"))),
                lty = 3, col = "lightgray")
 
@@ -505,24 +504,24 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
          xlab = "TRIMP", ylab = "TRIMP Zonal")
 
     plot(a$Total_Kcalories, a$Trimp_Points,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+         col  = a$Col, pch  = a$Pch, cex  = 0.6)
     plot(a$Total_Kcalories, a$Trimp_Zonal_Points,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+         col  = a$Col, pch  = a$Pch, cex  = 0.6)
     plot(a$Total_Kcalories, a$EPOC,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+         col  = a$Col, pch  = a$Pch, cex  = 0.6)
 
     plot(a$Workout_Time,   a$Trimp_Points / a$EPOC,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+         col  = a$Col, pch  = a$Pch, cex  = 0.6)
 
     plot(a$Total_Distance, a$Trimp_Points / a$EPOC,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+         col  = a$Col, pch  = a$Pch, cex  = 0.6)
 
 
 
     ### how column exist?
     grep("istanc",names(a),ignore.case = T,value = T)
     plot(a$Total_Distance, a$Distance,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+         col  = a$Col, pch  = a$Pch, cex  = 0.6)
 
     # plot(a$Workout_Time, a$Time_Recording,
     #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
