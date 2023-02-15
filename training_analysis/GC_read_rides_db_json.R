@@ -359,8 +359,15 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
 
     table(a$Pch)
 
-    grep("Run|Walk", unique(a$Workout_Code), ignore.case = T , value = T)
-    grep("Bike",     unique(a$Workout_Code), ignore.case = T , value = T)
+    grep("Run|Walk", unique(a$Workout_Code), ignore.case = T, value = T)
+    grep("Bike",     unique(a$Workout_Code), ignore.case = T, value = T)
+
+    ####  Drop sort term metrics  ----------------------------------------------
+    wecare <- grep("^[0-9]s_", names(a), value = T)
+    for (av in wecare) {
+        cat("Drop sort termp column:", av, "\n")
+        a[[av]] <- NULL
+    }
 
 
     ####  STORE DATA  ----------------------------------------------------------
@@ -430,6 +437,9 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
             cat(paste("Skip plot", avar),"\n")
             next()
         }
+
+        ## TODO add running mean
+        ## TODO add lm by month
 
         par(mar = c(2,2,1,1))
         plot(a$Date, a[[avar]],
