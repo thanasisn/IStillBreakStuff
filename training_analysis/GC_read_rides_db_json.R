@@ -370,7 +370,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
         a[[av]] <- NULL
     }
 
-stop()
+
     ####  STORE DATA  ----------------------------------------------------------
     write_RDS(a, file = storagefl, clean = TRUE)
 
@@ -439,22 +439,20 @@ stop()
             next()
         }
 
-        ## TODO add running mean
-        ## TODO add lm by month
-
         par(mar = c(2,2,1,1))
 
         rm   <- frollmean(a[[avar]], n = 30, hasNA = T, na.rm = T, algo = "exact" )
         ylim <- range(rm,a[[avar]], na.rm = T)
 
-        ## regresion my month
-        lms <- a[,
-                 .(model1 = list( lm(get(avar)~Date, .SD, na.action = na.omit) )),
-                   by = .(year(Date), month(Date)) ]
-        # lm <- lm(a[[avar]] ~ a$Date )
-        # my.seg <- segmented(lm,
-        #                     seg.Z = ~avar,
-        #                     psi = list( range(a[[avar]], na.rm = T )))
+        ## regression my month
+        ## fails when all is na in a group
+        # lms <- a[,
+        #          .(model1 = list( lm(get(avar)~Date, .SD, na.action = na.omit) )),
+        #            by = .(year(Date), month(Date)) ]
+        #
+        # lms <- a[,
+        #          .(model1 = if (!all(is.na(.SD[[avar]]))) {list(lm(get(avar)~Date, .SD, na.action = na.omit))} else {NULL}),
+        #          by = .(year(Date), month(Date)) ]
 
         plot(a$Date, a[[avar]],
              col  = a$Col,
@@ -463,19 +461,20 @@ stop()
              xlab = "", ylab = "")
 
         lines(a$Date, rm, col = "green")
-        # abline(lms$model1[[1]])
-        # abline(lm)
-        # plot(lms$model1[[1]])
 
-        for ( alm in 1:nrow(lms) ) {
-            aa <- lms[alm,]
-            Dstart <- as.POSIXct(strptime(paste(aa$year, aa$month, "1"), "%Y %m %d"))
-            Dend   <- as.POSIXct(lubridate::add_with_rollback(Dstart, months(1)))
-            res    <- predict(aa$model1[[1]], data.table(Date = c(Dstart,Dend)))
-            segments(x0 = Dstart, x1 = Dend, y0 = res[1], y1 = res[2], col = "grey")
-            # cat(format(Dstart), format(Dend), "\n")
+        ## create lm with loops
+        pp <- a[, .(Date, get(avar), month = month(Date), year = year(Date))]
+        for (ay in unique(pp$year)) {
+                tmp <- pp[year == ay, ]
+                if ( sum(!is.na(tmp$V2)) > 1) {
+                    mlm    <- lm(V2 ~ Date, tmp, na.action = na.omit)
+                    Dstart <- as.POSIXct(strptime(paste(ay, "1", "1"), "%Y %m %d"))
+                    Dend   <- as.POSIXct(lubridate::add_with_rollback(Dstart, months(1)))
+                    res    <- predict(mlm, data.table(Date = c(Dstart,Dend)) )
+                    segments(x0 = Dstart, x1 = Dend, y0 = res[1], y1 = res[2], col = "grey")
+                }
+            }
         }
-
 
         abline(v=as.numeric(unique(round(a$Date, "month"))),
                lty = 3, col = "lightgray")
@@ -545,8 +544,18 @@ stop()
 
         par(mar = c(2, 2, 1, 1))
 
-        rm   <- frollmean(a[[avar]], n = 20, hasNA = T, na.rm = T, algo = "exact" )
+        rm   <- frollmean(a[[avar]], n = 30, hasNA = T, na.rm = T, algo = "exact" )
         ylim <- range(rm,a[[avar]], na.rm = T)
+
+        ## regression my month
+        ## fails when all is na in a group
+        # lms <- a[,
+        #          .(model1 = list( lm(get(avar)~Date, .SD, na.action = na.omit) )),
+        #            by = .(year(Date), month(Date)) ]
+        #
+        # lms <- a[,
+        #          .(model1 = if (!all(is.na(.SD[[avar]]))) {list(lm(get(avar)~Date, .SD, na.action = na.omit))} else {NULL}),
+        #          by = .(year(Date), month(Date)) ]
 
         plot(a$Date, a[[avar]],
              col  = a$Col,
@@ -556,8 +565,24 @@ stop()
 
         lines(a$Date, rm, col = "green")
 
+        ## create lm with loops
+        pp <- a[, .(Date, get(avar), month = month(Date), year = year(Date))]
+        for (ay in unique(pp$year)) {
+            for (am in unique(pp$month)) {
+                tmp <- pp[year == ay & month == am, ]
+                if ( sum(!is.na(tmp$V2)) > 1) {
+                    mlm    <- lm(V2 ~ Date, tmp, na.action = na.omit)
+                    Dstart <- as.POSIXct(strptime(paste(ay, am, "1"), "%Y %m %d"))
+                    Dend   <- as.POSIXct(lubridate::add_with_rollback(Dstart, months(1)))
+                    res    <- predict(mlm, data.table(Date = c(Dstart,Dend)) )
+                    segments(x0 = Dstart, x1 = Dend, y0 = res[1], y1 = res[2], col = "grey")
+                }
+            }
+        }
+
         abline(v=as.numeric(unique(round(a$Date, "month"))),
                lty = 3, col = "lightgray")
+
 
         title(avar)
     }
