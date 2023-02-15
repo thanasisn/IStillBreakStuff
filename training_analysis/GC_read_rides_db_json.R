@@ -47,7 +47,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     a$fingerprint <- NULL
     a$metacrc     <- NULL
     a$color       <- NULL
-    a[, parsed_on := as.POSIXct(as.numeric(timestamp), origin = "1970-01-01") ]
+    a[, parsed_on := as.POSIXct(as.numeric(timestamp), origin = "1970-01-01")]
     a$timestamp   <- NULL
 
     ## breakup data sets
@@ -57,13 +57,12 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
 
     #### METRICS for activities ####
     for (av in names(b)) {
-        if (is.list(b[[av]]) ) {
+        if (is.list(b[[av]])) {
             cat(av, "\n")
 
             ## protect from null list
-            b[[av]][ which(sapply(b[[av]], is.null)) ] <- list(c(NA))
+            b[[av]][which(sapply(b[[av]], is.null))] <- list(c(NA))
 
-            # tmp <- data.table( b[[av]] )
             tmp <- data.table(t(list2DF(b[[av]])))
 
             for (at in names(tmp)) {
@@ -87,7 +86,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
             }
             ## multiple columns with data
             if (ncol(tmp) > 1) {
-                names(tmp) <- paste0(av,"_", names(tmp))
+                names(tmp) <- paste0(av, "_", names(tmp))
                 b <- cbind(b, tmp)
                 b[[av]] <- NULL
             }
@@ -107,12 +106,12 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     c <- rm.cols.dups.DT(c)
 
     ## combine data
-    stopifnot(length(intersect(names(a), names(b))) == 0 )
-    a <- cbind(a,b)
+    stopifnot(length(intersect(names(a), names(b))) == 0)
+    a <- cbind(a, b)
     rm(b)
 
-    stopifnot(length(intersect(names(a), names(c))) == 0 )
-    a <- cbind(a,c)
+    stopifnot(length(intersect(names(a), names(c))) == 0)
+    a <- cbind(a, c)
     rm(c)
 
     ## proper date
@@ -204,7 +203,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
 
 
     #### Fix temperatures NA ---------------------------------------------------
-    wecare <- grep("_temp", names(a), value = T)
+    wecare <- grep("_temp", names(a), value = TRUE)
     for (avar in wecare) {
         a[[avar]][a[[avar]] < -250 ] <- NA
     }
@@ -214,7 +213,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     # remove spaces from names
     names(a) <- gsub(" ", "_", names(a))
     # capitalize first letter
-    names(a) <- sub('^(\\w?)', '\\U\\1', names(a), perl = TRUE)
+    names(a) <- sub('^(\\w?)',   '\\U\\1', names(a), perl = TRUE)
     # capitalize words after _
     names(a) <- gsub('_(\\w?)', '_\\U\\1', names(a), perl = TRUE)
 
@@ -372,7 +371,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
 
 
     ####  STORE DATA  ----------------------------------------------------------
-    write_RDS(a, file = storagefl, clean = TRUE)
+    # write_RDS(a, file = storagefl, clean = TRUE)
 
 
     ####  PLOT ALL DATA  -------------------------------------------------------
@@ -465,18 +464,18 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
         ## create lm with loops
         pp <- a[, .(Date, get(avar), month = month(Date), year = year(Date))]
         for (ay in unique(pp$year)) {
-                tmp <- pp[year == ay, ]
-                if ( sum(!is.na(tmp$V2)) > 1) {
-                    mlm    <- lm(V2 ~ Date, tmp, na.action = na.omit)
-                    Dstart <- as.POSIXct(strptime(paste(ay, "1", "1"), "%Y %m %d"))
-                    Dend   <- as.POSIXct(lubridate::add_with_rollback(Dstart, months(1)))
-                    res    <- predict(mlm, data.table(Date = c(Dstart,Dend)) )
-                    segments(x0 = Dstart, x1 = Dend, y0 = res[1], y1 = res[2], col = "grey")
-                }
+            tmp <- pp[year == ay, ]
+            if ( sum(!is.na(tmp$V2)) > 1) {
+                mlm    <- lm(V2 ~ Date, tmp, na.action = na.omit)
+                Dstart <- as.POSIXct(strptime(paste(ay, "1", "1"), "%Y %m %d"))
+                Dend   <- as.POSIXct(lubridate::add_with_rollback(Dstart, months(1)))
+                res    <- predict(mlm, data.table(Date = c(Dstart,Dend)))
+                segments(x0 = Dstart, x1 = Dend, y0 = res[1], y1 = res[2], col = "grey")
             }
         }
 
-        abline(v=as.numeric(unique(round(a$Date, "month"))),
+
+        abline(v = as.numeric(unique(round(a$Date, "month"))),
                lty = 3, col = "lightgray")
 
         title(avar)
@@ -580,9 +579,8 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
             }
         }
 
-        abline(v=as.numeric(unique(round(a$Date, "month"))),
+        abline(v = as.numeric(unique(round(a$Date, "month"))),
                lty = 3, col = "lightgray")
-
 
         title(avar)
     }
