@@ -25,8 +25,9 @@ source("~/CODE/FUNCTIONS/R/data.R")
 gccache   <- "~/TRAIN/GoldenCheetah/Athan/cache/rideDB.json"
 storagefl <- "~/DATA/Other/GC_json_ride_data_2.Rds"
 
-pdfout1   <- "~/LOGs/training_status/GC_all_plots.pdf"
-pdfout2   <- "~/LOGs/training_status/GC_all_plots_last.pdf"
+pdfout1   <- "~/LOGs/training_status/GC_all_variables.pdf"
+pdfout2   <- "~/LOGs/training_status/GC_all_variables_last.pdf"
+LASTDAYS  <- 400
 
 
 if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
@@ -310,15 +311,13 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     ## another load calculation
     a[, Load_2 := 0.418 * (( (Workout_Time / 3600) * Average_Hr_V1 ) + (2.5 * Average_Hr_V1)) ]
 
-stop()
-
 
     #### check sport consistency -----------------------------------------------
 
     a[grepl("bike", Workout_Code) & Sport == "Bike" ]
 
     a[Sport == "Bike", .(Date, Total_Distance, Total_Kcalories, Sport, Workout_Code)]
-    a[Sport == "Run" , .(Date, total_distance, total_kcalories, Sport, Workout_Code)]
+    a[Sport == "Run" , .(Date, Total_Distance, Total_Kcalories, Sport, Workout_Code)]
 
     a[Sport == "Bike" & !grepl("Bike",Workout_Code), .(Date, Total_Distance, Total_Kcalories, Sport, Workout_Code)]
 
@@ -364,7 +363,6 @@ stop()
     grep("Bike",     unique(a$Workout_Code), ignore.case = T , value = T)
 
 
-
     ####  STORE DATA  ----------------------------------------------------------
     write_RDS(a, file = storagefl, clean = TRUE)
 
@@ -374,52 +372,56 @@ stop()
     wecare <- names(a)[!sapply(a, is.character)]
     wecare <- grep("date|filename|parsed|Col|Pch|sport|bike|shoes|CP_setting|workout_code|Year",
                    wecare, ignore.case = T, value = T, invert = T)
-    wecare <- wecare[!wecare %in% noplot]
+    wecare <- unique(wecare[!wecare %in% noplot])
+
 
     ## Plot all variables ------------------------------------------------------
     if (!interactive()) {
         pdf(file = pdfout1, width = 8, height = 4)
     }
 
-    ## investigate load metrics
     par(mar = c(4,4,1,1))
 
-    plot(a$EPOC, a$trimp_points,
+    plot(a$EPOC, a$Trimp_Points,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,
          xlab = "EPOC", ylab = "TRIMP")
 
-    plot(a$EPOC, a$trimp_zonal_points,
+    plot(a$EPOC, a$Trimp_Zonal_Points,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,
          xlab = "EPOC", ylab = "TRIMP Zonal")
 
-    plot(a$trimp_points, a$trimp_zonal_points,
+    plot(a$Trimp_Points, a$Trimp_Zonal_Points,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,
          xlab = "TRIMP", ylab = "TRIMP Zonal")
 
-    plot(a$total_kcalories, a$trimp_points,
+    plot(a$Total_Kcalories, a$Trimp_Points,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-    plot(a$total_kcalories, a$trimp_zonal_points,
+    plot(a$Total_Kcalories, a$Trimp_Zonal_Points,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-    plot(a$total_kcalories, a$EPOC,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-
-    plot(a$workout_time, a$trimp_points / a$EPOC,
+    plot(a$Total_Kcalories, a$EPOC,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
 
-    plot(a$total_distance, a$trimp_points / a$EPOC,
+    plot(a$Workout_Time,   a$Trimp_Points / a$EPOC,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
 
-    plot(a$total_distance, a$Distance,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-    plot(a$workout_time, a$time_recording,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-    plot(a$workout_time, a$time_carrying,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-    plot(a$workout_time, a$time_riding,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-    plot(a$workout_time, a$`Time Moving`,
+    plot(a$Total_Distance, a$Trimp_Points / a$EPOC,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
 
+
+
+    ### how column exist?
+    grep("istanc",names(a),ignore.case = T,value = T)
+    plot(a$Total_Distance, a$Distance,
+         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+
+    # plot(a$Workout_Time, a$Time_Recording,
+    #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+    # plot(a$Workout_Time, a$Time_Carrying,
+    #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+    # plot(a$Workout_Time, a$Time_Riding,
+    #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+    # plot(a$Workout_Time, a$Time_Moving,
+    #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
 
 
     for (avar in wecare) {
@@ -430,60 +432,69 @@ stop()
         }
 
         par(mar = c(2,2,1,1))
-        plot(a$date, a[[avar]],
+        plot(a$Date, a[[avar]],
              col  = a$Col,
              pch  = a$Pch,
              cex  = 0.6,
              xlab = "", ylab = "")
+
+        abline(v=as.numeric(unique(round(a$Date, "month"))),
+               lty = 3, col = "lightgray")
+
         title(avar)
     }
 
     dev.off()
 
 
-    a <- a[ as.Date(date) > (Sys.Date() - 400)  ]
+    ####  Plot last activities  ------------------------------------------------
+    a <- a[ as.Date(Date) > (Sys.Date() - LASTDAYS) ]
     if (!interactive()) {
         pdf(file = pdfout2, width = 8, height = 4)
     }
 
-    ## investigate load metrics
     par(mar = c(4,4,1,1))
 
-    plot(a$EPOC, a$trimp_points,
+    plot(a$EPOC, a$Trimp_Points,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,
          xlab = "EPOC", ylab = "TRIMP")
 
-    plot(a$EPOC, a$trimp_zonal_points,
+    plot(a$EPOC, a$Trimp_Zonal_Points,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,
          xlab = "EPOC", ylab = "TRIMP Zonal")
 
-    plot(a$trimp_points, a$trimp_zonal_points,
+    plot(a$Trimp_Points, a$Trimp_Zonal_Points,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,
          xlab = "TRIMP", ylab = "TRIMP Zonal")
 
-    plot(a$total_kcalories, a$trimp_points,
+    plot(a$Total_Kcalories, a$Trimp_Points,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-    plot(a$total_kcalories, a$trimp_zonal_points,
+    plot(a$Total_Kcalories, a$Trimp_Zonal_Points,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-    plot(a$total_kcalories, a$EPOC,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-
-    plot(a$workout_time, a$trimp_points/a$EPOC,
+    plot(a$Total_Kcalories, a$EPOC,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
 
-    plot(a$total_distance, a$trimp_points/a$EPOC,
+    plot(a$Workout_Time,   a$Trimp_Points / a$EPOC,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
 
-    plot(a$total_distance, a$Distance,
+    plot(a$Total_Distance, a$Trimp_Points / a$EPOC,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-    plot(a$workout_time, a$time_recording,
+
+
+
+    ### how column exist?
+    grep("istanc",names(a),ignore.case = T,value = T)
+    plot(a$Total_Distance, a$Distance,
          col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-    plot(a$workout_time, a$time_carrying,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-    plot(a$workout_time, a$time_riding,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-    plot(a$workout_time, a$`Time Moving`,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+
+    # plot(a$Workout_Time, a$Time_Recording,
+    #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+    # plot(a$Workout_Time, a$Time_Carrying,
+    #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+    # plot(a$Workout_Time, a$Time_Riding,
+    #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+    # plot(a$Workout_Time, a$Time_Moving,
+    #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
 
 
     for (avar in wecare) {
@@ -494,11 +505,15 @@ stop()
         }
 
         par(mar = c(2, 2, 1, 1))
-        plot(a$date, a[[avar]],
+        plot(a$Date, a[[avar]],
              col  = a$Col,
              pch  = a$Pch,
              cex  = 0.6,
              xlab = "", ylab = "")
+
+        abline(v=as.numeric(unique(round(a$Date, "month"))),
+               lty = 3, col = "lightgray")
+
         title(avar)
     }
 
