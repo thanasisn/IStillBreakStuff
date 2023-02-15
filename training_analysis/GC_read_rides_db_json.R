@@ -17,7 +17,7 @@ Script.Name <- funr::sys.script()
 
 library(myRtools)
 library(data.table)
-library(segmented)
+# library(segmented)
 library(jsonlite)
 source("~/CODE/FUNCTIONS/R/data.R")
 
@@ -447,7 +447,14 @@ stop()
         rm   <- frollmean(a[[avar]], n = 30, hasNA = T, na.rm = T, algo = "exact" )
         ylim <- range(rm,a[[avar]], na.rm = T)
 
-        lms <- a[, .(model1 = list(lm( Date ~ get(avar), .SD)) ), by = .(year(Date), month(Date)) ]
+        ## regresion my month
+        lms <- a[,
+                 .(model1 = list( lm(get(avar)~Date, .SD, na.action = na.omit) )),
+                   by = .(year(Date), month(Date)) ]
+        # lm <- lm(a[[avar]] ~ a$Date )
+        # my.seg <- segmented(lm,
+        #                     seg.Z = ~avar,
+        #                     psi = list( range(a[[avar]], na.rm = T )))
 
         plot(a$Date, a[[avar]],
              col  = a$Col,
@@ -456,6 +463,18 @@ stop()
              xlab = "", ylab = "")
 
         lines(a$Date, rm, col = "green")
+        # abline(lms$model1[[1]])
+        # abline(lm)
+        # plot(lms$model1[[1]])
+
+        for ( alm in 1:nrow(lms) ) {
+            aa <- lms[alm,]
+            Dstart <- as.POSIXct(strptime(paste(aa$year, aa$month, "1"), "%Y %m %d"))
+            Dend   <- as.POSIXct(lubridate::add_with_rollback(Dstart, months(1)))
+            res    <- predict(aa$model1[[1]], data.table(Date = c(Dstart,Dend)))
+            segments(x0 = Dstart, x1 = Dend, y0 = res[1], y1 = res[2], col = "grey")
+            # cat(format(Dstart), format(Dend), "\n")
+        }
 
 
         abline(v=as.numeric(unique(round(a$Date, "month"))),
