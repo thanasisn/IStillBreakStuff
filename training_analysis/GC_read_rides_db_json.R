@@ -30,8 +30,11 @@ pdfout1   <- "~/LOGs/training_status/GC_all_variables.pdf"
 pdfout2   <- "~/LOGs/training_status/GC_all_variables_last.pdf"
 LASTDAYS  <- 400
 
+DEBUG <- FALSE
+DEBUG <- TRUE
 
-if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
+
+if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     cat("\nHave to parse", gccache, "\n")
 
     ## read the whole data base
@@ -288,7 +291,7 @@ if (!file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
         }
     }
 
-
+stop()
     ####  Info on low variation columns  ---------------------------------------
     noplot <- c()
     for (at in names(a)) {
