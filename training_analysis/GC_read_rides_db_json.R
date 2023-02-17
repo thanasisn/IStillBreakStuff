@@ -291,7 +291,7 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
         }
     }
 
-stop()
+
     ####  Info on low variation columns  ---------------------------------------
     noplot <- c()
     for (at in names(a)) {
@@ -368,17 +368,28 @@ stop()
     ####  Drop sort term metrics  ----------------------------------------------
     wecare <- grep("^[0-9]s_", names(a), value = T)
     for (av in wecare) {
-        cat("Drop sort termp column:", av, "\n")
+        cat("Drop sort term column:", av, "\n")
         a[[av]] <- NULL
     }
+
 
 
     ####  STORE DATA  ----------------------------------------------------------
     write_RDS(a, file = storagefl, clean = TRUE)
 
 
-    ####  PLOT ALL DATA  -------------------------------------------------------
+    #### Don't plot other short term metrics  -----------------------------------
+    wecare <- grep( "^[0-9]+s_" , names(a), value = T)
+    wecare <- unique(c(wecare , grep( "^[0-9]m_" , names(a), value = T)))
+    wecare <- unique(c(wecare , grep("Best_[0-9]{2,3}m" ,names(a), value = T)))
+    wecare <- unique(c(wecare , grep("Compatibility" ,names(a), value = T)))
+    for (av in wecare) {
+        cat("Drop sort term column from plot:", av, "\n")
+        a[[av]] <- NULL
+    }
 
+
+    ####  PLOT ALL DATA  -------------------------------------------------------
     wecare <- names(a)[!sapply(a, is.character)]
     wecare <- grep("date|filename|parsed|Col|Pch|sport|bike|shoes|CP_setting|workout_code|Year",
                    wecare, ignore.case = T, value = T, invert = T)
