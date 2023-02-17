@@ -32,7 +32,8 @@ set +e
 pids=()
 
 
-
+"$HOME/BASH/TOOLS/brave_history_clean.sh"   & pids+=($!)
+"$HOME/BASH/CRON/gather_winb_email.R"       & pids+=($!)
 "$HOME/CODE/conky/scripts/transact_plot.R"  & pids+=($!)
 
 (
