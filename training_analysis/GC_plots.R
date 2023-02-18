@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 
 #### Golden Cheetah plots
+## Reads from single json activities files
 ## This is incorporated to conky
 
 
@@ -12,7 +13,6 @@ tic <- Sys.time()
 Script.Name <- funr::sys.script()
 
 # inputdata   <- "~/LOGs/GCmetrics.Rds"
-moredata    <- "~/DATA/Other/GC_json_data.Rds"
 outputpdf   <- paste0("~/LOGs/training_status/", basename(sub("\\.R$",".pdf", Script.Name)))
 datascript  <- "~/CODE/training_analysis/GC_read_activities.R"
 daysback    <- 365*3
@@ -39,8 +39,6 @@ source("~/FUNCTIONS/R/data.R")
 source(datascript)
 metrics <- readRDS("~/DATA/Other/Train_metrics.Rds")
 metrics <- metrics[date > Sys.Date() - daysback, ]
-
-
 
 
 fATL1 <- 1 / 7

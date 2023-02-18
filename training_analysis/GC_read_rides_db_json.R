@@ -29,9 +29,8 @@ storagefl <- "~/DATA/Other/GC_json_ride_data_2.Rds"
 pdfout1   <- "~/LOGs/training_status/GC_all_variables.pdf"
 pdfout2   <- "~/LOGs/training_status/GC_all_variables_last.pdf"
 LASTDAYS  <- 400
-
-DEBUG <- FALSE
-DEBUG <- TRUE
+DEBUG     <- FALSE
+# DEBUG     <- TRUE
 
 
 if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
@@ -391,10 +390,15 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
 
     ####  PLOT ALL DATA  -------------------------------------------------------
     wecare <- names(a)[!sapply(a, is.character)]
-    wecare <- grep("date|filename|parsed|Col|Pch|sport|bike|shoes|CP_setting|workout_code|Year|Duration|Time_Moving|Dropout_Time",
+    wecare <- grep("date|filename|parsed|Col|Pch|sport|bike|shoes|CP_setting|workout_code|Year|Duration|Time_Moving|Dropout_Time|Distance_Swim|Heartbeats",
                    wecare, ignore.case = T, value = T, invert = T)
     wecare <- unique(wecare[!wecare %in% noplot])
     wecare <- sort(wecare)
+
+    #### find few data cases ---------------------------------------------------
+    # test <- sapply(a[, ..wecare], function(x) sum(!is.na(x)) )
+    # test[test < 10]
+
     ## Plot all variables ------------------------------------------------------
     if (!interactive()) {
         pdf(file = pdfout1, width = 8, height = 4)
@@ -488,6 +492,8 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
         }
 
         abline(v = as.numeric(unique(round(a$Date, "month"))),
+               lty = 3, col = "lightgray")
+        abline(h = pretty(a[[avar]]),
                lty = 3, col = "lightgray")
 
         title(avar)
@@ -593,6 +599,8 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
 
         abline(v = as.numeric(unique(round(a$Date, "month"))),
                lty = 3, col = "lightgray")
+        abline(h = pretty(a[[avar]]),
+               lty = 3, col = "lightgray")
 
         title(avar)
     }
@@ -602,7 +610,6 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
 } else {
     cat("Don't have to parse json data base\n")
 }
-
 
 
 ####_ END _####
