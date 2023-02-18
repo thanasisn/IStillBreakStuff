@@ -4,6 +4,7 @@
 ## Reads from single json activities files
 ## This is incorporated to conky
 
+stop("Deprecate that")
 
 ####_ Set environment _####
 closeAllConnections()
@@ -12,7 +13,6 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- funr::sys.script()
 
-# inputdata   <- "~/LOGs/GCmetrics.Rds"
 outputpdf   <- paste0("~/LOGs/training_status/", basename(sub("\\.R$",".pdf", Script.Name)))
 datascript  <- "~/CODE/training_analysis/GC_read_activities.R"
 daysback    <- 365*3
