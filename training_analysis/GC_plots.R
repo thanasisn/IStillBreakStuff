@@ -4,7 +4,7 @@
 ## Reads from single json activities files
 ## This is incorporated to conky
 
-stop("Deprecate that")
+stop("Deprecate that!")
 
 ####_ Set environment _####
 closeAllConnections()
