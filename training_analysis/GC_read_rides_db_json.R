@@ -103,7 +103,7 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     b <- rm.cols.dups.DT(b)
 
     #### Ignore all intervals data ####
-    #  data$INTERVALS
+    # data$INTERVALS
 
     #### TAGS data ####
     c <- rm.cols.dups.DT(c)
@@ -338,7 +338,6 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
 
     ####  Set color and symbol for each activity type  -------------------------
 
-
     ## Add graph options -------------------------------------------------------
 
     ## Set colors
@@ -378,11 +377,12 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     write_RDS(a, file = storagefl, clean = TRUE)
 
 
-    #### Don't plot other short term metrics  -----------------------------------
+    #### Don't plot other short term metrics  ----------------------------------
     wecare <- grep( "^[0-9]+s_" , names(a), value = T)
     wecare <- unique(c(wecare , grep( "^[0-9]m_" , names(a), value = T)))
     wecare <- unique(c(wecare , grep("Best_[0-9]{2,3}m" ,names(a), value = T)))
     wecare <- unique(c(wecare , grep("Compatibility" ,names(a), value = T)))
+    wecare <- unique(c(wecare , grep("_V2$|_V3$", names(a), value = T)))
     for (av in wecare) {
         cat("Drop sort term column from plot:", av, "\n")
         a[[av]] <- NULL
@@ -391,11 +391,10 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
 
     ####  PLOT ALL DATA  -------------------------------------------------------
     wecare <- names(a)[!sapply(a, is.character)]
-    wecare <- grep("date|filename|parsed|Col|Pch|sport|bike|shoes|CP_setting|workout_code|Year",
+    wecare <- grep("date|filename|parsed|Col|Pch|sport|bike|shoes|CP_setting|workout_code|Year|Duration|Time_Moving|Dropout_Time",
                    wecare, ignore.case = T, value = T, invert = T)
-    wecare <- grep("_V2$|_V3$", wecare, value = T, invert = T)
     wecare <- unique(wecare[!wecare %in% noplot])
-
+    wecare <- sort(wecare)
     ## Plot all variables ------------------------------------------------------
     if (!interactive()) {
         pdf(file = pdfout1, width = 8, height = 4)
@@ -425,15 +424,15 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     plot(a$Workout_Time,   a$Trimp_Points / a$EPOC,
          col  = a$Col, pch  = a$Pch, cex  = 0.6)
 
-    plot(a$Total_Distance, a$Trimp_Points / a$EPOC,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6)
+    # plot(a$Total_Distance, a$Trimp_Points / a$EPOC,
+    #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
 
 
 
     ### how column exist?
     grep("istanc",names(a),ignore.case = T,value = T)
-    plot(a$Total_Distance, a$Distance,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6)
+    # plot(a$Total_Distance, a$Distance,
+    #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
 
     # plot(a$Workout_Time, a$Time_Recording,
     #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
@@ -534,8 +533,8 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
 
     ### how column exist?
     grep("istanc",names(a),ignore.case = T,value = T)
-    plot(a$Total_Distance, a$Distance,
-         col  = a$Col, pch  = a$Pch, cex  = 0.6)
+    # plot(a$Total_Distance, a$Distance,
+    #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
 
     # plot(a$Workout_Time, a$Time_Recording,
     #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
