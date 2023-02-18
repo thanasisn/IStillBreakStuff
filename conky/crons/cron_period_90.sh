@@ -43,6 +43,13 @@ pids=()
     "$HOME/CODE/training_analysis/GC_plots_b.R" 
 ) & pids+=($!)
 
+## New implementation
+(
+    "$HOME/CODE/training_analysis/GC_conky_plots_rides_db.R" 
+) & pids+=($!)
+
+
+
 
 wait "${pids[@]}"; pids=()
 echo "took $SECONDS seconds for $0 to complete"
