@@ -8,6 +8,8 @@
 # Unified plots
 # Mobile phone plot
 
+stop("Deprecated!!")
+
 ####_ Set environment _####
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
