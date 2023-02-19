@@ -139,6 +139,7 @@ git push -f -u origin main
 folders=(
     "$HOME/CHP_1_DIR/"
     "$HOME/CM_21_GLB/"
+    "$HOME/CS_id/"
     "$HOME/PANDOC/Thesis"
     "$HOME/RAD_QC"
     "$HOME/SUN"
