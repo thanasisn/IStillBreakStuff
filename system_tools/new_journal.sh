@@ -3,16 +3,14 @@
 ## https://github.com/thanasisn <lapauththanasis@gmail.com>
 
 
-#### Just create a new .md file 
+#### Just create a new .md file with a given or current date 
 ## This is meant to run only within the Journal folder
 
-## parse or create the date variable
-
 ## go to the folder
-cd "$HOME/PANDOC/Journal"
+# cd "$HOME/PANDOC/Journal"
 
+## parse or create the date variable
 args="$*"
-
 if [[ -z "$args" ]]; then
     echo "Using current date"
     stamp="$(date +"%s")"
