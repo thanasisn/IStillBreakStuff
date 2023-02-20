@@ -50,6 +50,12 @@ kill_run  kdeconnect-indicator
 kill_run  volumeicon
 kill_run  $HOME/CODE/conky/scripts/top_ps.sh
 kill_run  sxhkd
+
+if [[ $WM_NAME = "bspwm" ]]; then 
+    ## keybinds for bspwm
+    sxhkd -c "$HOME/.config/sxhkd/sxhkdrc_bspwm"
+fi
+
 # kill_run  "python3 $HOME/PROGRAMS/noisy/noisy.py --config $HOME/PROGRAMS/noisy/config.json"
 
 
@@ -105,7 +111,15 @@ $HOME/CODE/conky/crons/run_all_crons.sh &
 killall polybar
 xrandr --listactivemonitors | sed 's/^.* //' | sed 1d | while read screen; do
     export MONITOR=$screen
-    polybar -c $HOME/.config/polybar/config -r example &
+
+    ## use the right bar
+    if [[ $WM_NAME = "i3" ]]; then 
+        polybar -c $HOME/.config/polybar/config -r i3bar &
+    elif [[ $WM_NAME = "bspwm" ]]; then
+        polybar -c $HOME/.config/polybar/config -r bspwmbar &
+    else
+        polybar -c $HOME/.config/polybar/config -r example &
+    fi     
 done
 
 
