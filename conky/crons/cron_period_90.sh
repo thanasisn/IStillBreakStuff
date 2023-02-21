@@ -36,12 +36,7 @@ pids=()
 "$HOME/BASH/CRON/gather_winb_email.R"       & pids+=($!)
 "$HOME/CODE/conky/scripts/transact_plot.R"  & pids+=($!)
 
-(
-    ## why we run the old one?
-    "$HOME/CODE/training_analysis/GC_plots.R" 
-) & pids+=($!)
 
-## New implementation
 (
     "$HOME/CODE/training_analysis/GC_conky_plots_rides_db.R" 
 ) & pids+=($!)

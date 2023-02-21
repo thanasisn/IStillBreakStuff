@@ -376,12 +376,16 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     write_RDS(a, file = storagefl, clean = TRUE)
 
 
-    #### Don't plot other short term metrics  ----------------------------------
-    wecare <- grep( "^[0-9]+s_" , names(a), value = T)
-    wecare <- unique(c(wecare , grep( "^[0-9]m_" , names(a), value = T)))
-    wecare <- unique(c(wecare , grep("Best_[0-9]{2,3}m" ,names(a), value = T)))
-    wecare <- unique(c(wecare , grep("Compatibility" ,names(a), value = T)))
-    wecare <- unique(c(wecare , grep("_V2$|_V3$", names(a), value = T)))
+    #### Don't plot some metrics  ----------------------------------------------
+    wecare <- grep("^[0-9]+s_",                          names(a), value = T)
+    wecare <- unique(c(wecare , grep( "^[0-9]m_" ,       names(a), value = T)))
+    wecare <- unique(c(wecare , grep("Best_[0-9]{2,3}m", names(a), value = T)))
+    wecare <- unique(c(wecare , grep("Compatibility" ,   names(a), value = T)))
+    wecare <- unique(c(wecare , grep("_V2$|_V3$",        names(a), value = T)))
+    wecare <- unique(c(wecare , grep("_Temp",            names(a), value = T)))
+    wecare <- unique(c(wecare , grep("Time_Riding",      names(a), value = T)))
+    wecare <- unique(c(wecare , grep("Time_In_Zone",     names(a), value = T)))
+    wecare <- unique(c(wecare , grep("time_In_Zone",     names(a), value = T)))
     for (av in wecare) {
         cat("Drop sort term column from plot:", av, "\n")
         a[[av]] <- NULL

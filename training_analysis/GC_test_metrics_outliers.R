@@ -15,14 +15,14 @@
 #' - \setlength{\columnsep}{1cm}
 #'
 #' output:
+#'   html_document:
+#'     keep_md:          yes
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'   html_document:
-#'     keep_md:          yes
 #'   odt_document:  default
 #'   word_document: default
 #'
@@ -51,12 +51,9 @@ source("~/FUNCTIONS/R/data.R")
 
 
 ## NEw data input dont work
-# datascript  <- "~/CODE/training_analysis/GC_read_activities.R"
-# source(datascript)
-# metricsM <- readRDS("~/DATA/Other/Train_metrics.Rds")
+metricsM <- readRDS("~/DATA/Other/GC_json_ride_data_2.Rds")
 
 
-metricsM <- readRDS("~/LOGs/GCmetrics.Rds")
 metricsM <- data.table(metricsM)
 metricsM <- rm.cols.dups.DT(metricsM)
 
@@ -71,11 +68,13 @@ for (asp in unique(metricsM$Sport)) {
 
     if (nrow(metrics) <= 1) next()
 
-    wecare  <- names(Filter(is.numeric, metrics))
-    wecare  <- grep("Time_in_Zone",      wecare, value = T, invert = T )
-    wecare  <- grep("Time_in_Pace_Zone", wecare, value = T, invert = T )
-    wecare  <- grep("date|notes|time|sport|workout_code|bike|shoes|workout_title|device|Calendar_text|Elevation_Gain_Carrying|heartbeats|Max_Core_Temperature|Checksum|Right_Balance|Percent_in_Zone|Percent_in_Pace_Zone|Best_|Distance_Swim|Equipment_Weight|Average_Core_Temperature|Average_Temp|Max_Cadence|Max_Temp|min_Peak_Pace|_Peak_Pace|_Peak_Pace_HR|_Peak_Power|_Peak_Power_HR|min_Peak_Hr|_Peak_WPK|Min_temp|Average_Cadence|Average_Running_Cadence|Max_Running_Cadence|Percent_in_Pace_Zone|moderate_fatigue|heavy_fatigue|low_fatigue|severe_fatigue|[0-9]_HRV",
-                    wecare, ignore.case = T,value = T,invert = T)
+    wecare  <- names(metrics)[!sapply(metrics, is.character)]
+    wecare  <- grep("Date",      wecare, value = T, invert = T )
+    # wecare  <- grep("Time_in_Zone",      wecare, value = T, invert = T )
+    # wecare  <- grep("Time_in_Pace_Zone", wecare, value = T, invert = T )
+    # wecare  <- grep("date|notes|time|sport|workout_code|bike|shoes|workout_title|device|Calendar_text|Elevation_Gain_Carrying|heartbeats|Max_Core_Temperature|Checksum|Right_Balance|Percent_in_Zone|Percent_in_Pace_Zone|Best_|Distance_Swim|Equipment_Weight|Average_Core_Temperature|Average_Temp|Max_Cadence|Max_Temp|min_Peak_Pace|_Peak_Pace|_Peak_Pace_HR|_Peak_Power|_Peak_Power_HR|min_Peak_Hr|_Peak_WPK|Min_temp|Average_Cadence|Average_Running_Cadence|Max_Running_Cadence|Percent_in_Pace_Zone|moderate_fatigue|heavy_fatigue|low_fatigue|severe_fatigue|[0-9]_HRV",
+                    # wecare, ignore.case = T,value = T,invert = T)
+
     wecare <- sort(wecare)
 
 
@@ -83,8 +82,9 @@ for (asp in unique(metricsM$Sport)) {
         cat(paste("\n\\newpage\n"))
         cat(paste("\n\n## Sport class:",var,"\n\n"))
 
-        temp    <- data.table(metrics$date,  metrics[[var]])
+        temp    <- data.table(metrics$Date,  metrics[[var]])
         temp$V1 <- as.numeric(temp$V1)
+        temp    <- temp[!is.na(V2)]
 
         outlier_values <- boxplot.stats(temp$V2)$out  # outlier values.
 
@@ -98,28 +98,29 @@ for (asp in unique(metricsM$Sport)) {
         boxplot(V2 ~ cut(V1, pretty(temp$V1 )), data=temp, main=var, cex.axis=0.5)
         cat(paste("\n\n"))
 
-        temp$V1 <- as.Date(temp$V1,origin = "1970-01-01")
+        temp$V1 <- as.Date(temp$V1, origin = "1970-01-01")
+        # temp$V1 <- as.POSIXct(temp$V1)
 
         plot(temp$V1, temp$V2)
         title(var)
         cat(paste("\n\n"))
 
-        hist(temp$V2)
+        hist(temp$V2, main = var)
         cat(paste("\n\n"))
 
-        mod <- lm( as.numeric(V1) ~ V2, data=temp)
+        mod         <- lm( as.numeric(V1) ~ V2, data = temp)
         temp$cooksd <- cooks.distance(mod)
 
-        plot(temp$V1, temp$cooksd, pch="*", cex=2, main=var)  # plot cook's distance
-        abline(h = 4*mean(temp$cooksd, na.rm=T), col="red")  # add cutoff line
+        plot(temp$V1, temp$cooksd, pch = "*", cex = 2, main = var)  # plot cook's distance
+        abline(h = 4*mean(temp$cooksd, na.rm = T), col = "red")  # add cutoff line
         # text(x=1:length(cooksd)+1, y=cooksd, labels=ifelse(cooksd>4*mean(cooksd, na.rm=T),names(cooksd),""), col="red")  # add labels
         cat(paste("\n\n"))
 
-        pp <- temp[ cooksd > 4*mean(cooksd, na.rm=T), V2,V1 ]
-        setorder(pp,V2)
+        pp <- temp[ cooksd > 4 * mean(cooksd, na.rm=T), V2, V1 ]
+        setorder(pp, V2)
         names(pp) <- c("Date",var)
-
         cat(pander::pander( pp ))
+
         cat(paste("\n\n"))
     }
 }
