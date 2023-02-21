@@ -15,16 +15,16 @@
 #' - \setlength{\columnsep}{1cm}
 #'
 #' output:
-#'   html_document:
-#'     keep_md:          yes
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'   odt_document:  default
-#'   word_document: default
+#'   html_document:
+#'     keep_md:          yes
+#'     toc:              yes
+#'
 #'
 #' ---
 
