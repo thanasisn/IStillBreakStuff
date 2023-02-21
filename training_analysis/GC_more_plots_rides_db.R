@@ -417,25 +417,27 @@ for (days in pdays) {
 
 capture.output({
     metrics <- metrics[as.Date(Date) > Sys.Date() - 400, ]
-    weekly  <- metrics[, .(TRIMP_Points       = sum(Trimp_Points,       na.rm = TRUE),
-                           TRIMP_Zonal_Points = sum(Trimp_Zonal_Points, na.rm = TRUE),
-                           EPOC               = sum(EPOC,               na.rm = TRUE),
-                           Load_2             = sum(Load_2,             na.rm = TRUE),
-                           TrimpModWeighed    = sum(TrimpModWeighed,    na.rm = TRUE),
-                           Calories           = sum(Total_Kcalories,    na.rm = TRUE)),
+    weekly  <- metrics[, .(TRIMP_Points       = round(sum(Trimp_Points,       na.rm = TRUE)),
+                           TRIMP_Zonal_Points = round(sum(Trimp_Zonal_Points, na.rm = TRUE)),
+                           EPOC               = round(sum(EPOC,               na.rm = TRUE)),
+                           Load_2             = round(sum(Load_2,             na.rm = TRUE)),
+                           TrimpModWeighed    = round(sum(TrimpModWeighed,    na.rm = TRUE)),
+                           Total_Distance     = round(sum(Total_Distance,     na.rm = TRUE)),
+                           Calories           = round(sum(Total_Kcalories,    na.rm = TRUE))),
                        by = .(Year = year(Date), Week = isoweek(Date) )]
     weekly[ , Date := as.Date(paste(Year, Week, 1, sep="-"), "%Y-%U-%u") ]
     setorder(weekly, Date)
 
-    montly  <- metrics[, .(TRIMP_Points       = sum(Trimp_Points,       na.rm = TRUE),
-                           TRIMP_Zonal_Points = sum(Trimp_Zonal_Points, na.rm = TRUE),
-                           EPOC               = sum(EPOC,               na.rm = TRUE),
-                           Load_2             = sum(Load_2,             na.rm = TRUE),
-                           TrimpModWeighed    = sum(TrimpModWeighed,    na.rm = TRUE),
-                           Calories           = sum(Total_Kcalories,    na.rm = TRUE)),
+    monthly <- metrics[, .(TRIMP_Points       = round(sum(Trimp_Points,       na.rm = TRUE)),
+                           TRIMP_Zonal_Points = round(sum(Trimp_Zonal_Points, na.rm = TRUE)),
+                           EPOC               = round(sum(EPOC,               na.rm = TRUE)),
+                           Load_2             = round(sum(Load_2,             na.rm = TRUE)),
+                           TrimpModWeighed    = round(sum(TrimpModWeighed,    na.rm = TRUE)),
+                           Total_Distance     = round(sum(Total_Distance,     na.rm = TRUE)),
+                           Calories           = round(sum(Total_Kcalories,    na.rm = TRUE))),
                        by = .(Year = year(Date), month = month(Date))]
-    montly[ , Date := as.Date(paste(Year, month, 1, sep="-"), "%Y-%m-%d") ]
-    setorder(montly, Date)
+    monthly[ , Date := as.Date(paste(Year, month, 1, sep="-"), "%Y-%m-%d") ]
+    setorder(monthly, Date)
 
     cat("\n\n## WEEKLY SUMS\n\n")
     pander::panderOptions("table.split.table", 200)
@@ -445,8 +447,8 @@ capture.output({
     # cat(paste( names(weekly), collapse = "\t" ), "\n" )
 
     cat("\n\n## MONTHLY SUMS\n\n")
-    pander::pander(montly)
-    pander::pander(montly[1,])
+    pander::pander(monthly)
+    pander::pander(monthly[1,])
     # cat(paste(  names(montly), collapse = "\t" ), "\n" )
 
 }, file = "~/LOGs/training_status/Load_tables.md")
@@ -474,6 +476,8 @@ legend("topleft", bty = "n", lty = 1, lwd = 2, cex = .8,
 
 
 if (!interactive()) dev.off()
+
+
 
 capture.output({
     wecare <- names(metrics)
