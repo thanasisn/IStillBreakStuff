@@ -16,12 +16,13 @@ info "START :: $0 :: $* ::"
 
 
 folders=(
+    "$HOME/CS_id"
+    "$HOME/MANUSCRIPTS/2022_sdr_trends"
+    "$HOME/MISC/Redmi7_internal/documents"
+    "$HOME/PANDOC/Journal"
     "$HOME/PANDOC/Notes"
     "$HOME/PANDOC/Notes_Aerosols"
     "$HOME/PANDOC/Thesis"
-    "$HOME/PANDOC/Journal"
-    "$HOME/MISC/Redmi7_internal/documents"
-    "$HOME/MANUSCRIPTS/2022_sdr_trends"
 )
 
 for af in "${folders[@]}"; do
