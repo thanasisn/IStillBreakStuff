@@ -14,6 +14,11 @@ trap 'echo $( date +%F_%T ) ${SECONDS}s :: $0 interrupted ::  >&2;' INT TERM
 info "START :: $0 :: $* ::"
 
 
+if [[ "$(hostname)" = "tyler" ]]; then
+    echo "$(basename "$0") is suspended for now!!"
+    exit
+fi
+
 
 folders=(
     "$HOME/CS_id"
