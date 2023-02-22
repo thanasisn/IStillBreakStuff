@@ -1,6 +1,6 @@
 #!/bin/bash
 ## created on 2020-11-08
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 #### Gather S.M.A.R.T. info on all system drives
 

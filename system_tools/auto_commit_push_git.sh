@@ -1,6 +1,6 @@
 #!/bin/bash
 ## created on 2013-05-07
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 #### Auto commit and push all git repos
 

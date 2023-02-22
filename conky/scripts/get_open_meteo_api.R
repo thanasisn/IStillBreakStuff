@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# /* Copyright (C) 2023 Athanasios Natsis <natsisthanasis@gmail.com> */
+# /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 #### Get weather data from open-meteo.com
 

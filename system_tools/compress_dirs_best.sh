@@ -1,6 +1,6 @@
 #!/bin/bash
 ## created on 2022-09-21
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 
 #### Compress individual folders after testing for best compression method for each folder

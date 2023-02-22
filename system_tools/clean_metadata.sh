@@ -1,5 +1,5 @@
 #!/bin/bash
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 
 #### Remove metadata from any file using exiftool

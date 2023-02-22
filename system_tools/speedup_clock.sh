@@ -1,6 +1,6 @@
 #!/bin/bash
 ## created on 2016-01-10
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 
 #### Speed up the time of a linux machine by adding a fixed amount of time at every interval

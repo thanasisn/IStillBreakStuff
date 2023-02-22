@@ -1,4 +1,4 @@
-# /* Copyright (C) 2018 Athanasios Natsis <natsisthanasis@gmail.com> */
+# /* Copyright (C) 2018 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 
 ####    Relative Optical Mass or Air Mass Factor    ####

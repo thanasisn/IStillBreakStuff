@@ -1,6 +1,6 @@
 #!/bin/bash
 ## created on 2019-10-27
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 #### Count word frequency in a file
 ## Language agnostic

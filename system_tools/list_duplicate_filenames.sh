@@ -1,6 +1,6 @@
 #!/bin/bash
 ## created on 2020-11-09
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 
 #### Find duplicate filenames recursively in a folder structure

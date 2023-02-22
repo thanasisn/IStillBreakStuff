@@ -6,7 +6,7 @@ Created on 2018-10-27
 Copyright 2018 Athanasios Natsis
 
 @author:  Athanasios Natsis
-@contact: natsisthanasis@gmail.com
+@contact: natsisphysicist@gmail.com
 @license: GPLv3
 """
 

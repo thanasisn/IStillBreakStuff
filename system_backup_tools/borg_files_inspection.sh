@@ -1,5 +1,5 @@
 #!/bin/bash
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 #### Spit borg backup logs to list of ignored and archived files and display them
 ## Input file is *.files from "borg_backup.sh" or "borg_backup_test.sh" scripts

@@ -1,6 +1,6 @@
 #!/bin/bash
 ## created on 2019-01-11
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 
 #### List libraries used in R and Rmd scripts

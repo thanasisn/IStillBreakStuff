@@ -1,6 +1,6 @@
 #!/bin/bash
 ## created on 2022-12-19
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 
 #### Just create a new .md file with a given or current date 

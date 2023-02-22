@@ -1,6 +1,6 @@
 #!/bin/bash
 ## created on 2019-11-22
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 
 #### Display the keybinds of some programs by parsing their config files

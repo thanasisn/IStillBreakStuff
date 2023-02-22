@@ -1,6 +1,6 @@
 #!/bin/bash
 ## created on 2017-07-15
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 
 #### List files without extensions

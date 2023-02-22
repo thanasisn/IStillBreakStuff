@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-## https://github.com/thanasisn <lapauththanasis@gmail.com>
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 
 #### Split Google location history json to smaller manageable Rds files
