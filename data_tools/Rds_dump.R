@@ -4,9 +4,12 @@
 
 Sys.setenv(TZ = "UTC")
 
+
 args <- commandArgs(TRUE)
 
-USE_GDATA <- require(gdata, quietly = TRUE, warn.conflicts = FALSE)
+suppressPackageStartupMessages(
+    USE_GDATA <- require(gdata, quietly = TRUE, warn.conflicts = FALSE)
+)
 
 for (fl in args) {
     if (!file.exists(fl)) {
@@ -14,19 +17,24 @@ for (fl in args) {
     } else {
         ## read file
         tmp <- try(readRDS(fl))
-
+        cat("\r\n")
+        cat("## file:",fl,"\r\n")
+        cat("\r\n")
         if (USE_GDATA) {
-            library(gdata)
+            suppressPackageStartupMessages(library(gdata))
             ## use a nicer formatter
-            gdata::write.fwf(x = tmp,
-                             append   = FALSE,
-                             quote    = FALSE,
-                             sep      = " ; ",
-                             eol      = "\r\n",  ## for unfortunate people with windows
-                             na       = "NA",
-                             rownames = FALSE,
-                             colnames = TRUE,
-                             qmethod  = c("escape", "double")
+            write.fwf(x = tmp,
+                      append   = FALSE,
+                      quote    = FALSE,
+                      sep      = " ; ",
+                      eol      = "\r\n",  ## for unfortunate people with windows
+                      na       = "NA",
+                      rownames = FALSE,
+                      colnames = TRUE,
+                      qmethod  = c("escape", "double")
+            ## TODO maybe this don't needs gdata
+            ## Pipe it to   ... | column -t -s ";" -o " "
+            ## Pipe it to   ... | sed '/#.*/d' | column -t -s ";" -o " "
             )
         } else {
             ## output to terminal with native tool
