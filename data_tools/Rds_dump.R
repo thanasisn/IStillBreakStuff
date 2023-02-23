@@ -6,6 +6,8 @@ Sys.setenv(TZ = "UTC")
 
 args <- commandArgs(TRUE)
 
+USE_GDATA <- require(gdata, quietly = TRUE, warn.conflicts = FALSE)
+
 for (fl in args) {
     if (!file.exists(fl)) {
         warning(paste("NOT A FILE:",fl))
@@ -13,7 +15,8 @@ for (fl in args) {
         ## read file
         tmp <- try(readRDS(fl))
 
-        if (require(gdata,quietly = TRUE)) {
+        if (USE_GDATA) {
+            library(gdata)
             ## use a nicer formatter
             gdata::write.fwf(x = tmp,
                              append   = FALSE,
