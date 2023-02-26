@@ -23,6 +23,7 @@ daysback    <- 370*4
 
 
 library(data.table)
+library(lubridate)
 
 #### Load last data to plot ----------------------------------------------------
 source(datascript)
@@ -100,7 +101,7 @@ for (ii in 1:length(wecare)) {
     pp   <- data.table(time            = metrics$Date,
                        value           = metrics[[avar]],
                        VO2max_Detected = metrics$VO2max_Detected,
-                       Pch             = round(mean(metrics$Pch)))
+                       Pch             = round(median(metrics$Pch)))
     pp   <- pp[, .(value           = sum(value, na.rm = TRUE),
                    VO2max_Detected = mean(VO2max_Detected, na.rm = TRUE)),
                by = .(Date = as.Date(time))]
@@ -201,11 +202,16 @@ for (days in pdays) {
     axis(4)
 
     ####  each week metrics bar plot  ####
+    # weekly  <- pppppp[, .(EP.BAN_VAL = sum(EP.BAN_VAL, na.rm = TRUE),
+    #                       TZ.BAN_VAL = sum(TZ.BAN_VAL, na.rm = TRUE),
+    #                       TP.BAN_VAL = sum(TP.BAN_VAL, na.rm = TRUE)),
+    #                    by = .(Year = year(Date), Week = isoweek(Date) )]
+    # weekly[ , Date := as.Date(paste(Year, Week, 1, sep="-"), "%Y-%U-%u") ]
+
     weekly  <- pppppp[, .(EP.BAN_VAL = sum(EP.BAN_VAL, na.rm = TRUE),
                           TZ.BAN_VAL = sum(TZ.BAN_VAL, na.rm = TRUE),
                           TP.BAN_VAL = sum(TP.BAN_VAL, na.rm = TRUE)),
-                       by = .(Year = year(Date), Week = isoweek(Date) )]
-    weekly[ , Date := as.Date(paste(Year, Week, 1, sep="-"), "%Y-%U-%u") ]
+                       by = .(Date = floor_date(Date, unit = "week", week_start = 1) )]
 
     par("mar" = c(2,2,0.1,2), xpd = FALSE)
     ylim <- range(weekly[ , ..wwca ], na.rm = T)
