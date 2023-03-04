@@ -41,7 +41,7 @@ for af in "${folders[@]}"; do
     fi  
     cd "$af"
     ## run make with default
-    make -f *[Mm]akefile -C "$af"
+    nice -n 19 ionice -c2 -n7 make -f *[Mm]akefile -C "$af"
     echo "================================="
 done        
 
