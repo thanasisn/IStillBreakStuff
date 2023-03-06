@@ -20,9 +20,9 @@ if [[ "$(hostname)" = "tyler" ]]; then
 fi
 
 
+    #"$HOME/MANUSCRIPTS/2022_sdr_trends"
 folders=(
     "$HOME/CS_id"
-    "$HOME/MANUSCRIPTS/2022_sdr_trends"
     "$HOME/MISC/Redmi7_internal/documents"
     "$HOME/PANDOC/Journal"
     "$HOME/PANDOC/Notes"
