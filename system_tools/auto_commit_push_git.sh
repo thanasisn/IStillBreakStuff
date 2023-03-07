@@ -141,6 +141,7 @@ folders=(
     "$HOME/CM_21_GLB/"
     "$HOME/CS_id/"
     "$HOME/PANDOC/Thesis"
+    "$HOME/PANDOC/My_Publications"
     "$HOME/RAD_QC"
     "$HOME/SUN"
     "$HOME/TSI"
