@@ -3,6 +3,13 @@
 
 #### Just a cron job to run all Makefiles 
 
+# allow only one instance
+exec 9>"/dev/shm/$(basename $0).lock"
+if ! flock -n 9  ; then
+    echo "another instance is running";
+    exit 1
+fi
+
 
 info() { echo "$(date +%F_%T) ${SECONDS}s :: $* ::" >&1; }
 LOG_FILE="/dev/shm/$(basename "$0")_$(date +%F).log"
