@@ -19,6 +19,7 @@ library(myRtools)
 library(data.table)
 # library(segmented)
 library(jsonlite)
+library(fANCOVA,    quietly = TRUE, warn.conflicts = FALSE)
 source("~/CODE/FUNCTIONS/R/data.R")
 
 
@@ -29,6 +30,13 @@ storagefl <- "~/DATA/Other/GC_json_ride_data_2.Rds"
 pdfout1   <- "~/LOGs/training_status/GC_all_variables.pdf"
 pdfout2   <- "~/LOGs/training_status/GC_all_variables_last.pdf"
 LASTDAYS  <- 400
+
+DATA_PLOT_LIMIT <- 10
+
+## choose loess criterion for span
+LOESS_CRITERIO <-  c("aicc", "gcv")[1]
+
+
 DEBUG     <- FALSE
 # DEBUG     <- TRUE
 
@@ -390,14 +398,15 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     wecare <- unique(c(wecare , grep("^10m_" ,           names(a), value = T)))
     wecare <- unique(c(wecare , grep("1000m|1500m|2000m|3000m|4000m", names(a), value = T)))
     wecare <- unique(c(wecare , grep("Zone_P",           names(a), value = T)))
-    wecare <- unique(c(wecare , grep( "Peak_Wpk",          names(a), value = T)))
+    wecare <- unique(c(wecare , grep("Peak_Wpk",         names(a), value = T)))
+    wecare <- unique(c(wecare , grep("work_In_Zone",     names(a), value = T)))
 
-    for (av in wecare) {
+    for (av in sort(wecare)) {
         cat("Drop sort term column from plot:", av, "\n")
         a[[av]] <- NULL
     }
 
-    # sort(names(a)[!sapply(a, is.character)])
+    sort(names(a)[!sapply(a, is.character)])
 
 
     ####  PLOT ALL DATA  -------------------------------------------------------
@@ -463,9 +472,15 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     for (avar in wecare) {
         ## ignore no data
         if (all(as.numeric(a[[avar]]) %in% c(0, NA))) {
-            cat(paste("Skip plot", avar),"\n")
+            cat(paste("Skip plot 0 or NA:", avar),"\n")
             next()
         }
+
+        if (sum(!is.na(a[[avar]])) < DATA_PLOT_LIMIT) {
+            cat(paste("Skip plot few points:", avar),"\n")
+            next()
+        }
+
 
         par(mar = c(2,2,1,1))
 
@@ -502,6 +517,18 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
                 segments(x0 = Dstart, x1 = Dend, y0 = res[1], y1 = res[2], col = "grey")
             }
         }
+
+        ## LOESS curve
+        vec <- !is.na(a[[avar]])
+        if (sum(vec) > 20) {
+            FTSE.lo3 <- loess.as(a$Date[vec], a[[avar]][vec],
+                                 degree = 1,
+                                 criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
+            FTSE.lo.predict3 <- predict(FTSE.lo3, a$Date)
+            lines(a$Date, FTSE.lo.predict3, col = "cyan", lwd = 1)
+        }
+
+
 
         abline(v = as.numeric(unique(round(a$Date, "month"))),
                lty = 3, col = "lightgray")
@@ -567,9 +594,15 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     for (avar in wecare) {
         ## ignore no data
         if (all(as.numeric(a[[avar]]) %in% c(0, NA))) {
-            cat(paste("Skip plot", avar), "\n")
+            cat(paste("Skip plot 0 or NA:", avar),"\n")
             next()
         }
+
+        if (sum(!is.na(a[[avar]])) < DATA_PLOT_LIMIT) {
+            cat(paste("Skip plot few points:", avar),"\n")
+            next()
+        }
+
 
         par(mar = c(2, 2, 1, 1))
 
@@ -615,14 +648,14 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
                lty = 3, col = "lightgray")
 
         ## LOESS curve
-        ## a$Date, a[[avar]]
         vec <- !is.na(a[[avar]])
-        FTSE.lo3 <- loess.as(a$Date[vec], a[[avar]][vec],
-                             degree = 1,
-                             criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
-        FTSE.lo.predict3 <- predict(FTSE.lo3, a$Date)
-        lines(a$Date, FTSE.lo.predict3, col = "cyan", lwd = 2.5)
-
+        if (sum(vec) > 20) {
+            FTSE.lo3 <- loess.as(a$Date[vec], a[[avar]][vec],
+                                 degree = 1,
+                                 criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
+            FTSE.lo.predict3 <- predict(FTSE.lo3, a$Date)
+            lines(a$Date, FTSE.lo.predict3, col = "cyan", lwd = 1)
+        }
 
         title(avar)
     }
