@@ -32,6 +32,7 @@ LASTDAYS  <- 400
 DEBUG     <- FALSE
 # DEBUG     <- TRUE
 
+if (interactive()) DEBUG     <- TRUE
 
 if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     cat("\nHave to parse", gccache, "\n")
@@ -386,10 +387,17 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     wecare <- unique(c(wecare , grep("Time_Riding",      names(a), value = T)))
     wecare <- unique(c(wecare , grep("Time_In_Zone",     names(a), value = T)))
     wecare <- unique(c(wecare , grep("time_In_Zone",     names(a), value = T)))
+    wecare <- unique(c(wecare , grep("^10m_" ,           names(a), value = T)))
+    wecare <- unique(c(wecare , grep("1000m|1500m|2000m|3000m|4000m", names(a), value = T)))
+    wecare <- unique(c(wecare , grep("Zone_P",           names(a), value = T)))
+    wecare <- unique(c(wecare , grep( "Peak_Wpk",          names(a), value = T)))
+
     for (av in wecare) {
         cat("Drop sort term column from plot:", av, "\n")
         a[[av]] <- NULL
     }
+
+    # sort(names(a)[!sapply(a, is.character)])
 
 
     ####  PLOT ALL DATA  -------------------------------------------------------
@@ -605,6 +613,16 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
                lty = 3, col = "lightgray")
         abline(h = pretty(a[[avar]]),
                lty = 3, col = "lightgray")
+
+        ## LOESS curve
+        ## a$Date, a[[avar]]
+        vec <- !is.na(a[[avar]])
+        FTSE.lo3 <- loess.as(a$Date[vec], a[[avar]][vec],
+                             degree = 1,
+                             criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
+        FTSE.lo.predict3 <- predict(FTSE.lo3, a$Date)
+        lines(a$Date, FTSE.lo.predict3, col = "cyan", lwd = 2.5)
+
 
         title(avar)
     }
