@@ -67,7 +67,7 @@ rm.cols.dups.DT <- function( DT ) {
 #' @return   A new data.table without NA filled columns
 #' @export
 #'
-rm.cols.NA.DT <- function( DT ) {
+rm.cols.NA.DT <- function(DT) {
     if (nrow(DT) > 1) {
         dtnames <- names(DT)
         suppressWarnings({
@@ -80,6 +80,33 @@ rm.cols.NA.DT <- function( DT ) {
         return(DT)
     }
 }
+
+
+
+#' Remove columns filled only with NA from data.frame
+#'
+#' @param DF A data.table
+#'
+#' @return   A new data.frame without NA filled columns
+#' @export
+#'
+rm.cols.NA.df <- function(DF) {
+    if (nrow(DF) > 1) {
+        dtnames <- names(DF)
+        suppressWarnings({
+            vec <- vapply(DF, function(x) ! all(is.na(x)), logical(1L) )
+            cat(paste("Removed columns:", length(dtnames[!vec]),"\n"))
+            print( dtnames[!vec] )
+            return( DF[ , vec ] )
+        })
+    } else {
+        return(DF)
+    }
+}
+
+
+
+
 
 
 
