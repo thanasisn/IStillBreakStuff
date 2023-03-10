@@ -215,6 +215,7 @@ folders=(
     "$HOME/Improved_Aerosols_O3/"
     "$HOME/MISC/Redmi7_internal/documents"
     "$HOME/PANDOC/Journal/"
+    "$HOME/PANDOC/Journal_Work"
     "$HOME/PANDOC/Notes/"
     "$HOME/PANDOC/Notes_Aerosols/"
     "$HOME/PROJECTS/"

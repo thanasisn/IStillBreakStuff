@@ -43,38 +43,36 @@ for i in "${folders[@]}"; do
         ## in the git folder here
         pwd
         ## add files we care about
-        find . -type f \(    -iname '*.R'   \
-                          -o -iname '*.Rmd' \
-                          -o -iname '*.qmd' \
-                          -o -iname '*.bas' \
-                          -o -iname '*.bib' \
-                          -o -iname '*.c'   \
-                          -o -iname '*.conf'\
-                          -o -iname '*.cpp' \
-                          -o -iname '*.cs'  \
-                          -o -iname '*.css' \
-                          -o -iname '*.dia' \
-                          -o -iname '*.dot' \
-                          -o -iname '*.ex'  \
-                          -o -iname '*.f90' \
-                          -o -iname '*.frm' \
-                          -o -iname '*.gnu' \
-                          -o -iname '*.gp'  \
-                          -o -iname '*.h'   \
-                          -o -iname '*.jl'  \
-                          -o -iname '*.list'\
+        find . -type f \(    -iname '*.R'        \
+                          -o -iname '*.bas'      \
+                          -o -iname '*.bib'      \
+                          -o -iname '*.c'        \
+                          -o -iname '*.conf'     \
+                          -o -iname '*.cpp'      \
+                          -o -iname '*.cs'       \
+                          -o -iname '*.css'      \
+                          -o -iname '*.dia'      \
+                          -o -iname '*.dot'      \
+                          -o -iname '*.ex'       \
+                          -o -iname '*.f90'      \
+                          -o -iname '*.frm'      \
+                          -o -iname '*.gnu'      \
+                          -o -iname '*.gp'       \
+                          -o -iname '*.h'        \
+                          -o -iname '*.jl'       \
+                          -o -iname '*.list'     \
                           -o -iname '*.makefile' \
-                          -o -iname '*.md'  \
-                          -o -iname '*.par' \
-                          -o -iname '*.pbs' \
-                          -o -iname '*.py'  \
-                          -o -iname '*.qgs' \
+                          -o -iname '*.md'       \
+                          -o -iname '*.par'      \
+                          -o -iname '*.pbs'      \
+                          -o -iname '*.py'       \
+                          -o -iname '*.qgs'      \
                           -o -iname '*.qmd'      \
                           -o -iname '*.r'        \
                           -o -iname '*.rmd'      \
-                          -o -iname '*.sh'  \
-                          -o -iname '*.tex' \
-                          -o -iname '*.txt' \) -print0 |\
+                          -o -iname '*.sh'       \
+                          -o -iname '*.tex'      \
+                          -o -iname '*.txt'      \) -print0 |\
                       xargs -t -0 git add -f
         ## commit and push
         git commit -uno -a -m "Commit $(date +'%F %R')"
