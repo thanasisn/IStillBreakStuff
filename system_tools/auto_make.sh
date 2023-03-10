@@ -29,9 +29,13 @@ fi
 
     #"$HOME/CS_id"
     #"$HOME/MANUSCRIPTS/2022_sdr_trends"
+
+## list folders containing a makefile
 folders=(
+    "$HOME/CM_21_GLB/JOURNAL"
     "$HOME/MISC/Redmi7_internal/documents"
     "$HOME/PANDOC/Journal"
+    "$HOME/PANDOC/Journal_Work"
     "$HOME/PANDOC/Notes"
     "$HOME/PANDOC/Notes_Aerosols"
     "$HOME/PANDOC/Thesis"
