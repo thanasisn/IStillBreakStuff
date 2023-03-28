@@ -32,7 +32,7 @@ fi
 
 ## list folders containing a makefile
 folders=(
-    "$HOME/CM_21_GLB/JOURNAL"
+    "$HOME/BBand_LAP/JOURNAL"
     "$HOME/MISC/Redmi7_internal/documents"
     "$HOME/PANDOC/Journal"
     "$HOME/PANDOC/Journal_Work"
