@@ -26,7 +26,7 @@ for (fl in args) {
             write.fwf(x = tmp,
                       append   = FALSE,
                       quote    = FALSE,
-                      sep      = " ; ",
+                      sep      = " ",     ## we want a tight view of the data
                       eol      = "\r\n",  ## for unfortunate people with windows
                       na       = "NA",
                       rownames = FALSE,
@@ -41,7 +41,7 @@ for (fl in args) {
             write.table(x            = format(tmp),
                         append       = FALSE,
                         quote        = FALSE,
-                        sep          = " ; ",
+                        sep          = " ",     ## we want a tight view of the data
                         eol          = "\r\n",  ## for unfortunate people with windows
                         na           = "NA",
                         dec          = ".",

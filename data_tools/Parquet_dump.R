@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-####  Dump *.Rds files to a csv like format
+####  Dump *.parquet files to a table in terminal
 
 Sys.setenv(TZ = "UTC")
 library(arrow, warn.conflicts = FALSE, quietly = TRUE)
@@ -26,7 +26,7 @@ for (fl in args) {
             write.fwf(x = tmp,
                       append   = FALSE,
                       quote    = FALSE,
-                      sep      = " ; ",
+                      sep      = " ",     ## we want a tight view of the data
                       eol      = "\r\n",  ## for unfortunate people with windows
                       na       = "NA",
                       rownames = FALSE,
@@ -41,7 +41,7 @@ for (fl in args) {
             write.table(x            = format(tmp),
                         append       = FALSE,
                         quote        = FALSE,
-                        sep          = " ; ",
+                        sep          = " ",     ## we want a tight view of the data
                         eol          = "\r\n",  ## for unfortunate people with windows
                         na           = "NA",
                         dec          = ".",
