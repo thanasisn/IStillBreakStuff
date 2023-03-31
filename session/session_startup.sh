@@ -97,6 +97,9 @@ numlockx on
 # nohup $daemonize "stalonetray --sticky -bg black --window-strut right --icon-size 19 --grow-gravity W --skip-taskbar --geometry  4x1-650-6 --icon-gravity W --kludges fix_window_pos" &
 
 
+## a new toy
+"$HOME/BASH/notification_log.sh" "$HOME/LOGs/SYSTEM_LOGS/Notification_$(hostname).log"
+
 
 
 ## start conky
