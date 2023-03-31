@@ -43,7 +43,8 @@ myunlock <- function(file) {
             file.remove(file)
         }
     } else {
-        cat("\nNo lock file ", file, "\n")
+        cat("\nNo lock file to remove!", file, "\n")
+        stop("This is not good")
     }
 }
 
