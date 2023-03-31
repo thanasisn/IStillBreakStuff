@@ -48,3 +48,31 @@ myunlock <- function(file) {
     }
 }
 
+
+
+mylock_wait <-  function(file) {
+        if (!exists("Script.Name")) {
+            Script.Name <- "UNKNOWN SCRIPT"
+        }
+        if (file.exists(file)) {
+            cat("\nLock file exist ", file, "\n")
+            cat(readLines(DB_lock), "\n")
+
+            sleeptime <- 10
+            while (file.exists(file)) {
+                cat("Sleep for", sleeptime,"sec\n")
+                Sys.sleep(sleeptime)
+                sleeptime <- sleeptime + 0.5
+            }
+        } else {
+            cat("\nIssue Lock file ", file, "\n")
+            cat(format(Sys.time()), " by: ", Script.Name, "\n",
+                file = file)
+        }
+    }
+
+
+
+
+
+
