@@ -44,12 +44,24 @@ myunlock <- function(file) {
         }
     } else {
         cat("\nNo lock file to remove!", file, "\n")
-        stop("This is not good")
+        stop("No lock to remove! This is not good!")
     }
 }
 
 
 
+#'
+#' Create an R script lock file and wait until acquire a lock
+#'
+#' @param file A file name *.stopfile to use as a lock flag
+#'
+#' @details Create a file to use as an execution lock.
+#'          Have to have an '.stopfile' extension for security.
+#'          This is similar to 'mylock', with a wait loop until previous
+#'          file is removed.
+#'
+#' @export
+#'
 mylock_wait <-  function(file) {
         if (!exists("Script.Name")) {
             Script.Name <- "UNKNOWN SCRIPT"
@@ -58,11 +70,11 @@ mylock_wait <-  function(file) {
             cat("\nLock file exist ", file, "\n")
             cat(readLines(DB_lock), "\n")
 
-            sleeptime <- 10
+            sleeptime <- 1
             while (file.exists(file)) {
                 cat("Sleep for", sleeptime,"sec\n")
                 Sys.sleep(sleeptime)
-                sleeptime <- sleeptime + 0.5
+                sleeptime <- sleeptime + 1
             }
         } else {
             cat("\nIssue Lock file ", file, "\n")
@@ -70,8 +82,6 @@ mylock_wait <-  function(file) {
                 file = file)
         }
     }
-
-
 
 
 
