@@ -127,6 +127,9 @@ xrandr --listactivemonitors | sed 's/^.* //' | sed 1d | while read screen; do
     fi     
 done
 
-
+## i3 auto layout
+if [[ $WM_NAME = "i3" ]]; then 
+    setsid $HOME/.config/i3/i3-automatic-layout.py &
+fi
 
 exit 0
