@@ -44,7 +44,7 @@ myunlock <- function(file) {
         }
     } else {
         cat("\nNo lock file to remove!", file, "\n")
-        stop("No lock to remove! This is not good!")
+        stop("No lock to remove! This is not good!\nDid you forget to issue 'mylock'?")
     }
 }
 
