@@ -19,7 +19,6 @@ kill_run () {
 }
 
 
-
 # kill "$(ps -ef | grep "languagetool.jar" | grep -v grep | awk '{print $2}')"
 # nohup java -jar ~/PROGRAMS/LanguageTool-4.1/languagetool.jar  --tray &
 
@@ -82,7 +81,6 @@ fi
 numlockx on
 
 
-
 # killall -s 9 evolution
 # nohup $HOME/BASH/deamonize.sh "evolution -c calendar --name Evolution_i3" &
 
@@ -101,12 +99,13 @@ numlockx on
 "$HOME/BASH/notification_log.sh" "$HOME/LOGs/SYSTEM_LOGS/Notification_$(hostname).log"
 
 
-
 ## start conky
 # export DISPLAY=0 && $HOME/BASH/STARTUP/conky_chooser.sh
+$HOME/CODE/conky/conky_choose_bigger.sh &
 export DISPLAY=$display ; $HOME/CODE/conky/conky_choose_bigger.sh &
 
 ## update backgrounds on all screens
+$HOME/CODE/conky/scripts/update_background.sh &
 export DISPLAY=$display ; $HOME/CODE/conky/scripts/update_background.sh &
 
 ## start all conky cron scripts and truncate status logs
