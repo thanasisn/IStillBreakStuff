@@ -15,7 +15,7 @@ mylock <- function(file) {
     }
     if (file.exists(file)) {
         cat("\nLock file exist ", file, "\n")
-        cat(readLines(DB_lock), "\n")
+        cat(readLines(file), "\n")
         stop("\nLock file: ", file)
     } else {
         cat("\nIssue Lock file ", file, "\n")
@@ -68,7 +68,7 @@ mylock_wait <-  function(file) {
         }
         if (file.exists(file)) {
             cat("\nLock file exist ", file, "\n")
-            cat(readLines(DB_lock), "\n")
+            cat(readLines(file), "\n")
 
             sleeptime <- 1
             while (file.exists(file)) {
