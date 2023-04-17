@@ -138,7 +138,6 @@ git push -f -u origin main
 ## use full paths
 folders=(
     "$HOME/BBand_LAP"
-    "$HOME/CHP_1_DIR/"
     "$HOME/CM_21_GLB/"
     "$HOME/CS_id/"
     "$HOME/PANDOC/Thesis"
