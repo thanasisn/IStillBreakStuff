@@ -100,16 +100,15 @@ numlockx on
 
 
 ## start conky
-# export DISPLAY=0 && $HOME/BASH/STARTUP/conky_chooser.sh
-$HOME/CODE/conky/conky_choose_bigger.sh &
-export DISPLAY=$display ; $HOME/CODE/conky/conky_choose_bigger.sh &
-
 ## update backgrounds on all screens
-$HOME/CODE/conky/scripts/update_background.sh &
-export DISPLAY=$display ; $HOME/CODE/conky/scripts/update_background.sh &
+export DISPLAY=$display; "$HOME/CODE/conky/scripts/update_background.sh" &
+
+# export DISPLAY=0 && $HOME/BASH/STARTUP/conky_chooser.sh
+export DISPLAY=$display; "$HOME/CODE/conky/conky_choose_bigger.sh" &
+
 
 ## start all conky cron scripts and truncate status logs
-$HOME/CODE/conky/crons/run_all_crons.sh &
+"$HOME/CODE/conky/crons/run_all_crons.sh" &
 
 ## test polybar
 killall polybar

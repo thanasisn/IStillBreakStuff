@@ -28,6 +28,7 @@ EXECUTE="echo; date +'%F %T %Z'; echo; ${@:2}; echo"
 tmux has-session -t "$SESSION" 2>/dev/null
 if [ "$?" -eq 1 ] ; then
      echo "Creating session:: $SESSION"
+     EXECUTE="$SHELL; $EXECUTE"
      tmux new-session -d -s "$SESSION"
 else
      echo "Existing session:: $SESSION"
