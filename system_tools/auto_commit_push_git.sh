@@ -186,7 +186,8 @@ for i in "${folders[@]}"; do
                       -o -iname '*.rmd'      \
                       -o -iname '*.sh'       \
                       -o -iname '*.tex'      \
-                      -o -iname '*.txt'      \) -print0 |\
+                      -o -iname '*.txt'      \
+                      -o -iname 'makefile'   \) -print0 |\
                   xargs -t -0 git add -f
     ## commit and push
     git commit -uno -a -m "Commit $(date +'%F %R')"
@@ -198,21 +199,19 @@ done
 
 
 
-
-
-
-
-
-
-##  COMMIT PUSH to local repos  ################################################
-
+## COMMIT PUSH to local repos ########################################
 
 ## use full paths
 folders=(
     "$HOME/Aerosols/"
     "$HOME/BASH/"
+    "$HOME/Documents/Docu/to"
+    "$HOME/Documents/po"
     "$HOME/Ecotime_machine/Scripts/"
+    "$HOME/Formal/CV"
     "$HOME/Improved_Aerosols_O3/"
+    "$HOME/LibRadTranG"
+    "$HOME/LifeAsti"
     "$HOME/MISC/Redmi7_internal/documents"
     "$HOME/PANDOC/Journal/"
     "$HOME/PANDOC/Journal_Work"
@@ -239,6 +238,8 @@ for i in "${folders[@]}"; do
     rm -f "${i}/.git/index.lock"
     ## add files we care about
     find . -type f \(    -iname '*.bas'      \
+                      -o -iname '*.Rmd'      \
+                      -o -iname '*.bas'      \
                       -o -iname '*.bib'      \
                       -o -iname '*.c'        \
                       -o -iname '*.conf'     \
@@ -266,151 +267,15 @@ for i in "${folders[@]}"; do
                       -o -iname '*.rmd'      \
                       -o -iname '*.sh'       \
                       -o -iname '*.tex'      \
-                      -o -iname '*.txt'      \) -print0 |\
+                      -o -iname '*.txt'      \
+                      -o -iname 'makefile'   \) -print0 |\
                   xargs -t -0 git add 
     ## commit to local repo
     git commit -uno -a -m "Commit $(date +'%F %R')"
 done
 
 
-
-
-
-#TODO
-
-
-
-#-----------------------------------------------------------------------------#
-
-folder="$HOME/LibRadTranG"
-
-echo ""
-echo " vvvv START vvvv ${folder}"
-echo ""
-
-cd ${folder}
-rm -f "${folder}/.git/index.lock"
-
-find . -type f \(    -iname '*.sh'  \
-                  -o -iname '*.md'  \
-                  -o -iname '*.gnu' \
-                  -o -iname '*.dot' \
-                  -o -iname '*.qmd' \
-                  -o -iname '*.jl'  \
-                  -o -iname '*.frm' \
-                  -o -iname '*.pbs' \
-                  -o -iname '*.r'   \) -print0  |\
-                  xargs -0 git add
-
-git commit -uno -a -m "Commit $(date +'%F %R')"
-
-echo ""
-echo " ^^^^ FINISH ^^^^ ${folder}"
-
-#-----------------------------------------------------------------------------#
-
-
-
-folder="$HOME/Formal/CV"
-
-echo ""
-echo " vvvv START vvvv ${folder}"
-echo ""
-
-cd ${folder}
-rm -f "${folder}/.git/index.lock"
-
-find . -type f \(    -iname '*.tex'   \
-                  -o -iname '*.css'   \
-                  -o -iname '*.md'    \) -print0 |\
-                  xargs -0 git add
-
-git commit -uno -a -m "Commit $(date +'%F %R')"
-
-echo ""
-echo " ^^^^ FINISH ^^^^ ${folder}"
-
-
-#-----------------------------------------------------------------------------#
-
-folder="$HOME/LifeAsti"
-
-echo ""
-echo " vvvv START vvvv ${folder}"
-echo ""
-
-cd ${folder}
-rm -f "${folder}/.git/index.lock"
-
-find . -type f \(    -iname '*.sh'  \
-                  -o -iname '*.Rmd' \
-                  -o -iname '*.bas' \
-                  -o -iname '*.bib' \
-                  -o -iname '*.c'   \
-                  -o -iname '*.dot' \
-                  -o -iname '*.ex'  \
-                  -o -iname '*.f90' \
-                  -o -iname '*.qmd' \
-                  -o -iname '*.frm' \
-                  -o -iname '*.gnu' \
-                  -o -iname '*.jl'  \
-                  -o -iname '*.gp'  \
-                  -o -iname '*.h'   \
-                  -o -iname '*.md'  \
-                  -o -iname '*.par' \
-                  -o -iname '*.py'  \
-                  -o -iname '*.tex' \
-                  -o -iname '*.r'   \) -print0  |\
-                  xargs -0 git add
-
-git commit -uno -a -m "Commit $(date +'%F %R')"
-
-#-----------------------------------------------------------------------------#
-
-folder="$HOME/Documents/Docu/to"
-
-echo ""
-echo " vvvv START vvvv ${folder}"
-echo ""
-
-cd ${folder}
-rm -f "${folder}/.git/index.lock"
-
-find . -type f \(    -iname '*.sh'  \
-                  -o -iname '*.md'  \
-                  -o -iname '*.txt' \) -print0  |\
-                  xargs -0 git add
-
-git commit -uno -a -m "Commit $(date +'%F %R')"
-
-echo ""
-echo " ^^^^ FINISH ^^^^ ${folder}"
-
-#-----------------------------------------------------------------------------#
-
-folder="$HOME/Documents/po"
-
-echo ""
-echo " vvvv START vvvv ${folder}"
-echo ""
-
-cd ${folder}
-rm -f "${folder}/.git/index.lock"
-
-find . -type f \(    -iname '*.sh'  \
-                  -o -iname '*.md'  \
-                  -o -iname '*.txt' \) -print0  |\
-                  xargs -0 git add
-
-sleep $((RANDOM%60+1))
-git commit -uno -a -m "Commit $(date +'%F %R')"
-
-echo ""
-echo " ^^^^ FINISH ^^^^ ${folder}"
-
 echo "LOGFILE: $LOG_FILE"
 echo "ERRFILE: $ERR_FILE"
-
-
 
 exit 0
