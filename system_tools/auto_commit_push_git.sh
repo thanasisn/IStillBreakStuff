@@ -274,7 +274,7 @@ for i in "${folders[@]}"; do
     git commit -uno -a -m "Commit $(date +'%F %R')"
 done
 
-
+echo
 echo "LOGFILE: $LOG_FILE"
 echo "ERRFILE: $ERR_FILE"
 
