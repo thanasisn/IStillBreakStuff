@@ -92,8 +92,8 @@ if [ "$btrfserrors" -gt 0 ]; then
     echo "- - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo "$message" "$body"
     echo "- - - - - - - - - - - - - - - - - - - - - - - - - -"
-    notify-send  -t -1 -u critical "$message" "$body"
-    $NOTIFY_SEND -t -1 -u critical "$message" "$body"
+    sudo -u "$auser" notify-send  -t -1 -u critical "${message} !" "$body"
+    $NOTIFY_SEND -t -1 -u critical "${message} !!" "$body"
 else
     echo "BTRFS status ok!! $btrfserrors"
 fi
@@ -116,7 +116,7 @@ cat "$logfile" | grep "State[ ]\+:[ ]\+" | while read line; do
         echo "- - - - - - - - - - - - - - - - - - - - - - - - - -"
         echo "$message" "$body"
         echo "- - - - - - - - - - - - - - - - - - - - - - - - - -"
-        notify-send  -t -1 -u critical "$message" "$body"
+        sudo -u "$auser" notify-send -t -1 -u critical "$message" "$body"
         $NOTIFY_SEND -t -1 -u critical "$message" "$body"
     fi
 done
