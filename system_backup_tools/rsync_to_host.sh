@@ -9,6 +9,8 @@ list=(
 '/home/athan/BASH'
 '/home/athan/PROGRAMS'
 '/home/athan/CODE'
+'/home/athan/LOGs'
+'/home/athan/.unison'
 )
 
 
