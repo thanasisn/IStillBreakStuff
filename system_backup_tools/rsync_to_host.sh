@@ -38,7 +38,6 @@ echo
 read -p "continue  yes/n? " -n3
 echo ""
 if [[ $REPLY =~ ^[Yy][Ee][Ss]$ ]]; then
-
     #      --dry-run     \
 
     rsync $OPTIONS      \
