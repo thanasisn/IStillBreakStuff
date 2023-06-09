@@ -26,8 +26,8 @@ grep "file[ ]\+=[ ]\+{" "$infile" | cut -d":" -f2- | sed 's/:.*//' | while read 
     source="$(find "$indire" -name "$line")"
 
     echo "* * * * * *"
-    echo "$source"
-    echo "$line"
+    echo "Source: $source"
+    echo "Link:   $line"
     ## link actual file to current folder
     ln -i -s "$source" "./${line}"  
 done
