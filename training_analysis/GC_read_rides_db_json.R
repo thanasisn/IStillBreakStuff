@@ -52,19 +52,25 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
 
     #### Basic info for activities ####
     wecare <- grep("METRICS|TAGS|INTERVALS|XDATA", names(data), invert = TRUE, value = TRUE)
+
+    ## __ Activities meta data -------------
     a <- data.table(data[, wecare])
     a <- rm.cols.dups.DT(a)
-    a[, date := as.POSIXct(date) ]
+    a[, date := as.POSIXct(date)]
     a$fingerprint <- NULL
     a$metacrc     <- NULL
     a$color       <- NULL
     a[, parsed_on := as.POSIXct(as.numeric(timestamp), origin = "1970-01-01")]
     a$timestamp   <- NULL
 
+
+
     ## breakup data sets
     b <- data$METRIC
     c <- data.table(data$TAGS)
     rm(data)
+
+    stop()
 
     #### METRICS for activities ####
     for (av in names(b)) {
@@ -73,6 +79,17 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
 
             ## protect from null list
             b[[av]][which(sapply(b[[av]], is.null))] <- list(c(NA))
+
+            data.table(b[[av]])
+
+            data.frame(b[[av]])
+            b[[av]]
+
+            list2DF(b)
+            # https://stackoverflow.com/questions/61768192/how-to-convert-a-list-into-a-dataframe-and-filling-empty-values-with-na-in-r
+
+            ## get max lenght of vectors
+            ## fill vector while reading
 
             tmp <- data.table(t(list2DF(b[[av]])))
 
