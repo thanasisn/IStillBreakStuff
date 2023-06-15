@@ -37,7 +37,7 @@ LOESS_CRITERIO <-  c("aicc", "gcv")[1]
 
 
 DEBUG     <- FALSE
-DEBUG     <- TRUE
+# DEBUG     <- TRUE
 
 if (DEBUG) {
     warning("Debug is active!!")
@@ -88,8 +88,12 @@ if (DEBUG ||
 
             # tmp <- data.table(t(list2DF(b[[av]])))
             tmp <- data.table(plyr::ldply(b[[av]], rbind))
+            tnames <- grep("^[0-9]$", names(tmp), value = T)
 
-            stop()
+            for (anaa in tnames) {
+                names(tmp)[names(tmp) == anaa] <- paste0("V", anaa)
+            }
+
             for (at in names(tmp)) {
                 uni1 <- unique(tmp[[at]])
                 uni  <- uni1[!is.na(uni1)]
