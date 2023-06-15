@@ -343,11 +343,7 @@ if (DEBUG ||
     ## another load calculation
     a[, Load_2 := 0.418 * (( (Workout_Time / 3600) * Average_Hr_V1 ) + (2.5 * Average_Hr_V1)) ]
 
-    a$Average_Hr_1
-    a$Average_Hr_2
-    names(a)
-    a$Load_2
-stop()
+
     ## __ Check sport consistency ----------------------------------------------
 
     a[grepl("bike", Workout_Code) & Sport == "Bike" ]
