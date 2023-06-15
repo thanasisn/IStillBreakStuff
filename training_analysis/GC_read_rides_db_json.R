@@ -15,10 +15,9 @@ tic <- Sys.time()
 Script.Name <- funr::sys.script()
 
 
-library(myRtools)
-library(data.table)
-# library(segmented)
-library(jsonlite)
+library(myRtools,   quietly = TRUE, warn.conflicts = FALSE)
+library(data.table, quietly = TRUE, warn.conflicts = FALSE)
+library(jsonlite,   quietly = TRUE, warn.conflicts = FALSE)
 library(fANCOVA,    quietly = TRUE, warn.conflicts = FALSE)
 source("~/CODE/FUNCTIONS/R/data.R")
 
@@ -64,13 +63,11 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     a$timestamp   <- NULL
 
 
-
     ## breakup data sets
     b <- data$METRIC
     c <- data.table(data$TAGS)
     rm(data)
 
-    stop()
 
     #### METRICS for activities ####
     for (av in names(b)) {
@@ -80,22 +77,12 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
             ## protect from null list
             b[[av]][which(sapply(b[[av]], is.null))] <- list(c(NA))
 
-            data.table(b[[av]])
-
-            data.frame(b[[av]])
-            b[[av]]
-
-            rbindlist(b[[av]])
-
-            list2DF(b)
-
-            plyr::ldply(b[[av]])
+            data.table(plyr::ldply(b[[av]], rbind))
             # https://stackoverflow.com/questions/61768192/how-to-convert-a-list-into-a-dataframe-and-filling-empty-values-with-na-in-r
+            # https://stackoverflow.com/questions/15201305/how-to-convert-a-list-consisting-of-vector-of-different-lengths-to-a-usable-data
 
-            ## get max lenght of vectors
-            ## fill vector while reading
-
-            tmp <- data.table(t(list2DF(b[[av]])))
+            # tmp <- data.table(t(list2DF(b[[av]])))
+            tmp <- data.table(plyr::ldply(b[[av]], rbind))
 
             for (at in names(tmp)) {
                 uni1 <- unique(tmp[[at]])
@@ -277,11 +264,11 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
 
     ## We assume the manual override values are always more correct
     ## I am not sure about GC logic of this field, may be is not in use in 3.6
-    a[!is.na(Average_Heart_Rate) & grepl("average_hr", Overrides), Average_Hr_V1   := Average_Heart_Rate ]
+    a[!is.na(Average_Heart_Rate) & grepl("average_hr", Overrides), Average_Hr_V1   := Average_Heart_Rate]
     a[, Average_Heart_Rate := NULL]
-    a[!is.na(Calories)      & grepl("total_kcalories", Overrides), Total_Kcalories := Calories           ]
+    a[!is.na(Calories)      & grepl("total_kcalories", Overrides), Total_Kcalories := Calories          ]
     a[, Calories           := NULL]
-    a[!is.na(Distance)      & grepl("total_distance",  Overrides), Total_Distance  := Distance           ]
+    a[!is.na(Distance)      & grepl("total_distance",  Overrides), Total_Distance  := Distance          ]
     a[, Distance           := NULL]
 
     a[, Weekday            := NULL]
@@ -315,7 +302,7 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
         uni  <- uni1[!uni1 %in% c(NA, 0)]
         ## only containing the same value except NA and 0
         if (length(uni) <= 1) {
-            cat("Remove column with no variation:",at,"\n")
+            cat("Remove column with no variation:", at, "\n")
             a[[at]] <- NULL
         }
     }
@@ -408,19 +395,19 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
 
     #### Don't plot some metrics  ----------------------------------------------
     wecare <- grep("^[0-9]+s_",                          names(a), value = T)
-    wecare <- unique(c(wecare , grep( "^[0-9]m_" ,       names(a), value = T)))
-    wecare <- unique(c(wecare , grep("Best_[0-9]{2,3}m", names(a), value = T)))
-    wecare <- unique(c(wecare , grep("Compatibility" ,   names(a), value = T)))
-    wecare <- unique(c(wecare , grep("_V2$|_V3$",        names(a), value = T)))
-    wecare <- unique(c(wecare , grep("_Temp",            names(a), value = T)))
-    wecare <- unique(c(wecare , grep("Time_Riding",      names(a), value = T)))
-    wecare <- unique(c(wecare , grep("Time_In_Zone",     names(a), value = T)))
-    wecare <- unique(c(wecare , grep("time_In_Zone",     names(a), value = T)))
-    wecare <- unique(c(wecare , grep("^10m_" ,           names(a), value = T)))
-    wecare <- unique(c(wecare , grep("1000m|1500m|2000m|3000m|4000m", names(a), value = T)))
-    wecare <- unique(c(wecare , grep("Zone_P",           names(a), value = T)))
-    wecare <- unique(c(wecare , grep("Peak_Wpk",         names(a), value = T)))
-    wecare <- unique(c(wecare , grep("work_In_Zone",     names(a), value = T)))
+    wecare <- unique(c(wecare, grep("^[0-9]m_" ,        names(a), value = T)))
+    wecare <- unique(c(wecare, grep("Best_[0-9]{2,3}m", names(a), value = T)))
+    wecare <- unique(c(wecare, grep("Compatibility" ,   names(a), value = T)))
+    wecare <- unique(c(wecare, grep("_V2$|_V3$",        names(a), value = T)))
+    wecare <- unique(c(wecare, grep("_Temp",            names(a), value = T)))
+    wecare <- unique(c(wecare, grep("Time_Riding",      names(a), value = T)))
+    wecare <- unique(c(wecare, grep("Time_In_Zone",     names(a), value = T)))
+    wecare <- unique(c(wecare, grep("time_In_Zone",     names(a), value = T)))
+    wecare <- unique(c(wecare, grep("^10m_" ,           names(a), value = T)))
+    wecare <- unique(c(wecare, grep("1000m|1500m|2000m|3000m|4000m", names(a), value = T)))
+    wecare <- unique(c(wecare, grep("Zone_P",           names(a), value = T)))
+    wecare <- unique(c(wecare, grep("Peak_Wpk",         names(a), value = T)))
+    wecare <- unique(c(wecare, grep("work_In_Zone",     names(a), value = T)))
 
     for (av in sort(wecare)) {
         cat("Drop sort term column from plot:", av, "\n")
