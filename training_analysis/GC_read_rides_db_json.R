@@ -85,7 +85,11 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
             data.frame(b[[av]])
             b[[av]]
 
+            rbindlist(b[[av]])
+
             list2DF(b)
+
+            plyr::ldply(b[[av]])
             # https://stackoverflow.com/questions/61768192/how-to-convert-a-list-into-a-dataframe-and-filling-empty-values-with-na-in-r
 
             ## get max lenght of vectors
