@@ -37,9 +37,7 @@ LOESS_CRITERIO <-  c("aicc", "gcv")[1]
 
 
 DEBUG     <- FALSE
-# DEBUG     <- TRUE
-
-if (interactive()) DEBUG <- TRUE
+DEBUG     <- TRUE
 
 if (DEBUG) {
     warning("Debug is active!!")
@@ -85,13 +83,13 @@ if (DEBUG ||
             ## protect from null list
             b[[av]][which(sapply(b[[av]], is.null))] <- list(c(NA))
 
-            data.table(plyr::ldply(b[[av]], rbind))
             # https://stackoverflow.com/questions/61768192/how-to-convert-a-list-into-a-dataframe-and-filling-empty-values-with-na-in-r
             # https://stackoverflow.com/questions/15201305/how-to-convert-a-list-consisting-of-vector-of-different-lengths-to-a-usable-data
 
             # tmp <- data.table(t(list2DF(b[[av]])))
             tmp <- data.table(plyr::ldply(b[[av]], rbind))
 
+            stop()
             for (at in names(tmp)) {
                 uni1 <- unique(tmp[[at]])
                 uni  <- uni1[!is.na(uni1)]
@@ -144,6 +142,9 @@ if (DEBUG ||
     ## Process Data ------------------------------------------------------------
     a$activity_date <- NULL
     a$activity_crc  <- NULL
+
+    ## __ Fix multicolumn names ------------------------------------------------
+    grep("_[0-9]", names(a), value = T)
 
     ## __ Covert to numeric ----------------------------------------------------
     for (ac in names(a)[sapply(a, is.character)]) {
@@ -338,7 +339,11 @@ if (DEBUG ||
     ## another load calculation
     a[, Load_2 := 0.418 * (( (Workout_Time / 3600) * Average_Hr_V1 ) + (2.5 * Average_Hr_V1)) ]
 
-
+    a$Average_Hr_1
+    a$Average_Hr_2
+    names(a)
+    a$Load_2
+stop()
     ## __ Check sport consistency ----------------------------------------------
 
     a[grepl("bike", Workout_Code) & Sport == "Bike" ]

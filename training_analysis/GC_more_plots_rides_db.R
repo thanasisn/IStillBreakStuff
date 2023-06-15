@@ -80,9 +80,6 @@ if (!interactive()) pdf(paste0("~/LOGs/training_status/",
                                "_all_models",".pdf"), width = 9, height = 4)
 
 ## select metrics for pdf
-wecare <- c(
-            )
-
 wecare <- c("Trimp_Points", "Trimp_Zonal_Points", "EPOC", "Load_2", "TrimpModWeighed")
 shortn <- c(          "TP",                 "TZ",   "EP",     "L2",              "TW")
 extend <- 30
@@ -243,10 +240,10 @@ for (days in pdays) {
                     "Date", "VO2max_Detected")
             pp <- pppppp[, ..wp]
             ## easy names
-            vfit <- grep("FIT",wp,value = T)
-            vfat <- grep("FAT",wp,value = T)
-            vper <- grep("PER",wp,value = T)
-            vval <- grep("VAL",wp,value = T)
+            vfit <- grep("FIT", wp, value = T)
+            vfat <- grep("FAT", wp, value = T)
+            vper <- grep("PER", wp, value = T)
+            vval <- grep("VAL", wp, value = T)
 
             ## Training Impulse model plot
             par("mar" = c(2,0,2,0), xpd = TRUE)
@@ -256,7 +253,7 @@ for (days in pdays) {
             pp[[vval]][is.na(pp[[vval]])] <- 0
             lines(pp$Date, caTools::runmean(pp[[vval]], k = 9, align = "right")/2, col = "#71717171", lwd = 1.1)
             par(new = T)
-            ylim <-range( 45,53, pp$VO2max_Detected, na.rm = T)
+            ylim <- range(45, 53, pp$VO2max_Detected, na.rm = T)
             plot( pp$Date, pp$VO2max_Detected, ylim = ylim, col = "pink", pch = "-", cex = 2 )
             par(new = T)
             ylim    <- range(pp[[vfit]], pp[[vfat]], pp[[vper]], na.rm = T)

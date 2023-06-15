@@ -6,9 +6,7 @@
 ## Create conky plots
 
 
-
 ####_ Set environment _####
-closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
