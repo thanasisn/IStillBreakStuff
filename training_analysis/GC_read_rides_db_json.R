@@ -41,6 +41,11 @@ DEBUG     <- FALSE
 
 if (interactive()) DEBUG     <- TRUE
 
+if (DEBUG) {
+    warning("Debug is active")
+}
+
+## Parse JSON ------------------------------------------------------------------
 if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
     cat("\nHave to parse", gccache, "\n")
 
@@ -49,7 +54,7 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     stopifnot(length(data) == 2)
     data <- data$RIDES
 
-    #### Basic info for activities ####
+    ## Basic info for activities
     wecare <- grep("METRICS|TAGS|INTERVALS|XDATA", names(data), invert = TRUE, value = TRUE)
 
     ## __ Activities meta data -------------
@@ -66,10 +71,10 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     ## breakup data sets
     b <- data$METRIC
     c <- data.table(data$TAGS)
-    rm(data)
+    if (!DEBUG) rm(data)
 
 
-    #### METRICS for activities ####
+    ## __ METRICS for activities -----------------------------------------------
     for (av in names(b)) {
         if (is.list(b[[av]])) {
             cat(av, "\n")
@@ -115,13 +120,15 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
             }
         }
     }
+
+    stop()
     b <- data.table(b)
     b <- rm.cols.dups.DT(b)
 
-    #### Ignore all intervals data ####
+    ## __ Ignore all intervals data --------------------------------------------
     # data$INTERVALS
 
-    #### TAGS data ####
+    ## __ TAGS data ------------------------------------------------------------
     c <- rm.cols.dups.DT(c)
 
     ## combine data
