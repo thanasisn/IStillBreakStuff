@@ -39,14 +39,17 @@ LOESS_CRITERIO <-  c("aicc", "gcv")[1]
 DEBUG     <- FALSE
 # DEBUG     <- TRUE
 
-if (interactive()) DEBUG     <- TRUE
+if (interactive()) DEBUG <- TRUE
 
 if (DEBUG) {
-    warning("Debug is active")
+    warning("Debug is active!!")
 }
 
 ## Parse JSON ------------------------------------------------------------------
-if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl)) {
+if (DEBUG ||
+    !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storagefl) ||
+    !file.exists(pdfout1) ||
+    !file.exists(pdfout2)) {
     cat("\nHave to parse", gccache, "\n")
 
     ## read the whole data base
@@ -120,8 +123,6 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
             }
         }
     }
-
-    stop()
     b <- data.table(b)
     b <- rm.cols.dups.DT(b)
 
@@ -131,7 +132,7 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     ## __ TAGS data ------------------------------------------------------------
     c <- rm.cols.dups.DT(c)
 
-    ## combine data
+    ## __ combine data ---------------------------------------------------------
     stopifnot(length(intersect(names(a), names(b))) == 0)
     a <- cbind(a, b)
     rm(b)
@@ -140,11 +141,11 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     a <- cbind(a, c)
     rm(c)
 
-    ## proper date
+    ## Process Data ------------------------------------------------------------
     a$activity_date <- NULL
     a$activity_crc  <- NULL
 
-    ## covert types to numeric -------------------------------------------------
+    ## __ Covert to numeric ----------------------------------------------------
     for (ac in names(a)[sapply(a, is.character)]) {
         ## clean text first
         a[[ac]] <- sub("[ ]*$",        "", a[[ac]])
@@ -159,7 +160,7 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     }
 
 
-    ## Drop zeros on some columns ----------------------------------------------
+    ## __ Drop zeros on some columns -------------------------------------------
     wecare <- unique(c(
         grep("EOA",             names(a), value = TRUE, ignore.case = TRUE),
         grep("Feel",            names(a), value = TRUE, ignore.case = TRUE),
@@ -228,14 +229,14 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     a <- rm.cols.dups.DT(a)
 
 
-    #### Fix temperatures NA ---------------------------------------------------
+    ## __ Fix temperatures NA --------------------------------------------------
     wecare <- grep("_temp", names(a), value = TRUE)
     for (avar in wecare) {
         a[[avar]][a[[avar]] < -250 ] <- NA
     }
 
 
-    ## Make uniform names ------------------------------------------------------
+    ## __ Make uniform names ---------------------------------------------------
     # remove spaces from names
     names(a) <- gsub(" ", "_", names(a))
     # capitalize first letter
@@ -283,14 +284,14 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     a[, Weight             := NULL]
 
 
-    ####  Remove duplicate columns  --------------------------------------------
+    ## __ Remove duplicate columns  --------------------------------------------
     col.checksums <- sapply(a, function(x) digest::digest(x, "md5"), USE.NAMES = T)
     dup.cols      <- data.table(col.name = names(col.checksums), hash.value = col.checksums)
 
     for (hh in unique(dup.cols$hash.value)) {
         dups <- dup.cols[hash.value == hh]
         if (nrow(dups) > 1) {
-            cat(dups$col.name,"\n")
+            cat("DUPS:", dups$col.name,"\n")
             dnames <- dups$col.name
             ## arrange priority to keep
             dnames <- c(grep("_V[0-9]", dnames, value = T, invert = T),
@@ -303,19 +304,19 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     }
 
 
-    ####  Remove columns without data variation  -------------------------------
+    ## __ Remove columns without actual data -----------------------------------
     for (at in names(a)) {
         uni1 <- unique(a[[at]])
         uni  <- uni1[!uni1 %in% c(NA, 0)]
         ## only containing the same value except NA and 0
         if (length(uni) <= 1) {
-            cat("Remove column with no variation:", at, "\n")
+            cat("NO VAR:", at, "\n")
             a[[at]] <- NULL
         }
     }
 
 
-    ####  Info on low variation columns  ---------------------------------------
+    ## __ Info on low variation columns  ---------------------------------------
     noplot <- c()
     for (at in names(a)) {
         uni1 <- unique(a[[at]])
@@ -328,7 +329,7 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     }
 
 
-    ####  create some new metrics  ---------------------------------------------
+    ## __ Create some new metrics  ---------------------------------------------
     a$Intensity_TRIMP       <- a$Trimp_Points       / a$Workout_Time
     a$Intensity_TRIMP_Zonal <- a$Trimp_Zonal_Points / a$Workout_Time
     a$Intensity_EPOC        <- a$EPOC               / a$Workout_Time
@@ -338,7 +339,7 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     a[, Load_2 := 0.418 * (( (Workout_Time / 3600) * Average_Hr_V1 ) + (2.5 * Average_Hr_V1)) ]
 
 
-    #### check sport consistency -----------------------------------------------
+    ## __ Check sport consistency ----------------------------------------------
 
     a[grepl("bike", Workout_Code) & Sport == "Bike" ]
 
@@ -359,15 +360,13 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     table(a$Workout_Title)
 
 
-    ####  Set color and symbol for each activity type  -------------------------
-
     ## Add graph options -------------------------------------------------------
 
     ## Set colors
     a[Sport == "Bike", Col := "red" ]
     a[Sport == "Run",  Col := "blue"]
 
-    ## set points
+    ## Set points
     a[, Pch :=  1 ]
 
     a[Workout_Code == "Bike Road",       Pch :=  6]
@@ -387,7 +386,7 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     grep("Run|Walk", unique(a$Workout_Code), ignore.case = T, value = T)
     grep("Bike",     unique(a$Workout_Code), ignore.case = T, value = T)
 
-    ####  Drop sort term metrics  ----------------------------------------------
+    ## __ Drop sort term metrics  ----------------------------------------------
     wecare <- grep("^[0-9]s_", names(a), value = T)
     for (av in wecare) {
         cat("Drop sort term column:", av, "\n")
@@ -396,12 +395,12 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
 
 
 
-    ####  STORE DATA  ----------------------------------------------------------
+    ##  STORE DATA  ------------------------------------------------------------
     write_RDS(a, file = storagefl, clean = TRUE)
 
 
-    #### Don't plot some metrics  ----------------------------------------------
-    wecare <- grep("^[0-9]+s_",                          names(a), value = T)
+    ## __ Don't plot some metrics  ---------------------------------------------
+    wecare <- grep("^[0-9]+s_",                         names(a), value = T)
     wecare <- unique(c(wecare, grep("^[0-9]m_" ,        names(a), value = T)))
     wecare <- unique(c(wecare, grep("Best_[0-9]{2,3}m", names(a), value = T)))
     wecare <- unique(c(wecare, grep("Compatibility" ,   names(a), value = T)))
@@ -424,7 +423,7 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     sort(names(a)[!sapply(a, is.character)])
 
 
-    ####  PLOT ALL DATA  -------------------------------------------------------
+    ## __ PLOT ALL DATA  -------------------------------------------------------
     wecare <- names(a)[!sapply(a, is.character)]
     wecare <- grep("date|filename|parsed|Col|Pch|sport|bike|shoes|CP_setting|workout_code|Year|Duration|Time_Moving|Dropout_Time|Distance_Swim|Heartbeats",
                    wecare, ignore.case = T, value = T, invert = T)
@@ -435,7 +434,7 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     # test <- sapply(a[, ..wecare], function(x) sum(!is.na(x)) )
     # test[test < 10]
 
-    ## Plot all variables ------------------------------------------------------
+    ## __ Plot all variables ---------------------------------------------------
     if (!interactive()) {
         pdf(file = pdfout1, width = 8, height = 4)
     }
@@ -556,7 +555,7 @@ if (DEBUG || !file.exists(storagefl) || file.mtime(gccache) > file.mtime(storage
     dev.off()
 
 
-    ####  Plot last activities  ------------------------------------------------
+    ## __  PLOT LAST -----------------------------------------------------------
     a <- a[ as.Date(Date) > (Sys.Date() - LASTDAYS) ]
     if (!interactive()) {
         pdf(file = pdfout2, width = 8, height = 4)
