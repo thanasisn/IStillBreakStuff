@@ -191,7 +191,8 @@ for i in "${folders[@]}"; do
                   xargs -t -0 git add -f
     ## commit and push
     git commit -uno -a -m "Commit $(date +'%F %R')"
-    git push --tag -f
+    git push -f
+    git push --tag 
 done
 
 
