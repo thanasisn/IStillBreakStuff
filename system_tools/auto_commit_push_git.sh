@@ -139,9 +139,10 @@ git push -f -u origin main
 folders=(
     "$HOME/BBand_LAP"
     "$HOME/CM_21_GLB/"
+    "$HOME/CODE/nixos"
     "$HOME/CS_id/"
-    "$HOME/PANDOC/Thesis"
     "$HOME/PANDOC/My_Publications"
+    "$HOME/PANDOC/Thesis"
     "$HOME/RAD_QC"
     "$HOME/SUN"
     "$HOME/TSI"
@@ -177,6 +178,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.list'     \
                       -o -iname '*.makefile' \
                       -o -iname '*.md'       \
+                      -o -iname '*.nix'      \
                       -o -iname '*.par'      \
                       -o -iname '*.pbs'      \
                       -o -iname '*.py'       \
@@ -259,6 +261,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.list'     \
                       -o -iname '*.makefile' \
                       -o -iname '*.md'       \
+                      -o -iname '*.nix'      \
                       -o -iname '*.par'      \
                       -o -iname '*.pbs'      \
                       -o -iname '*.py'       \
