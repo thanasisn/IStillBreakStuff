@@ -190,7 +190,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.tex'      \
                       -o -iname '*.txt'      \
                       -o -iname 'makefile'   \) -print0 |\
-                  xargs -t -0 git add -f
+                  xargs -t -0 git add 
     ## commit and push
     git commit -uno -a -m "Commit $(date +'%F %R')"
     git push -f
