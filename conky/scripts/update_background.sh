@@ -54,7 +54,7 @@ screen_size=$( xrandr |awk '/\*/ {print $1}' )
 
 IFS=$'\n'
 readarray -t <<<"$screen_size"
-feh_command="feh --bg-fill"
+feh_command="feh --bg-fill --no-fehbg"
 
 for i in "${MAPFILE[@]}"; do
     echo size: "$i"
