@@ -23,7 +23,6 @@ set +e
 
 ## use full paths
 folders=(
-    "$HOME/MANUSCRIPTS"
 )
 
 
@@ -73,7 +72,7 @@ for i in "${folders[@]}"; do
                           -o -iname '*.sh'       \
                           -o -iname '*.tex'      \
                           -o -iname '*.txt'      \) -print0 |\
-                      xargs -t -0 git add 
+                      xargs -t -0 git add
         ## commit and push
         git commit -uno -a -m "Commit $(date +'%F %R')"
         git push -f

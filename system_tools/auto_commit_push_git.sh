@@ -147,6 +147,9 @@ folders=(
     "$HOME/RAD_QC"
     "$HOME/SUN"
     "$HOME/TSI"
+    "$HOME/MANUSCRIPTS/2022_sdr_trends"
+    "$HOME/MANUSCRIPTS/2022_sdr_trends/B147"
+    "$HOME/MANUSCRIPTS/presentations"
 )
 
 ## go through main folder
@@ -191,11 +194,11 @@ for i in "${folders[@]}"; do
                       -o -iname '*.tex'      \
                       -o -iname '*.txt'      \
                       -o -iname 'makefile'   \) -print0 |\
-                  xargs -t -0 git add 
+                  xargs -t -0 git add
     ## commit and push
     git commit -uno -a -m "Commit $(date +'%F %R')"
     git push -f
-    git push --tag 
+    git push --tag
 done
 
 
@@ -274,7 +277,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.tex'      \
                       -o -iname '*.txt'      \
                       -o -iname 'makefile'   \) -print0 |\
-                  xargs -t -0 git add 
+                  xargs -t -0 git add
     ## commit to local repo
     git commit -uno -a -m "Commit $(date +'%F %R')"
 done
