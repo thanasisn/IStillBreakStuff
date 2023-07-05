@@ -41,8 +41,9 @@ set +e
 ## plot radiation from broadband
 "${SCRIPTS}broadband_plot.R"   &
 
-## TODO  plot graphs of my cluster
-# "${SCRIPTS}Cnk_collectd_img.sh"
+## plot graphs of my cluster
+"${SCRIPTS}munin_rrd_plots.sh"
+
 
 ## don't ignore errors
 set -e
