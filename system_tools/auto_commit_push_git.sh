@@ -148,7 +148,7 @@ folders=(
     "$HOME/SUN"
     "$HOME/TSI"
     "$HOME/MANUSCRIPTS/2022_sdr_trends"
-    "$HOME/MANUSCRIPTS/2022_sdr_trends/B147"
+    "$HOME/MANUSCRIPTS/2022_sdr_trends/Build_147"
     "$HOME/MANUSCRIPTS/presentations"
 )
 
