@@ -20,25 +20,48 @@ scraper = Scraper("www.cpubenchmark.net")
 # search_results = scraper.search(query="i5 53",    limit = 4)
 
 res = []
-res.append(scraper.search(query="G3460",         limit=1)[0][0])  # blue
-res.append(scraper.search(query="Ryzen 5 5500U", limit=1)[0][0])
-res.append(scraper.search(query="i5-1135G7",     limit=1)[0][0])
-res.append(scraper.search(query="i5-3380M",      limit=1)[0][0])  # tyler
-res.append(scraper.search(query="i5-4310M",      limit=1)[0][0])
-res.append(scraper.search(query="i5-5300U",      limit=1)[0][0])
-res.append(scraper.search(query="i5-6300U",      limit=1)[0][0])
-res.append(scraper.search(query="i5-6440HQ",     limit=1)[0][0])
-res.append(scraper.search(query="i5-7200U",      limit=1)[0][0])
-res.append(scraper.search(query="i7-5600U",      limit=1)[0][0])
+res.append(scraper.search(query="G3460",            limit=1)[0][0])  # blue
+res.append(scraper.search(query="Ryzen 5 5500U",    limit=1)[0][0])
+res.append(scraper.search(query="i5-1135G7",        limit=1)[0][0])
+res.append(scraper.search(query="i5-3380M",         limit=1)[0][0])  # tyler
+res.append(scraper.search(query="i5-4310M",         limit=1)[0][0])
+res.append(scraper.search(query="i5-5300U",         limit=1)[0][0])
+res.append(scraper.search(query="i3-3110M",         limit=1)[0][0])  # crane
+res.append(scraper.search(query="i5-6300U",         limit=1)[0][0])
+res.append(scraper.search(query="i7-8700",          limit=1)[0][0])
+res.append(scraper.search(query="i5-6440HQ",        limit=1)[0][0])
+res.append(scraper.search(query="i5-7200U",         limit=1)[0][0])
+res.append(scraper.search(query="i7-5600U",         limit=1)[0][0])
+res.append(scraper.search(query="Xeon Silver 4108", limit=1)[0][0]) # yperos
+
 
 data = pd.DataFrame.from_dict(res)
 
-cnumeric = ['cpumark']
-typeof(data[cnumeric] )
-data[cnumeric] = data[cnumeric].apply(pd.to_numeric)
-data[cnumeric] = data[cnumeric].str.replace(',', '').astype(float)
-data[cnumeric] = data[cnumeric].astype(float)
-data.iloc[:,:].str.replace(',', '').astype(float)
+# cnumeric = ['cpumark']
+# data[cnumeric] = data[cnumeric].apply(pd.to_numeric)
+# data[cnumeric] = data[cnumeric].str.replace(',', '').astype(float)
+# data[cnumeric] = data[cnumeric].astype(float)
+# data.iloc[:,:].str.replace(',', '').astype(float)
+
+## conveert tu numeric
+data.cpumark = data.cpumark.str.replace(',','').astype(float)
+data.thread  = data.thread .str.replace(',','').astype(float)
+
+## set known machines fro id
+## is id stable??
+data.loc[data["id"]=="1973", "id"] = 'tyler'
+data.loc[data["id"]=="2361", "id"] = 'blue'
+data.loc[data["id"]=="3099", "id"] = 'sagan'
+data.loc[data["id"]=="3167", "id"] = 'yperos'
+data.loc[data["id"]=="763",  "id"] = 'crane'
+
+## use tyler as vase
+refmark   = data.cpumark[data.id == "tyler"]
+refthread = data.thread[data.id  == "tyler"]
+data['Rel cpumark'] = data.cpumark /   refmark.squeeze()
+data['Rel thread']  = data.thread  / refthread.squeeze()
+
+
 data = data.drop_duplicates()
 data.to_csv('CPU_scrap_data.csv')
 
@@ -51,15 +74,18 @@ data.to_csv('CPU_scrap_data.csv')
 
 # ## remove some keys from dictionaries
 # cres = []
-# removekeys = ['price',
-#               'secondaryCores',
-#               'secondaryLogicals',
-#               'output',
-#               'value',
-#               'href',
-#               'socket',
-#               'threadValue',
-#               'cat']
+removekeys = ['price',
+              'secondaryCores',
+              'secondaryLogicals',
+              'output',
+              'value',
+              'href',
+              'rank',
+              'powerPerf',
+              'socket',
+              'cpuCount',
+              'threadValue',
+              'cat']
 # for ar in res:
 #     for k in removekeys:
 #         ar.pop(k, None)
@@ -75,7 +101,14 @@ data.to_csv('CPU_scrap_data.csv')
 
 ## print with pandaw
 pp = data.drop(removekeys, axis=1)
-pp.sort_values(by=['cpumark'], ascending=False)
+pp = pp.round(3)
+pp = pp.sort_values(by=['cpumark','thread'], ascending=False)
+
+pp.insert(1, 'Rel cpumark', pp.pop('Rel cpumark'))
+pp.insert(2, 'Rel thread',  pp.pop('Rel thread'))
+pp.insert(3, 'cpumark',     pp.pop('cpumark'))
+pp.insert(4, 'thread',      pp.pop('thread'))
+
 
 print(tabulate.tabulate(pp,
                         headers='keys',
