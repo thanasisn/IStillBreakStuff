@@ -39,7 +39,9 @@ CPU = [
 
 res = []
 for aq in CPU:
-    res.append(scraper.search(query=aq, limit=1)[0][0])
+    qq = scraper.search(query=aq, limit=1)[0][0]
+    qq['key'] = aq
+    res.append(qq)
 
 ## convert to pandas
 data = pd.DataFrame.from_dict(res)
@@ -84,6 +86,8 @@ removekeys = ['price',
               'socket',
               'cpuCount',
               'threadValue',
+              'name',
+              'turbo',
               'cat']
 
 # ## print a nice format table in console without pandas
@@ -110,6 +114,8 @@ pp.insert(1, 'Rel cpumark', pp.pop('Rel cpumark'))
 pp.insert(2, 'Rel thread',  pp.pop('Rel thread'))
 pp.insert(3, 'cpumark',     pp.pop('cpumark'))
 pp.insert(4, 'thread',      pp.pop('thread'))
+pp.insert(5, 'key',         pp.pop('key'))
+
 
 ## output
 print("")
