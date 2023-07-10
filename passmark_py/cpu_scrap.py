@@ -18,20 +18,28 @@ scraper = Scraper("www.cpubenchmark.net")
 ## search for a specific term
 # search_results = scraper.search(query="i5 53",    limit = 4)
 
+CPU = [
+    "G3460",        # blue
+    "Ryzen 5 5500U",
+    "Xeon Silver 4108",   # yperos
+    "i3-3110M",           # crane
+    "i5-1135G7",
+    "i5-3380M",           # tyler
+    "i5-4310M",
+    "i5-4300U",
+    "i5-5300U",
+    "i5-6300U",
+    "i5-6440HQ",
+    "i5-7200U",
+    "i7-5500U",
+    "i7-5600U",
+    "i7-8700",
+]
+
+
 res = []
-res.append(scraper.search(query="G3460",            limit=1)[0][0])  # blue
-res.append(scraper.search(query="Ryzen 5 5500U",    limit=1)[0][0])
-res.append(scraper.search(query="i5-1135G7",        limit=1)[0][0])
-res.append(scraper.search(query="i5-3380M",         limit=1)[0][0])  # tyler
-res.append(scraper.search(query="i5-4310M",         limit=1)[0][0])
-res.append(scraper.search(query="i5-5300U",         limit=1)[0][0])
-res.append(scraper.search(query="i3-3110M",         limit=1)[0][0])  # crane
-res.append(scraper.search(query="i5-6300U",         limit=1)[0][0])
-res.append(scraper.search(query="i7-8700",          limit=1)[0][0])
-res.append(scraper.search(query="i5-6440HQ",        limit=1)[0][0])
-res.append(scraper.search(query="i5-7200U",         limit=1)[0][0])
-res.append(scraper.search(query="i7-5600U",         limit=1)[0][0])
-res.append(scraper.search(query="Xeon Silver 4108", limit=1)[0][0])  # yperos
+for aq in CPU:
+    res.append(scraper.search(query=aq, limit=1)[0][0])
 
 ## convert to pandas
 data = pd.DataFrame.from_dict(res)
