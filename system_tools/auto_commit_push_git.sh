@@ -193,6 +193,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.sh'       \
                       -o -iname '*.tex'      \
                       -o -iname '*.txt'      \
+                      -o -iname '*.yaml'     \
                       -o -iname 'makefile'   \) -print0 |\
                   xargs -t -0 git add
     ## commit and push
@@ -276,6 +277,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.sh'       \
                       -o -iname '*.tex'      \
                       -o -iname '*.txt'      \
+                      -o -iname '*.yaml'     \
                       -o -iname 'makefile'   \) -print0 |\
                   xargs -t -0 git add
     ## commit to local repo
