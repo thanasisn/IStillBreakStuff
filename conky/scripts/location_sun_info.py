@@ -115,9 +115,10 @@ def location_pango():
 #        zen = "z:" + u"%0.2f\u00B0" % sun_track[1]
 
         ## create message
-        text = "%s\n" % loc_nam
-        text += "Lat:%6.3f" % lat + " Lon:%6.3f" % float(lon) + " Acc: %dm\n" % float(acc) + \
-               "R " + sunup   + " S " + sundn + " N " + sunnn + " L "+ str(remainligh_pc) + "% D " + str(remainday_pc)+"%"
+        text = "%s" % loc_nam
+        text += "  ^" + sunup   + " v" + sundn + " |" + sunnn + "\n"
+        text += "Lat:%6.3f" % lat + " Lon:%6.3f" % float(lon) + " Acc: %dm" % float(acc) #+ \
+        #       "R " + sunup   + " S " + sundn + " N " + sunnn + " L "+ str(remainligh_pc) + "% D " + str(remainday_pc)+"%"
 #        text += "\n%s" % loc_nam
         return(text)
 
