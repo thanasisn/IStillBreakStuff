@@ -16,12 +16,20 @@ from datetime import datetime, timedelta
 
 
 ## default values for Thessaloniki
+
+global loc_lat
+global loc_lng
+global loc_acc
+global loc_dt
+global loc_nam
+
+
 loc_lat = 40.632811
 loc_lng = 22.955884
 loc_elv = 62.0
 loc_acc = "0"
 loc_dt  = ""
-loc_nam = "Thessalonikssssssi"
+loc_nam = "Thessaloniki"
 
 ## input files
 LOCATION_fl = "/dev/shm/CONKY/last_location.dat"   ## get coord from wifi
@@ -42,8 +50,9 @@ try:
         with open(LOCATION_fl) as locf:
             reader = csv.DictReader(locf)
             for r in reader:
-                # print(r)
+                print(r)
                 if r['Type'] == 'wifi':
+
                     ## capture last values only
                     loc_lat = float(r['Lat'])
                     loc_lng = float(r['Lng'])
