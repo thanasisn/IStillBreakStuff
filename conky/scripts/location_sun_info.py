@@ -50,15 +50,14 @@ try:
         with open(LOCATION_fl) as locf:
             reader = csv.DictReader(locf)
             for r in reader:
-                print(r)
-                if r['Type'] == 'wifi':
-
+                # print(r)
+                # if r['Type'] == 'wifi':
                     ## capture last values only
-                    loc_lat = float(r['Lat'])
-                    loc_lng = float(r['Lng'])
-                    loc_acc = str(r['Acc'])
-                    loc_dt  = r['Dt']
-                    loc_nam = r['City']
+                loc_lat = float(r['Lat'])
+                loc_lng = float(r['Lng'])
+                loc_acc = str(r['Acc'])
+                loc_dt  = r['Dt']
+                loc_nam = r['City']
 
         # ## after location try to read current weather
         # if os.path.isfile(CURRENTW_fl):
