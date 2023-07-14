@@ -19,13 +19,13 @@ from datetime import datetime, timedelta
 loc_lat = 40.632811
 loc_lng = 22.955884
 loc_elv = 62.0
-loc_acc = 0
+loc_acc = "0"
 loc_dt  = ""
-loc_nam = "Thessaloniki"
+loc_nam = "Thessalonikssssssi"
 
 ## input files
 LOCATION_fl = "/dev/shm/CONKY/last_location.dat"   ## get coord from wifi
-CURRENTW_fl = "/dev/shm/WHEATHER/last.dat"         ## get name of location
+# CURRENTW_fl = "/dev/shm/WHEATHER/last.dat"         ## get name of location
 
 def diff_times_in_seconds(t1, t2):
     # caveat emptor - assumes t1 & t2 are python times, on the same day and t2 is after t1
@@ -42,19 +42,21 @@ try:
         with open(LOCATION_fl) as locf:
             reader = csv.DictReader(locf)
             for r in reader:
+                # print(r)
                 if r['Type'] == 'wifi':
                     ## capture last values only
                     loc_lat = float(r['Lat'])
                     loc_lng = float(r['Lng'])
-                    loc_acc = r['Acc']
+                    loc_acc = str(r['Acc'])
                     loc_dt  = r['Dt']
+                    loc_nam = r['City']
 
-        ## after location try to read current weather
-        if os.path.isfile(CURRENTW_fl):
-            with open(CURRENTW_fl) as curf:
-                reader2 = csv.DictReader(curf)
-                for r in reader2:
-                    loc_nam = r['name']
+        # ## after location try to read current weather
+        # if os.path.isfile(CURRENTW_fl):
+        #     with open(CURRENTW_fl) as curf:
+        #         reader2 = csv.DictReader(curf)
+        #         for r in reader2:
+        #             loc_nam = r['name']
 
 except:
     print('Failed on parsing input files')
@@ -62,7 +64,7 @@ except:
     loc_lat = 40.632811
     loc_lng = 22.955884
     loc_elv = 62.0
-    loc_acc = 99999
+    loc_acc = "99999"
     loc_dt  = ""
     loc_nam = "Thessaloniki"
 
@@ -101,14 +103,14 @@ def location_pango():
         sundn = utc_to_local(ephem_day(lat=float(lat), lon=float(lon))['sunset']).strftime('%H:%M')
         sunup = utc_to_local(ephem_day(lat=float(lat), lon=float(lon))['sunrise']).strftime('%H:%M')
 
-        lightduration = diff_times_in_seconds( datetime.strptime( sunup, '%H:%M').time(), datetime.strptime( sundn, '%H:%M').time())
-        daypassed     = diff_times_in_seconds( datetime.strptime( sunup, '%H:%M').time(), datetime.now().time())
-        remainligh_pc = round( 100 * float(lightduration - daypassed) / lightduration, 1 )
+        # lightduration = diff_times_in_seconds( datetime.strptime( sunup, '%H:%M').time(), datetime.strptime( sundn, '%H:%M').time())
+        # daypassed     = diff_times_in_seconds( datetime.strptime( sunup, '%H:%M').time(), datetime.now().time())
+        # remainligh_pc = round( 100 * float(lightduration - daypassed) / lightduration, 1 )
 
-        today         = datetime.now().date()
-        start         = datetime(today.year, today.month, today.day)
-        diff          = datetime.now() - start
-        remainday_pc  = round( 100 * ( 3600*24 - diff.total_seconds() ) / (3600*24),1 )
+        # today         = datetime.now().date()
+        # start         = datetime(today.year, today.month, today.day)
+        # diff          = datetime.now() - start
+        # remainday_pc  = round( 100 * ( 3600*24 - diff.total_seconds() ) / (3600*24),1 )
 
 #        sun_track = sun.sun_vector(date=datetime.utcnow(),lat=float(lat),lon=float(lon))
 #        azz = "a:" + u"%0.2f\u00B0" % sun_track[0]
