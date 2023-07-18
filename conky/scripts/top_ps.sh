@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 exec 9>"/dev/shm/$(basename $0).lock"
 if ! flock -n 9  ; then
     echo "another instance is running";
@@ -28,9 +27,9 @@ while true; do
         sort -gr | sed 's/^[.0-9]\+ //' | head -n "$lines"       ) | column -c 5 -t > "$OUTPUT"
 
 
-    printf "%s\t%s\t%s\t%s\n" "$(date +"%s")"\
-                              "$(ps -e | wc -l)" "$(ps -U athan -u athan u | wc -l)"\
-                              "$(ps axjf | grep --invert-match '^[ ]*2 ' | wc --lines)" >> "$LOGPS" 
+#     printf "%s\t%s\t%s\t%s\n" "$(date +"%s")"\
+#                               "$(ps -e | wc -l)" "$(ps -U athan -u athan u | wc -l)"\
+#                               "$(ps axjf | grep --invert-match '^[ ]*2 ' | wc --lines)" >> "$LOGPS" 
 
     sleep "$rate"
 

@@ -47,7 +47,7 @@ kill_run  system-config-printer-applet
 kill_run  dunst
 kill_run  kdeconnect-indicator
 kill_run  volumeicon
-# kill_run  $HOME/CODE/conky/scripts/top_ps.sh
+kill_run  $HOME/CODE/conky/scripts/top_ps.sh
 
 if [[ $WM_NAME = "bspwm" ]]; then 
     ## keybinds for bspwm
