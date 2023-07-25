@@ -72,16 +72,16 @@ jsonfls <- grep(".json$", allfiles, ignore.case = TRUE, value = TRUE)
 jsonfls[file.size(jsonfls) <= 300]
 
 ## check and remove some files we don't care for
-fromJSON(grep("user_profile", jsonfls, value = T), flatten = T)
+# fromJSON(grep("user_profile", jsonfls, value = T), flatten = T)
 jsonfls <- grep("user_profile", jsonfls, value = T, invert = T)
 
-fromJSON(grep("social-profile", jsonfls, value = T), flatten = T)
+# fromJSON(grep("social-profile", jsonfls, value = T), flatten = T)
 jsonfls <- grep("social-profile", jsonfls, value = T, invert = T)
 
-fromJSON(grep("user_contact", jsonfls, value = T), flatten = F)
+# fromJSON(grep("user_contact", jsonfls, value = T), flatten = F)
 jsonfls <- grep("user_contact", jsonfls, value = T, invert = T)
 
-fromJSON(grep("UserGoal", jsonfls, value = T), flatten = F)
+# fromJSON(grep("UserGoal", jsonfls, value = T), flatten = F)
 jsonfls <- grep("UserGoal", jsonfls, value = T, invert = T)
 
 # fromJSON(grep("_courses", jsonfls, value = T), flatten = F)
@@ -90,16 +90,16 @@ jsonfls <- grep("UserGoal", jsonfls, value = T, invert = T)
 fromJSON(grep("_gear", jsonfls, value = T), flatten = T)
 jsonfls <- grep("_gear", jsonfls, value = T, invert = T)
 
-fromJSON(grep("_goal", jsonfls, value = T), flatten = T)
+# fromJSON(grep("_goal", jsonfls, value = T), flatten = T)
 jsonfls <- grep("_goal", jsonfls, value = T, invert = T)
 
-fromJSON(grep("_personalRecord", jsonfls, value = T), flatten = T)
+# fromJSON(grep("_personalRecord", jsonfls, value = T), flatten = T)
 jsonfls <- grep("_personalRecord", jsonfls, value = T, invert = T)
 
 fromJSON(grep("_workout", jsonfls, value = T), flatten = T)
 jsonfls <- grep("_workout", jsonfls, value = T, invert = T)
 
-fromJSON(grep("user_settings", jsonfls, value = T), flatten = T)
+# fromJSON(grep("user_settings", jsonfls, value = T), flatten = T)
 jsonfls <- grep("user_settings", jsonfls, value = T, invert = T)
 
 
