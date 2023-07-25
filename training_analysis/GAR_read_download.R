@@ -42,10 +42,9 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- tryCatch({ funr::sys.script() },
-                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("Garmin_read_dump") })
+Script.Name <- "~/CODE/training_analysis/GAR_read_download.R"
 
+# Input folder
 datalocation <- "~/ZHOST/ggg/6d2aff5b-0e5a-4608-9799-f5e304c02b77_1/"
 
 
@@ -87,7 +86,7 @@ jsonfls <- grep("UserGoal", jsonfls, value = T, invert = T)
 # fromJSON(grep("_courses", jsonfls, value = T), flatten = F)
 # jsonfls <- grep("_courses", jsonfls, value = T, invert = T)
 
-fromJSON(grep("_gear", jsonfls, value = T), flatten = T)
+# fromJSON(grep("_gear", jsonfls, value = T), flatten = T)
 jsonfls <- grep("_gear", jsonfls, value = T, invert = T)
 
 # fromJSON(grep("_goal", jsonfls, value = T), flatten = T)
