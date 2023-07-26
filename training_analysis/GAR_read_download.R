@@ -47,6 +47,8 @@ Script.Name <- "~/CODE/training_analysis/GAR_read_download.R"
 # Input folder
 datalocation <- "~/ZHOST/ggg/6d2aff5b-0e5a-4608-9799-f5e304c02b77_1/"
 
+system(paste0("dos2unix " ,datalocation,"**/*.json"))
+
 
 library(data.table)
 library(jsonlite)
@@ -166,20 +168,20 @@ write_RDS(object = GData_RunRacePredictions,
 #' ## Fitness Age Data
 #'
 #+ include=T, echo=F
-GData_FitnessAgeData$asOfDateGmt.date             <- as.POSIXct(strptime(GData_FitnessAgeData$asOfDateGmt.date,             "%b %d, %Y %r"))
-GData_FitnessAgeData$createTimestamp.date         <- as.POSIXct(strptime(GData_FitnessAgeData$createTimestamp.date,         "%b %d, %Y %r"))
-GData_FitnessAgeData$weightDataLastEntryDate.date <- as.POSIXct(strptime(GData_FitnessAgeData$weightDataLastEntryDate.date, "%b %d, %Y %r"))
-GData_FitnessAgeData$rhrLastEntryDate.date        <- as.POSIXct(strptime(GData_FitnessAgeData$rhrLastEntryDate.date,        "%b %d, %Y %r"))
+GData_fitnessAgeData$asOfDateGmt             <- as.POSIXct(strptime(GData_fitnessAgeData$asOfDateGmt,             "%FT%T"))
+GData_fitnessAgeData$createTimestamp         <- as.POSIXct(strptime(GData_fitnessAgeData$createTimestamp,         "%FT%T"))
+GData_fitnessAgeData$weightDataLastEntryDate <- as.POSIXct(strptime(GData_fitnessAgeData$weightDataLastEntryDate, "%FT%T"))
+GData_fitnessAgeData$rhrLastEntryDate        <- as.POSIXct(strptime(GData_fitnessAgeData$rhrLastEntryDate,        "%FT%T"))
 
-wecare <- names(GData_FitnessAgeData)
-wecare <- grep("date", wecare, ignore.case = T, invert = T, value = T)
+wecare <- names(GData_fitnessAgeData)
+wecare <- grep("date|timestamp", wecare, ignore.case = T, invert = T, value = T)
 for (av in wecare) {
     par(mar = c(3,2,2,1))
-    plot(GData_FitnessAgeData$asOfDateGmt.date, GData_FitnessAgeData[[av]],
+    plot(GData_fitnessAgeData$asOfDateGmt, GData_fitnessAgeData[[av]],
          ylab = "", xlab = "", cex = 0.6, type = "o")
     title(av)
 }
-write_RDS(object = GData_FitnessAgeData,
+write_RDS(object = GData_fitnessAgeData,
           file   = paste0(outbase, "/", "Garmin_Fitness_Age_Data"))
 # rm(GData_FitnessAgeData)
 
@@ -223,14 +225,14 @@ write_RDS(object = GData_MetricsAcuteTrainingLoad,
 #+ include=T, echo=F
 GData_HydrationLogFile <- GData_HydrationLogFile[ duration != 0 ]
 GData_HydrationLogFile <- rm.cols.NA.DT(GData_HydrationLogFile)
-GData_HydrationLogFile[, calendarDate.date := NULL ]
-GData_HydrationLogFile[, uuid.id           := NULL ]
-GData_HydrationLogFile$Date       <- as.POSIXct(strptime(GData_HydrationLogFile$persistedTimestampGMT.date, "%b %d, %Y %r"), tz = "UTC")
-GData_HydrationLogFile$Date_local <- as.POSIXct(strptime(GData_HydrationLogFile$timestampLocal.date,        "%b %d, %Y %r", tz = "Europe/Athens"), tz = "Europe/Athens")
-GData_HydrationLogFile[, persistedTimestampGMT.date := NULL ]
-GData_HydrationLogFile[, timestampLocal.date := NULL ]
+GData_HydrationLogFile[, calendarDate := NULL]
+GData_HydrationLogFile[, uuid.uuid    := NULL]
+GData_HydrationLogFile$Date       <- as.POSIXct(strptime(GData_HydrationLogFile$persistedTimestampGMT, "%FT%T"), tz = "UTC")
+GData_HydrationLogFile$Date_local <- as.POSIXct(strptime(GData_HydrationLogFile$timestampLocal,        "%FT%T", tz = "Europe/Athens"), tz = "Europe/Athens")
+GData_HydrationLogFile[, persistedTimestampGMT := NULL]
+GData_HydrationLogFile[, timestampLocal        := NULL]
 
-wecare <- grep("Date|time" , names(GData_HydrationLogFile), value = T, invert = T, ignore.case = T)
+wecare <- grep("Date|time|activityId" , names(GData_HydrationLogFile), value = T, invert = T, ignore.case = T)
 for (av in wecare) {
     par(mar = c(3,2,2,1))
     plot(GData_HydrationLogFile$Date, GData_HydrationLogFile[[av]],
