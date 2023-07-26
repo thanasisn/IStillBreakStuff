@@ -65,7 +65,7 @@ allfiles <- allfiles[file.size(allfiles) > 10]
 ## show file types
 table(sub( ".*\\.", "" , basename(allfiles)))
 
-
+#+ echo=F, include=T
 
 ####  parse json  ####
 jsonfls <- grep(".json$", allfiles, ignore.case = TRUE, value = TRUE)
@@ -203,7 +203,7 @@ GData_MetricsAcuteTrainingLoad[, Date_2 := as.POSIXct(calendarDate/1000, origin 
 
 stopifnot(length(unique(GData_MetricsAcuteTrainingLoad$acwrStatus)) == 4)
 GData_MetricsAcuteTrainingLoad$acwrStatus <- factor(GData_MetricsAcuteTrainingLoad$acwrStatus,
-                                                    levels  = c("LOW", "OPTIMAL", "HIGH", "VERY_HIGH" ),
+                                                    levels  = c("LOW", "VERY_HIGH", "OPTIMAL", "HIGH" ),
                                                     ordered = TRUE)
 
 wecare <- grep("Date|time" , names(GData_MetricsAcuteTrainingLoad), value = T, invert = T, ignore.case = T)
@@ -297,7 +297,7 @@ GData_summarizedActivities[, startTimeGmt   := as.POSIXct(startTimeGmt/1000,   o
 GData_summarizedActivities[, startTimeLocal := as.POSIXct(startTimeLocal/1000, origin = "1970-01-01", tz = "Europe/Athens")]
 GData_summarizedActivities[, beginTimestamp := as.POSIXct(beginTimestamp/1000, origin = "1970-01-01", tz = "UTC")]
 
-wecare <- grep("startTimeGmt", names(GData_summarizedActivities), value = T, invert = T, ignore.case = T)
+wecare <- grep("startTimeGmt|activityid|deviceid|courseid", names(GData_summarizedActivities), value = T, invert = T, ignore.case = T)
 for (av in wecare) {
     par(mar = c(3,2,2,1))
     if (is.character(GData_summarizedActivities[[av]])) next()
