@@ -154,6 +154,9 @@ GData_RunRacePredictions$calendarDate <- as.Date( GData_RunRacePredictions$calen
 wecare <- grep("Date" , names(GData_RunRacePredictions), value = T, invert = T)
 for (av in wecare) {
     par(mar = c(2,2,2,1))
+    ## skip non info
+    if (length(unique(na.omit(GData_RunRacePredictions[[av]]))) <= 1) next()
+
     plot(GData_RunRacePredictions$calendarDate , GData_RunRacePredictions[[av]],
     xlab = "", ylab = "", main = av, cex = 0.6 )
 }
@@ -177,6 +180,9 @@ wecare <- names(GData_fitnessAgeData)
 wecare <- grep("date|timestamp", wecare, ignore.case = T, invert = T, value = T)
 for (av in wecare) {
     par(mar = c(3,2,2,1))
+    ## skip non info
+    if (length(unique(na.omit(GData_fitnessAgeData[[av]]))) <= 1) next()
+
     plot(GData_fitnessAgeData$asOfDateGmt, GData_fitnessAgeData[[av]],
          ylab = "", xlab = "", cex = 0.6, type = "o")
     title(av)
@@ -206,6 +212,9 @@ for (av in wecare) {
     if (is.character(GData_MetricsAcuteTrainingLoad[[av]])) {
         GData_MetricsAcuteTrainingLoad[[av]] <- factor(GData_MetricsAcuteTrainingLoad[[av]])
     }
+    ## skip non info
+    if (length(unique(na.omit(GData_MetricsAcuteTrainingLoad[[av]]))) <= 1) next()
+
     plot(GData_MetricsAcuteTrainingLoad$Date, GData_MetricsAcuteTrainingLoad[[av]],
          ylab = "", xlab = "", cex = 0.6, type = "o", col = GData_MetricsAcuteTrainingLoad$acwrStatus)
     title(av)
@@ -235,6 +244,9 @@ GData_HydrationLogFile[, timestampLocal        := NULL]
 wecare <- grep("Date|time|activityId" , names(GData_HydrationLogFile), value = T, invert = T, ignore.case = T)
 for (av in wecare) {
     par(mar = c(3,2,2,1))
+    ## skip non info
+    if (length(unique(na.omit(GData_HydrationLogFile[[av]]))) <= 1) next()
+
     plot(GData_HydrationLogFile$Date, GData_HydrationLogFile[[av]],
          ylab = "", xlab = "", cex = 0.6, type = "o")
     title(av)
@@ -261,6 +273,8 @@ GData_MetricsMaxMetData$subSport   <- as.factor(GData_MetricsMaxMetData$subSport
 wecare <- grep("Date|time" , names(GData_MetricsMaxMetData), value = T, invert = T, ignore.case = T)
 for (av in wecare) {
     par(mar = c(3,2,2,1))
+    ## skip non info
+    if (length(unique(na.omit(GData_MetricsMaxMetData[[av]]))) <= 1) next()
     plot(GData_MetricsMaxMetData$Date, GData_MetricsMaxMetData[[av]],
          ylab = "", xlab = "", cex = 0.6, type = "o")
     title(av)
@@ -288,12 +302,16 @@ for (av in wecare) {
     par(mar = c(3,2,2,1))
     if (is.character(GData_summarizedActivities[[av]])) next()
     if (is.list(GData_summarizedActivities[[av]]))      next()
+    ## skip non info
+    if (length(unique(na.omit(GData_summarizedActivities[[av]]))) <= 1) next()
+
     plot(GData_summarizedActivities$startTimeGmt, GData_summarizedActivities[[av]],
          ylab = "", xlab = "", cex = 0.6, type = "o")
     title(av)
 }
 write_RDS(object = GData_summarizedActivities,
-          file   = paste0(outbase, "/", "Garmin_Summarized_Activities_Data"))
+          file   = paste0(outbase, "/", "Garmin_Summarized_Activities_Data"),
+          clean  = TRUE)
 
 
 
@@ -315,6 +333,9 @@ for (av in wecare) {
     par(mar = c(3,2,2,1))
     if (is.character(GData_UDSFile[[av]])) next()
     if (is.list(GData_UDSFile[[av]]))      next()
+    ## skip non info
+    if (length(unique(na.omit(GData_UDSFile[[av]]))) <= 1) next()
+
     plot(GData_UDSFile$calendarDate.date, GData_UDSFile[[av]],
          ylab = "", xlab = "", cex = 0.6, type = "o")
     title(av)
