@@ -7,10 +7,10 @@
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic = Sys.time()
-Script.Name = funr::sys.script()
-if(!interactive())pdf(file=sub("\\.R$",".pdf",Script.Name),width = 14)
-sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
+tic <- Sys.time()
+Script.Name <- funr::sys.script()
+if (!interactive()) pdf(file = sub("\\.R$", ".pdf", Script.Name), width = 14)
+sink(file = sub("\\.R$", ".out", Script.Name), split = TRUE)
 
 
 library(sf)
@@ -82,7 +82,22 @@ regions$NFiles  <- 0
 regions$NPoints <- 0
 
 
-wecare <- c("ele", "time", "magvar", "geoidheight", "name", "cmt", "desc", "src", "sym", "type", "ageofdgpsdata", "dgpsid", "geometry", "Region","file","mtime")
+wecare <- c("ele",
+            "time",
+            "magvar",
+            "geoidheight",
+            "name",
+            "cmt",
+            "desc",
+            "src",
+            "sym",
+            "type",
+            "ageofdgpsdata",
+            "dgpsid",
+            "geometry",
+            "Region",
+            "file",
+            "mtime")
 
 
 # gather     <- data.table()
@@ -97,17 +112,17 @@ ffff <- readRDS(wpt_seed3)
 
 
 ####  Get all waypoints from files  ####
-if (length(gpxlist)>0) {
+if (length(gpxlist) > 0) {
     update <- TRUE
-    for ( af in gpxlist) {
+    for (af in gpxlist) {
         if (!file.exists(af)) { next() }
         cat(paste(af,"\n"))
 
         ####  get waypoints  ####
         gpx     <- read_sf(af, layer = "waypoints")
-        if (nrow(gpx)>0) {
+        if (nrow(gpx) > 0) {
 
-            wpt     <- st_transform(gpx, EPSG) # apply transformation to points sf
+            wpt        <- st_transform(gpx, EPSG) # apply transformation to points sf
 
             ## get waypoints for the region
             wpt$file   <- af
@@ -247,7 +262,7 @@ if (update) {
 }
 
 ## remove dummy data for analysis ####
-ssel <- gather_wpt$geometry == ffff$geometry
+ssel       <- gather_wpt$geometry == ffff$geometry
 gather_wpt <- gather_wpt[ ! ssel, ]
 
 
@@ -320,7 +335,7 @@ suspects <- data.table(
     elev_B = gather_wpt$ele     [dd[,2]]
 )
 suspects$Dist <- distm[ cbind(dd[,2],dd[,1]) ]
-suspects <- suspects[order(suspects$Dist, decreasing = T) , ]
+suspects      <- suspects[order(suspects$Dist, decreasing = T) , ]
 # suspects <- suspects[order(suspects$file_A,suspects$file_B, decreasing = T) , ]
 
 
@@ -329,7 +344,7 @@ suspects <- suspects[order(suspects$Dist, decreasing = T) , ]
 suspects$time_A <- format( suspects$time_A, "%FT%R:%S" )
 suspects$time_B <- format( suspects$time_B, "%FT%R:%S" )
 
-wecare = grep("geom", names(suspects),invert = T,value = T )
+wecare <- grep("geom", names(suspects),invert = T,value = T )
 wecare <- c("Dist","elev_A","time_A","name_A","name_B","file_A","file_B" )
 
 gdata::write.fwf(suspects[, ..wecare],
@@ -359,7 +374,7 @@ gather_wpt <- gather_wpt %>% distinct_at(vars(-file,-mtime), .keep_all = T)
 
 ## rename vars
 gather_wpt$desc <- NULL
-names(gather_wpt)[names(gather_wpt)=="file"] <- 'desc'
+names(gather_wpt)[names(gather_wpt) == "file"] <- 'desc'
 
 ## drop data
 gather_wpt$file  <- NULL
@@ -542,7 +557,7 @@ suspects <- data.table(
     elev_B = gather_wpt$ele     [dd[,2]]
 )
 suspects$Dist <- distm[ cbind(dd[,2],dd[,1]) ]
-suspects <- suspects[order(suspects$Dist, decreasing = T) , ]
+suspects      <- suspects[order(suspects$Dist, decreasing = T), ]
 
 ## ignore points in the same file
 suspects <- suspects[name_A != name_B]
@@ -558,8 +573,8 @@ myRtools::write_dat(object = filescnt,
                     clean  = TRUE)
 
 
-wecare = grep("geom", names(suspects),invert = T,value = T )
-wecare <- c("Dist","name_A","name_B","file_A","file_B" )
+wecare <- grep("geom", names(suspects),invert = T,value = T )
+wecare <- c("Dist", "name_A", "name_B", "file_A", "file_B")
 
 # write.csv(suspects[,..wecare], "~/GISdata/Suspects_filtered.csv", row.names = FALSE)
 myRtools::write_dat(object = suspects[,..wecare],
@@ -578,5 +593,5 @@ write_sf(gather_wpt, '~/LOGs/waypoints_etrex/WPT_ALL.gpx',
 
 
 ####_ END _####
-tac = Sys.time()
+tac <- Sys.time()
 cat(sprintf("\n%s H:%s U:%s S:%s T:%f\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
