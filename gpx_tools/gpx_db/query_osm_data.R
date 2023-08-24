@@ -145,7 +145,7 @@ for (ar in regions) {
     write_sf(EXP, outfile, driver = "GPX", append = F, overwrite = T)
 
 
-stop()
+
     ## Get drinking water and springs from OSM #################################
     outfile <- paste0("~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs_",ar,".gpx")
     cat(paste("Query for drinking water and springs",ar,"\n"))
@@ -167,7 +167,7 @@ stop()
     saveRDS(q2, "~/GISdata/Layers/Auto/osm/OSM_Springs.Rds")
 
     ## combine available water
-    wecare <- intersect(names(q1),names(q2))
+    wecare <- intersect(names(q1), names(q2))
     Q      <- rbind( q1[wecare], q2[wecare])
     Q      <- unique(Q)
     # Q$geometry <- sf::st_centroid(Q$geometry)
@@ -206,6 +206,8 @@ stop()
     Q$name <- gsub("^[ ]",  "", Q$name)
     Q$name <- gsub("[ ]$",  "", Q$name)
 
+    table(Q$name)
+
     cnames <- unique(c("Вода",           "Drinking water",
                        "Çeşme",          "Чешма",
                        "Spring",         "Burim Uji",
@@ -215,7 +217,7 @@ stop()
                        "Eski Çeşme",     "Soğuksu Pınarı",
                        "Source"))
     for (cn in cnames) {
-        Q$name <- sub(paste0("^",cn,"$"), "", Q$name, ignore.case = T)
+        Q$name <- sub(paste0("^", cn, "$"), "", Q$name, ignore.case = T)
     }
 
     ## test output
@@ -247,15 +249,15 @@ stop()
 
 
     ## may be better without
-    Q$name[Q$name == ""] <- NA
-    Q$cmt[Q$cmt   == ""] <- NA
-    Q$cmt[Q$desc  == ""] <- NA
+    Q$name[Q$name  == ""] <- NA
+    Q$cmt[ Q$cmt   == ""] <- NA
+    Q$cmt[ Q$desc  == ""] <- NA
 
     ## test output
     ss <- table(Q$name)
 
     ## export data
-    EXP <- Q[,c("geometry","name","desc","sym","cmt")]
+    EXP <- Q[, c("geometry","name","desc","sym","cmt")]
     write_sf(EXP, outfile, driver = "GPX", append = F, overwrite = T)
 
 

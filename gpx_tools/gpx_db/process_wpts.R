@@ -146,7 +146,7 @@ if (length(gpxlist) > 0) {
     }
 }
 
-stop("DDD")
+
 ## Add drinking water from OSM ####
 if (DRINKING_WATER) {
     ## load drinking water data
