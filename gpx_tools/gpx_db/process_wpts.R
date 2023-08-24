@@ -146,14 +146,17 @@ if (length(gpxlist) > 0) {
     }
 }
 
-
+stop("DDD")
 ## Add drinking water from OSM ####
 if (DRINKING_WATER) {
     ## load drinking water data
     dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs_Gr.gpx"
     dw        <- read_sf(dw_fl, layer = "waypoints")
     ## clean data
-    dw$desc   <- gsub("\n"," ",dw$desc)
+    dw$desc   <- gsub("\n", " ", dw$desc)
+    dw$name   <- gsub("\n", " ", dw$name)
+    ## set a name for display
+    dw$name[is.na(dw$name)] <- "Nero OSM"
 
     ## overpass web interface
     ## parse drinking water
@@ -180,8 +183,8 @@ if (DRINKING_WATER) {
     ## find close points
     # dd <- which(distmwt < 5, arr.ind = T)
 
-    gather_wpt <- rbind( gather_wpt, dwm )
-    rm(dw,dwm)
+    gather_wpt <- rbind( gather_wpt, dwm)
+    rm(dw, dwm)
 }
 
 
@@ -210,7 +213,7 @@ if (WATERFALLS) {
     # dd <- which(distmwt < 5, arr.ind = T)
 
     gather_wpt <- rbind( gather_wpt, dwm )
-    rm(dw,dwm)
+    rm(dw, dwm)
 }
 
 
@@ -280,7 +283,7 @@ cat(paste("\n", nrow(gather_wpt),"waypoints parsed \n\n" ))
 copywpt <- gather_wpt
 
 ## rename
-names(copywpt)[names(copywpt)=="file"] <- 'desc'
+names(copywpt)[names(copywpt) == "file"] <- 'desc'
 
 ## drop data
 copywpt$file   <- NULL
@@ -298,7 +301,7 @@ distm <- round(distm, digits = 3)
 dd <- which(distm < close_flag, arr.ind = T)
 ## remove diagonal
 dd <- dd[dd[,1] != dd[,2], ]
-paste( nrow(dd), "point couples under", close_flag,"m distance" )
+paste( nrow(dd), "point couples under", close_flag, "m distance")
 
 ## remove pairs 2,3 == 3,2
 for (i in 1:nrow(dd)) {
@@ -317,7 +320,7 @@ for (i in 1:nrow(dd)) {
 
 
 dd <- unique(dd)
-paste( nrow(dd), "point couples under", close_flag,"m distance" )
+paste( nrow(dd), "point couples under", close_flag, "m distance" )
 
 
 
@@ -370,7 +373,7 @@ gdata::write.fwf(filescnt,
 
 ## deduplicate WPT
 gather_wpt <- unique(gather_wpt)
-gather_wpt <- gather_wpt %>% distinct_at(vars(-file,-mtime), .keep_all = T)
+gather_wpt <- gather_wpt %>% distinct_at(vars(-file, -mtime), .keep_all = T)
 
 ## rename vars
 gather_wpt$desc <- NULL
@@ -540,7 +543,7 @@ for (i in 1:nrow(dd)) {
     dd[i, ] = sort(dd[i, ])
 }
 dd <- unique(dd)
-cat(paste( nrow(dd), "point couples under", close_flag, "m distance" ),"\n")
+cat(paste( nrow(dd), "point couples under", close_flag, "m distance" ), "\n")
 
 
 ## indentify suspects

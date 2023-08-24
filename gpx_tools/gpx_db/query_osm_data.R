@@ -8,8 +8,8 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic = Sys.time()
 Script.Name = funr::sys.script()
-if(!interactive())pdf(file=sub("\\.R$",".pdf",Script.Name))
-sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
+if (!interactive()) pdf(file = sub("\\.R$",".pdf", Script.Name))
+sink(file=sub("\\.R$",".out",Script.Name,), split = TRUE)
 Script.Base = sub("\\.R$","",Script.Name)
 
 
@@ -38,7 +38,6 @@ for (ar in regions) {
     ## Get camp sites from OSM #################################################
     outfile <- paste0("~/GISdata/Layers/Auto/osm/OSM_Camp_sites_",ar,".gpx")
     cat(paste("Query for camp sites",ar,"\n"))
-
 
     q1      <- add_osm_feature(call, key = "tourism", value =  "camp_site")
     q1      <- osmdata_sf(q1)
@@ -146,9 +145,7 @@ for (ar in regions) {
     write_sf(EXP, outfile, driver = "GPX", append = F, overwrite = T)
 
 
-
-
-
+stop()
     ## Get drinking water and springs from OSM #################################
     outfile <- paste0("~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs_",ar,".gpx")
     cat(paste("Query for drinking water and springs",ar,"\n"))
@@ -157,7 +154,7 @@ for (ar in regions) {
     q1      <- osmdata_sf(q1)
     Sys.sleep(20) ## be polite to server
     q1      <- q1$osm_points
-    q1$sym  <-"Drinking Water"
+    q1$sym  <- "Drinking Water"
     q1$desc <- "vrisi"
     saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Drinking_water.Rds")
 
@@ -165,14 +162,14 @@ for (ar in regions) {
     q2      <- osmdata_sf(q2)
     Sys.sleep(20) ## be polite to server
     q2      <- q2$osm_points
-    q2$sym  <-"Parachute Area"
+    q2$sym  <- "Parachute Area"
     q2$desc <- "pigi"
-    saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_Springs.Rds")
+    saveRDS(q2, "~/GISdata/Layers/Auto/osm/OSM_Springs.Rds")
 
     ## combine available water
     wecare <- intersect(names(q1),names(q2))
     Q      <- rbind( q1[wecare], q2[wecare])
-    Q          <- unique(Q)
+    Q      <- unique(Q)
     # Q$geometry <- sf::st_centroid(Q$geometry)
 
     ## drop fields
@@ -272,12 +269,12 @@ for (ar in regions) {
     q1      <- osmdata_sf(q1)
     Sys.sleep(20) ## be polite to server
     q1      <- q1$osm_points
-    q1$sym  <-"Dam"
+    q1$sym  <- "Dam"
     q1$desc <- "falls"
     saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_Waterfalls.Rds")
 
-    Q <-    q1
-    Q          <- unique(Q)
+    Q       <- q1
+    Q       <- unique(Q)
     # Q$geometry <- sf::st_centroid(Q$geometry)
 
 
