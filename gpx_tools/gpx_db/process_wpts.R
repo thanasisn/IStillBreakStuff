@@ -174,9 +174,6 @@ if (DRINKING_WATER) {
     dw$mtime  <- file.mtime(dw_fl)
     dw        <- dw[wecare]
 
-    ## set a name for display in case empty
-    dw$name[is.na(dw$name)] <- "Nero"
-
     ## reproject to meters
     dwm <- st_transform(dw, EPSG) # apply transformation to points sf
 
