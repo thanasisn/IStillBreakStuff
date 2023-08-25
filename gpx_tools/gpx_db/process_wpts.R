@@ -157,6 +157,7 @@ if (DRINKING_WATER) {
     dw$name   <- gsub("\n", " ", dw$name)
     ## set a name for display in case empty
     dw$name[is.na(dw$name)] <- "Nero"
+    dw$link <- NA
 
     ## overpass web interface
     ## parse drinking water
