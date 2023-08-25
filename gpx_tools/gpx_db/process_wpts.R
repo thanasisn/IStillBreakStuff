@@ -155,8 +155,8 @@ if (DRINKING_WATER) {
     ## clean data
     dw$desc   <- gsub("\n", " ", dw$desc)
     dw$name   <- gsub("\n", " ", dw$name)
-    ## set a name for display
-    dw$name[is.na(dw$name)] <- "Nero OSM"
+    ## set a name for display in case empty
+    dw$name[is.na(dw$name)] <- "Nero"
 
     ## overpass web interface
     ## parse drinking water
@@ -173,6 +173,9 @@ if (DRINKING_WATER) {
     dw$Region <- NA
     dw$mtime  <- file.mtime(dw_fl)
     dw        <- dw[wecare]
+
+    ## set a name for display in case empty
+    dw$name[is.na(dw$name)] <- "Nero"
 
     ## reproject to meters
     dwm <- st_transform(dw, EPSG) # apply transformation to points sf
@@ -197,6 +200,9 @@ if (WATERFALLS) {
     ## clean data
     dw$desc   <- gsub("\n"," ",dw$desc)
 
+    ## set a name for display in case empty
+    dw$name[is.na(dw$name)] <- "Waterfall"
+
     # dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
     # dw$name   <- sub("node/[0-9]+","falls",dw$name)
 
@@ -218,13 +224,16 @@ if (WATERFALLS) {
 
 
 ## Add caves from OSM ####
-if (WATERFALLS) {
+if (CAVES) {
 
     ## load water falls data
     dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Caves_Gr.gpx"
     dw        <- read_sf(dw_fl, layer = "waypoints")
     ## clean data
     dw$desc   <- gsub("\n"," ",dw$desc)
+
+    ## set a name for display in case empty
+    dw$name[is.na(dw$name)] <- "Cave"
 
     # dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
     # dw$name   <- sub("node/[0-9]+","falls",dw$name)
