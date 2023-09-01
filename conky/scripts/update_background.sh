@@ -54,11 +54,12 @@ screen_size=$( xrandr |awk '/\*/ {print $1}' )
 
 IFS=$'\n'
 readarray -t <<<"$screen_size"
-feh_command="feh --bg-fill --no-fehbg"
+feh_command="feh --no-fehbg"
 
 for i in "${MAPFILE[@]}"; do
     echo size: "$i"
-    feh_command="$feh_command BackGround_$i.png"
+    # feh_command="$feh_command --bg-fill BackGround_$i.png"
+    feh_command="$feh_command --bg-max ~/MISC/Media/39,409_23,387_1024.jpg"
 done
 
 eval "$feh_command"
