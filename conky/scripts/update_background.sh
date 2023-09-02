@@ -59,7 +59,7 @@ feh_command="feh --no-fehbg"
 for i in "${MAPFILE[@]}"; do
     echo size: "$i"
     # feh_command="$feh_command --bg-fill BackGround_$i.png"
-    feh_command="$feh_command --bg-max ~/MISC/Media/39,409_23,387_1024.jpg"
+    feh_command="$feh_command --bg-max ~/MISC/Media/result.png"
 done
 
 eval "$feh_command"
