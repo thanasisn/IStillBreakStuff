@@ -74,6 +74,7 @@ data['Rel thread']  = data.thread  / refthread.squeeze()
 ## clean duplicates and save all data
 data = data.drop_duplicates()
 data.to_csv('CPU_scrap_data.csv')
+data.to_csv('~/LOGs/CPU_scrap_data.csv')
 
 ## ignore these keys
 removekeys = ['price',
