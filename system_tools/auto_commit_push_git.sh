@@ -147,8 +147,8 @@ folders=(
     "$HOME/RAD_QC"
     "$HOME/SUN"
     "$HOME/TSI"
-    "$HOME/MANUSCRIPTS/01.2022_sdr_trends"
-    "$HOME/MANUSCRIPTS/02.td"
+    "$HOME/MANUSCRIPTS/01_2022_sdr_trends"
+    "$HOME/MANUSCRIPTS/02_td"
     "$HOME/MANUSCRIPTS/presentations"
 )
 
