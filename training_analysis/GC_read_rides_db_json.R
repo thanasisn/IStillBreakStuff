@@ -50,6 +50,9 @@ if (DEBUG ||
     !file.exists(pdfout2)) {
     cat("\nHave to parse", gccache, "\n")
 
+    ## remove BOM
+    # system(paste("dos2unix -r ", gccache))
+
     ## read the whole data base
     data <- fromJSON(gccache, flatten = FALSE)
     stopifnot(length(data) == 2)
