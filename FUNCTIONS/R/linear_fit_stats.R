@@ -24,19 +24,23 @@
 linear_fit_stats <- function(lm, confidence_interval) {
 
     ## compute confidence intervals
-    default_confint <- 0.95
-    standard <- data.frame(confint(lm, level = default_confint))
+    default_confint   <- 0.95
+    standard          <- data.frame(confint(lm, level = default_confint))
     standard$interval <- ( standard[,2] - standard[,1] ) / 2
-    tt <- data.frame(t(standard$interval))
-    names(tt) <- paste0(c("intercept","slope"),".ConfInt_",default_confint)
+    tt                <- data.frame(t(standard$interval))
+    names(tt)         <- paste0(c("intercept","slope"),
+                                  ".ConfInt_",
+                                  default_confint)
 
     if (!missing(confidence_interval)) {
-        extra_confint <- confidence_interval
-        extra <- data.frame(confint(lm, level = extra_confint))
+        extra_confint  <- confidence_interval
+        extra          <- data.frame(confint(lm, level = extra_confint))
         extra$interval <- ( extra[,2] - extra[,1] ) / 2
-        ss <- data.frame(t(extra$interval))
-        names(ss) <- paste0(c("intercept","slope"),".ConfInt_",extra_confint)
-        tt<-cbind(tt,ss)
+        ss             <- data.frame(t(extra$interval))
+        names(ss)      <- paste0(c("intercept","slope"),
+                                 ".ConfInt_",
+                                 extra_confint)
+        tt <- cbind(tt,ss)
     }
 
     ## get more statistics
@@ -57,3 +61,11 @@ linear_fit_stats <- function(lm, confidence_interval) {
         tt
     )
 }
+
+
+
+
+
+
+
+
