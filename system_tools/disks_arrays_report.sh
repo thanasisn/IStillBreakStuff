@@ -12,30 +12,37 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 set +x
+set +e
 
 ## Variables
-USER="athan"
-LOGDIR="/home/$USER/LOGs/SYSTEM_LOGS"
-
+auser="athan"
+LOGDIR="/home/$auser/LOGs/SYSTEM_LOGS"
 mkdir -p "$LOGDIR"
 
-logfile="${LOGDIR}/Disks_$(hostname)_$(date +'%F').check"
-echo " " > "$logfile"
+
+NOTIFY_SEND="/home/athan/CODE/system_tools/pub_notifications.py"
+statusfile="${LOGDIR}/Disks_report_$(hostname).status"
+logfile="${LOGDIR}/Disks_report_$(hostname)_$(date +'%F').check"
+echo "" > "$logfile"
+touch "$statusfile"
+
 
 cleanup() {
-    ## make all files accessible when running as root
-    chown $USER "$LOGDIR"
-    chmod a+rw  "$LOGDIR"*
-    chown $USER "$LOGDIR"*
-    chmod a+rw  "$logfile"
-    chown $USER "$logfile"
+    ## make all files accessible after running as root
+    chown "$auser" "$LOGDIR"
+    chmod a+rw     "$LOGDIR"*
+    chown "$auser" "$LOGDIR"*
+    chmod a+rw     "$logfile"
+    chown "$auser" "$logfile"
+    chmod a+rw     "$statusfile"
+    chown "$auser" "$statusfile"
 }
 
 trap cleanup 0 1 2 3 6
 
 ## magic redirection for the whole script
 exec  > >(tee -i "${logfile}")
-#exec 2> >(tee -i "${logfile}" >&2)
+exec 2> >(tee -i "${logfile}" >&2)
 
 echo ""
 echo "Log file: $logfile"
@@ -47,8 +54,8 @@ echo ""
 
 ls -d -1 "/dev/md"* | while read device; do
     echo ""
-    echo "** REPORT FOR $device **"
-    /usr/sbin/mdadm --detail "${device}"
+    echo "** REPORT FOR $(hostname) $device **"
+    mdadm --detail "${device}"
     echo ""
 done
 
@@ -62,8 +69,8 @@ echo ""
 sudo -S /bin/btrfs fi show;
 echo
 
-sudo -S /bin/btrfs fi show | grep -o "/dev/.*" | while read device; do
-    echo "** REPORT FOR $device"
+sudo -S /bin/btrfs filesystem show | grep -o "/dev/.*" | while read device; do
+    echo "** REPORT FOR $(hostname) $device"
     btrfs device stats "$device"
     echo ""
 done

@@ -1,5 +1,6 @@
 #!/bin/bash
 ## created on 2020-11-08
+## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 #### Check status of akk mdraid and btrfs arrays for the host.
 ## Run locally and hope for a nice notification for errors
@@ -9,18 +10,19 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+set +x
 set +e
 
+## Variables
 auser="athan"
-LOGDIR="/home/athan/LOGs/SYSTEM_LOGS"
+LOGDIR="/home/$auser/LOGs/SYSTEM_LOGS"
 mkdir -p "$LOGDIR"
 
 
 NOTIFY_SEND="/home/athan/CODE/system_tools/pub_notifications.py"
-statusfile="${LOGDIR}/Disks_$(hostname).status"
-logfile="${LOGDIR}/Disks_$(hostname)_$(date +'%F').check"
+statusfile="${LOGDIR}/Disks_check_$(hostname).status"
+logfile="${LOGDIR}/Disks_check_$(hostname)_$(date +'%F').check"
 echo "" > "$logfile"
-echo      "$logfile"
 touch "$statusfile"
 
 
@@ -41,8 +43,8 @@ trap cleanup 0 1 2 3 6
 exec  > >(tee -i "${logfile}")
 exec 2> >(tee -i "${logfile}" >&2)
 
-
-
+echo ""
+echo "Log file: $logfile"
 echo ""
 echo "-------------------------------------"
 echo "$(date +%F_%R) RAID report on $(hostname)"
@@ -66,7 +68,7 @@ echo
 sudo -S /bin/btrfs filesystem show | grep -o "/dev/.*" | while read device; do
     echo "** REPORT FOR $(hostname) $device"
     btrfs device stats "$device"
-    echo
+    echo ""
 done
 
 echo "DONE Probing"
