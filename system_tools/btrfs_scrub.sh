@@ -1,40 +1,36 @@
 #!/bin/bash
 
-#### Start a btrfs scrub to check data integrity
+#### Scrub all btrfs filesystems
 
 
 LOGDIR="/home/athan/LOGs/SYSTEM_LOGS"
 
 mkdir -p "$LOGDIR"
 
-logfile="${LOGDIR}/$0_$(hostname)_$(date +'%F').check"
+logfile="${LOGDIR}/Btrfs_scrub_$(hostname)_$(date +'%F').check"
 echo " " > "$logfile"
 chmod a+rw  "$logfile"
 
 exec  > >(tee -i "${logfile}")
 exec 2> >(tee -i "${logfile}" >&2)
 
-echo "BTRFS partitions to scrub:"
-lsblk -f | grep  "btrfs" | grep -o " /.*"
+echo ""
+echo " * * * READ ONLY SCRUB * * * "
 
 lsblk -f | grep  "btrfs" | grep -o " /.*" | while read device; do
     echo ""
-    echo " ** Scrub btrfs $device ** "
-    sudo /usr/bin/btrfs scrub start -B -d "$device"
-    echo "---------------------------------------------------"
-    echo "** Status btrfs $device"
-    sudo /usr/bin/btrfs scrub status -d -R "$device"
-    echo "---------------------------------------------------"
+    echo "** Scrub btrfs $device"
+    sudo /usr/bin/btrfs scrub start -B -d -r "$device"
+    echo "---------------------------------------------"
 done
 
-echo
-echo "There is and a 'btrfs check' option, to use with care"
+echo ""
+echo " STATUS CHECK "
+echo ""
+sudo -S /usr/bin/btrfs filesystem show | grep -o "/dev/.*" | while read device; do
+    echo "** REPORT FOR $device"
+    sudo /usr/bin/btrfs device stats "$device"
+    echo ""
+done
 
-
-
-
-
-
-
-
-exit 0
+exit
