@@ -111,6 +111,12 @@ sudo ls -lF /dev/disk/by-id/
 echo ""
 echo "----------------------------------------------------------------"
 echo ""
+echo " ** findmnt ** "
+echo ""
+sudo findmnt --list --real --output-all --notruncate
+echo ""
+echo "----------------------------------------------------------------"
+echo ""
 echo " ** lshw -short -C disk ** "
 echo ""
 sudo lshw -short -C disk 
