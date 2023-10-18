@@ -6,17 +6,29 @@
 
 host="$1"
 
-LPORT="5900"
-width="1000"
-height="700"
-depth="16"
+## get resolution to use
+resolution="$(xdpyinfo | awk '/dimensions/{print $2}' | head -n 1)"
+width="$(echo $resolution | cut -d'x' -f1)"
+height="$(echo $resolution | cut -d'x' -f2)"
 
+echo "Screan Resolution"
+echo $width $height
+
+
+xgap="20"
+ygap="50"
+LPORT="5900"
+width=$((width - xgap))
+height=$((height - ygap))
+depth="16"
 if [ -z "$host" ]
 then
       echo "Give a host/ip"
       exit 1
 fi
 
+echo "Remote host resolution"
+echo "${width}x${height}"
 
 ## always restart xvnc
 ssh "$host" "pkill  Xtightvnc; pkill Xtigervnc; vncserver  -geometry ${width}x${height} -depth $depth -localhost"

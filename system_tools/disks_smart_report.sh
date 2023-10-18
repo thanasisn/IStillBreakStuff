@@ -4,19 +4,27 @@
 
 #### Gather S.M.A.R.T. info on all system drives
 
-if sudo true; then
-    true
-else
-    echo 'Root privileges required'
-    exit 1
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root"
+   exit 1
 fi
 
 set +x
+set +e
 
-## Variables init
-USER="athan"
-LOGDIR="$HOME/LOGs/SYSTEM_LOGS"
+## Variables
+auser="athan"
+LOGDIR="/home/$auser/LOGs/SYSTEM_LOGS/SMART"
 mkdir -p "$LOGDIR"
+
+cleanup() {
+    ## make all files accessible after running as root
+    chown "$auser" "$LOGDIR"
+    chmod a+rw     "$LOGDIR"*
+    chown "$auser" "$LOGDIR"*
+}
+
+trap cleanup 0 1 2 3 6
 
 ## Loop all devices
 for ad in /dev/sd[a-z] /dev/sd[a-z][a-z]; do
@@ -31,7 +39,7 @@ for ad in /dev/sd[a-z] /dev/sd[a-z][a-z]; do
     hourson="$( echo "$data" | grep -i "Power_On_Hours"   | sed 's/[ ]\+/ /g' | grep -o "[0-9]\+[ ]*$")"
     minhoron="$(echo "$data" | grep -i "Power_On_Minutes" | sed 's/[ ]\+/ /g' | cut -d" " -f11 | sed 's/h.*//g')"
     ## ouput file
-    outfile="${LOGDIR}/${model}_${serial}.smart"
+    outfile="${LOGDIR}/${model}_${serial}_$(date +%F).smart"
     ## generate report
     (
         echo ""

@@ -2,7 +2,6 @@
 ## created on 2020-11-08
 ## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
-
 #### Gather information for hard disks and arrays
 ## For btrfs and raid arrays
 
@@ -16,7 +15,7 @@ set +e
 
 ## Variables
 auser="athan"
-LOGDIR="/home/$auser/LOGs/SYSTEM_LOGS"
+LOGDIR="/home/$auser/LOGs/SYSTEM_LOGS/STORAGE"
 mkdir -p "$LOGDIR"
 
 
