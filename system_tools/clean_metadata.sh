@@ -7,26 +7,24 @@
 ## Try to remove metadata from any given file...
 ## Not fool proof of course. Test the results
 
+for af in "$@"; do
 
-FILE="$1"
+    [[ ! -f "$af" ]] && echo "NOT A FILE: $af" && continue
 
-if [ ! -f "$FILE" ]; then
-    echo "Give a file"
-    exit 1
-fi
+    echo "REMOVE METADATA FROM:  $af"
 
-echo "REMOVE METADATA:  $FILE"
+    ## show tags from the original PDF
+    # exiftool -all:all "$af"
 
-## show tags from the original PDF
-# exiftool -all:all "$FILE"
+    ## This will empty tags (XMP + metadata) from any file
+    exiftool -overwrite_original -all:all= "$af"
 
-## This will empty tags (XMP + metadata) from any file
-exiftool -overwrite_original -all:all= "$FILE"
+    ## Not sure why I use that
+    qpdf --linearize "$af" "${af}.tmp" && mv "${af}.tmp" "$af"
 
-## Not sure why I use that
-qpdf --linearize "$FILE" "${FILE}.tmp" && mv "${FILE}.tmp" "$FILE"
+    ## Show remaining metadata to be sure
+    exiftool -all:all "$af"
 
-## Show remaining metadata to be sure
-exiftool -all:all "$FILE"
+    done
 
 exit 0
