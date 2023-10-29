@@ -28,11 +28,12 @@ flip_matrix_v <- function(x) {
 #' @return         Nothing the columns are removed in-place
 #' @export
 #'
-rm.cols.DT <- function( DT , pattern ) {
-    message(paste("\nRemoving columns:", grep( pattern , names(DT), value = T) ))
-    # cat(paste("\nRemoving columns:", grep( pattern , names(DT), value = T) ),"\n")
+rm.cols.DT <- function(DT, pattern, quiet = FALSE ) {
+    if (quiet == FALSE) {
+        message(paste("\nRemoving columns:", grep(pattern ,names(DT), value = T)))
+    }
     suppressWarnings(
-        DT[ , (grep( pattern , names(DT))) := NULL ]
+        DT[ , (grep(pattern, names(DT))) := NULL]
     )
 }
 
@@ -45,7 +46,7 @@ rm.cols.DT <- function( DT , pattern ) {
 #' @return   A new data.table with removed the duplicate filled columns
 #' @export
 #'
-rm.cols.dups.DT <- function( DT ) {
+rm.cols.dups.DT <- function(DT) {
     if (nrow(DT) > 1) {
         dtnames <- names(DT)
         suppressWarnings({
