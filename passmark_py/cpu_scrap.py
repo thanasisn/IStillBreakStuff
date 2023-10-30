@@ -19,9 +19,7 @@ scraper = Scraper("www.cpubenchmark.net")
 # search_results = scraper.search(query="i5 53",    limit = 4)
 
 CPU = [
-    "G3460",        # blue
     "Ryzen 5 5500U",
-    "Xeon Silver 4108",   # yperos
     "i3-3110M",           # crane
     "i5-1135G7",
     "i5-3380M",           # tyler
@@ -35,6 +33,11 @@ CPU = [
     "i7-5500U",
     "i7-5600U",
     "i7-8700",
+    # Desktop
+    "i5-7500",
+    "i5-3450",
+    "G3460",        # blue
+    "Xeon Silver 4108",   # yperos
 ]
 
 
@@ -82,6 +85,7 @@ removekeys = ['price',
               'secondaryLogicals',
               'output',
               'value',
+              'speed',
               'href',
               'rank',
               'powerPerf',
@@ -90,7 +94,9 @@ removekeys = ['price',
               'threadValue',
               'name',
               'turbo',
-              'cat']
+              'tdp',
+              'thread',
+              ]
 
 # ## print a nice format table in console without pandas
 # ## remove some keys from dictionaries
@@ -109,14 +115,14 @@ removekeys = ['price',
 ## print a nice pandas table to terninal
 pp = data.drop(removekeys, axis=1)
 pp = pp.round(3)
-pp = pp.sort_values(by=['cpumark','thread'], ascending=False)
+pp = pp.sort_values(by=['cpumark'], ascending=False)
 
 ## rearrange columns
 pp.insert(1, 'Rel cpumark', pp.pop('Rel cpumark'))
 pp.insert(2, 'Rel thread',  pp.pop('Rel thread'))
 pp.insert(3, 'cpumark',     pp.pop('cpumark'))
-pp.insert(4, 'thread',      pp.pop('thread'))
-pp.insert(5, 'key',         pp.pop('key'))
+#pp.insert(4, 'thread',      pp.pop('thread'))
+pp.insert(4, 'key',         pp.pop('key'))
 
 
 ## output
