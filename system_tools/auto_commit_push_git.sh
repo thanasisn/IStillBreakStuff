@@ -31,6 +31,7 @@ set +e
 echo "DOTFILES"
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" commit -uno -a -m "Commit $(date +'%F %R')"
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" push -u origin master
+git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" maintenance run --auto
 
 
 
@@ -39,7 +40,7 @@ cd "$HOME/CODE/"
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
-
+git maintenance run --auto
 
 
 echo "---------------"
@@ -47,6 +48,7 @@ cd "$HOME/CODE/R_myRtools/myRtools"
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
+git maintenance run --auto
 
 
 
@@ -55,6 +57,7 @@ cd "$HOME/CODE/R_POLAr/POLAr/"
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin master
+git maintenance run --auto
 
 
 
@@ -63,6 +66,7 @@ cd "$HOME/CODE/deploy/"
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
+git maintenance run --auto
 
 
 
@@ -75,6 +79,7 @@ cd ".."
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
+git maintenance run --auto
 
 
 
@@ -87,6 +92,7 @@ cd ".."
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
+git maintenance run --auto
 
 
 
@@ -100,6 +106,7 @@ pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
 ## will include to thesis
 git push -f -u origin main
+git maintenance run --auto
 
 
 
@@ -112,6 +119,7 @@ cd ".."
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
+git maintenance run --auto
 
 
 
@@ -131,6 +139,7 @@ cd ".."
 pwd
 git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
+git maintenance run --auto
 
 
 
@@ -201,6 +210,7 @@ for i in "${folders[@]}"; do
     git commit -uno -a -m "Commit $(date +'%F %R')"
     git push -f
     git push --tag
+    git maintenance run --auto
 done
 
 
@@ -283,6 +293,7 @@ for i in "${folders[@]}"; do
                   xargs -t -0 git add
     ## commit to local repo
     git commit -uno -a -m "Commit $(date +'%F %R')"
+    git maintenance run --auto
 done
 
 echo
