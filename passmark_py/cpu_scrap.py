@@ -20,6 +20,7 @@ scraper = Scraper("www.cpubenchmark.net")
 
 CPU = [
     "Ryzen 5 5500U",
+    "Ryzen 7 Pro 5850U",
     "i3-3110M",           # crane
     "i5-1135G7",
     "i5-3380M",           # tyler
@@ -30,9 +31,13 @@ CPU = [
     "i5-6300U",
     "i5-6440HQ",
     "i5-7200U",
+    "i5-7300U",
+    "i5-8350U",
+    "i7-3520M",
     "i7-5500U",
     "i7-5600U",
     "i7-8700",
+    "i7-8750H",
     # Desktop
     "i5-7500",
     "i5-3450",
