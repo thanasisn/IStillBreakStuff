@@ -34,10 +34,10 @@ set +e
 pids=()
 
 
-(
-    "$HOME/CODE/conky/scripts/meteoblue_get.sh" 
-    "$HOME/CODE/conky/scripts/getForecast_DarkSkyNet.R" 
-) & pids+=($!)
+# (
+#     "$HOME/CODE/conky/scripts/meteoblue_get.sh" 
+#     "$HOME/CODE/conky/scripts/getForecast_DarkSkyNet.R" 
+# ) & pids+=($!)
 
 
 (

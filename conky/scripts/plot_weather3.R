@@ -106,11 +106,11 @@ for (av in wecare) {
 outfiles <- list.files(outdir, "*.pdf", full.names = T)
 file.remove(outfiles[file.mtime(outfiles) < Sys.time() -  5*24*3600])
 
-
+grep("sunrise",names(WAPI_daily), value = T)
 
 #### Prepare daily value from meteo blue ####
-WAPI_daily$sunrise <- as.POSIXct(strptime(WAPI_daily$sunrise, "%FT%R" , tz = WAPI_metadata$timezone ))
-WAPI_daily$sunset  <- as.POSIXct(strptime(WAPI_daily$sunset,  "%FT%R" , tz = WAPI_metadata$timezone ))
+WAPI_daily$sunrise <- as.POSIXct(strptime(WAPI_daily$sunrise_best_match, "%FT%R" , tz = WAPI_metadata$timezone ))
+WAPI_daily$sunset  <- as.POSIXct(strptime(WAPI_daily$sunset_best_match,  "%FT%R" , tz = WAPI_metadata$timezone ))
 
 WAPI_daily$From  <- as.POSIXct(strptime( paste(WAPI_daily$time, "00:00"), "%F %R" ), tz = WAPI_metadata$timezone)
 WAPI_daily$Until <- as.POSIXct(strptime( paste(WAPI_daily$time, "23:59"), "%F %R" ), tz = WAPI_metadata$timezone)

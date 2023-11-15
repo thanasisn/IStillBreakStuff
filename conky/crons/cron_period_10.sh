@@ -38,7 +38,7 @@ pids=()
 # "${SCRIPTS}Cnk_gcal_reader.sh"  &
 
 ## plot weather
-"$HOME/CODE/conky/scripts/plot_weather2.R" & pids+=($!)
+# "$HOME/CODE/conky/scripts/plot_weather2.R" & pids+=($!)
 "$HOME/CODE/conky/scripts/plot_weather3.R" & pids+=($!)
 
 ## output backup status
