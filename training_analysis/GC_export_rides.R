@@ -1,6 +1,8 @@
 #!/usr/bin/env Rscript
 
-#### Golden Cheetah get activities from a running instance of GC
+#### Golden Cheetach get activities from a running instance of GC
+
+## GoldenCheetach can serve data to others    
 
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")

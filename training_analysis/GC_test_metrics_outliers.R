@@ -33,6 +33,7 @@
 
 #### Golden Cheetah detect outliers in metrics data
 
+## Plot everything along outliers
 
 ####_ Set environment _####
 #rm(list = (ls()[ls() != ""]))

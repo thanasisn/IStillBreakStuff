@@ -1,8 +1,10 @@
 #!/usr/bin/env Rscript
 
 #### Golden Cheetah read activities summary directly
-## This is sourced by other files
 
+## Not usually used, we favor reading the whole Ridedb.json
+## More detail's in individual files
+## Should have the same output with Ridedb
 
 ###TODO explore this tools
 # library(cycleRtools)
@@ -10,7 +12,6 @@
 # GC_activity("Athan")
 # GC_metrics("Athan")
 # read_ride(file = af)
-
 
 ####_ Set environment _####
 # Sys.setenv(TZ = "UTC")

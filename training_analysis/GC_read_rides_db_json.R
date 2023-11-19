@@ -3,11 +3,11 @@
 #### Golden Cheetah read activities summary directly from rideDB.json
 
 ## - Runs if it is needed
-## - Read raw data
-## - Apply some filtering
-## - Create some new variables
-## - Store parsed data
-## - Plots all variables
+## - Reads raw data
+## - Applies some filtes
+## - Creates some new variables
+## - Stores parsed data
+## - Plots almost all variables
 
 ####_ Set environment _####
 Sys.setenv(TZ = "UTC")
@@ -25,7 +25,6 @@ source("~/CODE/FUNCTIONS/R/data.R")
 ## data paths
 gccache   <- "~/TRAIN/GoldenCheetah/Athan/cache/rideDB.json"
 storagefl <- "~/DATA/Other/GC_json_ride_data_2.Rds"
-
 pdfout1   <- "~/LOGs/training_status/GC_all_variables.pdf"
 pdfout2   <- "~/LOGs/training_status/GC_all_variables_last.pdf"
 LASTDAYS  <- 400
@@ -34,7 +33,6 @@ DATA_PLOT_LIMIT <- 10
 
 ## choose loess criterion for span
 LOESS_CRITERIO <-  c("aicc", "gcv")[1]
-
 
 DEBUG     <- FALSE
 # DEBUG     <- TRUE

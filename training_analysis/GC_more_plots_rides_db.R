@@ -1,12 +1,12 @@
 #!/usr/bin/env Rscript
 
-#### Human Performance plots and data
-## This is incorporated to conky
+#### Human Performance plots and data for GC data for different uses
 
 # Data from main json
 # Normal plots
 # Unified plots
 # Mobile phone plot
+# Conky desktop plot
 
 ####_ Set environment _####
 closeAllConnections()

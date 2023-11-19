@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 
 #### Golden Cheetah plot shoes usage total distance vs time
+
 ## Used inside Golden Cheetah software
 ## Plot a line for each shoe usage
 

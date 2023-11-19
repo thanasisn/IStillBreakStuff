@@ -35,7 +35,8 @@
 
 #### Read data from Garmin Connect data dump
 
-
+## - Have to ask Garmin for all your data and download them
+## - Selects some data to parse and plot
 
 ####_ Set environment _####
 # closeAllConnections()
@@ -48,7 +49,6 @@ Script.Name <- "~/CODE/training_analysis/GAR_read_download.R"
 datalocation <- "~/ZHOST/ggg/6d2aff5b-0e5a-4608-9799-f5e304c02b77_1/"
 
 system2(paste0('dos2unix ' , datalocation, '**/*.json'))
-
 
 library(data.table)
 library(jsonlite)

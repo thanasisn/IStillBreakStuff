@@ -34,6 +34,9 @@ Data sources over the years are: Fenix 6x, etrex 30x, Polar rs800cx and other ra
 
 
 
+
+
+
 ## Some references 
 
 - [fellrnr/Modeling Human Performance](https://fellrnr.com/wiki/Modeling_Human_Performance)
