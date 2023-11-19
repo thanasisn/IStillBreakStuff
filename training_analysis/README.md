@@ -18,23 +18,23 @@ but may read them directly also.
 Data sources over the years are: Fenix 6x, etrex 30x, Polar rs800cx and other random GPS devices.
 
 
-- **GC_plots_2.R                     :**   Golden Cheetah plots
-- **GC_plots_3.R                     :**   Golden Cheetah plots
-- **GC_plots.R                       :**   Golden Cheetah plots
+- **GAR_read_download.R              :**   Read data from Garmin Connect data dump
+- **GC_conky_plots_rides_db.R        :**   Golden Cheetah plots for desktop with conky
+- **GC_export_rides.R                :**   Golden Cheetach get activities from a running instance of GC
+- **GC_more_plots_rides_db.R         :**   Human Performance plots and data for GC data for different uses
+- **GC_read_activities_json.R        :**   Golden Cheetah read activities summary directly from individual files
 - **GC_read_activities.R             :**   Golden Cheetah read activities summary directly
 - **GC_read.R                        :**   Golden Cheetah read activities directly
-- **GC_read_rides.R                  :**   Golden Cheetah read activities summary directly
+- **GC_read_rides_db_json.R          :**   Golden Cheetah read activities summary directly from rideDB.json
 - **GC_test_metrics_outliers.R       :**   Golden Cheetah detect outliers in metrics data
 - **GC_test_metrics_pace_stats.R     :**   Golden Cheetah
 - **GC_test_shoes_usage_duration.R   :**   Golden Cheetah plot shoes usage total duration vs total distance
 - **GC_test_shoes_usage_timeseries.R :**   Golden Cheetah plot shoes usage total distance vs time
 - **GC_test_shoes_usage_usage.R      :**   Golden Cheetah plot shoes usage total distance vs time
-- **GC_test_target_estimation.R      :**   Golden Cheetah plot shoes usage total distance vs time
-- **GC_test_target_load.R            :**   Golden Cheetah plot shoes usage total distance vs time
-
-
-
-
+- **GC_test_target_estimation.R      :**   Golden Cheetah plot total trends
+- **GC_test_target_load.R            :**   Golden Cheetah plot training load yearly summary
+- **HRV_gather_GC.R                  :**   Parse HRV_monitor exported data
+- **HRV_monitor_parse.R              :**   Parse HRV_monitor exported data
 
 
 ## Some references 
