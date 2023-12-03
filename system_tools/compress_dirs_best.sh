@@ -17,8 +17,20 @@ BYTES_REDUCTION="1024"
 OVERWRITE="yes"
 PROGRESS="yes"
 
-ALGO=( bzip2 gzip xz )
+ALGO=( bzip2 gzip xz brotli zstd )
 
+## Check available compression algorithms
+for i in ${!ALGO[@]}; do
+    ## remove not existing
+    if ! command -v "${ALGO[i]}" &> /dev/null; then
+        # echo "NOT available: ${ALGO[i]}" 
+        unset "ALGO[i]"
+    # else
+    #     echo "Available  ${ALGO[i]}"
+    fi
+done
+echo ""
+echo "Available codecs:  ${ALGO[@]}"
 
 function _usage()
 {
@@ -29,7 +41,7 @@ $*
     Usage: $(basename "${0}") <[options]> ./Glob/path/*/
 
     Options:
-        --algorithm       [bzip2 gzip xz] (${ALGO[@]}) Give a specific algorithm to use quote and space for multiple .
+        --algorithm       [<an algorithm>] (${ALGO[@]}) Give a specific algorithm to use quote and space for multiple .
         --ask-human       [yes/no] ($INTERACTIVE) Ask human for input. Setting to 'no' may be dangerous.
         --compress        [yes/no] ($APPLY_COMPRESSION) Write file with the best compressed. If no just test for best algorithm.
         --remove-source   [yes/no] ($REMOVE_ORIGINAL) Remove source file if compression was successful.
@@ -218,11 +230,11 @@ for af in "$@" ; do
 
     ## print stats table
     if [[ $SHOW_TABLE =~ ^[Yy] ]]; then
-        paste <(printf "%s\n"   "${Scodecs[@]}") \
-              <(printf "%s\n"   "${Sclevel[@]}") \
-              <(printf "%s\n"   "${Sfsizes[@]}") \
-              <(printf "%s%%\n" "${Scratio[@]}") \
-              <(printf "%ss\n"  "${Scdurat[@]}")
+        paste <(printf "%s\n"    "${Scodecs[@]}") \
+              <(printf "%s\n"    "${Sclevel[@]}") \
+              <(printf "%s\n"    "${Sfsizes[@]}") \
+              <(printf "%s %%\n" "${Scratio[@]}") \
+              <(printf "%s s\n"  "${Scdurat[@]}")
     fi
 
     ## compression logic
