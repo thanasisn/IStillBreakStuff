@@ -25,49 +25,10 @@ set +e
 
 ##  COMMIT PUSH to github repos  ###############################################
 
-## The following do not add files to git automatically
-
-## this works only on tyler
 echo "DOTFILES"
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" commit -uno -a -m "Commit $(date +'%F %R')"
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" push -u origin master
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" maintenance run --auto
-
-
-
-echo "---------------"
-cd "$HOME/CODE/"
-pwd
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
-git maintenance run --auto
-
-
-echo "---------------"
-cd "$HOME/CODE/R_myRtools/myRtools"
-pwd
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
-git maintenance run --auto
-
-
-
-echo "---------------"
-cd "$HOME/CODE/R_POLAr/POLAr/"
-pwd
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin master
-git maintenance run --auto
-
-
-
-echo "---------------"
-cd "$HOME/CODE/deploy/"
-pwd
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
-git maintenance run --auto
-
 
 
 echo "---------------"
@@ -144,17 +105,12 @@ git maintenance run --auto
 
 ####  COMMIT and PUSH to github NO ADD  ################################
 
-echo "---------------"
-cd "$HOME/CODE/R_myRtools/myRtools"
-pwd
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
-git maintenance run --auto
-
-echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 ## use full paths
 folders=(
+    "$HOME/CODE/"
+    "$HOME/CODE/R_POLAr/POLAr/"
     "$HOME/CODE/R_myRtools/myRtools"
+    "$HOME/CODE/deploy/"
 )
 
 ## go through main folder
@@ -208,6 +164,8 @@ for i in "${folders[@]}"; do
     pwd
     ## add files we care about
     find . -type f \(    -iname '*.bas'      \
+                      -o -iname '*.Rmd'      \
+                      -o -iname '*.bas'      \
                       -o -iname '*.bib'      \
                       -o -iname '*.c'        \
                       -o -iname '*.conf'     \
@@ -324,6 +282,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.tex'      \
                       -o -iname '*.txt'      \
                       -o -iname '*.yaml'     \
+                      -o -iname 'flake.lock' \
                       -o -iname 'makefile'   \) -print0 |\
                   xargs -t -0 git add
     ## commit to local repo
