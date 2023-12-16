@@ -142,8 +142,41 @@ git push -f -u origin main
 git maintenance run --auto
 
 
+####  COMMIT and PUSH to github NO ADD  ################################
 
-####  Automatically commit to github  ################################
+echo "---------------"
+cd "$HOME/CODE/R_myRtools/myRtools"
+pwd
+git commit -uno -a -m "Commit $(date +'%F %R')"
+git push -f -u origin main
+git maintenance run --auto
+
+echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+## use full paths
+folders=(
+    "$HOME/CODE/R_myRtools/myRtools"
+)
+
+## go through main folder
+for i in "${folders[@]}"; do
+    echo
+    info " $i "
+    echo
+    [ ! -d "$i" ] && echo "Not a folder: $i" && continue
+    ## go through sub folders
+    cd "$i" || return
+    ## in the git folder here
+    pwd
+    ## commit and push
+    git commit -uno -a -m "Commit $(date +'%F %R')"
+    git push -f
+    git push --tag
+    git maintenance run --auto
+done
+
+
+
+####  ADD COMMIT and PUSH to github  ################################
 
 ## use full paths
 folders=(
@@ -160,6 +193,7 @@ folders=(
     "$HOME/MANUSCRIPTS/02_enhancement"
     "$HOME/MANUSCRIPTS/presentations"
     "$HOME/MANUSCRIPTS/reports"
+    "$HOME/.nix-home"
 )
 
 ## go through main folder
@@ -204,6 +238,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.tex'      \
                       -o -iname '*.txt'      \
                       -o -iname '*.yaml'     \
+                      -o -iname 'flake.lock' \
                       -o -iname 'makefile'   \) -print0 |\
                   xargs -t -0 git add
     ## commit and push
@@ -218,7 +253,7 @@ done
 
 
 
-## COMMIT PUSH to local repos ########################################
+## ADD and COMMIT only for local repos ########################################
 
 ## use full paths
 folders=(
