@@ -123,6 +123,12 @@ echo ""
 echo "----------------------------------------------------------------"
 echo ""
 echo " ** sfdisk -d disk ** "
+echo ""
+echo "----------------------------------------------------------------"
+echo ""
+echo " ** hdparm ** "
+echo ""
+sudo hdparm -I /dev/sd*
 
 ls -1 "/dev/sd"? | while read device; do
     echo ""
