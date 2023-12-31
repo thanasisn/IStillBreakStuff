@@ -2,7 +2,7 @@
 
 #### Gather and store gpx track points systematically.
 ## Will be processed by other scripts
-## This gather all track points, filenames and mtime
+## This gather all track points, filenames and mtime from new gpx, fit.gz
 
 
 ####_ Set environment _####
@@ -33,11 +33,11 @@ options(warn=1)
 ## gather all gpx files
 gpxlist <- c()
 for (ar in gpx_repos) {
-    templist  <- list.files(path        = ar,
-                            pattern     = ".gpx$",
-                            recursive   = T,
-                            full.names  = T,
-                            ignore.case = T)
+    templist <- list.files(path        = ar,
+                           pattern     = ".gpx$",
+                           recursive   = T,
+                           full.names  = T,
+                           ignore.case = T)
     gpxlist <- unique(c(gpxlist, templist))
 }
 
@@ -55,16 +55,16 @@ gpxlist <- unique(c(gpxlist, traincomplist))
 ## load or start a new data table
 if (file.exists(trackpoints_fl)) {
     ## load old data
-    data <- readRDS(trackpoints_fl)
+    data   <- readRDS(trackpoints_fl)
     ## remove missing files
-    data <- data[ file.exists(filename) ]
+    data   <- data[ file.exists(filename) ]
     ## get parsed files
     dblist <- unique( data[, c("filename","F_mtime")] )
     ## get all files
     fllist <- data.frame(file = gpxlist,
                          F_mtime = file.mtime(gpxlist))
     ## files to do
-    ddd <- anti_join( fllist, dblist )
+    ddd    <- anti_join(fllist, dblist)
 
     ## check for changed files
     ##FIXME  not tested

@@ -50,8 +50,8 @@ DT2 <- DT2[ !is.na(time), ]
 ## find Google data we should include due to missing data
 setorder(DT2, time )
 setorder(DT,  time )
-near    <- myRtools::nearest( as.numeric( DT2$time),
-                              as.numeric( DT$time ) )
+near    <- myRtools::nearest(as.numeric( DT2$time),
+                             as.numeric( DT$time ) )
 timdiff <- abs( as.numeric(DT[ near, ]$time - DT2$time))
 DT2     <- DT2[ timdiff >= google_threshold ]
 
@@ -175,7 +175,7 @@ gdata::write.fwf(dup_points[,.(Set, filename, DupPnts, TotPnts, Cover, STime, ET
 
 
 
-####  Filter data by speed  #####
+##  Filter data by speed  ------------------------------------------------------
 
 ##TODO
 hist(DT$timediff)
@@ -207,7 +207,7 @@ DT[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(timedi
 
 
 
-#### Bin points in grids ####
+##  Bin points in grids  -------------------------------------------------------
 
 ## no need for all data for griding
 DT[, kph      := NULL]
