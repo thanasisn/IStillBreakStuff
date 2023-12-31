@@ -1,13 +1,13 @@
 
 #### Definitions of global variables for gpx_db scripts
 
-## This is file is sourced by R scripts
 
-
-## Repo of track points of all gpx files ####
+## Repo of track points of all gpx files  --------------------------------------
 EPSG_WGS84      <- 4326
 EPSG            <- 3857
+## points from local files
 trackpoints_fl  <- paste0("~/GISdata/Count_sl2_",EPSG,".Rds")
+## periodically download of google locations
 goolgepoints_fl <- "~/DATA/Other/GLH/Count_GlL_3857.Rds"
 
 
@@ -19,7 +19,7 @@ gpx_repos <- c("~/GISdata/GPX/",
                "~/TRAIN/GoldenCheetah/")
 
 
-## Files to evaluate track problems ####
+## Files to evaluate track problems  -------------------------------------------
 baseoutput      <- "~/GISdata/"
 ## track points with no times
 fl_notimes      <- paste0(baseoutput,"/Files_points_no_time.csv")
@@ -30,7 +30,7 @@ cover_threshold <- 0.95
 fl_suspctpt_all <- paste0(baseoutput,"/Dups_point_suspects_all.csv")
 
 
-## Output for qgis grid display ####
+## Output for qgis grid display  -----------------------------------------------
 
 ## one file for all data
 layers_out       <- "~/GISdata/Layers/Auto/"
@@ -56,7 +56,7 @@ rsltemp         <- 600    ##  in seconds
 ## points inside the square counts once every 300 secs
 
 
-## Characterize all gpx file by region ####
+## Characterize all gpx file by region  ----------------------------------------
 
 ## The resolution to simplify data points for localization
 resolution_lcz     <- 200
@@ -66,7 +66,7 @@ fl_localized       <- paste0(baseoutput,"/Location_list.Rds")
 gather_command     <- "~/CODE/gpx_tools/gather_tracks_gpx.sh"
 
 
-## Gather and process waypoints ####
+## Gather and process waypoints  -----------------------------------------------
 
 ## Waypoints repo
 fl_waypoints <- paste0(baseoutput,"/Location_waypoins.Rds")
@@ -75,8 +75,6 @@ fl_waypoints <- paste0(baseoutput,"/Location_waypoins.Rds")
 close_flag   <- 10       ## meters between points to flag as close
 
 
-## Sort by location ####
-
-## Export gpx track files by location
+## Export gpx track files by location  -----------------------------------------
 outputrep     <- "~/ZHOST/Gpx_by_location/"
 
