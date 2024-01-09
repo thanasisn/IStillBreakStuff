@@ -42,7 +42,10 @@ echo "Config:     $confile"
 
 killall -s 9 conky
 
+echo "$conpause" "$confont" "$conalig" "$Xoff" "$Yoff" "$confile"  
 
+
+exit
 ## the only instance we like to see time in home locale
 export LC_ALL="el_GR.UTF-8"
 
