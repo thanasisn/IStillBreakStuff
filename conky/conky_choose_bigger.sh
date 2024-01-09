@@ -29,6 +29,9 @@ done | tail -n1 | read maxl
 
 #TODO check output
 
+echo "TEST: $maxl"
+Xres="$(echo "$maxl" | grep -o "[0-9]\+x[0-9]\+" | cut -d'x' -f1)"
+Yres="$(echo "$maxl" | grep -o "[0-9]\+x[0-9]\+" | cut -d'x' -f2)"
 
 ## get screen offset
 Yoff="$(echo "$maxl" | grep -o "+[0-9]\++[0-9]\+" | cut -d'+' -f3)"
@@ -36,16 +39,14 @@ Xoff="$(echo "$maxl" | grep -o "+[0-9]\++[0-9]\+" | cut -d'+' -f2)"
 
 ## Info
 echo "Larger mon: $maxl"
-echo "X offset:   $Xoff"
-echo "Y offset:   $Yoff"
-echo "Config:     $confile"
+echo "X offset  : $Xoff"
+echo "Y offset  : $Yoff"
+echo "X size    : $Xres"
+echo "Y size    : $Yres"
+echo "Config    : $confile"
 
 killall -s 9 conky
 
-echo "$conpause" "$confont" "$conalig" "$Xoff" "$Yoff" "$confile"  
-
-
-exit
 ## the only instance we like to see time in home locale
 export LC_ALL="el_GR.UTF-8"
 
