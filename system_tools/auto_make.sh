@@ -32,6 +32,7 @@ folders=(
     "$HOME/PANDOC/Journal"
     "$HOME/PANDOC/Notes"
     "$HOME/PANDOC/Notes/09_JOURNAL_WORK"
+    "$HOME/PANDOC/Notes/11_TRAINING/Running"
     "$HOME/PANDOC/Notes_Aerosols"
 )
 
