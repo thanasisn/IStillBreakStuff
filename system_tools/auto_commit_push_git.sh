@@ -225,7 +225,7 @@ folders=(
     "$HOME/LifeAsti"
     "$HOME/MISC/Redmi7_internal/documents"
     "$HOME/PANDOC/Journal/"
-    "$HOME/PANDOC/Notes/9_JOURNAL_WORK"
+    "$HOME/PANDOC/Notes/09_JOURNAL_WORK"
     "$HOME/PANDOC/Notes/"
     "$HOME/PANDOC/Notes_Aerosols/"
     "$HOME/PROJECTS/"
