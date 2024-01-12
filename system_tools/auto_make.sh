@@ -49,8 +49,8 @@ for af in "${folders[@]}"; do
     fi  
     cd "$af" || continue
     ## keep some logging on each make
-    exec  > >(tee -i "automake.log")
-    exec 2> >(tee -i "automake.err" >&2)
+    exec  > >(tee -i ".automake.log")
+    exec 2> >(tee -i ".automake.err" >&2)
     ## run make with default
     nice -n 19 ionice -c2 -n7 make -f *[Mm]akefile -C "$af"
     echo "================================="
