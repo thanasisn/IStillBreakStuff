@@ -29,14 +29,13 @@ info "START :: $0 :: $* ::"
 ## list folders containing a makefile
 folders=(
     "$HOME/BBand_LAP/JOURNAL"
-    "$HOME/PANDOC/Journal"
     "$HOME/PANDOC/Notes/01_PROJECTS"
+    "$HOME/PANDOC/Notes/01_PROJECTS/Aerosols"
     "$HOME/PANDOC/Notes/02_AREA"
     "$HOME/PANDOC/Notes/03_RESOURCES"
     "$HOME/PANDOC/Notes/08_JOURNAL"
     "$HOME/PANDOC/Notes/09_JOURNAL_WORK"
     "$HOME/PANDOC/Notes/11_TRAINING/Running"
-    "$HOME/PANDOC/Notes_Aerosols"
 )
 
 for af in "${folders[@]}"; do
@@ -46,7 +45,7 @@ for af in "${folders[@]}"; do
     else
         info "$af don't exist SKIP!!"
         continue
-    fi  
+    fi
     cd "$af" || continue
     ## keep some logging on each make
     exec  > >(tee -i ".automake.log")
@@ -54,7 +53,7 @@ for af in "${folders[@]}"; do
     ## run make with default
     nice -n 19 ionice -c2 -n7 make -f *[Mm]akefile -C "$af"
     echo "================================="
-done        
+done
 
 
 
