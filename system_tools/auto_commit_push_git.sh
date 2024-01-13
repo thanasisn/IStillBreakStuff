@@ -159,6 +159,9 @@ for i in "${folders[@]}"; do
     [ ! -d "$i" ] && echo "Not a folder: $i" && continue
     ## go through sub folders
     cd "$i" || return
+    ## do some logging for each repo
+    exec  > >(tee -i ".autogit.log")
+    exec 2> >(tee -i ".autogit.err" >&2)
     ## in the git folder here
     pwd
     ## add files we care about
@@ -242,6 +245,9 @@ for i in "${folders[@]}"; do
     [ ! -d "$i" ] && echo "Not a folder: $i" && continue
     ## go through sub folders
     cd "$i" || return
+    ## do some logging for each repo
+    exec  > >(tee -i ".autogit.log")
+    exec 2> >(tee -i ".autogit.err" >&2)
     ## in the git folder here
     pwd
     ## always break lock
