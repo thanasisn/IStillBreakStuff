@@ -36,8 +36,11 @@ folders=(
     "$HOME/PANDOC/Notes/04_ARCHIVE"
     "$HOME/PANDOC/Notes/08_JOURNAL"
     "$HOME/PANDOC/Notes/09_JOURNAL_WORK"
+    "$HOME/PANDOC/Notes/11_TRAINING"
     "$HOME/PANDOC/Notes/11_TRAINING/Running"
+    "$HOME/PANDOC/Notes/12_WRITINGS"
     "$HOME/PANDOC/Notes/Clippings"
+    "$HOME/PANDOC/Notes/templates"
 )
 
 for af in "${folders[@]}"; do
