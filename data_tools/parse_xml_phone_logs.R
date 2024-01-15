@@ -96,10 +96,10 @@ if (!file.exists(old_files[1])) {
 # find . -name "*" -type f | xargs sed -i -e '/ <sms pr/d'
 
 
-# old_files <- list.files(path = data_folder,
-#                         pattern = "sms.*\\.xml",
-#                         full.names = T,
-#                         recursive = T)
+old_files <- list.files(path = data_folder,
+                        pattern = "sms.*\\.xml",
+                        full.names = T,
+                        recursive = T)
 
 old_files <- c("~/LOGs/sms/SMSall.xml")
 
