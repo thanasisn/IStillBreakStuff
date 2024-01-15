@@ -27,11 +27,11 @@ data_folder = "~/LOGs/sms/"
 ## Better use bash tools to merge files before parsing
 # grep -h "<call " ./call/call*.xml | sort -u > Callall.xml
 
-# old_files <- list.files(path = data_folder,
-#                         pattern = "calls.*\\.xml",
-#                         full.names = T,
-#                         recursive = T)
-old_files <- c("~/LOGs/sms/Callall.xml")
+old_files <- list.files(path = data_folder,
+                        pattern = "calls.*\\.xml",
+                        full.names = T,
+                        recursive = T)
+# old_files <- c("~/LOGs/sms/Callall.xml")
 
 gather <- data.frame()
 if (!file.exists(old_files[1])) {
