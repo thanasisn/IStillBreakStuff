@@ -6,29 +6,27 @@
 #### Just create a new .md file with a given or current date 
 ## This is meant to run only within the Journal folder
 
-## go to the folder
-# cd "$HOME/PANDOC/Journal"
-
-## parse or create the date variable
+## parse input or create the date variable
 args="$*"
 if [[ -z "$args" ]]; then
     echo "Using current date"
     stamp="$(date +"%s")"
 else
     stamp="$(date -d "${args}" +"%s")"
-    [[ $? -gt 0 ]] && echo "Can not parse input as date" && exit 1 
-fi 
+    [[ $? -gt 0 ]] && echo "Can not parse input as date" && exit 1
+fi
 
 datestr="$(date -d@"${stamp}" +"%F %H:%M")"
-datenme="$(date -d@"${stamp}" +"%Y%m%d_%H%M")"
+datestrs="$(date -d@"${stamp}" +"%F %T")"
+datenme="$(date -d@"${stamp}" +"%Y-%m-%d_%H%M")"
 year="$(date -d@"${stamp}" +"%Y")"
-goto="6"
+goto="9"
 
-## create the folder
+## create the year folder
 mkdir -p "./${year}"
 filename="./${year}/${datenme}.md"
 
-## open existing file
+## open existing file if exist
 if [[ -f "$filename" ]] ; then
     echo "File $filename exist"
     vim "$filename"
@@ -36,17 +34,23 @@ if [[ -f "$filename" ]] ; then
     exit 0
 fi
 
-## open a new file
+## create new file with obsidian template
 echo  "Creating: $filename"
 touch "$filename"
 (
+    echo "---"
+    echo "tags:   [  ]"
+    echo "scope:  "
+    echo "created: $datestrs"
+    echo "---"
     echo ""
     echo "## ${datestr}"
     echo ""
-    echo "[//]: # (Keywords: #key_1, #key_2)"
     echo ""
     echo ""
 ) > "$filename"
+
+## open for edit
 vim -c "$goto" "$filename"
 
 exit 0
