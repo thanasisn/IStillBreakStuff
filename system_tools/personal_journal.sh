@@ -2,11 +2,11 @@
 ## created on 2024-01-10
 ## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
-#### Start a new .md file with a given or current date
+#### Start a new enty in personal journal with the current or given system date
 ## This is only used to create entries in a specific location
 
 ## go to the journal folder
-cd "$HOME/PANDOC/Notes/08_JOURNAL" || exit
+cd "$HOME/NOTES/08_JOURNAL" || exit
 
 ## parse input or create the date variable
 args="$*"
@@ -18,11 +18,12 @@ else
     [[ $? -gt 0 ]] && echo "Can not parse input as date" && exit 1
 fi
 
-datestr="$(date -d@"${stamp}" +"%F %H:%M")"
-datestrs="$(date -d@"${stamp}" +"%F %T")"
-datenme="$(date -d@"${stamp}" +"%Y-%m-%d_%H%M")"
-year="$(date -d@"${stamp}" +"%Y")"
-goto="9"
+datestr="$(date    -d@"${stamp}" +"%F %H:%M %Z")"
+datestrs="$(date   -d@"${stamp}" +"%F %T %Z")"
+dateUTC="$(date -u -d@"${stamp}" +"%F %T %Z")"
+datenme="$(date    -d@"${stamp}" +"%Y-%m-%d_%H%M")"
+year="$(date       -d@"${stamp}" +"%Y")"
+goto="10"
 
 ## create the year folder
 mkdir -p "./${year}"
@@ -41,9 +42,10 @@ echo  "Creating: $filename"
 touch "$filename"
 (
     echo "---"
-    echo "tags:   [ empty ]"
-    echo "scope:  Personal Journal"
+    echo "tags:    [   ]"
+    echo "scope:   Personal Journal"
     echo "created: $datestrs"
+    echo "UTC:     $dateUTC"
     echo "---"
     echo ""
     echo "## ${datestr}"
@@ -56,4 +58,3 @@ touch "$filename"
 vim -c "$goto" "$filename"
 
 exit 0
-

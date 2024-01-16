@@ -40,7 +40,7 @@ folders=(
     "$HOME/NOTES/11_TRAINING/Running"
     "$HOME/NOTES/12_WRITINGS"
     "$HOME/NOTES/Clippings"
-    "$HOME/NOTES/templates"
+    "$HOME/NOTES/zauto"
 )
 
 for af in "${folders[@]}"; do
