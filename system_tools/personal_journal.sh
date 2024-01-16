@@ -6,7 +6,8 @@
 ## This is only used to create entries in a specific location
 
 ## go to the journal folder
-cd "$HOME/NOTES/08_JOURNAL" || exit
+ROOTDIR="$HOME/NOTES/08_JOURNAL"
+cd "$ROOTDIR" || exit
 
 ## parse input or create the date variable
 args="$*"
@@ -18,16 +19,16 @@ else
     [[ $? -gt 0 ]] && echo "Can not parse input as date" && exit 1
 fi
 
-datestr="$(date    -d@"${stamp}" +"%F %H:%M %Z")"
-datestrs="$(date   -d@"${stamp}" +"%F %T %Z")"
-dateUTC="$(date -u -d@"${stamp}" +"%F %T %Z")"
+datestr="$(date    -d@"${stamp}" +"%F %H:%M %:z")"
+datestrs="$(date   -d@"${stamp}" +"%F %T %:z")"
+dateUTC="$(date -u -d@"${stamp}" +"%F %T %:z")"
 datenme="$(date    -d@"${stamp}" +"%Y-%m-%d_%H%M")"
 year="$(date       -d@"${stamp}" +"%Y")"
-goto="10"
+goto="11"
 
 ## create the year folder
-mkdir -p "./${year}"
-filename="./${year}/${datenme}.md"
+mkdir -p "${ROOTDIR}/${year}"
+filename="${ROOTDIR}/${year}/${datenme}.md"
 
 ## open existing file if exist
 if [[ -f "$filename" ]] ; then
@@ -42,10 +43,11 @@ echo  "Creating: $filename"
 touch "$filename"
 (
     echo "---"
-    echo "tags:    [   ]"
-    echo "scope:   Personal Journal"
-    echo "created: $datestrs"
-    echo "UTC:     $dateUTC"
+    echo "tags:      [  ]"
+    echo "scope:     Personal Journal"
+    echo "created:   $datestrs"
+    echo "cunixtime: ${stamp}"
+    echo "UTC:       $dateUTC"
     echo "---"
     echo ""
     echo "## ${datestr}"
@@ -56,5 +58,8 @@ touch "$filename"
 
 ## open for edit
 vim -c "$goto" "$filename"
+
+echo  "Created: $filename"
+sleep 1
 
 exit 0

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/env bash
 ## created on 2022-12-19
 ## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
@@ -12,8 +12,10 @@
 filename="${1}.md"
 
 stamp="$(date +"%s")"
-datestr="$(date -d@${stamp} +"%Y %b %d %A  #timestamp:'%F %T'")"
-goto="7"
+datestr="$(date    -d@${stamp} +"%Y %b %d %A ")"
+datestrs="$(date   -d@"${stamp}" +"%F %T %:z")"
+dateUTC="$(date -u -d@"${stamp}" +"%F %T %:z")"
+goto="11"
 
 ## open existing file
 if [[ -f "$filename" ]] ; then
@@ -27,14 +29,24 @@ fi
 echo  "Creating: $filename"
 touch "$filename"
 (
+    echo "---"
+    echo "tags:      [  ]"
+    echo "scope:     "
+    echo "created:   $datestrs"
+    echo "cunixtime: ${stamp}"
+    echo "UTC:       $dateUTC"
+    echo "---"
     echo ""
     echo "## $(basename "${1}" | sed 's/_/ /g')"
-    echo "Created: ${datestr}"
     echo ""
-    echo "[//]: # (Keywords: #key_1, #key_2)"
     echo ""
     echo ""
 ) > "$filename"
+
+## open for edit
 vim -c "$goto" "$filename"
+
+echo  "Created: $filename"
+sleep 1
 
 exit 0
