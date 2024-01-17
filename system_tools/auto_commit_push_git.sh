@@ -226,6 +226,7 @@ folders=(
     "$HOME/LibRadTranG"
     "$HOME/LifeAsti"
     "$HOME/MISC/Redmi7_internal/documents"
+    "$HOME/NOTES"
     "$HOME/NOTES/01_PROJECTS/Aerosols"
     "$HOME/NOTES/08_JOURNAL"
     "$HOME/NOTES/09_JOURNAL_WORK"
