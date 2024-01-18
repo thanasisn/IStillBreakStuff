@@ -47,9 +47,9 @@ kill_run  system-config-printer-applet
 kill_run  dunst
 kill_run  kdeconnect-indicator
 kill_run  volumeicon
-kill_run  $HOME/CODE/conky/scripts/top_ps.sh
+# kill_run  $HOME/CODE/conky/scripts/top_ps.sh
 
-if [[ $WM_NAME = "bspwm" ]]; then 
+if [[ $WM_NAME = "bspwm" ]]; then
     ## keybinds for bspwm
     skill_run xhkd -c "$HOME/.config/sxhkd/sxhkdrc_bspwm"
 else
@@ -61,7 +61,7 @@ fi
 
 
 ## restart sycnthing server
-killall -9 syncthing 
+killall -9 syncthing
 setsid syncthing -config="$HOME/.config/syncthing_$(hostname)" \
                  -data="$HOME/.config/syncthing_$(hostname)"   \
                  -audit                                        \
@@ -70,7 +70,7 @@ setsid syncthing -config="$HOME/.config/syncthing_$(hostname)" \
                  -logfile="/dev/shm/synchthing_log"            &
 
 ## restart applet
-kill_run syncthing-gtk --minimized --home "$HOME/.config/syncthing_$(hostname)" 
+kill_run syncthing-gtk --minimized --home "$HOME/.config/syncthing_$(hostname)"
 
 
 if [[ $(hostname) == "crane" ]]; then
@@ -116,17 +116,17 @@ xrandr --listactivemonitors | sed 's/^.* //' | sed 1d | while read screen; do
     export MONITOR=$screen
 
     ## use the right bar
-    if [[ $WM_NAME = "i3" ]]; then 
+    if [[ $WM_NAME = "i3" ]]; then
         polybar -c $HOME/.config/polybar/config -r i3bar &
     elif [[ $WM_NAME = "bspwm" ]]; then
         polybar -c $HOME/.config/polybar/config -r bspwmbar &
     else
         polybar -c $HOME/.config/polybar/config -r example &
-    fi     
+    fi
 done
 
 ## i3 auto layout
-if [[ $WM_NAME = "i3" ]]; then 
+if [[ $WM_NAME = "i3" ]]; then
     setsid $HOME/.config/i3/i3-automatic-layout.py &
 fi
 
