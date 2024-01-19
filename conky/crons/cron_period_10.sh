@@ -52,10 +52,11 @@ pids=()
 
 
 ## Clean some of syncthing artifacts
-find "$HOME/LOGs/SYSTEM_LOGS" -name "*sync-conflict*" -delete
-find "$HOME/LOGs/waypoints"   -name "*sync-conflict*" -delete
-find "$HOME/LOGs/winb"        -name "*sync-conflict*" -delete
-find "$HOME/PANDOC"           -name "*sync-conflict*" -delete
+find "$HOME/LOGs/SYSTEM_LOGS" -name "*.sync-conflict-*" -delete
+find "$HOME/LOGs/waypoints"   -name "*.sync-conflict-*" -delete
+find "$HOME/LOGs/winb"        -name "*.sync-conflict-*" -delete
+find "$HOME/PANDOC"           -name "*.sync-conflict-*" -delete
+find "$HOME/NOTES/.obsidian"  -name "*.sync-conflict-*" -delete
 
 
 wait "${pids[@]}"; pids=()
