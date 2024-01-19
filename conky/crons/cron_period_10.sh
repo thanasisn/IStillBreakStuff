@@ -51,6 +51,12 @@ pids=()
 "$HOME/CODE/conky/scripts/ext_ip_watch.sh"     & pids+=($!)
 
 
+## Clean some of syncthing artifacts
+find "$HOME/LOGs/SYSTEM_LOGS" -name "*sync-conflict*" -delete
+find "$HOME/LOGs/waypoints"   -name "*sync-conflict*" -delete
+find "$HOME/LOGs/winb"        -name "*sync-conflict*" -delete
+find "$HOME/PANDOC"           -name "*sync-conflict*" -delete
+
 
 wait "${pids[@]}"; pids=()
 set -e
