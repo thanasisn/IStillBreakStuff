@@ -8,9 +8,11 @@ closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-# Script.Name = funr::sys.script()
-# if(!interactive())pdf(file=sub("\\.R$",".pdf",Script.Name),width = 14)
-# sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
+Script.Name <- "~/CODE/data_tools/parse_xml_phone_logs.R"
+if (!interactive()) {
+    pdf( file = paste0(sub("\\.R$",".pdf", Script.Name)))
+    sink(file = paste0(sub("\\.R$",".out", Script.Name)), split = TRUE)
+}
 
 
 library(XML)
@@ -21,6 +23,9 @@ library(myRtools)
 data_folder = "~/LOGs/sms/"
 
 
+TEST <- FALSE
+# TEST <- TRUE
+
 
 ## Parse all xml call logs #####################################################
 
@@ -29,8 +34,8 @@ data_folder = "~/LOGs/sms/"
 
 old_files <- list.files(path = data_folder,
                         pattern = "calls.*\\.xml",
-                        full.names = T,
-                        recursive = T)
+                        full.names = TRUE,
+                        recursive  = TRUE)
 # old_files <- c("~/LOGs/sms/Callall.xml")
 
 gather <- data.frame()
@@ -38,7 +43,7 @@ if (!file.exists(old_files[1])) {
     cat(paste("NO CALL FILES\n"))
 } else {
     if (length(old_files) > 0) {
-        for ( af in old_files) {
+        for (af in old_files) {
             cat(paste(af), sep = "\n")
 
             ## read a file
@@ -98,10 +103,13 @@ if (!file.exists(old_files[1])) {
 
 old_files <- list.files(path = data_folder,
                         pattern = "sms.*\\.xml",
-                        full.names = T,
-                        recursive = T)
+                        full.names = TRUE,
+                        recursive  = TRUE)
+# old_files <- c("~/LOGs/sms/SMSall.xml")
 
-old_files <- c("~/LOGs/sms/SMSall.xml")
+if (TEST) {
+    old_files <- sample( old_files, 5 )
+}
 
 gather <- data.frame()
 if (!file.exists(old_files[1])) {
@@ -135,21 +143,28 @@ if (!file.exists(old_files[1])) {
         gather <- gather[ , vec ]
 
         gather <- unique( gather )
+
         ## ignore different formatting of readable date
-        gather <- gather[!duplicated(gather[,!(names(gather) %in% c("readable_date"))]),]
+        # gather <- gather[!duplicated(gather[,!(names(gather) %in% c("readable_date"))]),]
 
-        # as.POSIXct(as.numeric(gather$date), origin = "1970-01-01")
+        if (!TEST) {
+            ## store xml data
+            exp_fl <- paste0(data_folder,"/SMS_xml_",format(Sys.time(),"%F_%T"))
+            write_dat(gather, exp_fl)
+            write_RDS(gather, exp_fl)
 
-        ## store xml data
-        exp_fl <- paste0(data_folder,"/SMS_xml_",format(Sys.time(),"%F_%T"))
-        write_dat(gather, exp_fl)
-        write_RDS(gather, exp_fl)
-
-        # cat(paste("\nRemove CALLs xml files and move", exp_fl, "to data storage\n"))
+            cat(paste("\nRemove SMSs xml files and move", exp_fl, "to data storage\n"))
+        }
     }
 }
 
 
-####_ END _####
-tac = Sys.time()
-cat(sprintf("\n%s H:%s U:%s S:%s T:%f\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
+#' **END**
+#+ include=T, echo=F
+tac <- Sys.time()
+cat(sprintf("%s %s@%s %s %f mins\n\n", Sys.time(), Sys.info()["login"],
+            Sys.info()["nodename"], basename(Script.Name), difftime(tac,tic,units = "mins")))
+if (interactive() & difftime(tac,tic,units = "sec") > 30) {
+    system("mplayer /usr/share/sounds/freedesktop/stereo/dialog-warning.oga", ignore.stdout = T, ignore.stderr = T)
+    system(paste("notify-send -u normal -t 30000 ", Script.Name, " 'R script ended'"))
+}
