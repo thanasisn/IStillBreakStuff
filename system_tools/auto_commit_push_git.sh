@@ -140,6 +140,7 @@ folders=(
     "$HOME/CODE/nixos"
     "$HOME/CS_id/"
     "$HOME/PANDOC/My_Publications"
+    "$HOME/PANDOC/thanasisn.github.io"
     "$HOME/RAD_QC"
     "$HOME/SUN"
     "$HOME/TSI"
@@ -209,6 +210,36 @@ for i in "${folders[@]}"; do
 done
 
 
+
+####  ADD COMMIT and PUSH to github.io  ################################
+
+## use full paths
+folders=(
+    "$HOME/PANDOC/thanasisn.github.io/_site"
+)
+
+## go through main folder
+for i in "${folders[@]}"; do
+    echo
+    info " $i "
+    echo
+    [ ! -d "$i" ] && echo "Not a folder: $i" && continue
+    ## go through sub folders
+    cd "$i" || return
+    ## do some logging for each repo
+    exec  > >(tee -i ".autogit.log")
+    exec 2> >(tee -i ".autogit.err" >&2)
+    ## in the git folder here
+    pwd
+    ## add files we care about
+    find . -type f -print0 |\
+                  xargs -t -0 git -f add
+    ## commit and push
+    git commit -uno -a -m "Commit $(date +'%F %R')"
+    git push -f
+    git push --tag
+    git maintenance run --auto
+done
 
 
 
