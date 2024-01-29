@@ -232,8 +232,13 @@ for i in "${folders[@]}"; do
     ## in the git folder here
     pwd
     ## add files we care about
+    # find . -type f \(    -iname '*.html'   \
+    #                   -o -iname '*.svg'    \
+    #                   -o -iname '*.ttf'    \
+    #                   -o -iname '*.css'   \) -print0 |\
+    #               xargs -t -0 git add
     find . -type f -print0 |\
-                  xargs -t -0 git -f add
+                  xargs -t -0 git add -f
     ## commit and push
     git commit -uno -a -m "Commit $(date +'%F %R')"
     git push -f
