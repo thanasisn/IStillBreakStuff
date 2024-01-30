@@ -199,6 +199,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.tex'      \
                       -o -iname '*.txt'      \
                       -o -iname '*.yaml'     \
+                      -o -iname '*.yml'      \
                       -o -iname 'flake.lock' \
                       -o -iname 'makefile'   \) -print0 |\
                   xargs -t -0 git add
@@ -323,6 +324,7 @@ for i in "${folders[@]}"; do
                       -o -iname '*.tex'      \
                       -o -iname '*.txt'      \
                       -o -iname '*.yaml'     \
+                      -o -iname '*.yml'      \
                       -o -iname 'flake.lock' \
                       -o -iname 'makefile'   \) -print0 |\
                   xargs -t -0 git add
