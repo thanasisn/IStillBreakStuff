@@ -19,36 +19,39 @@ scraper = Scraper("www.cpubenchmark.net")
 # search_results = scraper.search(query="i5 53",    limit = 4)
 
 CPU = [
+    "G3460",        # blue
     "Ryzen 5 5500U",
     "Ryzen 7 Pro 5850U",
+    "Xeon Silver 4108",   # yperos
     "i3-3110M",           # crane
     "i5-1135G7",
+    "i5-2540M",
     "i5-3380M",           # tyler
+    "i5-3450",
     "i5-4300U",
     "i5-4310M",
+    "i5-4590",
     "i5-5300U",
-    "i5-6500",
-    "i5-7600",
     "i5-6200U",
     "i5-6300U",
     "i5-6440HQ",
+    "i5-6500",
     "i5-7200U",
     "i5-7300U",
+    "i5-7500",
+    "i5-7600",
     "i5-8250U",
     "i5-8265U",
     "i5-8350U",
-    "i5-2540M",
+    "i5-8400",
     "i7-3520M",
     "i7-5500U",
     "i7-5600U",
+    "i7-6700",
     "i7-7600U",
     "i7-8700",
     "i7-8750H",
     # Desktop
-    "i5-7500",
-    "i5-3450",
-    "G3460",        # blue
-    "Xeon Silver 4108",   # yperos
 ]
 
 
