@@ -135,21 +135,22 @@ done
 
 ## use full paths
 folders=(
+    "$HOME/.dot_files"
+    "$HOME/.nix-home"
     "$HOME/BBand_LAP"
     "$HOME/CM_21_GLB/"
     "$HOME/CODE/nixos"
     "$HOME/CS_id/"
-    "$HOME/PANDOC/My_Publications"
-    "$HOME/PANDOC/thanasisn.github.io"
-    "$HOME/RAD_QC"
-    "$HOME/SUN"
-    "$HOME/TSI"
     "$HOME/MANUSCRIPTS/01_2022_sdr_trends"
     "$HOME/MANUSCRIPTS/02_enhancement"
     "$HOME/MANUSCRIPTS/03_thesis"
     "$HOME/MANUSCRIPTS/presentations"
     "$HOME/MANUSCRIPTS/reports"
-    "$HOME/.nix-home"
+    "$HOME/PANDOC/My_Publications"
+    "$HOME/PANDOC/thanasisn.github.io"
+    "$HOME/RAD_QC"
+    "$HOME/SUN"
+    "$HOME/TSI"
 )
 
 ## go through main folder
