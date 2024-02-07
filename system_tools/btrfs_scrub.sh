@@ -8,11 +8,11 @@ LOGDIR="/home/athan/LOGs/SYSTEM_LOGS"
 mkdir -p "$LOGDIR"
 
 logfile="${LOGDIR}/Btrfs_scrub_$(hostname)_$(date +'%F').check"
-echo " " > "$logfile"
-chmod a+rw  "$logfile"
-
 exec  > >(tee -i "${logfile}")
 exec 2> >(tee -i "${logfile}" >&2)
+
+echo "** Start **"
+chmod a+rw  "$logfile"
 
 echo ""
 echo " * * * READ ONLY SCRUB * * * "
@@ -32,5 +32,7 @@ sudo -S /usr/bin/btrfs filesystem show | grep -o "/dev/.*" | while read device; 
     sudo /usr/bin/btrfs device stats "$device"
     echo ""
 done
+
+chmod a+rw  "$logfile"
 
 exit
