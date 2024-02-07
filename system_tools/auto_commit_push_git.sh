@@ -136,7 +136,6 @@ done
 ## use full paths
 folders=(
     "$HOME/.dot_files"
-    "$HOME/.nix-home"
     "$HOME/BBand_LAP"
     "$HOME/CM_21_GLB/"
     "$HOME/CODE/nixos"
