@@ -2,7 +2,7 @@
 ## created on 2020-11-08
 ## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
-#### Check status of akk mdraid and btrfs arrays for the host.
+#### Check status of mdraid and btrfs arrays for the host.
 ## Run locally and hope for a nice notification for errors
 
 if [[ $EUID -ne 0 ]]; then
@@ -45,6 +45,7 @@ exec 2> >(tee -i "${logfile}" >&2)
 
 echo ""
 echo "Log file: $logfile"
+echo "====================================="
 echo ""
 echo "-------------------------------------"
 echo "$(date +%F_%R) RAID report on $(hostname)"
@@ -65,12 +66,22 @@ echo "-------------------------------------"
 sudo -S /bin/btrfs filesystem show;
 echo
 
+## for each btrfs filesystem
 sudo -S /bin/btrfs filesystem show | grep -o "/dev/.*" | while read device; do
     echo "** REPORT FOR $(hostname) $device"
     btrfs device stats "$device"
     echo ""
 done
 
+
+echo "-------------------------------------"
+echo "$(date +%F_%R) ZFS report on $(hostname)"
+echo "-------------------------------------"
+sudo zpool status -v
+echo
+
+
+echo "====================================="
 echo "DONE Probing"
 echo ""
 
