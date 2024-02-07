@@ -88,16 +88,9 @@ echo ""
 
 
 ## count all btrfs errors for host
-btrfserrors="$(
-echo "$(cat "$logfile"           |\
-        grep "^\[\/dev.*_errs.*" |\
-        cut -d' ' -f2-           |\
-        sed 's/^[ ]*/ /g'        |\
-        sed 's/\r$//g'           |\
-        tr '\n' '+'              |\
-        sed 's/[ ]*//g'          |\
-        sed 's/+$//'             )"  | bc
-)"
+## keep it one line!!
+btrfserrors="$(cat "$logfile" | grep --text "^\[\/dev.*_errs.*" | cut -d' ' -f2- | sed 's/^[ ]*/ /g' | sed 's/\r$//g' | tr '\n' '+' | sed 's/[ ]*//g' | sed 's/+$/\n/' | bc)"
+echo "$btrfserrors"
 
 if [ "$btrfserrors" -gt 0 ]; then
     message="BTRFS ERRORS on $(hostname) !!"
@@ -105,8 +98,8 @@ if [ "$btrfserrors" -gt 0 ]; then
     echo "- - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo "$message" "$body"
     echo "- - - - - - - - - - - - - - - - - - - - - - - - - -"
-    sudo -u "$auser" notify-send  -t 999999999 -u critical "${message} !" "$body"
-    $NOTIFY_SEND -t 999999999 -u critical "${message} !!" "$body"
+    sudo -u "$auser" notify-send  -t -1 -u critical "${message} !" "$body"
+    $NOTIFY_SEND -t -1 -u critical "${message} !!" "$body"
     echo "$message" >> "$statusfile"
     echo "$body"    >> "$statusfile"
 else
@@ -120,7 +113,7 @@ echo ""
 
 
 ## Capture errors on raids
-cat "$logfile" | grep "State[ ]\+:[ ]\+" | while read line; do
+cat "$logfile" | grep --text "State[ ]\+:[ ]\+" | while read line; do
     key="$(echo $line | cut -d':' -f2- | sed 's/\r$//g' | sed 's/[ ]*//g' )"
     # echo $key
     if [[ "$key" == "clean" || "$key" == "active" ]] ; then
@@ -133,8 +126,8 @@ cat "$logfile" | grep "State[ ]\+:[ ]\+" | while read line; do
         echo "- - - - - - - - - - - - - - - - - - - - - - - - - -"
         echo "$message" "$body"
         echo "- - - - - - - - - - - - - - - - - - - - - - - - - -"
-        sudo -u "$auser" notify-send -t 999999999 -u critical "$message" "$body"
-        $NOTIFY_SEND -t 999999999 -u critical "$message" "$body"
+        sudo -u "$auser" notify-send -t -1 -u critical "$message" "$body"
+        $NOTIFY_SEND -t -1 -u critical "$message" "$body"
         echo "$message" >> "$statusfile"
         echo "$body"    >> "$statusfile"
     fi
@@ -157,8 +150,8 @@ if [ "${condition}" ]; then
     echo "- - - - - - - - - - - - - - - - - - - - - - - - - -"
     echo "$message" "$body"
     echo "- - - - - - - - - - - - - - - - - - - - - - - - - -"
-    sudo -u "$auser" notify-send -t 999999999 -u critical "$message" "$body"
-    $NOTIFY_SEND -t 999999999 -u critical "$message" "$body"
+    sudo -u "$auser" notify-send -t -1 -u critical "$message" "$body"
+    $NOTIFY_SEND -t -1 -u critical "$message" "$body"
     echo "$message" >> "$statusfile"
     echo "$body"    >> "$statusfile"
 else
@@ -169,6 +162,7 @@ fi
 echo "DONE checking ZFS"
 echo ""
 
-
+echo "$statusfile"
+echo "$logfile"
 
 exit 0
