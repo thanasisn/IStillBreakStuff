@@ -2,8 +2,8 @@
 ## created on 2020-11-08
 ## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
-#### Gather information for hard disks and arrays
-## For btrfs and raid arrays
+#### Gather information for hard disks, partitions and storage arrays
+## Also useful for btrfs, zfs and md raid arrays
 
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root"
@@ -46,7 +46,11 @@ exec 2> >(tee -i "${logfile}" >&2)
 echo ""
 echo "Log file: $logfile"
 echo ""
-echo "----------------------------------------------------------------"
+echo "================================================================"
+
+
+
+## check storage arrays first
 echo ""
 echo "$(date +%F_%R) ** RAID report start on $(hostname) ** "
 echo ""
@@ -62,21 +66,40 @@ echo ""
 echo "$(date +%F_%R) ** RAID report end ** "
 echo ""
 echo "----------------------------------------------------------------"
+
+
+
 echo ""
 echo "$(date +%F_%R) BTRFS report start on $(hostname)"
 echo ""
-sudo -S /bin/btrfs fi show;
+sudo -S /bin/btrfs filesystem show
 echo
 
+## stats on each file system
 sudo -S /bin/btrfs filesystem show | grep -o "/dev/.*" | while read device; do
     echo "** REPORT FOR $(hostname) $device"
     btrfs device stats "$device"
     echo ""
 done
 
-echo "$(date +%F_%R) ** RAID report end ** "
+echo "$(date +%F_%R) ** BTRFS report end ** "
 echo ""
 echo "----------------------------------------------------------------"
+
+
+
+echo ""
+echo "$(date +%F_%R) ZFS report start on $(hostname)"
+echo ""
+sudo -S zpool status -v
+echo
+echo "$(date +%F_%R) ** ZFS report end ** "
+echo ""
+echo "----------------------------------------------------------------"
+
+
+
+## general info on devices and partitions
 echo ""
 echo "$(date +%F_%R) file system report start on $(hostname)"
 echo ""
@@ -136,8 +159,9 @@ ls -1 "/dev/sd"? | while read device; do
     echo ""
 done
 
-echo "----------------------------------------------------------------"
 
+
+echo "================================================================"
 echo "## report end ##"
 echo "Report file: $logfile"
 
