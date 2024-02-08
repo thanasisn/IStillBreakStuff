@@ -213,10 +213,11 @@ done
 
 
 
-## ADD and COMMIT only for local repos ########################################
-
+## ADD and COMMIT only for LOCAL repos ########################################
+#
 ## use full paths
 folders=(
+    "$HOME/.dot_files_private"
     "$HOME/Aerosols/"
     "$HOME/BASH/"
     "$HOME/Documents/Docu/to"
