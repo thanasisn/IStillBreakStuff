@@ -15,7 +15,7 @@ else
    echo "Will make:   $scriptname"
 
    ## bash template
-   (printf "#!/bin/bash\n"
+   (printf "#!/usr/bin/env bash\n"
    printf "## created on $(date +%F)\n\n"
    printf "#### enter description here\n\n"
    printf 'echo "i am $0 who the hell are you"\n'
