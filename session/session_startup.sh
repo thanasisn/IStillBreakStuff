@@ -96,7 +96,8 @@ numlockx on
 
 
 ## a new toy
-"$HOME/BASH/notification_log.sh" "$HOME/LOGs/SYSTEM_LOGS/Notification_$(hostname).log"
+## this may break conky
+"$HOME/BASH/notification_log.sh" "$HOME/LOGs/SYSTEM_LOGS/Notification_$(hostname).log" &
 
 
 ## start conky
