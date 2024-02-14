@@ -11,7 +11,7 @@ resolution="$(xdpyinfo | awk '/dimensions/{print $2}' | head -n 1)"
 width="$(echo $resolution | cut -d'x' -f1)"
 height="$(echo $resolution | cut -d'x' -f2)"
 
-echo "Screan Resolution"
+echo "Screen Resolution"
 echo $width $height
 
 
@@ -21,19 +21,20 @@ LPORT="5900"
 width=$((width - xgap))
 height=$((height - ygap))
 depth="16"
+
 if [ -z "$host" ]
 then
       echo "Give a host/ip"
       exit 1
 fi
 
-echo "Remote host resolution"
-echo "${width}x${height}"
+echo "Ask remote host resolution"
+echo "$width x $height : $depth"
 
 ## always restart xvnc
 ssh "$host" "pkill  Xtightvnc; pkill Xtigervnc; vncserver  -geometry ${width}x${height} -depth $depth -localhost"
 
-## find availble port on local host 
+## find available port on local host 
 _check="placeholder"
 while [[ ! -z "${_check}" ]]; do
     ((LPORT++))
@@ -42,7 +43,7 @@ done
 
 echo "Connecting:  localhost:$LPORT -> $host:5901 "
 
-## create ssh tunel
+## create ssh tunnel
 control="/tmp/ssh_tunnel_$LPORT"
 ssh -S "$control" -L "$LPORT:localhost:5901" -f -N "$host"
 
@@ -59,7 +60,7 @@ ssh $host 'pkill  Xtightvnc; pkill Xtigervnc'
 ## clean up on abnormal exit
 trap "ssh $host 'pkill  Xtightvnc; pkill Xtigervnc'" 0 1 2 3 6 8 14 15
 
-exit
+exit 0
 
 
 ## ping all lan
