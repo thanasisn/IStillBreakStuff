@@ -63,8 +63,6 @@ ls -d -1 "/dev/md"* | while read device; do
 done
 
 echo ""
-echo "$(date +%F_%R) ** RAID report end ** "
-echo ""
 echo "----------------------------------------------------------------"
 
 
@@ -73,7 +71,7 @@ echo ""
 echo "$(date +%F_%R) BTRFS report start on $(hostname)"
 echo ""
 sudo -S /bin/btrfs filesystem show
-echo
+echo ""
 
 ## stats on each file system
 sudo -S /bin/btrfs filesystem show | grep -o "/dev/.*" | while read device; do
@@ -82,8 +80,6 @@ sudo -S /bin/btrfs filesystem show | grep -o "/dev/.*" | while read device; do
     echo ""
 done
 
-echo "$(date +%F_%R) ** BTRFS report end ** "
-echo ""
 echo "----------------------------------------------------------------"
 
 
@@ -91,11 +87,14 @@ echo "----------------------------------------------------------------"
 echo ""
 echo "$(date +%F_%R) ZFS report start on $(hostname)"
 echo ""
+## get health status
 sudo -S zpool status -v
-echo
-echo "$(date +%F_%R) ** ZFS report end ** "
+echo ""
+## get all properties
+sudo -S zfs get all
 echo ""
 echo "----------------------------------------------------------------"
+
 
 
 
