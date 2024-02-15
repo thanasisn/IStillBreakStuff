@@ -20,10 +20,10 @@ mkdir -p "$LOGDIR"
 
 
 NOTIFY_SEND="/home/athan/CODE/system_tools/pub_notifications.py"
-statusfile="${LOGDIR}/Disks_report_$(hostname).status"
+# statusfile="${LOGDIR}/Disks_report_$(hostname).status"
 logfile="${LOGDIR}/Disks_report_$(hostname)_$(date +'%F').check"
 echo "" > "$logfile"
-touch "$statusfile"
+# touch "$statusfile"
 
 
 cleanup() {
@@ -33,8 +33,8 @@ cleanup() {
     chown "$auser" "$LOGDIR"*
     chmod a+rw     "$logfile"
     chown "$auser" "$logfile"
-    chmod a+rw     "$statusfile"
-    chown "$auser" "$statusfile"
+    # chmod a+rw     "$statusfile"
+    # chown "$auser" "$statusfile"
 }
 
 trap cleanup 0 1 2 3 6
