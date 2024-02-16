@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2022-10-15
 
 #### Create links here to files included in a bib file

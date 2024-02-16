@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2019-01-11
 ## https://github.com/thanasisn <natsisphysicist@gmail.com>
 

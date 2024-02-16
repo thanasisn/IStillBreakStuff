@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2020-11-08
 ## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
@@ -162,6 +162,7 @@ done
 
 echo "================================================================"
 echo "## report end ##"
+LC_ALL=C sed -i 's/[^\x0-\xB1]//g' "$logfile"
 echo "Report file: $logfile"
 
 exit 0

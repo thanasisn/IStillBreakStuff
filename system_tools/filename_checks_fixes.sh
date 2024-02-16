@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2017-09-26
 
 #### Make file and folder names consistent and nice

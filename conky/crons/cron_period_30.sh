@@ -41,10 +41,9 @@ pids=()
 
 
 (
-    "$HOME/CODE/conky/scripts/getCurrent_OpenWeather.R" 
-    "$HOME/CODE/conky/scripts/getForecast_OpenWeather.R" 
+    "$HOME/CODE/conky/scripts/getCurrent_OpenWeather.R"
+    "$HOME/CODE/conky/scripts/getForecast_OpenWeather.R"
 ) & pids+=($!)
-
 
 "$HOME/CODE/conky/scripts/get_open_meteo_api.R"  & pids+=($!)
 

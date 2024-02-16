@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2019-01-13
 
 #### Keep a program always running and restart it if needed

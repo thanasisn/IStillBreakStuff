@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2022-01-14
 
 #### Keep a record of all history from all hosts  

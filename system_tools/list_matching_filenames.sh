@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2021-10-22
 
 #### Create list of filename (ignoring extensions) occurrences recursively

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2023-01-31
 
 #### Open a browser bookmark with dmenu

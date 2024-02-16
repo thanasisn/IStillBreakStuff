@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #### Add missing '/' to bib files pahts
 ## This should work only for full path files

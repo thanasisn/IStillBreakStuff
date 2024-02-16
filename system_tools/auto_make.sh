@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2022-12-18
 
 #### Just a cron job to run all Makefiles 

@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2020-11-08
 ## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
-#### Gather S.M.A.R.T. info on all system drives
+#### Gather S.M.A.R.T. info form all system drives
 
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root"
@@ -39,7 +39,8 @@ for ad in /dev/sd[a-z] /dev/sd[a-z][a-z]; do
     hourson="$( echo "$data" | grep -i "Power_On_Hours"   | sed 's/[ ]\+/ /g' | grep -o "[0-9]\+[ ]*$")"
     minhoron="$(echo "$data" | grep -i "Power_On_Minutes" | sed 's/[ ]\+/ /g' | cut -d" " -f11 | sed 's/h.*//g')"
     ## ouput file
-    outfile="${LOGDIR}/${model}_${serial}_$(date +%F).smart"
+    # outfile="${LOGDIR}/${model}_${serial}_$(date +%F).smart"
+    outfile="${LOGDIR}/${model}_${serial}.smart"
     ## generate report
     (
         echo ""

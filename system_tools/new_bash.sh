@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
 

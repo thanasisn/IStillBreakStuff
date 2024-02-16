@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2023-02-05
 
 #### Organize 'pass' entries with a uniform manner "./url/login"

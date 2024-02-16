@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2020-11-08
 ## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
@@ -162,6 +162,11 @@ fi
 echo "DONE checking ZFS"
 echo ""
 
+## fix binary chars in log files
+LC_ALL=C sed -i 's/[^\x0-\xB1]//g' "$statusfile"
+LC_ALL=C sed -i 's/[^\x0-\xB1]//g' "$logfile"
+
+echo "Output files"
 echo "$statusfile"
 echo "$logfile"
 

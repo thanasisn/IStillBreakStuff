@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #### Scrub all btrfs filesystems
 
@@ -34,5 +34,8 @@ sudo -S /usr/bin/btrfs filesystem show | grep -o "/dev/.*" | while read device; 
 done
 
 chmod a+rw  "$logfile"
+
+## remove binary chars for logs
+LC_ALL=C sed -i 's/[^\x0-\xB1]//g' "$logfile"
 
 exit

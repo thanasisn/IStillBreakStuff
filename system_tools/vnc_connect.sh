@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #### Creates a ssh tunnel and open a new vnc connection to known hosts
 ## works for entries configured in .ssh/config

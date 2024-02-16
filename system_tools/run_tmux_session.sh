@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2023-04-27
 
 #### Create or reuse a named tmux session to run commands 

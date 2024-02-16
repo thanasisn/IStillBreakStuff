@@ -1,7 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #### Start a zfs scrub to check data integrity
-
 
 LOGDIR="/home/athan/LOGs/SYSTEM_LOGS/STORAGE"
 
@@ -26,5 +25,7 @@ zpool list -H -o name | while read device; do
     echo "---------------------------------------------"
 done
 
+## remove binary chars for logs
+LC_ALL=C sed -i 's/[^\x0-\xB1]//g' "$logfile"
 
 exit 0

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2024-01-11
 
 #### Builds pdf and png for *.dot files in the folder
