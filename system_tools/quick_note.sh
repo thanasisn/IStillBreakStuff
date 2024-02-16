@@ -7,7 +7,7 @@
 
 ## go to this folder at the end
 NOTESDIR="$HOME/PANDOC/Notes"
-cd "$NOTESDIR" || exit 
+cd "$NOTESDIR" || exit
 
 ## file name for the note
 newfile="${NOTESDIR}/Quick_Note_$(date +'%F_%H%M')"
