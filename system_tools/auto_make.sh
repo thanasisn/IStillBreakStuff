@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## created on 2022-12-18
 
-#### Just a cron job to run all Makefiles 
+#### Just a cron job to run Makefiles in certain folder
 ## Use it mainly for document production
 
 # allow only one instance
@@ -52,15 +52,12 @@ for af in "${folders[@]}"; do
         continue
     fi
     cd "$af" || continue
-    ## keep some logging on each make
-    exec  > >(tee -i ".automake.log")
-    exec 2> >(tee -i ".automake.err" >&2)
-    ## run make with default
-    nice -n 19 ionice -c2 -n7 make -f *[Mm]akefile -C "$af"
+    (
+        ## run make with default
+        nice -n 19 ionice -c2 -n7 make -f *[Mm]akefile -C "$af"
+    ) > >(tee .automake.log) 2> >(tee .automake.err >&2)
     echo "================================="
 done
 
 
-
-## end coding
-exit 0 
+exit 0
