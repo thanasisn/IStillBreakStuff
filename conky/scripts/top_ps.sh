@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 exec 9>"/dev/shm/$(basename $0).lock"
 if ! flock -n 9  ; then

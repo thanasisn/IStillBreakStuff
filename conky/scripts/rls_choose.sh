@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2021-01-07
 
 #### Print a random message from the rules

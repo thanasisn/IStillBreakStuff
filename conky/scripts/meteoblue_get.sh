@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2018-12-22
 
 #### Get meteogram and data from meteoblue and covert them

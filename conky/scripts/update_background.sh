@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2021-11-10
 
 #### Create a desktop background for host/user and set it
