@@ -3,6 +3,8 @@
 
 My small projects are collected here.
 
+Some may be moved to other/new repositories.
+
 Each folder should have a README file.
 
 ------------------------------------------------------------------------
