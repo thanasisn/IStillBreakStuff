@@ -4,6 +4,7 @@
 ## just parse and prepare data for use
 
 rm(list = (ls()[ls() != ""]))
+.libPaths(c(.libPaths(), "~/.R/x86_64-pc-linux-gnu-library/4.2.3/"))
 Sys.setenv(TZ = "UTC")
 readRenviron("~/.Renviron")
 
