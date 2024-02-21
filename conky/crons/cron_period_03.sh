@@ -2,50 +2,45 @@
 
 #### Run conky scripts every 3 minutes with crontab
 
-## external kill switch
-#####################################################################
+##  External kill switch  ###########################################
 killfile="/dev/shm/KILL_SWITCH/$(basename "$0")"
 [[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 99
-#####################################################################
-
-## no need to run without a Xserver or headless
-#####################################################################
+##  Dot no run headless  ############################################
 xsessions="$(w | grep -o " :[0-9]\+ " | sort -u | wc -l)"
 if [[ $xsessions -gt 0 ]]; then
     echo "Display exists $xsessions"
 else
     echo "No X server at \$DISPLAY [$DISPLAY] $xsessions" >&2
-    exit 11
+    exit 0
 fi
-#####################################################################
-
-
-mkdir -p "/dev/shm/CONKY"
-
-## watchdog script
+##  Watchdog for script  ############################################
 mainpid=$$
 (sleep $((60*3)); kill -9 $mainpid) &
 watchdogpid=$!
 
-SCRIPTS="$HOME/CODE/conky/scripts/"
+##  MAIN  ############################################################
 
-## ignore errors
+## Init
+mkdir -p "/dev/shm/CONKY"
 set +e
+pids=()
 
-## plot number of processes
-"${SCRIPTS}plot_ps.gp"         &
+##  Plot number of processes
+# "$HOME/CODE/conky/scripts/plot_ps.gp"         &
 
-## create tinc network image map
-"${SCRIPTS}tinc_diagram.sh"    &
+## Create tinc network image map
+"$HOME/CODE/conky/scripts/tinc_diagram.sh"    & pids+=($!)
 
-## plot radiation from broadband
-"${SCRIPTS}broadband_plot.R"   &
+## Plot radiation from broadband
+"$HOME/CODE/conky/scripts/broadband_plot.R"   & pids+=($!)
 
-## plot graphs of my cluster
-"${SCRIPTS}munin_rrd_plots.sh"
+## Plot graphs of my cluster
+"$HOME/CODE/conky/scripts/munin_rrd_plots.sh" & pids+=($!)
 
 
-## don't ignore errors
+## Clean
+wait "${pids[@]}"; pids=()
 set -e
+echo "took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"
 exit 0

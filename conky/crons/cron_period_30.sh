@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## created on 2018-06-05
 
-#### Run conky scripts with every 10 minutes with crontab
+#### Run conky scripts every 30 minutes with crontab
 
 ## external kill switch
 #####################################################################
