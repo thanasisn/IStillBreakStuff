@@ -14,33 +14,28 @@ library(owmr)
 library(plyr)
 readRenviron("~/.Renviron")
 
-
-
-dir.create(  "/dev/shm/WHEATHER/", recursive = T, showWarnings = F)
+dir.create("/dev/shm/WHEATHER/", recursive = TRUE, showWarnings = FALSE)
 CURRENT_FL = "/dev/shm/WHEATHER/Current_OpenWeather.Rds"
 LOCATIO_FL = "/dev/shm/CONKY/last_location.dat"
 KEEP_MAX   = 1000
 
-
 ## Resolve location to ask weather for
 stopifnot(file.exists(LOCATIO_FL))
 geo <- read.csv(LOCATIO_FL, stringsAsFactors = F)
-geo <- geo[!is.na( geo$Lat ) & !is.na( geo$Lng ),]
+geo <- geo[!is.na(geo$Lat) & !is.na(geo$Lng),]
 geo <- geo[order(geo$Dt), ]
 ## just choose last
-loc <- tail(geo,1)
-
+loc <- tail(geo, 1)
 
 ## get current weather
 res_cr <- get_current(lat  = loc$Lat, lon = loc$Lng, units = "metric")
 stopifnot(length(res_cr) > 10) ## should be 12
 
-
 ## parse and format data
 currW             <- as.data.frame(res_cr)
-currW$dt          <- strptime( currW$dt,          format = "%s" )
-currW$sys.sunrise <- strptime( currW$sys.sunrise, format = "%s" )
-currW$sys.sunset  <- strptime( currW$sys.sunset,  format = "%s" )
+currW$dt          <- strptime(currW$dt,          format = "%s")
+currW$sys.sunrise <- strptime(currW$sys.sunrise, format = "%s")
+currW$sys.sunset  <- strptime(currW$sys.sunset,  format = "%s")
 currW$source      <- "OpenWeatherMAP"
 
 ## drop some data
@@ -54,7 +49,6 @@ currW <- remove_prefix(currW, c("main","sys","coord","weather"))
 colnames(currW)[colnames(currW) == "all"  ] <- "cloud_cover"
 colnames(currW)[colnames(currW) == "speed"] <- "wind_speed"
 colnames(currW)[colnames(currW) == "deg"  ] <- "wind_direction"
-
 
 ## load previous data
 if (file.exists(CURRENT_FL)) {

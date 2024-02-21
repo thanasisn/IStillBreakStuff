@@ -9,25 +9,24 @@ Sys.setenv(TZ = "UTC")
 library(owmr)
 readRenviron("~/.Renviron")
 
-dir.create(  "/dev/shm/WHEATHER/", recursive = T, showWarnings = F)
-CURRENT_FL = "/dev/shm/WHEATHER/Forecast_OpenWeather.Rds"
-LOCATIO_FL = "/dev/shm/CONKY/last_location.dat"
-
+dir.create("/dev/shm/WHEATHER/", recursive = TRUE, showWarnings = FALSE)
+CURRENT_FL <- "/dev/shm/WHEATHER/Forecast_OpenWeather.Rds"
+LOCATIO_FL <- "/dev/shm/CONKY/last_location.dat"
 
 ## Resolve location to ask weather for
 stopifnot(file.exists(LOCATIO_FL))
 geo <- read.csv(LOCATIO_FL, stringsAsFactors = F)
-geo <- geo[!is.na( geo$Lat ) & !is.na( geo$Lng ),]
+geo <- geo[!is.na(geo$Lat) & !is.na(geo$Lng), ]
 geo <- geo[order(geo$Dt), ]
 ## just choose last
-loc <- tail(geo,1)
+loc <- tail(geo, 1)
 
 
 # get forecast for current location
 res_fr        <- get_forecast(lat  = loc$Lat, lon = loc$Lng, units = "metric")
 
 stopifnot(length(res_fr) > 3) ## should be 12
-stopifnot( res_fr$cnt > 5   ) ## should be 40
+stopifnot(res_fr$cnt     > 5) ## should be 40
 
 
 ## parse and format data
@@ -93,7 +92,6 @@ saveRDS( currFR, CURRENT_FL )
 ##     list.dt_txt Data/time of calculation, UTC
 ##
 ###########################################################################################################
-
 
 
 # get weather data from stations

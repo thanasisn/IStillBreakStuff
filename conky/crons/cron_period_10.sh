@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+## created on 2018-06-05
 
 #### Run conky scripts every 10 minutes with crontab
 
