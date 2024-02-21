@@ -10,13 +10,13 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- funr::sys.script()
+Script.Name <- "~/CODE/training_analysis/GC_conky_plots_rides_db.R"
 
 
 storagefl   <- "~/DATA/Other/GC_json_ride_data_2.Rds"
 datascript  <- "~/CODE/training_analysis/GC_read_rides_db_json.R"
-outputpdf   <- paste0("~/LOGs/training_status/", basename(sub("\\.R$",".pdf", Script.Name)))
-daysback    <- 365*3
+outputpdf   <- paste0("~/LOGs/training_status/", basename(sub("\\.R$", ".pdf", Script.Name)))
+daysback    <- 365 * 3
 hourstriger <- 4
 
 checkfile   <- "/dev/shm/CONKY/PMC_EPOC_400.png"
