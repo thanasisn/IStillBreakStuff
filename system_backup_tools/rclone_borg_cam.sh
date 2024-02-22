@@ -199,12 +199,12 @@ done
 fstatus=$(IFS=+; echo "$((${stats[*]}))")
 if [[ $fstatus -eq 0 ]]; then
     echo ""
-    echo "******* SUCCESSFUL UPLOAD  (rclone home) ********"
+    echo "******* SUCCESSFUL UPLOAD  (rclone came) ********"
     echo "$(date +"%F %R:%S") $fstatus SUCCESSFUL UPLOAD (rclone $PNAME) ${0}"
     status "Success $fstatus"
 else
     echo ""
-    echo "******* UPLOAD NOT SUCCESSFUL (rclone home) ********"
+    echo "******* UPLOAD NOT SUCCESSFUL (rclone came) ********"
     echo "$(date +"%F %R:%S") ${stats[*]} UPLOAD FAILED (rclone $PNAME) ${0}"
     status "Fail  $fstatus"
 fi

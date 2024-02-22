@@ -6,7 +6,6 @@
 PNAME="HOME"
 remotespattern="^h[0-9][0-9]_"
 
-
 ## allow only one instance
 LOCK_FILE="/dev/shm/rclone_borg_$PNAME.lock"
 exec 9>"$LOCK_FILE"
