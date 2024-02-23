@@ -219,7 +219,7 @@ folders=(
     "$HOME/.dot_files_private"
     "$HOME/Aerosols/"
     "$HOME/BASH/"
-    "$HOME/Documents/Docu/to"
+    "$HOME/DATA_ARC/10_TODO/to"
     "$HOME/Ecotime_machine/Scripts/"
     "$HOME/Formal/CV"
     "$HOME/Improved_Aerosols_O3/"

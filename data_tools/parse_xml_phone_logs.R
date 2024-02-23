@@ -20,7 +20,7 @@ library(myRtools)
 
 
 ## root of all xml files
-data_folder = "~/LOGs/sms/"
+data_folder = "~/DATA_ARC/08_Chats/SMS_CALLS/"
 
 
 TEST <- FALSE
@@ -38,6 +38,11 @@ old_files <- list.files(path = data_folder,
                         recursive  = TRUE)
 # old_files <- c("~/LOGs/sms/Callall.xml")
 
+batch <- 30
+if (length(old_files) > batch) {
+    old_files <- sample(old_files, batch)
+}
+
 gather <- data.frame()
 if (!file.exists(old_files[1])) {
     cat(paste("NO CALL FILES\n"))
@@ -50,15 +55,21 @@ if (!file.exists(old_files[1])) {
             data  <- xmlParse(af)
             dd    <- xmlToList(data)
 
+
             ##FIXME this is slow
             ## create dataframe from uneven rows
             for (aa in dd) {
                 gather <- plyr::rbind.fill(gather, data.frame(t(aa), stringsAsFactors = FALSE))
             }
-        }
-        ## clean often too many dups
-        gather <- unique( gather )
 
+            ## clean often too many dups
+            gather <- unique(gather)
+            gather$backup_date <- NULL
+            gather$backup_set  <- NULL
+            gather$count       <- NULL
+
+        }
+stop()
         ## clean calls logs
         gather$backup_set  <- NULL
         gather$backup_date <- NULL
@@ -69,7 +80,6 @@ if (!file.exists(old_files[1])) {
         gather$subscription_component_name[ gather$subscription_component_name == "null" ] <- NA
         gather$subscription_component_name[ gather$subscription_component_name == "com.android.phone/com.android.services.telephony.TelephonyConnectionService" ] <- NA
 
-        unique( gather$post_dial_digits )
 
         gather <- gather[ !(is.na(gather$date) & is.na(gather$number)), ]
         vec    <- vapply(gather, function(x) length(unique(x)) > 1, logical(1L))
@@ -81,7 +91,7 @@ if (!file.exists(old_files[1])) {
         # gather <- gather[!duplicated(gather[,!(names(gather) %in% c("readable_date"))]),]
 
         # as.POSIXct(as.numeric(gather$date), origin = "1970-01-01")
-
+stop()
         ## store xml data
         exp_fl <- paste0(data_folder,"/Calls_xml_",format(Sys.time(),"%F_%T"))
         write_dat(gather, exp_fl)
