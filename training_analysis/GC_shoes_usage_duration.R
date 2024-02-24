@@ -47,12 +47,11 @@ metrics <- data.table(metrics)
 ## usefull data only
 metrics <- metrics[, .(Date, Shoes, Workout_Time, Workout_Code, Total_Distance,Sport)]
 metrics <- metrics[!Sport %in% c("Bike", "Measurement")]
-
-table(metrics$Workout_Code)
+names(metrics)[names(metrics) == "Total_Distance"] <- "Distance"
 
 ## export shoes lists
 write.fwf(metrics[,
-                  .(Dist   = round(sum(Total_Distance),1),
+                  .(Dist   = round(sum(Distance), 1),
                     From   = min(Date),
                     To     = max(Date),
                     Active = difftime(max(Date), min(Date))),
@@ -67,8 +66,9 @@ ddd   <- metrics[metrics$Shoes != "Multi", ]
 empty <- ddd[ddd$Shoes == "?" | ddd$Shoes == "", ]
 ddd   <- ddd[ddd$Shoes != "?", ]
 ddd   <- ddd[ddd$Shoes != "", ]
+ddd[, Date := as.Date(Date)]
 
-## listi missing shoes info
+## list missing shoes info
 empty  <- empty[empty$Sport == "Run", ]
 emtpyD <- sum(empty$Total_Distance, na.rm = T)
 
@@ -77,15 +77,10 @@ extra <- read.delim("~/TRAIN/Shoes.csv",
                     comment.char = '#',
                     sep = ";",
                     strip.white = T)
-extra$date     <- as.Date(extra$date)
+extra$Date     <- as.Date(extra$date)
 extra$Distance <- as.numeric(extra$Distance)
 
-stop()
 
-
-
-
-##TODO this may be broken
 ## get days of usage
 gather <- data.frame()
 for (as in unique(ddd$Shoes)) {
@@ -94,26 +89,26 @@ for (as in unique(ddd$Shoes)) {
   if (nrow(temp) > 0) {
     ## insert extra data
     if (nrow(text) > 0) {
-      text$date[is.na(text$date)] <- as.Date(min(temp$date, text$date, na.rm = T), origin = "1970-01-01")
+      text$Date[is.na(text$Date)] <- as.Date(min(temp$Date, text$Date, na.rm = T), origin = "1970-01-01")
       ## is retired
       if (any(text$Status == "End")) {
-        # ## sanity checks
-        # stopifnot(text$Status[which.max(text$date)] == "End")
-        # stopifnot(max(text$date) >= max(temp$date))
+        ## sanity checks
+        stopifnot(text$Status[which.max(text$Date)] == "End")
+        stopifnot(max(text$Date) >= max(temp$Date))
         ## move End day after last usage
-        text$date[which.max(text$date)] <- temp$date[which.max(temp$date)] + 1
+        text$Date[which.max(text$Date)] <- temp$Date[which.max(temp$Date)] + 1
       }
       temp <- plyr::rbind.fill(text, temp)
-      temp <- temp[order(temp$date), ]
+      temp <- temp[order(temp$Date), ]
     }
     ## aa day
-    temp$nday <- temp$date - min(temp$date)
+    temp$nday <- temp$Date - min(temp$Date)
     ## cumsum
     temp$total <- cumsum(temp$Distance)
     ## retired
     temp$total[temp$Status == "End"] <- 0
     ## test shoe line
-    temp[ , c("Date", "total", "Total_Distance")]
+    temp[ , c("Date", "total", "Distance")]
     # plot(temp$date, temp$total)
     ## gather for plotting
     gather <- plyr::rbind.fill(gather, temp)
@@ -157,8 +152,12 @@ for (as in sort(unique(gather$Shoes))) {
 ## add legend
 sn <- c(sn, paste0("NO ENTRY (", round(emtpyD,0), "km)"))
 sc <- c(sc, NA)
-legend("topleft", legend = sn, col = sc, bty = "n", pch = 19, cex = cex)
+legend("topright", legend = sn, col = sc, bty = "n", pch = 19, cex = cex)
 
+
+if (!interactive()) {
+  dev.off()
+}
 
 ####_ END _####
 tac <- Sys.time()
