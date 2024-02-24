@@ -13,16 +13,7 @@ tic <- Sys.time()
 Script.Name <- "~/CODE/training_analysis/GC_shoes_usage_duration.R"
 
 out_file <- paste0("~/LOGs/training_status/", basename(sub("\\.R$",".pdf", Script.Name)))
-in_file  <- "~/LOGs/GCmetrics.Rds"
-
-if (!interactive()) {
-  pdf(file  = out_file)
-  sink(file = sub("\\.R$",".out",Script.Name), split = TRUE)
-}
-
-## save in goldencheetah
-# metrics <- GC.metrics(all=TRUE)
-# saveRDS(metrics, "~/LOGs/GCmetrics.Rds")
+in_file  <- "~/DATA/Other/GC_json_ride_data_2.Rds"
 
 ##  Check if have to run  ------------------------------------------------------
 if (!file.exists(out_file) |
@@ -32,6 +23,10 @@ if (!file.exists(out_file) |
 } else {
   cat("Not have to run\n")
   stop("Not have to run")
+}
+
+if (!interactive()) {
+  pdf(file = out_file)
 }
 
 ##  Load parsed data
@@ -48,23 +43,34 @@ cols <- c(
   "#731647", "#664a13", "#414d35", "#22444d", "#6b1880", "#ff70a9")
 
 metrics <- data.table(metrics)
-write.fwf(metrics[, .(Dist = round(sum(Distance),1),
-                      From = min(date),
-                      To   = max(date),
-                      Active = difftime(max(date),min(date))), by = Shoes],
+
+## usefull data only
+metrics <- metrics[, .(Date, Shoes, Workout_Time, Workout_Code, Total_Distance,Sport)]
+metrics <- metrics[!Sport %in% c("Bike", "Measurement")]
+
+table(metrics$Workout_Code)
+
+## export shoes lists
+write.fwf(metrics[,
+                  .(Dist   = round(sum(Total_Distance),1),
+                    From   = min(Date),
+                    To     = max(Date),
+                    Active = difftime(max(Date), min(Date))),
+                  by = Shoes],
           file = "~/TRAIN/Shoes.list", colnames = F)
 
 ## plot params
 cex <- 0.7
 
-## exclude non meaning
+## exclude non meaningfull for shoes
 ddd   <- metrics[metrics$Shoes != "Multi", ]
 empty <- ddd[ddd$Shoes == "?" | ddd$Shoes == "", ]
 ddd   <- ddd[ddd$Shoes != "?", ]
 ddd   <- ddd[ddd$Shoes != "", ]
 
+## listi missing shoes info
 empty  <- empty[empty$Sport == "Run", ]
-emtpyD <- sum(empty$Distance,na.rm = T)
+emtpyD <- sum(empty$Total_Distance, na.rm = T)
 
 ## get external shoe logging
 extra <- read.delim("~/TRAIN/Shoes.csv",
@@ -74,7 +80,12 @@ extra <- read.delim("~/TRAIN/Shoes.csv",
 extra$date     <- as.Date(extra$date)
 extra$Distance <- as.numeric(extra$Distance)
 
+stop()
 
+
+
+
+##TODO this may be broken
 ## get days of usage
 gather <- data.frame()
 for (as in unique(ddd$Shoes)) {
@@ -83,12 +94,12 @@ for (as in unique(ddd$Shoes)) {
   if (nrow(temp) > 0) {
     ## insert extra data
     if (nrow(text) > 0) {
-      text$date[is.na(text$date)] <- min(temp$date,text$date,na.rm = T)
+      text$date[is.na(text$date)] <- as.Date(min(temp$date, text$date, na.rm = T), origin = "1970-01-01")
       ## is retired
       if (any(text$Status == "End")) {
-        ## sanity checks
-        stopifnot(text$Status[which.max(text$date)] == "End")
-        stopifnot(max(text$date) >= max(temp$date))
+        # ## sanity checks
+        # stopifnot(text$Status[which.max(text$date)] == "End")
+        # stopifnot(max(text$date) >= max(temp$date))
         ## move End day after last usage
         text$date[which.max(text$date)] <- temp$date[which.max(temp$date)] + 1
       }
@@ -102,7 +113,7 @@ for (as in unique(ddd$Shoes)) {
     ## retired
     temp$total[temp$Status == "End"] <- 0
     ## test shoe line
-    temp[ , c("date", "total", "Distance")]
+    temp[ , c("Date", "total", "Total_Distance")]
     # plot(temp$date, temp$total)
     ## gather for plotting
     gather <- plyr::rbind.fill(gather, temp)

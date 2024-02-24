@@ -4,7 +4,6 @@
 ## Used inside Golden Cheetah software
 ## Plot a line for each shoe usage
 
-
 ####_ Set environment _####
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
@@ -13,15 +12,8 @@ tic <- Sys.time()
 Script.Name <- "~/CODE/training_analysis/GC_shoes_usage_usage.R"
 
 out_file <- paste0("~/LOGs/training_status/", basename(sub("\\.R$",".pdf", Script.Name)))
-in_file  <- "~/LOGs/GCmetrics.Rds"
+in_file  <- "~/DATA/Other/GC_json_ride_data_2.Rds"
 
-if (!interactive()) {
-  pdf(file  = out_file)
-}
-
-## save in goldencheetah
-# metrics <- GC.metrics(all=TRUE)
-# saveRDS(metrics, "~/LOGs/GCmetrics.Rds")
 
 ##  Check if have to run  ------------------------------------------------------
 if (!file.exists(out_file) |
@@ -33,6 +25,9 @@ if (!file.exists(out_file) |
   stop("Not have to run")
 }
 
+if (!interactive()) {
+  pdf(file = out_file)
+}
 ##  Load parsed data
 metrics <- readRDS(in_file)
 
@@ -183,18 +178,12 @@ for (as in sort(unique(gath$Shoes))) {
     cc <- cc + 1
 }
 
-
 ## add legend
-sn <- c(sn, paste0("NO ENTRY (", round(emtpyD,0),"km)"))
+sn <- c(sn, paste0("NO ENTRY (", round(emtpyD,0), "km)"))
 sc <- c(sc, NA)
 legend("topleft", legend = sn, col = sc, bty = "n", pch = 19, cex = cex)
 
 
-
-
-
-
-
 ####_ END _####
-tac = Sys.time()
+tac <- Sys.time()
 cat(sprintf("\n%s H:%s U:%s S:%s T:%f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))

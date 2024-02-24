@@ -12,7 +12,6 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/CODE/training_analysis/GC_conky_plots_rides_db.R"
 
-
 storagefl   <- "~/DATA/Other/GC_json_ride_data_2.Rds"
 datascript  <- "~/CODE/training_analysis/GC_read_rides_db_json.R"
 outputpdf   <- paste0("~/LOGs/training_status/", basename(sub("\\.R$", ".pdf", Script.Name)))

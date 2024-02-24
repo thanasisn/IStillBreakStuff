@@ -10,18 +10,11 @@ closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/CODE/training_analysis/GC_shoes_usage_duration.R"
+Script.Name <- "~/CODE/training_analysis/GC_shoes_usage_timeseries.R"
 
 out_file <- paste0("~/LOGs/training_status/", basename(sub("\\.R$",".pdf", Script.Name)))
-in_file  <- "~/LOGs/GCmetrics.Rds"
+in_file  <- "~/DATA/Other/GC_json_ride_data_2.Rds"
 
-if (!interactive()) {
-  pdf(file  = out_file)
-}
-
-## save in goldencheetah
-# metrics <- GC.metrics(all=TRUE)
-# saveRDS(metrics, "~/LOGs/GCmetrics.Rds")
 
 ##  Check if have to run  ------------------------------------------------------
 if (!file.exists(out_file) |
@@ -33,6 +26,9 @@ if (!file.exists(out_file) |
   stop("Not have to run")
 }
 
+if (!interactive()) {
+  pdf(file = out_file)
+}
 ##  Load parsed data
 metrics <- readRDS(in_file)
 
