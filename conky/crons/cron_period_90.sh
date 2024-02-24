@@ -40,6 +40,7 @@ pids=()
 (
 "$HOME/CODE/training_analysis/GC_conky_plots_rides_db.R"
 "$HOME/CODE/training_analysis/GC_shoes_usage_duration.R"
+"$HOME/CODE/training_analysis/GC_shoes_usage_timeseries.R"
 ) & pids+=($!)
 
 

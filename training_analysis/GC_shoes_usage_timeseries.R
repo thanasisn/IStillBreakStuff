@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-#### GoldenCheetah plot shoes usage total duration vs total distance
+#### GoldenCheetah plot shoes usage total distance vs time
 
 ## Can be used inside Golden Cheetah software
 ## Plot a line for each shoe usage
@@ -17,7 +17,6 @@ in_file  <- "~/LOGs/GCmetrics.Rds"
 
 if (!interactive()) {
   pdf(file  = out_file)
-  sink(file = sub("\\.R$",".out",Script.Name), split = TRUE)
 }
 
 ## save in goldencheetah
@@ -48,11 +47,22 @@ cols <- c(
   "#731647", "#664a13", "#414d35", "#22444d", "#6b1880", "#ff70a9")
 
 metrics <- data.table(metrics)
-write.fwf(metrics[, .(Dist = round(sum(Distance),1),
-                      From = min(date),
-                      To   = max(date),
-                      Active = difftime(max(date),min(date))), by = Shoes],
-          file = "~/TRAIN/Shoes.list", colnames = F)
+
+## export shoes lists
+summdt <- metrics[,
+                  .(Dist   = round(sum(Distance),1),
+                    From   = min(date),
+                    To     = max(date),
+                    Active = difftime(max(date), min(date))),
+                  by = Shoes]
+vars <- names(summdt)
+
+## create multiple list sorting
+for (avar in vars) {
+  write.fwf(summdt[order(summdt[[avar]])],
+            file = paste0("~/LOGs/training_status/Shoes_by_", avar, ".list"),
+            colnames = F)
+}
 
 ## plot params
 cex <- 0.7
@@ -95,33 +105,55 @@ for (as in unique(ddd$Shoes)) {
       temp <- plyr::rbind.fill(text, temp)
       temp <- temp[order(temp$date), ]
     }
-    ## aa day
-    temp$nday <- temp$date - min(temp$date)
-    ## cumsum
-    temp$total <- cumsum(temp$Distance)
-    ## retired
-    temp$total[temp$Status == "End"] <- 0
-    ## test shoe line
-    temp[ , c("date", "total", "Distance")]
-    # plot(temp$date, temp$total)
-    ## gather for plotting
     gather <- plyr::rbind.fill(gather, temp)
   }
 }
 
 
+## aggregate for plot
+gather    <- data.table(gather)
+agg       <- gather[,
+                    .(Distance = sum(Distance)),
+                    by = .(year(date), month(date), Shoes)
+]
+agg$date  <- as.Date(paste(agg$year,agg$month, "1"), format = "%Y %m %d")
+
+## for daily steps
+# aggD      <- gather[, .(Distance = sum(Distance)), by = .(date = as.Date(date), Shoes)]
+# agg <- aggD
+
+
+## compute cumulative sums
+gath <- data.table()
+for (as in unique(agg$Shoes)) {
+  temp <- agg[Shoes == as]
+  setorder(temp,date)
+  temp[,total := cumsum(Distance)]
+  gath <- rbind(gath,temp)
+}
+
+## pretty numbers
+gath$total <- round(gath$total, 0)
+unique(gath$Shoes)
 
 ## init empty plot
 par("mar" = c(4, 4, 1, 1))
-xlim <- range(gather$nday, max(gather$nday) + 7 , na.rm = T)
-ylim <- range(0, gather$total * 1.05, na.rm = T)
-plot(1,
-     type = "n",
-     xlab = "Days of usage",
+xlim <- range(gath$date, Sys.Date() + 7 , na.rm = T)
+ylim <- range(0,gath$total * 1.05 , na.rm = T)
+plot(1, type="n",
+     xlab = "",
      ylab = "km",
      xlim = xlim,
      ylim = ylim,
+     xaxt = 'n',
      cex.axis = cex)
+axis.Date(1, agg$date)
+axis.Date(1, at = seq(min(agg$date), max(agg$date) + 1, "months"),
+          labels = FALSE, tcl = -0.2)
+
+## missing type
+lines(empty$date, cumsum(empty$Distance), col = "grey", lwd = 4, type = "s")
+
 
 ## create color palette
 n <- length(unique(gather$Shoes))
@@ -131,12 +163,16 @@ n <- length(unique(gather$Shoes))
 sn <- c()
 sc <- c()
 cc <- 1
-for (as in sort(unique(gather$Shoes))) {
-  temp <- gather[gather$Shoes == as, ]
-  lines(temp$nday, temp$total, col = cols[cc], lwd = 4, type = "s")
+for (as in sort(unique(gath$Shoes))) {
+  temp <- gath[gath$Shoes == as, ]
+  lines(temp$date, temp$total, col = cols[cc], lwd = 4, type = "s" )
   model <- gsub("^.*-[ ]+", "", as)
-  text(temp$nday[which.max(temp$total)], max(temp$total),
-       labels = paste(model,"\n", round(max(temp$total), 0)),
+
+  segments(x0 = min(temp$date), y0 = 0, x1 = min(temp$date), y1 = temp$total[which.min(temp$date)], lty = 2, col = cols[cc])
+  segments(x0 = max(temp$date), y0 = 0, x1 = max(temp$date), y1 = temp$total[which.max(temp$date)], lty = 2, col = cols[cc])
+
+  text(temp$date[which.max(temp$total)], max(temp$total),
+       labels = paste(model, "\n", round(max(temp$total), 0)),
        pos = 3, cex = cex * 0.8  )
   sn <- c(sn, paste0(as, " (", round(max(temp$total), 0), "km)"))
   sc <- c(sc,cols[cc])
