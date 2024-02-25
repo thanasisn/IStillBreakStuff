@@ -4,9 +4,7 @@
 ## accept a grep pattern to match rclone remotes
 
 remotespattern="${1:-.*}"
-
 echo "Remotes pattern:  $remotespattern"
-
 
 ## allow only one instance
 LOCK_FILE="/dev/shm/$(basename "${0}").lock"
@@ -56,10 +54,8 @@ RCLONE_CONFIG="$HOME/Documents/rclone.conf"
 LOG_FILE="/tmp/$(basename "$0")_$(date +%F_%R).log"
 ERR_FILE="/tmp/$(basename "$0")_$(date +%F_%R).err"
 
-
 exec  > >(tee -i "$LOG_FILE")
 exec 2> >(tee -i "$ERR_FILE")
-
 
 ## get a list of remotes to check
 remotes=( $( "$RCLONE" --config  "$RCLONE_CONFIG"  listremotes | grep "$remotespattern" ) )
@@ -78,11 +74,9 @@ printf "  %s \n" "${remotes[@]}"
 echo "----------------------------"
 
 
-
 ##------------------------------------##
 ##   report on usage of each remote   ##
 ##------------------------------------##
-
 TOTAL=0
 USED=0
 FREE=0
@@ -90,7 +84,6 @@ TRASH=0
 OTHER=0
 FOLDR=0
 WASTE=0
-
 
 for (( ii=0; ii<total; ii++ )); do
     echo ""
@@ -131,7 +124,6 @@ for (( ii=0; ii<total; ii++ )); do
     TRASH=$(( TRASH + ${strash%.*} ))
     OTHER=$(( OTHER + ${sother%.*} ))
     FOLDR=$(( FOLDR + folde ))
-
 done
 
 
@@ -142,10 +134,8 @@ bytesToHuman() {
         b=$((b / 1024))
         (( s++ ))
     done
-#     echo   "$b$d ${S[$s]}"
     printf "%5s%s %s" "$b" "$d" "${S[$s]}"
 }
-
 
 ## display summary
 echo ""
@@ -161,6 +151,20 @@ status "FOLDERS: $(bytesToHuman $FOLDR)"
 status "PARSED ACCOUNTS: $total"
 echo "---------------------------"
 echo ""
+
+## send to telegram
+$HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone storage $remotespattern" \
+"
+TOTAL:   $(bytesToHuman $TOTAL)
+USED:    $(bytesToHuman $USED)
+FREE:    $(bytesToHuman $FREE)
+WASTE:   $(bytesToHuman $WASTE)
+TRASH:   $(bytesToHuman $TRASH)
+OTHER:   $(bytesToHuman $OTHER)
+---------------------------
+FOLDERS: $(bytesToHuman $FOLDR)
+PARSED ACCOUNTS: $total
+---------------------------"
 
 kill "$watchdogpid"
 exit 0

@@ -35,6 +35,7 @@ cleanup() {
     fstatus=$(IFS=+; echo "$((${stats[*]}))")
     info "End status: $fstatus"
     info "All status: ${stats[@]:1}"
+    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "${stats[@]:1} :: $fstatus"
     rm -fvr "$TEMP_FOLDER"
     rm -fv  "$LOCK_FILE"
     scriptpt="$(basename "${0}")"
@@ -202,12 +203,15 @@ if [[ $fstatus -eq 0 ]]; then
     echo "******* SUCCESSFUL UPLOAD  (rclone came) ********"
     echo "$(date +"%F %R:%S") $fstatus SUCCESSFUL UPLOAD (rclone $PNAME) ${0}"
     status "Success $fstatus"
+    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "$fstatus SUCCESSFUL UPLOAD (rclone $PNAME) ${0}"
 else
     echo ""
     echo "******* UPLOAD NOT SUCCESSFUL (rclone came) ********"
     echo "$(date +"%F %R:%S") ${stats[*]} UPLOAD FAILED (rclone $PNAME) ${0}"
     status "Fail  $fstatus"
+    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "${stats[*]} UPLOAD FAILED (rclone $PNAME) ${0}"
 fi
+
 info "All status:${stats[@]:1}"
 echo ""
 
