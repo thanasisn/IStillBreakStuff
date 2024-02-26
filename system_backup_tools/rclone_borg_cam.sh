@@ -35,7 +35,7 @@ cleanup() {
     fstatus=$(IFS=+; echo "$((${stats[*]}))")
     info "End status: $fstatus"
     info "All status: ${stats[@]:1}"
-    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "${stats[@]:1} :: $fstatus"
+    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "a ${stats[@]:1} e $fstatus"
     rm -fvr "$TEMP_FOLDER"
     rm -fv  "$LOCK_FILE"
     scriptpt="$(basename "${0}")"
