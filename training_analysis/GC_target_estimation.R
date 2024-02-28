@@ -80,6 +80,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
 
   ##TODO by sport
   for (as in unique(data$sport)) {
+
     ## prepare cusums
     data[sport == as, Cum_Dist := cumsum(Distance) ]
     data[sport == as, Cum_Dura := cumsum(Duration) ]
@@ -87,18 +88,63 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     data[sport == as, Cum_Desc := cumsum(Descent ) ]
     data[sport == as, Cum_Calo := cumsum(Calories) ]
 
-    data[sport == as, Pre_Dist := predict(lm(Distance ~ date, na.action = NULL, singular.ok = T), date) ]
-    data[sport == as, Pre_Dura := predict(lm(Duration ~ date, na.action = NULL, singular.ok = T), date) ]
-    data[sport == as, Pre_Asce := predict(lm(Ascent   ~ date, na.action = NULL, singular.ok = T), date) ]
-    data[sport == as, Pre_Desc := predict(lm(Descent  ~ date, na.action = NULL, singular.ok = T), date) ]
-    data[sport == as, Pre_Calo := predict(lm(Calories ~ date, na.action = NULL, singular.ok = T), date) ]
+
+
+stop()
+
+    tryCatch(
+      data[, predict(lm(Duration ~ date, data = data[sport == as]), date)],
+      error = function(x) rep(NA, data[, .N])
+    )
+
+
+
+        data[sport == as, Pre_Dist := tryCatch(
+      predict(lm(Distance ~ date, na.action = NULL, singular.ok = F), date),
+      error = function(x) rep(NA, .N)
+    )]
+    data[sport == as, Pre_Dura := tryCatch(
+      predict(lm(Duration ~ date, na.action = NULL, singular.ok = F), date),
+      error = function(x) rep(NA, .N)
+    )]
+    data[sport == as, Pre_Asce := tryCatch(
+      predict(lm(Ascent ~ date, na.action = NULL, singular.ok = F), date),
+      error = function(x) rep(NA, .N)
+    )]
+    data[sport == as, Pre_Desc := tryCatch(
+      predict(lm(Descent ~ date, na.action = NULL, singular.ok = F), date),
+      error = function(x) rep(NA, .N)
+    )]
+    data[sport == as, Pre_Calo := tryCatch(
+      predict(lm(Calories ~ date, na.action = NULL, singular.ok = F), date),
+      error = function(x) rep(NA, .N)
+    )]
+
+
+
+    data[sport == as]$Pre_Dura <- tryCatch(
+      data[sport == as, predict(lm(Duration ~ date, na.action = NULL, singular.ok = F), date)],
+      error = function(x) rep(NA, data[sport == as, .N])
+    )
+    data[sport == as]$Pre_Asce <- tryCatch(
+      data[sport == as, predict(lm(Ascent ~ date, na.action = NULL, singular.ok = F), date)],
+      error = function(x) rep(NA, data[sport == as, .N])
+    )
+    data[sport == as]$Pre_Desc <- tryCatch(
+      data[sport == as, predict(lm(Descent ~ date, na.action = NULL, singular.ok = F), date)],
+      error = function(x) rep(NA, data[sport == as, .N])
+    )
+    data[sport == as]$Pre_Calo <- tryCatch(
+      data[sport == as, predict(lm(Calories ~ date, na.action = NULL, singular.ok = F), date)],
+      error = function(x) rep(NA, data[sport == as, .N])
+    )
 
     assign(paste0("PP_", as), data)
   }
   rm(data)
 
 
-
+stop()
   ## plots
   layout(matrix(c(1,2,3,4), 4, 1, byrow = TRUE))
 
