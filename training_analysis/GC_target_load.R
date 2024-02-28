@@ -105,7 +105,7 @@ for (ay in years) {
 
   ## week TRIMP_Points
   cc <- 4
-  ylim <- range(data$TRIMP_Points, na.rm = T)
+  ylim <- range(0, data$TRIMP_Points, na.rm = T)
   plot(data$date, data$TRIMP_Points, "h",
        xlab = "", ylab = "", axes = FALSE, bty = "n",
        cex.axis = cex, lwd = 4, col = alpha(cols[cc], 0.7),
@@ -120,7 +120,7 @@ for (ay in years) {
   ## cumulative TRIMP_Points
   par(new = TRUE)
   cc <- 1
-  ylim <- range(data$Cum_Dist, alw$Pred_Dist, na.rm = T)
+  ylim <- range(0, data$Cum_Dist, alw$Pred_Dist, na.rm = T)
   plot(data$date, data$Cum_Dist, "s",
        xlab = "", ylab = "",
        cex.axis = cex, lwd = 3, col = alpha(cols[cc], 0.7),
@@ -186,7 +186,7 @@ for (ay in years) {
 
   ## week EPOC
   cc <- 7
-  ylim <- range(data$EPOC, na.rm = T)
+  ylim <- range(0, data$EPOC, na.rm = T)
   plot(data$date, data$EPOC, "h",
        xlab = "", ylab = "", axes = FALSE, bty = "n",
        cex.axis = cex, lwd = 4, col = alpha(cols[cc], 0.7),
@@ -201,7 +201,7 @@ for (ay in years) {
   ## cumulative EPOC
   par(new=TRUE)
   cc <- 5
-  ylim <- range(data$Cum_EPOC, alw$Pred_EPOC, na.rm = T)
+  ylim <- range(0, data$Cum_EPOC, alw$Pred_EPOC, na.rm = T)
   plot(data$date, data$Cum_EPOC, "s",
        xlab = "", ylab = "",
        cex.axis = cex, lwd = 3, col = alpha(cols[cc], 0.7),
@@ -233,7 +233,7 @@ for (ay in years) {
 
   ## week TRIMP_Zonal_Points
   cc <- 8
-  ylim <- range(data$TRIMP_Zonal_Points, na.rm = T)
+  ylim <- range(0, data$TRIMP_Zonal_Points, na.rm = T)
   plot(data$date, data$TRIMP_Zonal_Points, "h",
        xlab = "", ylab = "", axes = FALSE, bty = "n",
        cex.axis = cex, lwd = 4, col = alpha(cols[cc], 0.7),
@@ -247,7 +247,7 @@ for (ay in years) {
   ## cumulative TRIMP_Zonal_Points
   par(new=TRUE)
   cc <- 10
-  ylim <- range(data$Cum_Dura, alw$Pred_Dura, na.rm = T)
+  ylim <- range(0, data$Cum_Dura, alw$Pred_Dura, na.rm = T)
   plot(data$date, data$Cum_Dura, "s",
        xlab = "", ylab = "",
        cex.axis = cex, lwd = 3, col = alpha(cols[cc], 0.7),

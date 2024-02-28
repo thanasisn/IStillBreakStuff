@@ -23,6 +23,7 @@ checkfile   <- "/dev/shm/CONKY/PMC_EPOC_400.png"
 if (!interactive()) {
     ## check if we have to run
     if (!file.exists(checkfile) |
+        !file.exists(storagefl) |
         # file.mtime(inputdata) > file.mtime(outputpdf) |
         file.mtime(checkfile) < Sys.time() - hourstriger * 3600) {
         cat(paste("will run"))

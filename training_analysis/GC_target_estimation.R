@@ -9,7 +9,7 @@ closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/CODE/training_analysis/GC_shoes_usage_usage.R"
+Script.Name <- "~/CODE/training_analysis/GC_target_estimation.R"
 
 out_file <- paste0("~/LOGs/training_status/", basename(sub("\\.R$", ".pdf", Script.Name)))
 in_file  <- "~/DATA/Other/GC_json_ride_data_2.Rds"
@@ -39,6 +39,7 @@ library(scales)
 
 ##  Load parsed data
 metrics <- data.table(readRDS(in_file))
+metrics <- metrics[Sport %in% c("Run", "Bike"), ]
 metrics <- janitor::remove_constant(metrics)
 
 
@@ -48,190 +49,805 @@ cols <- c(
   "#9ee6d7", "#482ef2", "#66465b", "#33200a", "#385911", "#24a0bf", "#270f4d",
   "#731647", "#664a13", "#414d35", "#22444d", "#6b1880", "#ff70a9")
 
-
-
-## keep only "on feet" data
-if ( !is.null(metrics$Sport)) {
-    metrics <- metrics[metrics$Sport == "Run",]
-}
-
-
 ## plot params
 cex <- 1
 
 
-grep("calories" ,names(metrics), value = T, ignore.case = T)
+table(metrics$Sport, metrics$Workout_Code)
 
-
+metrics[Sport == "Run" & Workout_Code == "HRV", Date]
 
 ## aggregate data for load estimation
 metrics[, Duration := Workout_Time / 3600 ]
-data <- metrics[ , .(Distance = sum(Total_Distance,       na.rm = T),
-                     Duration = sum(Duration,       na.rm = T),
-                     Ascent   = sum(Elevation_Gain, na.rm = T),
-                     Descent  = sum(Elevation_Loss, na.rm = T),
-                     Calories = sum()),
-                 by = .(date = as.Date((as.numeric(metrics$Date) %/% 7) * 7, origin = "1970-01-01")) ]
-
-lastdate <- as.Date( paste0(year(max(data$date)),"-12-31") )
-
-## prepare data to plot
-data[ , Cum_Dist := cumsum( Distance ) ]
-data[ , Cum_Dura := cumsum( Duration ) ]
-data[ , Cum_Asce := cumsum( Ascent   ) ]
-data[ , Cum_Desc := cumsum( Descent  ) ]
-
-## predict
-lmDist <- lm(Cum_Dist ~ as.numeric(date), data)
-lmDura <- lm(Cum_Dura ~ as.numeric(date), data)
-lmAsce <- lm(Cum_Asce ~ as.numeric(date), data)
-lmDesc <- lm(Cum_Desc ~ as.numeric(date), data)
+DATA <- metrics[ , .(Distance = sum(Total_Distance,  na.rm = T),
+                     Duration = sum(Duration,        na.rm = T),
+                     Ascent   = sum(Elevation_Gain,  na.rm = T),
+                     Descent  = sum(Elevation_Loss,  na.rm = T),
+                     Calories = sum(Total_Kcalories, na.rm = T)),
+                 by = .( date = as.Date((as.numeric(as.Date(metrics$Date)) %/% 7) * 7, origin = "1970-01-01"),
+                         sport = Sport) ]
 
 
-alw <- seq(min(data$date), lastdate, by = "week")
-alw <- data.frame(date = alw)
+for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
+  ## by sport
+  for (as in na.omit(unique(DATA$sport))) {
 
-alw$Pred_Dist <- predict(lmDist, alw)
-alw$Pred_Dura <- predict(lmDura, alw)
-alw$Pred_Asce <- predict(lmAsce, alw)
-alw$Pred_Desc <- predict(lmDesc, alw)
+    data      <- DATA[year(date) == ay & sport == as, ]
 
+    if (nrow(data) < 2) next()
 
-## plots
-layout(matrix(c(1,1,2,3), 4, 1, byrow = TRUE))
+    lastdate  <- as.Date(paste0(year(max(data$date)),"-12-31"))
+    firstdate <- as.Date(paste0(year(max(data$date)),"-01-01"))
 
-xlim <- range(data$date,lastdate, na.rm = T)
-par(mar = c(2,3,1,3))
-par(xpd = TRUE)
+    ## prepare cusums by week
+    data[, Cum_Dist := cumsum(Distance) ]
+    data[, Cum_Dura := cumsum(Duration) ]
+    data[, Cum_Asce := cumsum(Ascent  ) ]
+    data[, Cum_Desc := cumsum(Descent ) ]
+    data[, Cum_Calo := cumsum(Calories) ]
 
+    ## create all days
+    data <- merge(data,
+                  data.table(date = seq(firstdate, lastdate, by = "day")),
+                  all = TRUE)
 
-## Distance plot ####
+    data$Pre_Dist <- tryCatch(
+      data[, predict(lm(Cum_Dist ~ date, data = data[sport == as]), date)],
+      error = function(x) rep(NA, data[, .N])
+    )
+    data$Pre_Dura <- tryCatch(
+      data[, predict(lm(Cum_Dura ~ date, data = data[sport == as]), date)],
+      error = function(x) rep(NA, data[, .N])
+    )
+    data$Pre_Asce <- tryCatch(
+      data[, predict(lm(Cum_Asce ~ date, data = data[sport == as]), date)],
+      error = function(x) rep(NA, data[, .N])
+    )
+    data$Pre_Desc <- tryCatch(
+      data[, predict(lm(Cum_Desc ~ date, data = data[sport == as]), date)],
+      error = function(x) rep(NA, data[, .N])
+    )
+    data$Pre_Calo <- tryCatch(
+      data[, predict(lm(Cum_Calo ~ date, data = data[sport == as]), date)],
+      error = function(x) rep(NA, data[, .N])
+    )
 
-## week distance
-cc <- 4
-ylim <- range(data$Distance, na.rm = T)
-plot(data$date, data$Distance, "h",
-     xlab = "", ylab = "", axes = FALSE, bty = "n",
-     cex.axis = cex, lwd = 4, col = alpha(cols[cc], 0.7),
-     xlim = xlim, ylim = c(ylim[1], ylim[2]*2 ) )
-axis(side=4, at = pretty(range(data$Distance)),
-     cex.axis = cex, col.axis = cols[cc] )
-mtext("Weekly Distance", side = 4, line = 2, col = cols[cc])
-abline(h = mean(data$Distance, na.rm = T),
-       col = alpha(cols[cc], 0.7), lty = 3, lwd = 2)
+    assign(paste0("PP_", as), data)
+  }
+  rm(data)
 
-## cumulative distance
-par(new=TRUE)
-cc <- 1
-ylim <- range(data$Cum_Dist, alw$Pred_Dist, na.rm = T)
-plot(data$date, data$Cum_Dist, "s",
-     xlab = "", ylab = "",
-     cex.axis = cex, lwd = 3, col = alpha(cols[cc], 0.7),
-     col.axis = cols[cc],
-     xlim = xlim, ylim = ylim)
-mtext("Distance", side = 2, line = 2, col = cols[cc])
+  ## plots
+  layout(matrix(c(1,2,3,4), 4, 1, byrow = TRUE))
 
-## lm line
-cc <- 2
-lines( alw$date, alw$Pred_Dist,
-       lwd = 3, col = alpha(cols[cc], 0.7)  )
-text( x = last(alw$date), y = last(alw$Pred_Dist), labels = round(last(alw$Pred_Dist)),
-      pos = 4, col = alpha(cols[cc], 0.7)    )
-
-## current
-cc <- 3
-abline(v = Sys.Date(),
-       lty = 3, lwd = 3, col = alpha(cols[cc], 0.7) )
-
-
+  xlim <- range(PP_Bike$date, na.rm = T)
+  par(mar = c(2, 3, 1, 3))
+  par(xpd = TRUE)
 
 
+  ## Distance plot ------------------------------------------------------------
+  ylimW <- range(0, PP_Bike$Distance, PP_Run$Distance, na.rm = T)
+  ylimD <- range(PP_Bike$Cum_Dist, PP_Bike$Pre_Dist,
+                 PP_Run$Cum_Dist,  PP_Run$Pre_Dist,
+                 na.rm = T)
+  if (ylimD[1] < 0) ylimD[1] <- 0
+
+  ## _ Bike -------------------------------------------------------------------
+  cc <- 4
+
+  ## week distance
+  plot(
+    PP_Bike$date + 3,
+    PP_Bike$Distance,
+    "h",
+    xlab     = "",
+    ylab     = "",
+    axes     = FALSE,
+    bty      = "n",
+    cex.axis = cex,
+    lwd      = 4,
+    col      = alpha(cols[cc], 0.7),
+    xlim     = xlim,
+    ylim     = c(ylimW[1], ylimW[2] * 1.1 ) )
+
+  abline(
+    h   = mean(PP_Bike$Distance, na.rm = T),
+    col = alpha(cols[cc], 0.7),
+    lty = 3,
+    lwd = 2
+  )
+  text(
+    x      = last(PP_Bike$date),
+    y      = mean(PP_Bike$Distance, na.rm = T),
+    labels = round(mean(PP_Bike$Distance, na.rm = T)),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+  mtext(
+    "Weekly Distance",
+    side = 4,
+    line = 2,
+    col  = 1,
+    cex  = 0.7
+  )
+  axis(
+    side     = 4,
+    at       = pretty(range(c(PP_Run$Distance, PP_Bike$Distance), na.rm = T)),
+    cex.axis = cex,
+    col.axis = 1
+  )
+
+  title(ay)
+
+  ## cumulative distance
+  par(new = TRUE)
+  plot(
+    PP_Bike[!is.na(Cum_Dist), Cum_Dist, date],
+    "s",
+    xlab     = "",
+    ylab     = "",
+    cex.axis = cex,
+    bty      = "n",
+    lwd      = 3,
+    col      = alpha(cols[cc], 0.7),
+    col.axis = 1,
+    xlim     = xlim,
+    ylim     = ylimD
+  )
+  axis(
+    side = 1,
+    at = pretty(range(c(PP_Run$Cum_Dist, PP_Bike$Cum_Dist), na.rm = T)),
+    cex.axis = cex,
+    col.axis = cols[cc]
+  )
+  mtext(
+    "Total Distance",
+    side = 2,
+    line = 2,
+    col = 1,
+    cex = 0.7
+  )
+
+  ## lm line
+  lines(
+    PP_Bike[, Pre_Dist, date],
+    lwd = 3,
+    col = alpha(cols[cc], 0.7),
+    lty = 3
+  )
+  text(
+    x      = last(PP_Bike$date),
+    y      = last(PP_Bike$Pre_Dist),
+    labels = round(last(PP_Run$Pre_Dist)),
+    pos    = 4,
+    col    = alpha(cols[cc], 0.7)
+  )
 
 
-## Ascent plot ####
-
-## week Ascent
-cc <- 7
-ylim <- range(data$Ascent, na.rm = T)
-plot(data$date, data$Ascent, "h",
-     xlab = "", ylab = "", axes = FALSE, bty = "n",
-     cex.axis = cex, lwd = 4, col = alpha(cols[cc], 0.7),
-     xlim = xlim, ylim = c(ylim[1], ylim[2]*2 ) )
-axis(side=4, at = pretty(range(data$Ascent)),
-     cex.axis = cex, col.axis = cols[cc] )
-mtext("Weekly Ascent ", side=4, line = 2, col = cols[cc])
-abline(h = mean(data$Ascent, na.rm = T),
-       col = alpha(cols[cc], 0.7), lty = 3, lwd = 2)
 
 
-## cumulative Ascent
-par(new=TRUE)
-cc <- 5
-ylim <- range(data$Cum_Asce, alw$Pred_Asce, na.rm = T)
-plot(data$date, data$Cum_Asce, "s",
-     xlab = "", ylab = "",
-     cex.axis = cex, lwd = 3, col = alpha(cols[cc], 0.7),
-     col.axis = cols[cc],
-     xlim = xlim, ylim = ylim)
-mtext("Ascent", side=2, line=2, col = cols[cc])
+  ## _ Run -------------------------------------------------------------------
 
-## lm line
-cc <- 13
-lines( alw$date, alw$Pred_Asce,
-       lwd = 3, col = alpha(cols[cc], 0.7)  )
-text( x = last(alw$date), y = last(alw$Pred_Asce), labels = round(last(alw$Pred_Asce)),
-      pos = 4, col = alpha(cols[cc], 0.7)    )
+  ## week distance
+  par(new = TRUE)
+  cc <- 8
+  plot(
+    PP_Run$date,
+    PP_Run$Distance,
+    "h",
+    xlab     = "",
+    ylab     = "",
+    axes     = FALSE,
+    bty      = "n",
+    cex.axis = cex,
+    lwd      = 4,
+    col      = alpha(cols[cc], 0.7),
+    xlim     = xlim,
+    ylim     = c(ylimW[1], ylimW[2] * 1.1 )
+  )
 
-## current
-cc <- 3
-abline(v = Sys.Date(),
-       lty = 3, lwd = 3, col = alpha(cols[cc], 0.7) )
+  abline(
+    h   = mean(PP_Run$Distance, na.rm = T),
+    col = alpha(cols[cc], 0.7),
+    lty = 3,
+    lwd = 2
+  )
+  text(
+    x      = last(PP_Bike$date),
+    y      = mean(PP_Run$Distance, na.rm = T),
+    labels = round(mean(PP_Run$Distance, na.rm = T)),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
 
+  ## cumulative distance
+  par(new = TRUE)
+  plot(
+    PP_Run[!is.na(Cum_Dist), Cum_Dist, date],
+    "s",
+    xlab     = "",
+    ylab     = "",
+    cex.axis = cex,
+    lwd      = 3,
+    bty      = "n",
+    col      = alpha(cols[cc], 0.7),
+    col.axis = 1,
+    xlim     = xlim,
+    ylim     = ylimD
+  )
 
+  ## lm line
+  lines(
+    PP_Run[, Pre_Dist, date],
+    lwd = 3,
+    col = alpha(cols[cc], 0.7),
+    lty = 3
+  )
+  text(
+    x      = last(PP_Run$date),
+    y      = last(PP_Run$Pre_Dist),
+    labels = round(last(PP_Run$Pre_Dist)),
+    pos    = 4,
+    col    = alpha(cols[cc], 0.7)
+  )
 
-
-
-
-## Duration plot ####
-
-## week duration
-cc <- 8
-ylim <- range(data$Duration, na.rm = T)
-plot(data$date, data$Duration, "h",
-     xlab = "", ylab = "", axes = FALSE, bty = "n",
-     cex.axis = cex, lwd = 4, col = alpha(cols[cc], 0.7),
-     xlim = xlim, ylim = c(ylim[1], ylim[2]*2 ) )
-axis(side=4, at = pretty(range(data$Duration)),
-     cex.axis = cex, col.axis = cols[cc] )
-mtext("Weekly Duration", side=4, line = 2, col = cols[cc])
-abline(h = mean(data$Duration, na.rm = T),
-       col = alpha(cols[cc], 0.7), lty = 3, lwd = 2)
-
-## cumulative Duration
-par(new=TRUE)
-cc <- 10
-ylim <- range(data$Cum_Dura, alw$Pred_Dura, na.rm = T)
-plot(data$date, data$Cum_Dura, "s",
-     xlab = "", ylab = "",
-     cex.axis = cex, lwd = 3, col = alpha(cols[cc], 0.7),
-     col.axis = cols[cc],
-     xlim = xlim, ylim = ylim)
-mtext("Duration", side=2, line=2, col = cols[cc])
-
-## lm line
-cc <- 11
-lines( alw$date, alw$Pred_Dura,
-       lwd = 3, col = alpha(cols[cc], 0.7)  )
-text( x = last(alw$date), y = last(alw$Pred_Dura), labels = round(last(alw$Pred_Dura)),
-      pos = 4, col = alpha(cols[cc], 0.7)    )
-
-## current
-cc <- 3
-abline(v = Sys.Date(),
-       lty = 3, lwd = 3, col = alpha(cols[cc], 0.7) )
+  ## current
+  cc <- 3
+  abline(
+    v   = Sys.Date(),
+    lty = 3,
+    lwd = 3,
+    col = alpha(cols[cc], 0.7)
+  )
 
 
 
+
+
+  ## Duration plot ------------------------------------------------------------
+  ylimW <- range(0, PP_Bike$Duration, PP_Run$Duration, na.rm = T)
+  ylimD <- range(PP_Bike$Cum_Dura, PP_Bike$Pre_Dura,
+                 PP_Run$Cum_Dura,  PP_Run$Pre_Dura,
+                 na.rm = T)
+  if (ylimD[1] < 0) ylimD[1] <- 0
+
+  ## _ Bike -------------------------------------------------------------------
+  cc <- 5
+
+  ## week Duration
+  plot(
+    PP_Bike$date + 3,
+    PP_Bike$Duration,
+    "h",
+    xlab     = "",
+    ylab     = "",
+    axes     = FALSE,
+    bty      = "n",
+    cex.axis = cex,
+    lwd      = 4,
+    col      = alpha(cols[cc], 0.7),
+    xlim     = xlim,
+    ylim     = c(ylimW[1], ylimW[2] * 1.1 ) )
+
+  abline(
+    h   = mean(PP_Bike$Duration, na.rm = T),
+    col = alpha(cols[cc], 0.7),
+    lty = 3,
+    lwd = 2
+  )
+  text(
+    x      = last(PP_Bike$date),
+    y      = mean(PP_Bike$Duration, na.rm = T),
+    labels = round(mean(PP_Bike$Duration, na.rm = T)),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+  mtext(
+    "Weekly Duration",
+    side = 4,
+    line = 2,
+    col  = 1,
+    cex  = 0.7
+  )
+  axis(
+    side     = 4,
+    at       = pretty(range(c(PP_Run$Duration, PP_Bike$Duration), na.rm = T)),
+    cex.axis = cex,
+    col.axis = 1
+  )
+
+
+  ## cumulative distance
+  par(new = TRUE)
+  plot(
+    PP_Bike[!is.na(Cum_Dura), Cum_Dura, date],
+    "s",
+    xlab     = "",
+    ylab     = "",
+    cex.axis = cex,
+    bty      = "n",
+    lwd      = 3,
+    col      = alpha(cols[cc], 0.7),
+    col.axis = 1,
+    xlim     = xlim,
+    ylim     = ylimD
+  )
+  axis(
+    side = 1,
+    at = pretty(range(c(PP_Run$Cum_Dura, PP_Bike$Cum_Dura), na.rm = T)),
+    cex.axis = cex,
+    col.axis = cols[cc]
+  )
+  mtext(
+    "Total Duration",
+    side = 2,
+    line = 2,
+    col = 1,
+    cex = 0.7
+  )
+
+  ## lm line
+  lines(
+    PP_Bike[, Pre_Dura, date],
+    lwd = 3,
+    col = alpha(cols[cc], 0.7),
+    lty = 3
+  )
+  text(
+    x      = last(PP_Bike$date),
+    y      = last(PP_Bike$Pre_Dura),
+    labels = round(last(PP_Run$Pre_Dura)),
+    pos    = 4,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+
+
+
+  ## _ Run -------------------------------------------------------------------
+
+  ## week distance
+  par(new = TRUE)
+  cc <- 9
+  plot(
+    PP_Run$date,
+    PP_Run$Duration,
+    "h",
+    xlab     = "",
+    ylab     = "",
+    axes     = FALSE,
+    bty      = "n",
+    cex.axis = cex,
+    lwd      = 4,
+    col      = alpha(cols[cc], 0.7),
+    xlim     = xlim,
+    ylim     = c(ylimW[1], ylimW[2] * 1.1 )
+  )
+
+  abline(
+    h   = mean(PP_Run$Duration, na.rm = T),
+    col = alpha(cols[cc], 0.7),
+    lty = 3,
+    lwd = 2
+  )
+  text(
+    x      = last(PP_Bike$date),
+    y      = mean(PP_Run$Duration, na.rm = T),
+    labels = round(mean(PP_Run$Duration, na.rm = T)),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+  ## cumulative distance
+  par(new = TRUE)
+  plot(
+    PP_Run[!is.na(Cum_Dura), Cum_Dura, date],
+    "s",
+    xlab     = "",
+    ylab     = "",
+    cex.axis = cex,
+    lwd      = 3,
+    bty      = "n",
+    col      = alpha(cols[cc], 0.7),
+    col.axis = 1,
+    xlim     = xlim,
+    ylim     = ylimD
+  )
+
+  ## lm line
+  lines(
+    PP_Run[, Pre_Dura, date],
+    lwd = 3,
+    col = alpha(cols[cc], 0.7),
+    lty = 3
+  )
+  text(
+    x      = last(PP_Run$date),
+    y      = last(PP_Run$Pre_Dura),
+    labels = round(last(PP_Run$Pre_Dura)),
+    pos    = 4,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+  ## current
+  cc <- 3
+  abline(
+    v   = Sys.Date(),
+    lty = 3,
+    lwd = 3,
+    col = alpha(cols[cc], 0.7)
+  )
+
+
+
+
+
+
+
+
+
+
+
+  ## Ascent plot ------------------------------------------------------------
+  ylimW <- range(0, PP_Bike$Ascent, PP_Run$Ascent, na.rm = T)
+  ylimD <- range(PP_Bike$Cum_Asce, PP_Bike$Pre_Asce,
+                 PP_Run$Cum_Asce,  PP_Run$Pre_Asce,
+                 na.rm = T)
+  if (ylimD[1] < 0) ylimD[1] <- 0
+
+  ## _ Bike -------------------------------------------------------------------
+  cc <- 6
+
+  ## week Ascent
+  plot(
+    PP_Bike$date + 3,
+    PP_Bike$Ascent,
+    "h",
+    xlab     = "",
+    ylab     = "",
+    axes     = FALSE,
+    bty      = "n",
+    cex.axis = cex,
+    lwd      = 4,
+    col      = alpha(cols[cc], 0.7),
+    xlim     = xlim,
+    ylim     = c(ylimW[1], ylimW[2] * 1.1 ) )
+
+  abline(
+    h   = mean(PP_Bike$Ascent, na.rm = T),
+    col = alpha(cols[cc], 0.7),
+    lty = 3,
+    lwd = 2
+  )
+  text(
+    x      = last(PP_Bike$date),
+    y      = mean(PP_Bike$Ascent, na.rm = T),
+    labels = round(mean(PP_Bike$Ascent, na.rm = T)),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+  mtext(
+    "Weekly Ascent",
+    side = 4,
+    line = 2,
+    col  = 1,
+    cex  = 0.7
+  )
+  axis(
+    side     = 4,
+    at       = pretty(range(c(PP_Run$Ascent, PP_Bike$Ascent), na.rm = T)),
+    cex.axis = cex,
+    col.axis = 1
+  )
+
+
+  ## cumulative distance
+  par(new = TRUE)
+  plot(
+    PP_Bike[!is.na(Cum_Asce), Cum_Asce, date],
+    "s",
+    xlab     = "",
+    ylab     = "",
+    cex.axis = cex,
+    bty      = "n",
+    lwd      = 3,
+    col      = alpha(cols[cc], 0.7),
+    col.axis = 1,
+    xlim     = xlim,
+    ylim     = ylimD
+  )
+  axis(
+    side = 1,
+    at = pretty(range(c(PP_Run$Cum_Asce, PP_Bike$Cum_Asce), na.rm = T)),
+    cex.axis = cex,
+    col.axis = cols[cc]
+  )
+  mtext(
+    "Total Ascent",
+    side = 2,
+    line = 2,
+    col = 1,
+    cex = 0.7
+  )
+
+  ## lm line
+  lines(
+    PP_Bike[, Pre_Asce, date],
+    lwd = 3,
+    col = alpha(cols[cc], 0.7),
+    lty = 3
+  )
+  text(
+    x      = last(PP_Bike$date),
+    y      = last(PP_Bike$Pre_Asce),
+    labels = round(last(PP_Run$Pre_Asce)),
+    pos    = 4,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+
+
+
+  ## _ Run -------------------------------------------------------------------
+
+  ## week distance
+  par(new = TRUE)
+  cc <- 10
+  plot(
+    PP_Run$date,
+    PP_Run$Ascent,
+    "h",
+    xlab     = "",
+    ylab     = "",
+    axes     = FALSE,
+    bty      = "n",
+    cex.axis = cex,
+    lwd      = 4,
+    col      = alpha(cols[cc], 0.7),
+    xlim     = xlim,
+    ylim     = c(ylimW[1], ylimW[2] * 1.1 )
+  )
+
+  abline(
+    h   = mean(PP_Run$Ascent, na.rm = T),
+    col = alpha(cols[cc], 0.7),
+    lty = 3,
+    lwd = 2
+  )
+  text(
+    x      = last(PP_Bike$date),
+    y      = mean(PP_Run$Ascent, na.rm = T),
+    labels = round(mean(PP_Run$Ascent, na.rm = T)),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+  ## cumulative distance
+  par(new = TRUE)
+  plot(
+    PP_Run[!is.na(Cum_Asce), Cum_Asce, date],
+    "s",
+    xlab     = "",
+    ylab     = "",
+    cex.axis = cex,
+    lwd      = 3,
+    bty      = "n",
+    col      = alpha(cols[cc], 0.7),
+    col.axis = 1,
+    xlim     = xlim,
+    ylim     = ylimD
+  )
+
+  ## lm line
+  lines(
+    PP_Run[, Pre_Asce, date],
+    lwd = 3,
+    col = alpha(cols[cc], 0.7),
+    lty = 3
+  )
+  text(
+    x      = last(PP_Run$date),
+    y      = last(PP_Run$Pre_Asce),
+    labels = round(last(PP_Run$Pre_Asce)),
+    pos    = 4,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+  ## current
+  cc <- 3
+  abline(
+    v   = Sys.Date(),
+    lty = 3,
+    lwd = 3,
+    col = alpha(cols[cc], 0.7)
+  )
+
+
+
+
+
+
+
+
+
+
+
+
+  ## Calories plot ------------------------------------------------------------
+  ylimW <- range(0, PP_Bike$Calories, PP_Run$Calories, na.rm = T)
+  ylimD <- range(PP_Bike$Cum_Calo, PP_Bike$Pre_Calo,
+                 PP_Run$Cum_Calo,  PP_Run$Pre_Calo,
+                 na.rm = T)
+  if (ylimD[1] < 0) ylimD[1] <- 0
+
+
+  ## _ Bike -------------------------------------------------------------------
+  cc <- 7
+
+  ## week Calories
+  plot(
+    PP_Bike$date + 3,
+    PP_Bike$Calories,
+    "h",
+    xlab     = "",
+    ylab     = "",
+    axes     = FALSE,
+    bty      = "n",
+    cex.axis = cex,
+    lwd      = 4,
+    col      = alpha(cols[cc], 0.7),
+    xlim     = xlim,
+    ylim     = c(ylimW[1], ylimW[2] * 1.1 ) )
+
+  abline(
+    h   = mean(PP_Bike$Calories, na.rm = T),
+    col = alpha(cols[cc], 0.7),
+    lty = 3,
+    lwd = 2
+  )
+  text(
+    x      = last(PP_Bike$date),
+    y      = mean(PP_Bike$Calories, na.rm = T),
+    labels = round(mean(PP_Bike$Calories, na.rm = T)),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+  mtext(
+    "Weekly Calories",
+    side = 4,
+    line = 2,
+    col  = 1,
+    cex  = 0.7
+  )
+  axis(
+    side     = 4,
+    at       = pretty(range(c(PP_Run$Calories, PP_Bike$Calories), na.rm = T)),
+    cex.axis = cex,
+    col.axis = 1
+  )
+
+
+  ## cumulative distance
+  par(new = TRUE)
+  plot(
+    PP_Bike[!is.na(Cum_Calo), Cum_Calo, date],
+    "s",
+    xlab     = "",
+    ylab     = "",
+    cex.axis = cex,
+    bty      = "n",
+    lwd      = 3,
+    col      = alpha(cols[cc], 0.7),
+    col.axis = 1,
+    xlim     = xlim,
+    ylim     = ylimD
+  )
+  axis(
+    side = 1,
+    at = pretty(range(c(PP_Run$Cum_Calo, PP_Bike$Cum_Calo), na.rm = T)),
+    cex.axis = cex,
+    col.axis = cols[cc]
+  )
+  mtext(
+    "Total Calories",
+    side = 2,
+    line = 2,
+    col = 1,
+    cex = 0.7
+  )
+
+  ## lm line
+  lines(
+    PP_Bike[, Pre_Calo, date],
+    lwd = 3,
+    col = alpha(cols[cc], 0.7),
+    lty = 3
+  )
+  text(
+    x      = last(PP_Bike$date),
+    y      = last(PP_Bike$Pre_Calo),
+    labels = round(last(PP_Run$Pre_Calo)),
+    pos    = 4,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+
+
+
+  ## _ Run -------------------------------------------------------------------
+
+  ## week distance
+  par(new = TRUE)
+  cc <- 11
+  plot(
+    PP_Run$date,
+    PP_Run$Calories,
+    "h",
+    xlab     = "",
+    ylab     = "",
+    axes     = FALSE,
+    bty      = "n",
+    cex.axis = cex,
+    lwd      = 4,
+    col      = alpha(cols[cc], 0.7),
+    xlim     = xlim,
+    ylim     = c(ylimW[1], ylimW[2] * 1.1 )
+  )
+
+  abline(
+    h   = mean(PP_Run$Calories, na.rm = T),
+    col = alpha(cols[cc], 0.7),
+    lty = 3,
+    lwd = 2
+  )
+  text(
+    x      = last(PP_Bike$date),
+    y      = mean(PP_Run$Calories, na.rm = T),
+    labels = round(mean(PP_Run$Calories, na.rm = T)),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+  ## cumulative distance
+  par(new = TRUE)
+  plot(
+    PP_Run[!is.na(Cum_Calo), Cum_Calo, date],
+    "s",
+    xlab     = "",
+    ylab     = "",
+    cex.axis = cex,
+    lwd      = 3,
+    bty      = "n",
+    col      = alpha(cols[cc], 0.7),
+    col.axis = 1,
+    xlim     = xlim,
+    ylim     = ylimD
+  )
+
+  ## lm line
+  lines(
+    PP_Run[, Pre_Calo, date],
+    lwd = 3,
+    col = alpha(cols[cc], 0.7),
+    lty = 3
+  )
+  text(
+    x      = last(PP_Run$date),
+    y      = last(PP_Run$Pre_Calo),
+    labels = round(last(PP_Run$Pre_Calo)),
+    pos    = 4,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+  ## current
+  cc <- 3
+  abline(
+    v   = Sys.Date(),
+    lty = 3,
+    lwd = 3,
+    col = alpha(cols[cc], 0.7)
+  )
+
+}
 
 
 ####_ END _####

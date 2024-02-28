@@ -37,6 +37,7 @@ pids=()
 "$HOME/CODE/training_analysis/GC_shoes_usage_duration.R"
 "$HOME/CODE/training_analysis/GC_shoes_usage_timeseries.R"
 "$HOME/CODE/training_analysis/GC_target_load.R"
+"$HOME/CODE/training_analysis/GC_target_estimation.R"
 ) & pids+=($!)
 
 
