@@ -22,8 +22,8 @@ mkdir -p "$LOGDIR"
 NOTIFY_SEND="/home/athan/CODE/system_tools/pub_notifications.py"
 statusfile="${LOGDIR}/Disks_check_$(hostname).status"
 logfile="${LOGDIR}/Disks_check_$(hostname)_$(date +'%F').check"
-echo "** Report **" > "$logfile"
-echo "** Status **" > "$statusfile"
+echo "** $(hostname) Report **" > "$logfile"
+echo "** $(hostname) Status **" > "$statusfile"
 
 
 cleanup() {
@@ -162,12 +162,17 @@ fi
 echo "DONE checking ZFS"
 echo ""
 
-## fix binary chars in log files
+## send to telegram
+~/CODE/system_tools/telegram_status.sh "$(hostname) filesystem" "$(cat "$statusfile")"
+
+## maybe fix binary chars in log files
 LC_ALL=C sed -i 's/[^\x0-\xB1]//g' "$statusfile"
 LC_ALL=C sed -i 's/[^\x0-\xB1]//g' "$logfile"
 
 echo "Output files"
 echo "$statusfile"
 echo "$logfile"
+
+
 
 exit 0
