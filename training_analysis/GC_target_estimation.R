@@ -9,7 +9,7 @@ closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/CODE/training_analysis/GC_target_load.R"
+Script.Name <- "~/CODE/training_analysis/GC_shoes_usage_usage.R"
 
 out_file <- paste0("~/LOGs/training_status/", basename(sub("\\.R$", ".pdf", Script.Name)))
 in_file  <- "~/DATA/Other/GC_json_ride_data_2.Rds"
@@ -39,7 +39,6 @@ library(scales)
 
 ##  Load parsed data
 metrics <- data.table(readRDS(in_file))
-metrics <- metrics[Sport %in% c("Run", "Bike"), ]
 metrics <- janitor::remove_constant(metrics)
 
 
@@ -49,163 +48,100 @@ cols <- c(
   "#9ee6d7", "#482ef2", "#66465b", "#33200a", "#385911", "#24a0bf", "#270f4d",
   "#731647", "#664a13", "#414d35", "#22444d", "#6b1880", "#ff70a9")
 
+
+
+## keep only "on feet" data
+if ( !is.null(metrics$Sport)) {
+    metrics <- metrics[metrics$Sport == "Run",]
+}
+
+
 ## plot params
 cex <- 1
 
 
-table(metrics$Sport, metrics$Workout_Code)
+grep("calories" ,names(metrics), value = T, ignore.case = T)
 
-metrics[Sport == "Run" & Workout_Code == "HRV", Date]
+
 
 ## aggregate data for load estimation
 metrics[, Duration := Workout_Time / 3600 ]
-DATA <- metrics[ , .(Distance = sum(Total_Distance,  na.rm = T),
-                     Duration = sum(Duration,        na.rm = T),
-                     Ascent   = sum(Elevation_Gain,  na.rm = T),
-                     Descent  = sum(Elevation_Loss,  na.rm = T),
-                     Calories = sum(Total_Kcalories, na.rm = T)),
-                 by = .( date = as.Date((as.numeric(as.Date(metrics$Date)) %/% 7) * 7, origin = "1970-01-01"),
-                         sport = Sport) ]
+data <- metrics[ , .(Distance = sum(Total_Distance,       na.rm = T),
+                     Duration = sum(Duration,       na.rm = T),
+                     Ascent   = sum(Elevation_Gain, na.rm = T),
+                     Descent  = sum(Elevation_Loss, na.rm = T),
+                     Calories = sum()),
+                 by = .(date = as.Date((as.numeric(metrics$Date) %/% 7) * 7, origin = "1970-01-01")) ]
+
+lastdate <- as.Date( paste0(year(max(data$date)),"-12-31") )
+
+## prepare data to plot
+data[ , Cum_Dist := cumsum( Distance ) ]
+data[ , Cum_Dura := cumsum( Duration ) ]
+data[ , Cum_Asce := cumsum( Ascent   ) ]
+data[ , Cum_Desc := cumsum( Descent  ) ]
+
+## predict
+lmDist <- lm(Cum_Dist ~ as.numeric(date), data)
+lmDura <- lm(Cum_Dura ~ as.numeric(date), data)
+lmAsce <- lm(Cum_Asce ~ as.numeric(date), data)
+lmDesc <- lm(Cum_Desc ~ as.numeric(date), data)
 
 
-for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
-  data      <- DATA[year(date) == ay]
-  lastdate  <- as.Date(paste0(year(max(data$date)),"-12-31"))
-  firstdate <- as.Date(paste0(year(max(data$date)),"-01-01"))
+alw <- seq(min(data$date), lastdate, by = "week")
+alw <- data.frame(date = alw)
 
-  ## create all days
-  data <- merge(data,
-                data.table(date = seq(firstdate, lastdate, by = "day")),
-                all = TRUE)
-
-  ##TODO by sport
-  for (as in unique(data$sport)) {
-
-    ## prepare cusums
-    data[sport == as, Cum_Dist := cumsum(Distance) ]
-    data[sport == as, Cum_Dura := cumsum(Duration) ]
-    data[sport == as, Cum_Asce := cumsum(Ascent  ) ]
-    data[sport == as, Cum_Desc := cumsum(Descent ) ]
-    data[sport == as, Cum_Calo := cumsum(Calories) ]
+alw$Pred_Dist <- predict(lmDist, alw)
+alw$Pred_Dura <- predict(lmDura, alw)
+alw$Pred_Asce <- predict(lmAsce, alw)
+alw$Pred_Desc <- predict(lmDesc, alw)
 
 
+## plots
+layout(matrix(c(1,1,2,3), 4, 1, byrow = TRUE))
 
-stop()
-
-    tryCatch(
-      data[, predict(lm(Duration ~ date, data = data[sport == as]), date)],
-      error = function(x) rep(NA, data[, .N])
-    )
-
+xlim <- range(data$date,lastdate, na.rm = T)
+par(mar = c(2,3,1,3))
+par(xpd = TRUE)
 
 
-        data[sport == as, Pre_Dist := tryCatch(
-      predict(lm(Distance ~ date, na.action = NULL, singular.ok = F), date),
-      error = function(x) rep(NA, .N)
-    )]
-    data[sport == as, Pre_Dura := tryCatch(
-      predict(lm(Duration ~ date, na.action = NULL, singular.ok = F), date),
-      error = function(x) rep(NA, .N)
-    )]
-    data[sport == as, Pre_Asce := tryCatch(
-      predict(lm(Ascent ~ date, na.action = NULL, singular.ok = F), date),
-      error = function(x) rep(NA, .N)
-    )]
-    data[sport == as, Pre_Desc := tryCatch(
-      predict(lm(Descent ~ date, na.action = NULL, singular.ok = F), date),
-      error = function(x) rep(NA, .N)
-    )]
-    data[sport == as, Pre_Calo := tryCatch(
-      predict(lm(Calories ~ date, na.action = NULL, singular.ok = F), date),
-      error = function(x) rep(NA, .N)
-    )]
+## Distance plot ####
 
+## week distance
+cc <- 4
+ylim <- range(data$Distance, na.rm = T)
+plot(data$date, data$Distance, "h",
+     xlab = "", ylab = "", axes = FALSE, bty = "n",
+     cex.axis = cex, lwd = 4, col = alpha(cols[cc], 0.7),
+     xlim = xlim, ylim = c(ylim[1], ylim[2]*2 ) )
+axis(side=4, at = pretty(range(data$Distance)),
+     cex.axis = cex, col.axis = cols[cc] )
+mtext("Weekly Distance", side = 4, line = 2, col = cols[cc])
+abline(h = mean(data$Distance, na.rm = T),
+       col = alpha(cols[cc], 0.7), lty = 3, lwd = 2)
 
+## cumulative distance
+par(new=TRUE)
+cc <- 1
+ylim <- range(data$Cum_Dist, alw$Pred_Dist, na.rm = T)
+plot(data$date, data$Cum_Dist, "s",
+     xlab = "", ylab = "",
+     cex.axis = cex, lwd = 3, col = alpha(cols[cc], 0.7),
+     col.axis = cols[cc],
+     xlim = xlim, ylim = ylim)
+mtext("Distance", side = 2, line = 2, col = cols[cc])
 
-    data[sport == as]$Pre_Dura <- tryCatch(
-      data[sport == as, predict(lm(Duration ~ date, na.action = NULL, singular.ok = F), date)],
-      error = function(x) rep(NA, data[sport == as, .N])
-    )
-    data[sport == as]$Pre_Asce <- tryCatch(
-      data[sport == as, predict(lm(Ascent ~ date, na.action = NULL, singular.ok = F), date)],
-      error = function(x) rep(NA, data[sport == as, .N])
-    )
-    data[sport == as]$Pre_Desc <- tryCatch(
-      data[sport == as, predict(lm(Descent ~ date, na.action = NULL, singular.ok = F), date)],
-      error = function(x) rep(NA, data[sport == as, .N])
-    )
-    data[sport == as]$Pre_Calo <- tryCatch(
-      data[sport == as, predict(lm(Calories ~ date, na.action = NULL, singular.ok = F), date)],
-      error = function(x) rep(NA, data[sport == as, .N])
-    )
+## lm line
+cc <- 2
+lines( alw$date, alw$Pred_Dist,
+       lwd = 3, col = alpha(cols[cc], 0.7)  )
+text( x = last(alw$date), y = last(alw$Pred_Dist), labels = round(last(alw$Pred_Dist)),
+      pos = 4, col = alpha(cols[cc], 0.7)    )
 
-    assign(paste0("PP_", as), data)
-  }
-  rm(data)
-
-
-stop()
-  ## plots
-  layout(matrix(c(1,2,3,4), 4, 1, byrow = TRUE))
-
-  xlim <- range(data$date,lastdate, na.rm = T)
-  par(mar = c(2,3,1,3))
-  par(xpd = TRUE)
-
-  ## Distance plot ####
-
-  ## week distance
-  cc <- 4
-  ylim <- range(data$Distance, na.rm = T)
-
-  data[sport == "Run", Distance, date]
-
-  plot(data$date, data$Distance, "h",
-       xlab = "", ylab = "", axes = FALSE, bty = "n",
-       cex.axis = cex, lwd = 4, col = alpha(cols[cc], 0.7),
-       xlim = xlim, ylim = c(ylim[1], ylim[2]*2 ) )
-
-
-  axis(side = 4, at = pretty(range(data$Distance)),
-       cex.axis = cex, col.axis = cols[cc] )
-
-  mtext("Weekly Distance", side = 4, line = 2, col = cols[cc])
-
-  abline(h = mean(data$Distance, na.rm = T),
-         col = alpha(cols[cc], 0.7), lty = 3, lwd = 2)
-
-  # ## cumulative distance
-  # par(new = TRUE)
-  # cc <- 1
-  # ylim <- range(data$Cum_Dist, data$Pred_Dist, na.rm = T)
-  # plot(data$date, data$Pred_Dist, "s",
-  #      xlab = "", ylab = "",
-  #      cex.axis = cex, lwd = 3, col = alpha(cols[cc], 0.7),
-  #      col.axis = cols[cc],
-  #      xlim = xlim, ylim = ylim)
-  # mtext("Distance", side = 2, line = 2, col = cols[cc])
-  #
-  # ## lm line
-  # cc <- 2
-  # lines( alw$date, alw$Pred_Dist,
-  #        lwd = 3, col = alpha(cols[cc], 0.7)  )
-  # text( x = last(alw$date), y = last(alw$Pred_Dist), labels = round(last(alw$Pred_Dist)),
-  #       pos = 4, col = alpha(cols[cc], 0.7)    )
-  #
-  # ## current
-  # cc <- 3
-  # abline(v = Sys.Date(),
-  #        lty = 3, lwd = 3, col = alpha(cols[cc], 0.7) )
-  #
-
-
-  stop()
-}
-
-
-
-
-
+## current
+cc <- 3
+abline(v = Sys.Date(),
+       lty = 3, lwd = 3, col = alpha(cols[cc], 0.7) )
 
 
 
