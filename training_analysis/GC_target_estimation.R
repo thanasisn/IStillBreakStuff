@@ -8,54 +8,63 @@
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic = Sys.time()
-Script.Name = funr::sys.script()
-if(!interactive()) {
-    pdf( file=sub("\\.R$",".pdf",Script.Name))
-    sink(file=sub("\\.R$",".out",Script.Name),split=TRUE)
+tic <- Sys.time()
+Script.Name <- "~/CODE/training_analysis/GC_shoes_usage_usage.R"
+
+out_file <- paste0("~/LOGs/training_status/", basename(sub("\\.R$", ".pdf", Script.Name)))
+in_file  <- "~/DATA/Other/GC_json_ride_data_2.Rds"
+
+
+##  Check if have to run  ------------------------------------------------------
+if (!file.exists(out_file) |
+    file.mtime(out_file) < file.mtime(in_file) |
+    interactive()) {
+  cat("Have to run\n")
+} else {
+  cat("Not have to run\n")
+  stop("Not have to run")
 }
 
-## save in goldencheetah
-# metrics <- GC.metrics(all=TRUE)
-# saveRDS(metrics, "~/LOGs/GCmetrics.Rds")
+if (!interactive()) {
+  pdf(file = out_file)
+}
+##  Load parsed data
+metrics <- readRDS(in_file)
 
-## load outside goldencheetah
-metrics <- readRDS("~/LOGs/GCmetrics_selection.Rds")
-source("~/FUNCTIONS/R/data.R")
-metrics <- rm.cols.dups.df(metrics)
-
-
-
-####  Copy for GC below  ####################################################
+####  Copy for GC below  -------------------------------------------------------
 
 
 library(data.table)
 library(scales)
 
-# This crushes version 3.6-DRV2006 of goldenchretah
-# library(randomcoloR)
+##  Load parsed data
+metrics <- data.table(readRDS(in_file))
+metrics <- metrics[Sport %in% c("Run", "Bike"), ]
+metrics <- janitor::remove_constant(metrics)
 
-cols <- c("#f22e2e", "#d9b629", "#30ff83", "#3083ff", "#f22ee5", "#33161e", "#e6a89e", "#bbbf84", "#1d995f", "#324473", "#cc8dc8", "#59111b", "#b25c22", "#b1f22e", "#9ee6d7", "#482ef2", "#66465b", "#33200a", "#385911", "#24a0bf", "#270f4d", "#731647", "#664a13", "#414d35", "#22444d", "#6b1880", "#ff70a9")
 
-metrics <- data.table(metrics)
-
-## keep only "on feet" data
-if ( !is.null(metrics$Sport)) {
-    metrics <-metrics[metrics$Sport == "Run",]
-}
+cols <- c(
+  "#f22e2e", "#d9b629", "#30ff83", "#3083ff", "#f22ee5", "#33161e", "#e6a89e",
+  "#bbbf84", "#1d995f", "#324473", "#cc8dc8", "#59111b", "#b25c22", "#b1f22e",
+  "#9ee6d7", "#482ef2", "#66465b", "#33200a", "#385911", "#24a0bf", "#270f4d",
+  "#731647", "#664a13", "#414d35", "#22444d", "#6b1880", "#ff70a9")
 
 ## plot params
 cex <- 1
 
 
+table(metrics$Sport, metrics$Workout_Code)
+
+metrics[Sport == "Run" & Workout_Code == "HRV", Date]
 
 ## aggregate data for load estimation
-metrics[, Duration := Duration / 3600 ]
-data <- metrics[ , .(Distance = sum(Distance,       na.rm = T),
+metrics[, Duration := Workout_Time / 3600 ]
+data <- metrics[ , .(Distance = sum(Total_Distance,       na.rm = T),
                      Duration = sum(Duration,       na.rm = T),
                      Ascent   = sum(Elevation_Gain, na.rm = T),
-                     Descent  = sum(Elevation_Loss, na.rm = T)),
-                 by = .(date = as.Date((as.numeric(metrics$date) %/% 7) * 7, origin = "1970-01-01")) ]
+                     Descent  = sum(Elevation_Loss, na.rm = T),
+                     Calories = sum(Total_Kcalories, na.rm = T)),
+                 by = .(date = as.Date((as.numeric(metrics$Date) %/% 7) * 7, origin = "1970-01-01")) ]
 
 lastdate <- as.Date( paste0(year(max(data$date)),"-12-31") )
 
@@ -219,5 +228,5 @@ abline(v = Sys.Date(),
 
 
 ####_ END _####
-tac = Sys.time()
+tac <- Sys.time()
 cat(sprintf("\n%s H:%s U:%s S:%s T:%f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))
