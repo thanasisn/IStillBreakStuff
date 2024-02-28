@@ -33,9 +33,13 @@ cleanup() {
     set +e
     info " ... clean up trap ... "
     fstatus=$(IFS=+; echo "$((${stats[*]}))")
+    echo "test1 ${stats[@]:1}"
+    echo "test2 ${stats[@]}"
+    echo "test3 ${stats[*]}"
+    Astatus="${stats[@]:1}"
     info "End status: $fstatus"
-    info "All status: ${stats[@]:1}"
-    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "a ${stats[@]:1} e $fstatus"
+    info "All status: $Astatus"
+    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "e $fstatus a $Astatus"
     rm -fvr "$TEMP_FOLDER"
     rm -fv  "$LOCK_FILE"
     scriptpt="$(basename "${0}")"
