@@ -11,7 +11,7 @@ LOCK_FILE="/dev/shm/rclone_borg_$PNAME.lock"
 exec 9>"$LOCK_FILE"
 if ! flock -n 9  ; then
     echo "another instance is running";
-    exit 99
+    exit 9
 fi
 
 if [[ $(hostname) != "blue" ]]; then
@@ -202,13 +202,13 @@ done
 fstatus=$(IFS=+; echo "$((${stats[*]}))")
 if [[ $fstatus -eq 0 ]]; then
     echo ""
-    echo "******* SUCCESSFUL UPLOAD  (rclone home) ********"
+    echo "******* SUCCESSFUL UPLOAD  (rclone $PNAME) ********"
     echo "$(date +"%F %R:%S") $fstatus SUCCESSFUL UPLOAD (rclone $PNAME) ${0}"
     status "Success $fstatus"
     $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "$fstatus SUCCESSFUL UPLOAD (rclone $PNAME) ${0}"
 else
     echo ""
-    echo "******* UPLOAD NOT SUCCESSFUL (rclone home) ********"
+    echo "******* UPLOAD NOT SUCCESSFUL (rclone $PNAME) ********"
     echo "$(date +"%F %R:%S") ${stats[*]} UPLOAD FAILED (rclone $PNAME) ${0}"
     status "Fail  $fstatus"
     $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "${stats[*]} UPLOAD FAILED (rclone $PNAME) ${0}"

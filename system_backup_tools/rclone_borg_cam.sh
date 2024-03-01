@@ -6,13 +6,12 @@
 PNAME="CAME"
 remotespattern="^c[0-9][0-9]"
 
-
 ## allow only one instance
 LOCK_FILE="/dev/shm/rclone_borg_$PNAME.lock"
 exec 9>"$LOCK_FILE"
 if ! flock -n 9  ; then
     echo "another instance is running";
-    exit 99
+    exit 9
 fi
 
 if [[ $(hostname) != "blue" ]]; then
@@ -34,12 +33,11 @@ cleanup() {
     info " ... clean up trap ... "
     fstatus=$(IFS=+; echo "$((${stats[*]}))")
     echo "test1 ${stats[@]:1}"
-    echo "test2 ${stats[@]}"
-    echo "test3 ${stats[*]}"
+    echo "test3 ${stats[*]:1}"
     Astatus="${stats[@]:1}"
     info "End status: $fstatus"
     info "All status: $Astatus"
-    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "e $fstatus a $Astatus"
+    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "Total: $fstatus  Accounts: $Astatus"
     rm -fvr "$TEMP_FOLDER"
     rm -fv  "$LOCK_FILE"
     scriptpt="$(basename "${0}")"
@@ -63,8 +61,8 @@ ID="$1"
 SCRIPT="$(basename "$0")"
 
 fsta="${ldir}/$(basename "$0")_$ID.status"
-info()   { echo "$(date +'%F %T') ::INF::${SCRIPT}::${ID}:: $* ::" | tee -a "$fsta"; }
-status() { echo "$(date +'%F %T') ::STA::${SCRIPT}::${ID}:: $* ::" | tee -a "$fsta"; }
+info()   {echo "$(date +'%F %T') ::INF::${SCRIPT}::${ID}:: $* ::" | tee -a "$fsta";}
+status() {echo "$(date +'%F %T') ::STA::${SCRIPT}::${ID}:: $* ::" | tee -a "$fsta";}
 
 info "script started"
 
@@ -204,13 +202,13 @@ done
 fstatus=$(IFS=+; echo "$((${stats[*]}))")
 if [[ $fstatus -eq 0 ]]; then
     echo ""
-    echo "******* SUCCESSFUL UPLOAD  (rclone came) ********"
+    echo "******* SUCCESSFUL UPLOAD  (rclone $PNAME) ********"
     echo "$(date +"%F %R:%S") $fstatus SUCCESSFUL UPLOAD (rclone $PNAME) ${0}"
     status "Success $fstatus"
     $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "$fstatus SUCCESSFUL UPLOAD (rclone $PNAME) ${0}"
 else
     echo ""
-    echo "******* UPLOAD NOT SUCCESSFUL (rclone came) ********"
+    echo "******* UPLOAD NOT SUCCESSFUL (rclone $PNAME) ********"
     echo "$(date +"%F %R:%S") ${stats[*]} UPLOAD FAILED (rclone $PNAME) ${0}"
     status "Fail  $fstatus"
     $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "${stats[*]} UPLOAD FAILED (rclone $PNAME) ${0}"
