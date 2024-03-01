@@ -32,12 +32,10 @@ cleanup() {
     set +e
     info " ... clean up trap ... "
     fstatus=$(IFS=+; echo "$((${stats[*]}))")
-    echo "test1 ${stats[@]:1}"
-    echo "test3 ${stats[*]:1}"
-    Astatus="${stats[@]:1}"
+    Astatus="${stats[*]:1}"
     info "End status: $fstatus"
     info "All status: $Astatus"
-    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "Total: $fstatus  Accounts: $Astatus"
+    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "Bad: $fstatus  Per Account: $Astatus"
     rm -fvr "$TEMP_FOLDER"
     rm -fv  "$LOCK_FILE"
     scriptpt="$(basename "${0}")"
@@ -61,8 +59,8 @@ ID="$1"
 SCRIPT="$(basename "$0")"
 
 fsta="${ldir}/$(basename "$0")_$ID.status"
-info()   { echo "$(date +'%F %T') ::INF::${SCRIPT}::${ID}:: $* ::" | tee -a "$fsta"; }
-status() { echo "$(date +'%F %T') ::STA::${SCRIPT}::${ID}:: $* ::" | tee -a "$fsta"; }
+info()   { echo "$(date +'%F %T') ::INF::${SCRIPT}::${ID}:: $* ::" | tee -a "$fsta";}
+status() { echo "$(date +'%F %T') ::STA::${SCRIPT}::${ID}:: $* ::" | tee -a "$fsta";}
 
 info "script started"
 
