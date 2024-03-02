@@ -20,10 +20,11 @@ mes="$(hostname) $(date +'%F %T')
 $(uptime -p)
 L: $(cat /proc/loadavg)
 T: $(ps -e | wc -l)
-M: $(free -h | awk '/Mem:/ { print $3 "/" $2 }')
 $(uptime | cut -d',' -f3  | sed 's/^[ ]*//')
 
-$(w -h)
+$(free -h)
+
+$(w)
 
 $(df -Th -x tmpfs -x devtmpfs)
 
@@ -40,11 +41,12 @@ echo "$mes"
 curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" -d parse_mode='MarkdownV2' -d chat_id="$TELEGRAM_ID" -d text="$mes"
 
 ## if succeed exit
-if [  $? -eq 0 ]; then
-  echo OK
+if [ $? -eq 0 ]; then
+  echo
+  echo "OK"
   exit 0
 else
-  echo "Markdown failed"
+  echo "Markdown failed, trying plain"
 fi
 
 ## Use plain text if markdown fails
