@@ -92,6 +92,11 @@ run sudo hwinfo --short
 run sudo hwinfo
 
 
+dis "INFO: inxi"
+
+run inxi -F
+
+
 
 dis "INFO: list of packages"
 
