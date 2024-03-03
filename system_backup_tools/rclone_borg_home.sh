@@ -35,7 +35,7 @@ cleanup() {
     Astatus="${stats[*]:1}"
     info "End status: $fstatus"
     info "All status: $Astatus"
-    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "Bad: $fstatus  Per Account: $Astatus"
+    /home/athan/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "Bad: $fstatus  Per Account: $Astatus"
     rm -fvr "$TEMP_FOLDER"
     rm -fv  "$LOCK_FILE"
     scriptpt="$(basename "${0}")"
@@ -51,7 +51,7 @@ trap cleanup 0 1 2 3 6 8 14 15
 ##   logging definitions   ##
 ##-------------------------##
 
-ldir="$HOME/LOGs/SYSTEM_LOGS/"
+ldir="/home/athan/LOGs/SYSTEM_LOGS/"
 mkdir -p "$ldir"
 
 ID="$1"
@@ -69,12 +69,12 @@ info "script started"
 BORG_FOLDER="/media/free/.BORGbackup/crane_$PNAME"
 RCLONE_ROOT="/media/free/.BORGbackup"
 TEMP_FOLDER="/dev/shm/borg_to_rclone_$PNAME"
-RCLONE="$HOME/PROGRAMS/rclone"
-RCLONE_CONFIG="$HOME/Documents/rclone.conf"
+RCLONE="/home/athan/PROGRAMS/rclone"
+RCLONE_CONFIG="/home/athan/Documents/rclone.conf"
 LOG_FILE="/tmp/$(basename "$0")_$(date +%F_%R).log"
 ERR_FILE="/tmp/$(basename "$0")_$(date +%F_%R).err"
 DIR_PREF="rclone_storage"
-REPORT_SCRIPT="$HOME/CODE/system_backup_tools/rclone_remotes_usage.sh"
+REPORT_SCRIPT="/home/athan/CODE/system_backup_tools/rclone_remotes_usage.sh"
 
 ## start log files
 exec  > >(tee -i "$LOG_FILE")
@@ -203,16 +203,16 @@ if [[ $fstatus -eq 0 ]]; then
     echo "******* SUCCESSFUL UPLOAD  (rclone $PNAME) ********"
     echo "$(date +"%F %R:%S") $fstatus SUCCESSFUL UPLOAD (rclone $PNAME) ${0}"
     status "Success $fstatus"
-    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "$fstatus SUCCESSFUL UPLOAD (rclone $PNAME) ${0}"
+    /home/athan/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "$fstatus SUCCESSFUL UPLOAD (rclone $PNAME) ${0}"
 else
     echo ""
     echo "******* UPLOAD NOT SUCCESSFUL (rclone $PNAME) ********"
     echo "$(date +"%F %R:%S") ${stats[*]} UPLOAD FAILED (rclone $PNAME) ${0}"
     status "Fail  $fstatus"
-    $HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "${stats[*]} UPLOAD FAILED (rclone $PNAME) ${0}"
+    /home/athan/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "${stats[*]} UPLOAD FAILED (rclone $PNAME) ${0}"
 fi
 
-info "All status:${stats[@]:1}"
+info "All status:${stats[*]:1}"
 echo ""
 
 
@@ -222,8 +222,6 @@ echo ""
 
 echo "run: $REPORT_SCRIPT" "$remotespattern"
 "$REPORT_SCRIPT" "$remotespattern"
-
-
 
 
 ##------------------------------------##

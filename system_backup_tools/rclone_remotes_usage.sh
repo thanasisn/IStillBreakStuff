@@ -153,7 +153,7 @@ echo "---------------------------"
 echo ""
 
 ## send to telegram
-$HOME/CODE/system_tools/telegram_status.sh "$(hostname) rclone storage $remotespattern" \
+/home/athan/CODE/system_tools/telegram_status.sh "$(hostname) rclone storage $remotespattern" \
 "
 TOTAL:   $(bytesToHuman $TOTAL)
 USED:    $(bytesToHuman $USED)
