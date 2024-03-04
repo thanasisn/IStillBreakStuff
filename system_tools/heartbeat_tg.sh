@@ -10,8 +10,7 @@ set +e
 if [ -f ~/.ssh/telegram/unikey_$(hostname) ]; then
     . ~/.ssh/telegram/unikey_$(hostname)
   else
-    TELEGRAM_TOKEN="7109742645:AAH4sya6BBpqS5xyh27lxGNLYzclvdZVRjI"
-    TELEGRAM_ID="6849911952"
+    . ~/.ssh/telegram/unikey_hosts
 fi
 
 ## Try to use markdown first
@@ -20,8 +19,6 @@ mes="$(hostname) $(date +'%F %T')
 $(uptime -p)
 L: $(cat /proc/loadavg)
 T: $(ps -e | wc -l)
-$(uptime | cut -d',' -f3  | sed 's/^[ ]*//')
-
 $(free -h)
 
 $(w)
@@ -55,10 +52,12 @@ mes="$(hostname) $(date +'%F %T')
 $(uptime -p)
 L: $(cat /proc/loadavg)
 T: $(ps -e | wc -l)
-M: $(free -h | awk '/Mem:/ { print $3 "/" $2 }')
-$(uptime | cut -d',' -f3  | sed 's/^[ ]*//')
-$(w -h)
+$(free -h)
+
+$(w)
+
 $(df -Th -x tmpfs -x devtmpfs)
+
 $(sensors -A)
 "
 
