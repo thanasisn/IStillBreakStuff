@@ -56,7 +56,7 @@ $(free -h)
 
 $(w)
 
-$(df -Th -x tmpfs -x devtmpfs)
+$(df -Th -x tmpfs -x devtmpfs -x squashfs)
 
 $(sensors -A)
 "
@@ -78,7 +78,7 @@ $(uptime | cut -d',' -f3  | sed 's/^[ ]*//')
 
 $(w -h)
 
-$(df -Th -x tmpfs -x devtmpfs)
+$(df -Th -x tmpfs -x devtmpfs -x squashfs)
 
 $(sensors -A)
 \`\`\`
