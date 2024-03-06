@@ -113,52 +113,46 @@ mkdir -p  "$TEMP_FOLDER"
 find "$BORG_FOLDER" | sort -V > "$BORG_FOLDER/filelist.lst"
 
 
-
-##------------------------------------------------------##
-##   break borg repo to lists of files with set size    ##
-##------------------------------------------------------##
+##  break borg repo to lists of files with set size  ---------------------------
 
 sum=0
 list=1
 find "$BORG_FOLDER" -type f -printf "%s %p\n" | sort -t' ' -k2 -V | while read line; do
-    asize="$(echo "$line" | sed 's/ .*//')"
-    afile="$(echo "$line" | sed 's/^[0-9]\+ //')"
-    sum=$((sum+asize))
-
-    ## count cumulative size and break
-    if [[ $sum -ge $breakin ]]; then
-        listname=$(printf "file_list_%02d" "$list")
-        echo "${listname}"
-        echo "$sum bytes"
-        echo $sum | awk '{ byte =$1 /1024/1024/1024; print byte " GB" }'
-        sum=0
-        list=$((list+1))
-    fi
-    ## name of the current list
+  asize="$(echo "$line" | sed 's/ .*//')"
+  afile="$(echo "$line" | sed 's/^[0-9]\+ //')"
+  sum=$((sum+asize))
+  ## count cumulative size and break
+  if [[ $sum -ge $breakin ]]; then
     listname=$(printf "file_list_%02d" "$list")
-    ## add file in current list
-    echo "$afile" >> "${TEMP_FOLDER}/${listname}"
+    echo "${listname}"
+    echo "$sum bytes"
+    echo $sum | awk '{ byte =$1 /1024/1024/1024; print byte " GB" }'
+    sum=0
+    list=$((list+1))
+  fi
+  ## name of the current list
+  listname=$(printf "file_list_%02d" "$list")
+  ## add file in current list
+  echo "$afile" >> "${TEMP_FOLDER}/${listname}"
 done
 info "$list lists created"
 
 ## fix relative paths for rclone
 find ${TEMP_FOLDER} -type f -iname "file_list_*" | sort | while read line; do
-    sed -i 's,'"$RCLONE_ROOT"',,g' "$line"
-    echo "Made $line paths relative"
+  sed -i 's,'"$RCLONE_ROOT"',,g' "$line"
+  echo "Made $line paths relative"
 done
 
 ## warn when data are going to spill out of available accounts
 ## TODO use the global notify system
 oversized="$(find ${TEMP_FOLDER} -type f -iname "file_list_*" | wc -l)"
 if [[ $oversized -gt $MAX_ACCOUNTS ]]; then
-    notify-send -u critical "rclone $PNAME has gone oversize" "have to configure new gmail account for the extra data"
+  /home/athan/CODE/system_tools/telegram_status.sh "!! rclone $PNAME has gone oversize" "have to configure new gmail account for the extra data"
+  notify-send -u critical "rclone $PNAME has gone oversize" "have to configure new gmail account for the extra data"
 fi
 
 
-
-##--------------------------------------------##
-##   use rclone to upload files to gdrives    ##
-##--------------------------------------------##
+##  use rclone to upload files to gdrives  ------------------------------------
 
 ## common rclone options
 otheropt=" --checkers=20 --delete-before --delete-excluded --stats=60s --progress --drive-use-trash=false "
@@ -171,18 +165,14 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
     jj=$ii
     ## padded index
     ii="$(printf %02d "$ii")"
-
     info "Start  $jj / $MAX_ACCOUNTS  ${drive[$jj]}:/$DIR_PREF"
-
+    ## work on list of actual data
     [[ ! -f "${TEMP_FOLDER}/file_list_$ii" ]] && echo " * No list to do ! * " && stats["$jj"]=0 && continue
-
     ## dedupe remote
     ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${drive[$jj]}"
-
     ## empty trash in remote
     ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${drive[$jj]}"
-
-    ## sync to remote
+    ## sync to remote!
     drivelogfl="/dev/shm/rc_${PNAME}_borg_${ii}.log"
     echo "Start" > "$drivelogfl"
     "$RCLONE" ${otheropt} ${bwlimit} --config       "$RCLONE_CONFIG"                \
@@ -191,12 +181,14 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
                                      --stats        "10m"                           \
                                      sync "$RCLONE_ROOT" "${drive[$jj]}/$DIR_PREF"
     stats["$jj"]=$?
+    /home/athan/CODE/system_tools/telegram_status.sh "rclone $PNAME" "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
     status "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
     echo "-----------------------------------------------------------------"
 done
 
 
-## check output status for all drives
+##  check output status for all drives  -----------------------------------------
+
 fstatus=$(IFS=+; echo "$((${stats[*]}))")
 if [[ $fstatus -eq 0 ]]; then
     echo ""
@@ -216,17 +208,13 @@ info "All status:${stats[*]:1}"
 echo ""
 
 
-##-----------------------------------------------##
-##   report on used capacity for each account    ##
-##-----------------------------------------------##
+##  report on used capacity for each account  ----------------------------------
 
 echo "run: $REPORT_SCRIPT" "$remotespattern"
 "$REPORT_SCRIPT" "$remotespattern"
 
 
-##------------------------------------##
-##   clear an account to be reused    ##
-##------------------------------------##
+##  clear an account to be reused  ---------------------------------------------
 
 # otheropt=" --delete-before --delete-excluded --drive-use-trash=false"
 # ${RCLONE} --config "$RCLONE_CONFIG" ${otheropt} purge   "skts01:/hde_1"
