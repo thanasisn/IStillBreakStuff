@@ -154,35 +154,35 @@ fi
 ##  use rclone to upload files to gdrives  ------------------------------------
 
 ## common rclone options
-otheropt=" --checkers=20 --delete-before --delete-excluded --stats=60s --progress --drive-use-trash=false "
+otheropt=" --checkers=20 --delete-before --delete-excluded --stats=60s --progress --drive-use-trash=false --transfers=1 "
 bwlimit="  --bwlimit=${BWLIM_K}k"
 
 info "rclone started"
 
 for ii in $(seq 1 "$MAX_ACCOUNTS"); do
-    ## numeric index
-    jj=$ii
-    ## padded index
-    ii="$(printf %02d "$ii")"
-    info "Start  $jj / $MAX_ACCOUNTS  ${drive[$jj]}:/$DIR_PREF"
-    ## work on list of actual data
-    [[ ! -f "${TEMP_FOLDER}/file_list_$ii" ]] && echo " * No list to do ! * " && stats["$jj"]=0 && continue
-    ## dedupe remote
-    ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${drive[$jj]}"
-    ## empty trash in remote
-    ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${drive[$jj]}"
-    ## sync to remote!
-    drivelogfl="/dev/shm/rc_${PNAME}_borg_${ii}.log"
-    echo "Start" > "$drivelogfl"
-    "$RCLONE" ${otheropt} ${bwlimit} --config       "$RCLONE_CONFIG"                \
-                                     --include-from "${TEMP_FOLDER}/file_list_$ii"  \
-                                     --log-file     "$drivelogfl"                   \
-                                     --stats        "10m"                           \
-                                     sync "$RCLONE_ROOT" "${drive[$jj]}/$DIR_PREF"
-    stats["$jj"]=$?
-    /home/athan/CODE/system_tools/telegram_status.sh "rclone $PNAME" "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
-    status "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
-    echo "-----------------------------------------------------------------"
+  ## numeric index
+  jj=$ii
+  ## zero padded index
+  ii="$(printf %02d "$ii")"
+  info "Start  $jj / $MAX_ACCOUNTS  ${drive[$jj]}:/$DIR_PREF"
+  ## work on list of actual data
+  [[ ! -f "${TEMP_FOLDER}/file_list_$ii" ]] && echo " * No list to do ! * " && stats["$jj"]=0 && continue
+  ## dedupe remote
+  ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  dedupe newest "${drive[$jj]}"
+  ## empty trash in remote
+  ${RCLONE}         --stats=0 --config "$RCLONE_CONFIG"  cleanup       "${drive[$jj]}"
+  ## sync to remote!
+  drivelogfl="/dev/shm/rc_${PNAME}_borg_${ii}.log"
+  echo "Start" > "$drivelogfl"
+  "$RCLONE" ${otheropt} ${bwlimit} --config       "$RCLONE_CONFIG"                \
+                                   --include-from "${TEMP_FOLDER}/file_list_$ii"  \
+                                   --log-file     "$drivelogfl"                   \
+                                   --stats        "10m"                           \
+                                   sync "$RCLONE_ROOT" "${drive[$jj]}/$DIR_PREF"
+  stats["$jj"]=$?
+  /home/athan/CODE/system_tools/telegram_status.sh "rclone $PNAME" "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
+  status "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
+  echo "-----------------------------------------------------------------"
 done
 
 
@@ -220,6 +220,6 @@ echo "run: $REPORT_SCRIPT" "$remotespattern"
 # ${RCLONE} --config "$RCLONE_CONFIG" ${otheropt} cleanup "skts01:/"
 
 # kill "$watchdogpid"
-cleanup
+# cleanup
 info "Script ends here"
 exit 0
