@@ -29,27 +29,25 @@ set +e
 ## always kill watchdog and lock if this script ends
 cleanup() {
 (
-    set +e
-    info " ... clean up trap ... "
-    fstatus=$(IFS=+; echo "$((${stats[*]}))")
-    Astatus="${stats[*]:1}"
-    info "End status: $fstatus"
-    info "All status: $Astatus"
-    /home/athan/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "Bad: $fstatus  Per Account: $Astatus"
-    rm -fvr "$TEMP_FOLDER"
-    rm -fv  "$LOCK_FILE"
-    scriptpt="$(basename "${0}")"
-    # pgrep -l -f ".*${scriptpt%.*}.*"
-    pkill -9 -e ".*${scriptpt%.*}.*"
+  set +e
+  info " ... clean up trap ... "
+  fstatus=$(IFS=+; echo "$((${stats[*]}))")
+  Astatus="${stats[*]:1}"
+  info "End status: $fstatus"
+  info "All status: $Astatus"
+  /home/athan/CODE/system_tools/telegram_status.sh "$(hostname) rclone $PNAME" "Bad: $fstatus  Per Account: $Astatus"
+  rm -fvr "$TEMP_FOLDER"
+  rm -fv  "$LOCK_FILE"
+  scriptpt="$(basename "${0}")"
+  # pgrep -l -f ".*${scriptpt%.*}.*"
+  pkill -9 -e ".*${scriptpt%.*}.*"
 ) >> "$LOG_FILE"
 }
 
 trap 'echo $( date )  $0 interrupted >&2;' INT TERM
 trap cleanup 0 1 2 3 6 8 14 15
 
-##-------------------------##
-##   logging definitions   ##
-##-------------------------##
+## logging definitions  --------------------------------------------------------
 
 ldir="/home/athan/LOGs/SYSTEM_LOGS/"
 mkdir -p "$ldir"
@@ -103,7 +101,8 @@ printf "                      %s \n" "${drive[@]}"
 printf "%0.s-" {1..50}; echo
 echo   ""
 
-## _ MAIN _ ##
+
+## _ MAIN _  -------------------------------------------------------------------
 
 ## prepare output folder
 rm    -rf "$TEMP_FOLDER"
