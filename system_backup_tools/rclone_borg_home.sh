@@ -62,6 +62,14 @@ status() { echo "$(date +'%F %T') ::STA::${SCRIPT}::${ID}:: $* ::" | tee -a "$fs
 
 info "script started"
 
+## Get telegram credentials  ---------------------------------------------------
+
+if [ -f ~/.ssh/telegram/unikey_$(hostname) ]; then
+    . ~/.ssh/telegram/unikey_$(hostname)
+  else
+    . ~/.ssh/telegram/unikey_hosts
+fi
+
 ## set upload variables
 
 BORG_FOLDER="/media/free/.BORGbackup/crane_$PNAME"
@@ -180,7 +188,13 @@ for ii in $(seq 1 "$MAX_ACCOUNTS"); do
                                    --stats        "10m"                           \
                                    sync "$RCLONE_ROOT" "${drive[$jj]}/$DIR_PREF"
   stats["$jj"]=$?
-  /home/athan/CODE/system_tools/telegram_status.sh "rclone $PNAME" "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
+  # /home/athan/CODE/system_tools/telegram_status.sh "rclone $PNAME" "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
+  mes="rclone $PNAME
+  Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
+  curl -s -X POST                                             \
+    "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
+    -d chat_id="$TELEGRAM_ID"                                 \
+    -d text="$mes"
   status "Drive:${jj}  Status:${stats[$jj]}  Drive:${drive[$jj]}"
   echo "-----------------------------------------------------------------"
 done
