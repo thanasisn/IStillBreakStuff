@@ -306,6 +306,14 @@ if (file.exists(R_make_$file)) {
   new <- rbind(old, new)
 }
 
+for (pp in unique(new$path)) {
+
+  temp <- new[new$path == pp, ]
+  temp[order(temp$mtime), ]
+
+}
+
+
 
 read.csv(R_make_$file)
 
