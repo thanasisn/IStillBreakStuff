@@ -53,7 +53,7 @@ Rmk_id_source <- function(file, ...) {
   require(digest, quietly = TRUE)
 
   if (file.exists(file)) {
-    data.frame(mtime = as.numeric(file.mtime(file)),
+    data.frame(mtime = ceiling(as.numeric(file.mtime(file))*1000),
                atime = as.numeric(Sys.time()),
                ptime = as.character(Sys.time()),
                path  = file,
@@ -82,7 +82,7 @@ Rmk_id_data <- function(file) {
 
   require(digest, quietly = TRUE)
 
-  data.frame(mtime = as.numeric(file.mtime(file)),
+  data.frame(mtime = ceiling(as.numeric(file.mtime(file))*1000),
              atime = as.numeric(Sys.time()),
              ptime = as.character(Sys.time()),
              path  = file,
@@ -92,7 +92,6 @@ Rmk_id_data <- function(file) {
 }
 
 
-as.character(Sys.time())
 ## Function to store options
 ## all was good
 ## - read rmk
@@ -213,7 +212,7 @@ check_Rmake <- function(depend.source = c(),
 
   ## check for new dependencies
   if (any(!(new_s$path %in% old_s$path))){
-    cat("Unrecorded dependecies !!", "\n")
+    cat("Unrecorded source dependecies !!", "\n")
     # cat("\nHAVE TO RUN\n\n")
     R_make_$RUN <- TRUE
   }
@@ -233,6 +232,30 @@ check_Rmake <- function(depend.source = c(),
   }
 
 
+  ## check data files
+  new_d <- new[new$type == "data", c("path", "mtime") ]
+  old_d <- old[old$type == "data", c("path", "mtime") ]
+
+  ## check for new dependencies
+  if (any(!(new_d$path %in% old_d$path))){
+    cat("Unrecorded data dependecies !!", "\n")
+    # cat("\nHAVE TO RUN\n\n")
+    R_make_$RUN <- TRUE
+  }
+
+  ## check for new or changed hash
+  for (ii in 1:nrow(new_d)) {
+    item <- new_d[ii, ]
+
+    if (any(abs(old_d[item$path == old_d$path,]$mtime - item$mtime) < 0.001)) {
+      cat("Not changed: ", item$path, "\n")
+    } else {
+      cat("UPDATED:     ", item$path, "\n")
+      cat("\nHAVE TO RUN\n\n")
+      R_make_$RUN <- TRUE
+    }
+
+  }
 
 
 
@@ -259,12 +282,12 @@ check_Rmake <- function(depend.source = c(),
 
 out <- check_Rmake(depend.source = c("~/CODE/FUNCTIONS/R/make_tools.R"),
                    depend.data  = c("~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"),
-                   targets      = c("~/ZHOST/testfile", "~/ZHOST/testfile2") )
+                   targets      = c("~/ZHOST/testfile") )
 out
 
 
 out <- check_Rmake(depend.source = c("~/CODE/FUNCTIONS/R/make_tools.R", "BASH/apt_clean_lists.sh"),
-                   depend.data  = c("~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet")
+                   depend.data  = c("~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet", "~/ZHOST/testfile")
                    )
 (out)
 
@@ -273,35 +296,15 @@ old <- out$old
 
 
 
-## check data files
-new_d <- new[new$type == "data", c("path", "mtime") ]
-old_d <- old[old$type == "data", c("path", "mtime") ]
-
-# ## check for new dependencies
-# if (any(!(new_s$path %in% old_s$path))){
-#   cat("Unrecorded dependecies !!", "\n")
-#   cat("\nHAVE TO RUN\n\n")
-#   R_make_$RUN <- TRUE
-# }
-
-## check for new or changed hash
-for (ii in 1:nrow(new_d)) {
-  item <- new_d[ii, ]
 
 
-  if (abs(old_d[item$path == old_d$path,]$mtime - item$mtime) < 0.001) {
-    cat("Not changed: ", item$path, "\n")
-  } else {
-    cat("UPDATED:     ", item$path, "\n")
-    cat("\nHAVE TO RUN\n\n")
-    R_make_$RUN <- TRUE
-  }
 
+
+
+if (file.exists(R_make_$file)) {
+  old <- read.csv(R_make_$file)
+  new <- rbind(old, new)
 }
-
-
-
-
 
 
 read.csv(R_make_$file)
