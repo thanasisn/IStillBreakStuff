@@ -1,19 +1,34 @@
 
-#' Clean source from non info
+#### Create `make` like rules in R
+
+#'
+#' Functions used in R scripts, to create rules similar to `GNU make`
+#' logic, where a target depends on data "mtime" or source code hash.
+#' The intent is to create a workflow chain for data procesing projects.
+#'
+#' 1. Create and/or test rule output.
+#' 2. Do work...
+#' 3. Store rule state for retest
+#'
+
+
+
+
+#' Helper function to clean text file from spaces and comments
 #'
 #' @param file        Source file to parse
-#' @param rm.commend  Remove comments default `TRUE`
+#' @param rm.comment  Remove comments default `TRUE`
 #' @param rm.space    Remove empty space default `TRUE`
 #' @param commend.ch  First character of comments default `#`
 #'
 #' @return            A string
 #'
 detext_source <- function(file,
-                           rm.commend = TRUE,
+                           rm.comment = TRUE,
                            rm.space   = TRUE,
-                           commend.ch = "#") {
-  if (rm.commend == TRUE) {
-    res <- paste0(gsub(paste0(commend.ch, ".*"),
+                           comment.ch = "#") {
+  if (rm.comment == TRUE) {
+    res <- paste0(gsub(paste0(comment.ch, ".*"),
                        "",
                        readLines(file, warn = FALSE)),
                   collapse = "")
@@ -43,11 +58,13 @@ id_source <- function(file, ...) {
     data.frame(mtime = as.numeric(file.mtime(file)),
                atime = as.numeric(Sys.time()),
                path  = file,
+               type  = "source",
                hash  = digest(detext_source(file, ...), algo = "sha1", serialize = TRUE))
   } else {
     data.frame(mtime = NA,
                atime = NA,
                path  = file,
+               type  = "source",
                hash  = NA)
   }
 }
@@ -67,11 +84,14 @@ id_data <- function(file) {
     data.frame(mtime = as.numeric(file.mtime(file)),
                atime = as.numeric(Sys.time()),
                path  = file,
-               hash  = digest(file, algo = "sha1", serialize = TRUE))
+               type  = "data",
+               # hash  = digest(file, algo = "sha1", serialize = TRUE)
+               hash  = NA)
   } else {
     data.frame(mtime = NA,
                atime = NA,
                path  = file,
+               type  = "data",
                hash  = NA)
   }
 }
@@ -119,26 +139,26 @@ id_data("./_targets/objects/drop_zeros")
 
 
 
-snap_Rmake <- function(source.files = c(),
-                       data.files   = c(),
+snap_Rmake <- function(depend,source = c(),
+                       depend,data   = c(),
                        file = "_Rmake.mc",
                        path = "./") {
   Rmkfile <- paste0(path, "/", file)
 }
 
 
-check_Rmake <- function(source.files = c(),
-                        data.files   = c(),
+check_Rmake <- function(depend,source = c(),
+                        depend,data   = c(),
                         file = "_Rmake.mc",
                         path = "./") {
   Rmkfile <- paste0(path, "/", file)
 
   ss <- data.frame()
-  for (sf in source.files) {
+  for (sf in depend,source) {
     ss <- rbind(ss, id_source(sf))
   }
   dd <- data.frame()
-  for (df in data.files) {
+  for (df in depend,data) {
     dd <- rbind(dd, id_source(df))
   }
   new <- rbind(dd, ss)
@@ -152,5 +172,5 @@ check_Rmake <- function(source.files = c(),
 }
 
 
-check_Rmake(source.files = c("_targets/objects/drop_zeros", "function.R"))
+check_Rmake(depend,source = c("_targets/objects/drop_zeros", "function.R"))
 
