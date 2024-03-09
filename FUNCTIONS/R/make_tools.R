@@ -236,11 +236,23 @@ old <- out$old
 
 ## check for changes in source
 
+new_s <- new[new$type == "source", c("path", "hash") ]
+old_s <- old[old$type == "source", c("path", "hash") ]
+
+for (ii in 1:nrow(new_s)) {
+  item <- new_s[ii, ]
+
+  if (any(duplicated(rbind(item, old_s)))) {
+    cat("Not changed: ", item$path)
+  } else {
+    cat("UPDATED: ", item$path)
+  }
+
+}
 
 
-new_s <- new[new$type == "source", ]
 
-old_s <- old[old$type == "source", ]
+
 
 
 read.csv(R_make_$file)
