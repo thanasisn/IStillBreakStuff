@@ -56,12 +56,14 @@ id_source <- function(file, ...) {
     data.frame(mtime = as.numeric(file.mtime(file)),
                atime = as.numeric(Sys.time()),
                path  = file,
+             exist = file.exists(file),
                type  = "source",
                hash  = digest(detext_source(file, ...), algo = "sha1", serialize = TRUE))
   } else {
     data.frame(mtime = NA,
                atime = NA,
                path  = file,
+             exist = file.exists(file),
                type  = "source",
                hash  = NA)
   }
@@ -78,20 +80,12 @@ id_data <- function(file) {
 
   require(digest, quietly = TRUE)
 
-  if (file.exists(file)) {
-    data.frame(mtime = as.numeric(file.mtime(file)),
-               atime = as.numeric(Sys.time()),
-               path  = file,
-               type  = "data",
-               # hash  = digest(file, algo = "sha1", serialize = TRUE)
-               hash  = NA)
-  } else {
-    data.frame(mtime = NA,
-               atime = NA,
-               path  = file,
-               type  = "data",
-               hash  = NA)
-  }
+  data.frame(mtime = as.numeric(file.mtime(file)),
+             atime = as.numeric(Sys.time()),
+             path  = file,
+             exist = file.exists(file),
+             type  = "data",
+             hash  = NA)
 }
 
 
@@ -145,13 +139,23 @@ snap_Rmake <- function(depend.source = c(),
 }
 
 
+## Environment to pass make argumets
+R_make_ <- new.env(parent = emptyenv())
+
 check_Rmake <- function(depend.source = c(),
                         depend.data   = c(),
-                        target.source = c(),
+                        targets       = c(),
                         file = "_Rmake.mc",
                         path = "./") {
-  ## file to read depend
+  ## default file to read depend
   Rmkfile <- paste0(path, "/", file)
+
+  ## srore some variables
+  R_make_$file          <- Rmkfile
+  R_make_$depend.source <- depend.source
+  R_make_$depend.data   <- depend.data
+  R_make_$targets       <- targets
+  R_make_$RUN           <- FALSE
 
   ## parse source files
   ss <- data.frame()
@@ -161,30 +165,49 @@ check_Rmake <- function(depend.source = c(),
   ## parse data files
   dd <- data.frame()
   for (df in depend.data) {
-    dd <- rbind(dd, id_source(df))
+    dd <- rbind(dd, id_data(df))
   }
-  new <- rbind(dd, ss)
   ## parse target files
   tt <- data.frame()
-  for (tf in target.source) {
+  for (tf in targets) {
     dd <- rbind(dd, id_source(tf))
-    dd$type <- "targer"
+    dd$type <- "target"
   }
 
+  new <- rbind(dd, ss, tt)
 
   write.csv(new, Rmkfile, row.names = FALSE)
+
+
+
+
 
 
   return(new)
 
 
   ## Source hash changed from previous run
-  ## Source hash not exist
+  ## Source hash not existk
   ## Data date changed from previous run
   ## Data target not exist
+
+
+
 
 }
 
 
-check_Rmake(depend.source = c("_targets/objects/drop_zeros", "function.R"))
+new <- check_Rmake(depend.source = c( "function.R", "~/CODE/FUNCTIONS/R/make_tools.R"),
+                   depend.data  = c("~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"),
+                   targets      = c("~/ZHOST/testfile") )
 
+
+new$type == "target"
+
+store_Rmake <- function() {
+  return(R_make_$depend.data)
+}
+
+store_Rmake()
+
+write.csv(1, "~/ZHOST/testfile")
