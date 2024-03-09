@@ -25,16 +25,16 @@ R_make_ <- new.env(parent = emptyenv())
 #' @param file        Source file to parse
 #' @param rm.comment  Remove comments default `TRUE`
 #' @param rm.space    Remove empty space default `TRUE`
-#' @param comment.char  First character of comments default `#`
+#' @param commend.ch  First character of comments default `#`
 #'
 #' @return            A string
 #'
 Rmk_detext_source <- function(file,
-                           rm.comment   = TRUE,
-                           rm.space     = TRUE,
-                           comment.char = "#") {
+                           rm.comment = TRUE,
+                           rm.space   = TRUE,
+                           comment.ch = "#") {
   if (rm.comment == TRUE) {
-    res <- paste0(gsub(paste0(comment.char, ".*"),
+    res <- paste0(gsub(paste0(comment.ch, ".*"),
                        "",
                        readLines(file, warn = FALSE)),
                   collapse = "")
@@ -113,6 +113,26 @@ Rmk_id_data <- function(file) {
 }
 
 
+## Function to store options
+## all was good
+## - read rmk
+## - read input
+## - clean input
+## - store input
+
+
+## Function to check options
+## - read
+## - compare input
+## - T/F
+
+
+## Create and read lock file
+
+## store common option for input
+
+
+
 
 #' Helper function to parse the given files
 #'
@@ -122,7 +142,7 @@ Rmk_id_data <- function(file) {
 #'
 #' @return
 #'
-Rmk_parse_files <- function(depend.source = c(),
+parse_files <- function(depend.source = c(),
                         depend.data   = c(),
                         targets       = c()) {
 
@@ -171,7 +191,7 @@ check_Rmake <- function(depend.source = c(),
   R_make_$RUN           <- FALSE
 
   ## parse dependencies and targets
-  new <- Rmk_parse_files(
+  new <- parse_files(
     depend.source = depend.source,
     depend.data   = depend.data,
     targets       = targets
