@@ -10,6 +10,14 @@
 #' 2. Do work...
 #' 3. Store rule state for retest
 #'
+#' Using a common file for the project to store hashes and dates for the
+#' dependencies in order to detect meaningful changes of source files.
+#' Data files always are compared against the last mtime.
+#'
+
+
+## Will use an environment for some arguments passing
+R_make_ <- new.env(parent = emptyenv())
 
 
 #' Helper function to clean text file from spaces and comments
@@ -17,16 +25,16 @@
 #' @param file        Source file to parse
 #' @param rm.comment  Remove comments default `TRUE`
 #' @param rm.space    Remove empty space default `TRUE`
-#' @param commend.ch  First character of comments default `#`
+#' @param comment.char  First character of comments default `#`
 #'
 #' @return            A string
 #'
 Rmk_detext_source <- function(file,
-                           rm.comment = TRUE,
-                           rm.space   = TRUE,
-                           comment.ch = "#") {
+                           rm.comment   = TRUE,
+                           rm.space     = TRUE,
+                           comment.char = "#") {
   if (rm.comment == TRUE) {
-    res <- paste0(gsub(paste0(comment.ch, ".*"),
+    res <- paste0(gsub(paste0(comment.char, ".*"),
                        "",
                        readLines(file, warn = FALSE)),
                   collapse = "")
@@ -53,19 +61,24 @@ Rmk_id_source <- function(file, ...) {
   require(digest, quietly = TRUE)
 
   if (file.exists(file)) {
-    data.frame(mtime = ceiling(as.numeric(file.mtime(file))*1000),
+    data.frame(mtime = ceiling(as.numeric(file.mtime(file)) * 1000),
                atime = as.numeric(Sys.time()),
                ptime = as.character(Sys.time()),
                path  = file,
-               exist = file.exists(file),
+               exist = TRUE,
                type  = "source",
-               hash  = digest(Rmk_detext_source(file, ...), algo = "sha1", serialize = TRUE))
+               hash  = digest(
+                 Rmk_detext_source(file, ...),
+                 algo      = "sha1",
+                 serialize = TRUE
+               )
+    )
   } else {
     data.frame(mtime = NA,
                atime = NA,
                ptime = NA,
                path  = file,
-               exist = file.exists(file),
+               exist = FALSE,
                type  = "source",
                hash  = NA)
   }
@@ -80,40 +93,36 @@ Rmk_id_source <- function(file, ...) {
 #'
 Rmk_id_data <- function(file) {
 
-  require(digest, quietly = TRUE)
-
-  data.frame(mtime = ceiling(as.numeric(file.mtime(file))*1000),
-             atime = as.numeric(Sys.time()),
-             ptime = as.character(Sys.time()),
-             path  = file,
-             exist = file.exists(file),
-             type  = "data",
-             hash  = NA)
+  if (file.exists(file)) {
+    data.frame(mtime = ceiling(as.numeric(file.mtime(file))*1000),
+               atime = as.numeric(Sys.time()),
+               ptime = as.character(Sys.time()),
+               path  = file,
+               exist = TRUE,
+               type  = "data",
+               hash  = file.size(file))
+  } else {
+    data.frame(mtime = NA,
+               atime = NA,
+               ptime = NA,
+               path  = file,
+               exist = FALSE,
+               type  = "source",
+               hash  = NA)
+  }
 }
 
 
-## Function to store options
-## all was good
-## - read rmk
-## - read input
-## - clean input
-## - store input
 
-
-## Function to check options
-## - read
-## - compare input
-## - T/F
-
-
-## Create and read lock file
-
-## store common option for input
-
-
-
-
-parse_files <- function(depend.source = c(),
+#' Helper function to parse the given files
+#'
+#' @param depend.source
+#' @param depend.data
+#' @param targets
+#'
+#' @return
+#'
+Rmk_parse_files <- function(depend.source = c(),
                         depend.data   = c(),
                         targets       = c()) {
 
@@ -141,16 +150,7 @@ parse_files <- function(depend.source = c(),
 
 
 
-snap_Rmake <- function(depend.source = c(),
-                       depend.data   = c(),
-                       file = ".R_make.mk",
-                       path = "./") {
-  Rmkfile <- paste0(path, "/", file)
-}
 
-
-## Environment to pass make argumets
-R_make_ <- new.env(parent = emptyenv())
 
 
 
@@ -171,7 +171,7 @@ check_Rmake <- function(depend.source = c(),
   R_make_$RUN           <- FALSE
 
   ## parse dependencies and targets
-  new <- parse_files(
+  new <- Rmk_parse_files(
     depend.source = depend.source,
     depend.data   = depend.data,
     targets       = targets
@@ -301,15 +301,12 @@ old <- out$old
 
 
 
-if (file.exists(R_make_$file)) {
-  old <- read.csv(R_make_$file)
-  new <- rbind(old, new)
-}
 
+gather <- data.frame()
 for (pp in unique(new$path)) {
 
   temp <- new[new$path == pp, ]
-  temp[order(temp$mtime), ]
+  gather <- rbind(gather, tail(temp[order(temp$mtime), ], n = 1))
 
 }
 
@@ -318,7 +315,7 @@ for (pp in unique(new$path)) {
 read.csv(R_make_$file)
 
 
-store_Rmake <- function() {
+Rmk_store_depend <- function() {
 
   if (file.exists(R_make_$file)) {
     old <- read.csv(R_make_$file)
@@ -341,3 +338,15 @@ write.csv(1, "~/ZHOST/testfile")
 Rmk_id_source("function.R", rm.commend = F)
 Rmk_id_source("dfdsfs")
 Rmk_id_data("./_targets/objects/drop_zeros")
+
+
+R_make_$ff <- function() {
+  cat("I  am trapped")
+  cat(R_make_$file)
+}
+
+R_make_$ff()
+
+
+
+
