@@ -55,15 +55,17 @@ Rmk_id_source <- function(file, ...) {
   if (file.exists(file)) {
     data.frame(mtime = as.numeric(file.mtime(file)),
                atime = as.numeric(Sys.time()),
+               ptime = as.character(Sys.time()),
                path  = file,
-             exist = file.exists(file),
+               exist = file.exists(file),
                type  = "source",
                hash  = digest(Rmk_detext_source(file, ...), algo = "sha1", serialize = TRUE))
   } else {
     data.frame(mtime = NA,
                atime = NA,
+               ptime = NA,
                path  = file,
-             exist = file.exists(file),
+               exist = file.exists(file),
                type  = "source",
                hash  = NA)
   }
@@ -82,6 +84,7 @@ Rmk_id_data <- function(file) {
 
   data.frame(mtime = as.numeric(file.mtime(file)),
              atime = as.numeric(Sys.time()),
+             ptime = as.character(Sys.time()),
              path  = file,
              exist = file.exists(file),
              type  = "data",
@@ -89,7 +92,7 @@ Rmk_id_data <- function(file) {
 }
 
 
-
+as.character(Sys.time())
 ## Function to store options
 ## all was good
 ## - read rmk
@@ -189,7 +192,7 @@ check_Rmake <- function(depend.source = c(),
   if (any(mis_tar)) {
     cat("Not existing targets:\n")
     cat(paste(" < ", new[mis_tar, "path"]), sep = "\n")
-    cat("\nHAVE TO RUN\n\n")
+    # cat("\nHAVE TO RUN\n\n")
     R_make_$RUN <- TRUE
     ## return
   }
@@ -197,11 +200,45 @@ check_Rmake <- function(depend.source = c(),
   ## Check if we know of previous runs
   if (!file.exists(Rmkfile)) {
     cat("No previous watch file found: ", Rmkfile, "\n")
-    cat("\nHAVE TO RUN\n\n")
+    # cat("\nHAVE TO RUN\n\n")
     R_make_$RUN <- TRUE
   } else {
     old <- read.csv(Rmkfile)
   }
+
+
+  ## check source files
+  new_s <- new[new$type == "source", c("path", "hash") ]
+  old_s <- old[old$type == "source", c("path", "hash") ]
+
+  ## check for new dependencies
+  if (any(!(new_s$path %in% old_s$path))){
+    cat("Unrecorded dependecies !!", "\n")
+    # cat("\nHAVE TO RUN\n\n")
+    R_make_$RUN <- TRUE
+  }
+
+  ## check for new or changed hash
+  for (ii in 1:nrow(new_s)) {
+    item <- new_s[ii, ]
+
+    if (any(old_s[item$path == old_s$path, ]$hash == item$hash)) {
+      # if (any(duplicated(rbind(item, old_s)))) {
+      cat("Not changed: ", item$path, "\n")
+    } else {
+      cat("UPDATED:     ", item$path, "\n")
+      # cat("\nHAVE TO RUN\n\n")
+      R_make_$RUN <- TRUE
+    }
+  }
+
+
+
+
+
+
+
+
 
 
   print(R_make_$RUN)
@@ -226,7 +263,7 @@ out <- check_Rmake(depend.source = c("~/CODE/FUNCTIONS/R/make_tools.R"),
 out
 
 
-out <- check_Rmake(depend.source = c("~/CODE/FUNCTIONS/R/make_tools.R"),
+out <- check_Rmake(depend.source = c("~/CODE/FUNCTIONS/R/make_tools.R", "BASH/apt_clean_lists.sh"),
                    depend.data  = c("~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet")
                    )
 (out)
@@ -234,18 +271,30 @@ out <- check_Rmake(depend.source = c("~/CODE/FUNCTIONS/R/make_tools.R"),
 new <- out$new
 old <- out$old
 
-## check for changes in source
 
-new_s <- new[new$type == "source", c("path", "hash") ]
-old_s <- old[old$type == "source", c("path", "hash") ]
 
-for (ii in 1:nrow(new_s)) {
-  item <- new_s[ii, ]
+## check data files
+new_d <- new[new$type == "data", c("path", "mtime") ]
+old_d <- old[old$type == "data", c("path", "mtime") ]
 
-  if (any(duplicated(rbind(item, old_s)))) {
-    cat("Not changed: ", item$path)
+# ## check for new dependencies
+# if (any(!(new_s$path %in% old_s$path))){
+#   cat("Unrecorded dependecies !!", "\n")
+#   cat("\nHAVE TO RUN\n\n")
+#   R_make_$RUN <- TRUE
+# }
+
+## check for new or changed hash
+for (ii in 1:nrow(new_d)) {
+  item <- new_d[ii, ]
+
+
+  if (abs(old_d[item$path == old_d$path,]$mtime - item$mtime) < 0.001) {
+    cat("Not changed: ", item$path, "\n")
   } else {
-    cat("UPDATED: ", item$path)
+    cat("UPDATED:     ", item$path, "\n")
+    cat("\nHAVE TO RUN\n\n")
+    R_make_$RUN <- TRUE
   }
 
 }
@@ -259,12 +308,21 @@ read.csv(R_make_$file)
 
 
 store_Rmake <- function() {
+
+  if (file.exists(R_make_$file)) {
+    old <- read.csv(R_make_$file)
+    new <- rbind(old, new)
+  }
+
+
   write.csv(new, R_make_$file, row.names = FALSE)
 }
-store_Rmake()
+# store_Rmake()
 
 print(R_make_$file)
 
+
+unique(new)
 
 write.csv(1, "~/ZHOST/testfile")
 
