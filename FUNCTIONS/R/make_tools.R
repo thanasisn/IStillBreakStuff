@@ -4,14 +4,12 @@
 #'
 #' Functions used in R scripts, to create rules similar to `GNU make`
 #' logic, where a target depends on data "mtime" or source code hash.
-#' The intent is to create a workflow chain for data procesing projects.
+#' The intent is to create a workflow chain for data processing projects.
 #'
 #' 1. Create and/or test rule output.
 #' 2. Do work...
 #' 3. Store rule state for retest
 #'
-
-
 
 
 #' Helper function to clean text file from spaces and comments
@@ -43,7 +41,7 @@ detext_source <- function(file,
 }
 
 
-#' Id a source file
+#' Helper function to id a "source" file by hash
 #'
 #' @param file    A source file to id with `detext_source`
 #' @param ...     Parameters passed to `detext_source`
@@ -70,7 +68,7 @@ id_source <- function(file, ...) {
 }
 
 
-#' Id a data file
+#' Helper function to id a "data" file by mtime
 #'
 #' @param file   A data file to id
 #'
@@ -139,26 +137,26 @@ id_data("./_targets/objects/drop_zeros")
 
 
 
-snap_Rmake <- function(depend,source = c(),
-                       depend,data   = c(),
+snap_Rmake <- function(depend.source = c(),
+                       depend.data   = c(),
                        file = "_Rmake.mc",
                        path = "./") {
   Rmkfile <- paste0(path, "/", file)
 }
 
 
-check_Rmake <- function(depend,source = c(),
-                        depend,data   = c(),
+check_Rmake <- function(depend.source = c(),
+                        depend.data   = c(),
                         file = "_Rmake.mc",
                         path = "./") {
   Rmkfile <- paste0(path, "/", file)
 
   ss <- data.frame()
-  for (sf in depend,source) {
+  for (sf in depend.source) {
     ss <- rbind(ss, id_source(sf))
   }
   dd <- data.frame()
-  for (df in depend,data) {
+  for (df in depend.data) {
     dd <- rbind(dd, id_source(df))
   }
   new <- rbind(dd, ss)
@@ -172,5 +170,5 @@ check_Rmake <- function(depend,source = c(),
 }
 
 
-check_Rmake(depend,source = c("_targets/objects/drop_zeros", "function.R"))
+check_Rmake(depend.source = c("_targets/objects/drop_zeros", "function.R"))
 
