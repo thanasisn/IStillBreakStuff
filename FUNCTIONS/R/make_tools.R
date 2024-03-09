@@ -147,25 +147,41 @@ snap_Rmake <- function(depend.source = c(),
 
 check_Rmake <- function(depend.source = c(),
                         depend.data   = c(),
+                        target.source = c(),
                         file = "_Rmake.mc",
                         path = "./") {
+  ## file to read depend
   Rmkfile <- paste0(path, "/", file)
 
+  ## parse source files
   ss <- data.frame()
   for (sf in depend.source) {
     ss <- rbind(ss, id_source(sf))
   }
+  ## parse data files
   dd <- data.frame()
   for (df in depend.data) {
     dd <- rbind(dd, id_source(df))
   }
   new <- rbind(dd, ss)
+  ## parse target files
+  tt <- data.frame()
+  for (tf in target.source) {
+    dd <- rbind(dd, id_source(tf))
+    dd$type <- "targer"
+  }
 
 
   write.csv(new, Rmkfile, row.names = FALSE)
 
 
   return(new)
+
+
+  ## Source hash changed from previous run
+  ## Source hash not exist
+  ## Data date changed from previous run
+  ## Data target not exist
 
 }
 
