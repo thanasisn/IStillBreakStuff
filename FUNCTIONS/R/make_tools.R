@@ -3,16 +3,17 @@
 
 #'
 #' Functions used in R scripts, to create rules similar to `GNU make`
-#' logic, where a target depends on data "mtime" or source code hash.
+#' logic, where a target depends on data `mtime` or source code hash.
 #' The intent is to create a workflow chain for data processing projects.
 #'
 #' 1. Create and/or test rule output.
-#' 2. Do work...
-#' 3. Store rule state for retest
+#' 2. Do the run or exit?
+#' 3. Store rule state for retest after the run was successful
 #'
-#' Using a common file for the project to store hashes and dates for the
-#' dependencies in order to detect meaningful changes of source files.
-#' Data files always are compared against the last mtime.
+#' Using a common file for the project, to store hashes and dates for the
+#' dependencies, in order to detect meaningful changes of source files.
+#' Data files always are compared against the last `mtime`.
+#' Editing ".R_make.mk" can trigger full executions.
 #'
 
 
@@ -25,16 +26,16 @@ R_make_ <- new.env(parent = emptyenv())
 #' @param file        Source file to parse
 #' @param rm.comment  Remove comments default `TRUE`
 #' @param rm.space    Remove empty space default `TRUE`
-#' @param commend.ch  First character of comments default `#`
+#' @param comment.char  First character of comments default `#`
 #'
 #' @return            A string
 #'
 Rmk_detext_source <- function(file,
-                           rm.comment = TRUE,
-                           rm.space   = TRUE,
-                           comment.ch = "#") {
+                           rm.comment   = TRUE,
+                           rm.space     = TRUE,
+                           comment.char = "#") {
   if (rm.comment == TRUE) {
-    res <- paste0(gsub(paste0(comment.ch, ".*"),
+    res <- paste0(gsub(paste0(comment.char, ".*"),
                        "",
                        readLines(file, warn = FALSE)),
                   collapse = "")
@@ -113,27 +114,6 @@ Rmk_id_data <- function(file) {
 }
 
 
-## Function to store options
-## all was good
-## - read rmk
-## - read input
-## - clean input
-## - store input
-
-
-## Function to check options
-## - read
-## - compare input
-## - T/F
-
-
-## Create and read lock file
-
-## store common option for input
-
-
-
-
 #' Helper function to parse the given files
 #'
 #' @param depend.source
@@ -142,7 +122,7 @@ Rmk_id_data <- function(file) {
 #'
 #' @return
 #'
-parse_files <- function(depend.source = c(),
+Rmk_parse_files <- function(depend.source = c(),
                         depend.data   = c(),
                         targets       = c()) {
 
@@ -167,31 +147,38 @@ parse_files <- function(depend.source = c(),
 }
 
 
+#' Check dependencies and deside if we need to run
+#'
+#' @param depend.source Source files we depend on (optional)
+#' @param depend.data   Data files we depend on (optional)
+#' @param targets       Target files we produce with the run (optional)
+#' @param file          File to store project dependencies (default ".R_make.mk")
+#' @param path          Folder to store project dependencies (default "./")
+#' @note
+#' Use this at the start of the script to check the dependencies rules of the
+#' executions. Have to use `Rmk_store_depend` to store the state of the source
+#' files. No need if you only care for data files.
+#'
+#' @return              TRUE: have to run, FALSE: no need to run
+#'
+Rmk_check_dependencies <- function(depend.source = c(),
+                                   depend.data   = c(),
+                                   targets       = c(),
+                                   file = ".R_make.mk",
+                                   path = "./") {
 
-
-
-
-
-
-
-
-check_Rmake <- function(depend.source = c(),
-                        depend.data   = c(),
-                        targets       = c(),
-                        file = ".R_make.mk",
-                        path = "./") {
-  ## default file to read depend
+  ## Default file to read depend
   Rmkfile <- paste0(path, "/", file)
 
-  ## store some variables
+  ## Store some variables for reuse
   R_make_$file          <- Rmkfile
   R_make_$depend.source <- depend.source
   R_make_$depend.data   <- depend.data
   R_make_$targets       <- targets
   R_make_$RUN           <- FALSE
 
-  ## parse dependencies and targets
-  new <- parse_files(
+  ## Parse current dependencies and targets
+  new <- Rmk_parse_files(
     depend.source = depend.source,
     depend.data   = depend.data,
     targets       = targets
@@ -206,167 +193,149 @@ check_Rmake <- function(depend.source = c(),
     new <- new[!mis_dep, ]
   }
 
-  ## Check if we missing targets
+  ## Missing targets
   mis_tar <- new$type  == "target" & new$exist == FALSE
   if (any(mis_tar)) {
     cat("Not existing targets:\n")
     cat(paste(" < ", new[mis_tar, "path"]), sep = "\n")
-    # cat("\nHAVE TO RUN\n\n")
     R_make_$RUN <- TRUE
-    ## return
+    return(R_make_$RUN)
   }
 
-  ## Check if we know of previous runs
-  if (!file.exists(Rmkfile)) {
-    cat("No previous watch file found: ", Rmkfile, "\n")
-    # cat("\nHAVE TO RUN\n\n")
-    R_make_$RUN <- TRUE
-  } else {
-    old <- read.csv(Rmkfile)
-  }
-
-
-  ## check source files
-  new_s <- new[new$type == "source", c("path", "hash") ]
-  old_s <- old[old$type == "source", c("path", "hash") ]
-
-  ## check for new dependencies
-  if (any(!(new_s$path %in% old_s$path))){
-    cat("Unrecorded source dependecies !!", "\n")
-    # cat("\nHAVE TO RUN\n\n")
-    R_make_$RUN <- TRUE
-  }
-
-  ## check for new or changed hash
-  for (ii in 1:nrow(new_s)) {
-    item <- new_s[ii, ]
-
-    if (any(old_s[item$path == old_s$path, ]$hash == item$hash)) {
-      # if (any(duplicated(rbind(item, old_s)))) {
-      cat("Not changed: ", item$path, "\n")
-    } else {
-      cat("UPDATED:     ", item$path, "\n")
-      # cat("\nHAVE TO RUN\n\n")
+  ## Previous runs
+  try({
+    if (!file.exists(R_make_$file)) {
+      cat("No previous watch file found: ", R_make_$file, "\n")
       R_make_$RUN <- TRUE
+      return(R_make_$RUN)
+    } else {
+      old <- read.csv(R_make_$file)
+    }
+  }, silent = TRUE)
+
+  ## Checks for source files
+  new_s <- new[new$type == "source", c("path", "hash")]
+  old_s <- old[old$type == "source", c("path", "hash")]
+
+  if (nrow(new_s) > 0) {
+    ## New dependencies
+    if (any(!(new_s$path %in% old_s$path))){
+      cat("Unrecorded source dependecies !!", "\n")
+      R_make_$RUN <- TRUE
+      return(R_make_$RUN)
+    }
+
+    ## Changed hashes
+    for (ii in 1:nrow(new_s)) {
+      item <- new_s[ii, ]
+
+      if (any(old_s[item$path == old_s$path, ]$hash == item$hash)) {
+        # if (any(duplicated(rbind(item, old_s)))) {
+        cat("Not changed: ", item$path, "\n")
+      } else {
+        cat("UPDATED:     ", item$path, "\n")
+        R_make_$RUN <- TRUE
+        return(R_make_$RUN)
+      }
     }
   }
 
-
-  ## check data files
+  ## Checks for data files
   new_d <- new[new$type == "data", c("path", "mtime") ]
   old_d <- old[old$type == "data", c("path", "mtime") ]
 
-  ## check for new dependencies
-  if (any(!(new_d$path %in% old_d$path))){
-    cat("Unrecorded data dependecies !!", "\n")
-    # cat("\nHAVE TO RUN\n\n")
-    R_make_$RUN <- TRUE
-  }
-
-  ## check for new or changed hash
-  for (ii in 1:nrow(new_d)) {
-    item <- new_d[ii, ]
-
-    if (any(abs(old_d[item$path == old_d$path,]$mtime - item$mtime) < 0.001)) {
-      cat("Not changed: ", item$path, "\n")
-    } else {
-      cat("UPDATED:     ", item$path, "\n")
-      cat("\nHAVE TO RUN\n\n")
+  if (nrow(new_d) > 0) {
+    ## New dependencies
+    if (any(!(new_d$path %in% old_d$path))){
+      cat("Unrecorded data dependecies !!", "\n")
       R_make_$RUN <- TRUE
+      return(R_make_$RUN)
     }
 
+    ## Changed hashes
+    for (ii in 1:nrow(new_d)) {
+      item <- new_d[ii, ]
+
+      if (any(abs(old_d[item$path == old_d$path,]$mtime - item$mtime) < 0.001)) {
+        cat("Not changed: ", item$path, "\n")
+      } else {
+        cat("UPDATED:     ", item$path, "\n")
+        R_make_$RUN <- TRUE
+        return(R_make_$RUN)
+      }
+    }
   }
 
-
-
-
-
-
-
-
-  print(R_make_$RUN)
-
-  return(list(new = new, old = old))
-
-
-  ## Source hash changed from previous run
-  ## Source hash not existk
-  ## Data date changed from previous run
-  ## Data target not exist
-
-
-
-
+  ## This should return false
+  stopifnot(R_make_$RUN == FALSE)
+  return(R_make_$RUN)
+  # print(R_make_$RUN)
+  # return(list(new = new, old = old))
 }
 
 
-out <- check_Rmake(depend.source = c("~/CODE/FUNCTIONS/R/make_tools.R"),
-                   depend.data  = c("~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"),
-                   targets      = c("~/ZHOST/testfile") )
-out
+#' Store the source files hashes for check against later
+#'
+#' @param depend.source Source files we depend on (optional)
+#' @param depend.data   Data files we depend on (optional)
+#' @param targets       Target files we produce with the run (optional)
+#' @param file          File to store project dependencies (default ".R_make.mk")
+#' @param path          Folder to store project dependencies (default "./")
+#' @note
+#' Use this at the end to store source files hashes in order to be
+#' detected by `Rmk_check_dependencies`. It shouldn't matter for data files,
+#' which compared with `mtime` only.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+Rmk_store_dependencies <- function(depend.source = c(),
+                                   depend.data   = c(),
+                                   targets       = c(),
+                                   file = ".R_make.mk",
+                                   path = "./") {
 
+  ## Default file to read dependencies
+  Rmkfile <- paste0(path, "/", file)
 
-out <- check_Rmake(depend.source = c("~/CODE/FUNCTIONS/R/make_tools.R", "BASH/apt_clean_lists.sh"),
-                   depend.data  = c("~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet", "~/ZHOST/testfile")
-                   )
-(out)
+  ## Store some variables for reuse
+  R_make_$file <- Rmkfile
 
-new <- out$new
-old <- out$old
+  if (length(depend.source) > 0) R_make_$depend.source <- depend.source
+  if (length(depend.data)   > 0) R_make_$depend.data   <- depend.data
+  if (length(targets)       > 0) R_make_$targets       <- targets
 
+  ## Parse current dependencies and targets
+  new <- Rmk_parse_files(
+    depend.source = R_make_$depend.source,
+    depend.data   = R_make_$depend.data,
+    targets       = R_make_$targets
+  )
 
+  ## Read older entries
+  try({
+    if (file.exists(R_make_$file)) {
+      old <- read.csv(R_make_$file)
+      new <- rbind(old, new)
+    }
+  })
 
-
-
-
-
-
-
-gather <- data.frame()
-for (pp in unique(new$path)) {
-
-  temp <- new[new$path == pp, ]
-  gather <- rbind(gather, tail(temp[order(temp$mtime), ], n = 1))
-
-}
-
-
-
-read.csv(R_make_$file)
-
-
-Rmk_store_depend <- function() {
-
-  if (file.exists(R_make_$file)) {
-    old <- read.csv(R_make_$file)
-    new <- rbind(old, new)
+  ## Clear entries
+  store <- data.frame()
+  for (pp in unique(new$path)) {
+    temp <- new[new$path == pp, ]
+    store <- rbind(store, tail(temp[order(temp$mtime), ], n = 1))
   }
 
-
-  write.csv(new, R_make_$file, row.names = FALSE)
-}
-# store_Rmake()
-
-print(R_make_$file)
-
-
-unique(new)
-
-write.csv(1, "~/ZHOST/testfile")
-
-
-Rmk_id_source("function.R", rm.commend = F)
-Rmk_id_source("dfdsfs")
-Rmk_id_data("./_targets/objects/drop_zeros")
-
-
-R_make_$ff <- function() {
-  cat("I  am trapped")
-  cat(R_make_$file)
+  ## Store entries
+  if (nrow(store) > 0){
+    write.csv(store, R_make_$file, row.names = FALSE)
+    cat("Written `R_make_` file:", R_make_$file, "\n")
+  }
 }
 
-R_make_$ff()
 
-
-
-
+## self example
+# print(Rmk_check_dependencies(depend.source = c("~/CODE/FUNCTIONS/R/make_tools.R") ))
+# Rmk_store_dependencies()
