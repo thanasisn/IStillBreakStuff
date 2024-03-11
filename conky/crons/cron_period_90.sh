@@ -33,6 +33,8 @@ pids=()
 
 
 (
+"$HOME/CODE/training_analysis/GC_data_proccess/GC_update_all.sh"
+
 "$HOME/CODE/training_analysis/GC_conky_plots_rides_db.R"
 "$HOME/CODE/training_analysis/GC_shoes_usage_duration.R"
 "$HOME/CODE/training_analysis/GC_shoes_usage_timeseries.R"
@@ -46,6 +48,6 @@ pids=()
 ## Clean
 wait "${pids[@]}"; pids=()
 set -e
-echo "took $SECONDS seconds for $0 to complete"
+echo "Took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"
 exit 0
