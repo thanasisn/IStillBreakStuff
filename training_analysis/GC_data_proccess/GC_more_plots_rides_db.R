@@ -21,15 +21,30 @@ datascript  <- "~/CODE/training_analysis/GC_data_proccess/GC_read_rides_db_json.
 outputpdf   <- paste0("~/LOGs/training_status/", basename(sub("\\.R$",".pdf", Script.Name)))
 daysback    <- 370 * 4
 
+allmodelspdf <- paste0("~/LOGs/training_status/", basename(sub("\\.R$","", Script.Name)), "_all_models.pdf")
+unifiedpdf   <- paste0("~/LOGs/training_status/", basename(sub("\\.R$","", Script.Name)), "_unified.pdf")
+loadtables   <- "~/LOGs/training_status/Load_tables.md"
+lastactivit  <- "~/LOGs/training_status/Last_Activities.md"
+
+# paste0("/home/athan/LOGs/training_status/", va, ".png")
+
 
 library(data.table)
 library(lubridate)
 library(pander)
 library(caTools)
 
+source("~/CODE/FUNCTIONS/R/make_tools.R")
+source("~/CODE/FUNCTIONS/R/data.R")
+
+Rmk_check_dependencies(depend.source = Script.Name,
+                       depend.data   = storagefl,
+                       targets       = c(loadtables))
+
 
 #### Load last data to plot ----------------------------------------------------
-source(datascript)
+# source(datascript)
+
 metrics <- readRDS(storagefl)
 metrics <- metrics[as.Date(Date) > Sys.Date() - daysback, ]
 metrics <- metrics[Sport %in% c("Run", "Bike")]
@@ -78,9 +93,7 @@ busso <- function(fitness, fatigue, trimp, par2 , k1 = 0.031, k3 = 0.000035, r1 
 
 
 
-if (!interactive()) pdf(paste0("~/LOGs/training_status/",
-                               basename(sub("\\.R$","", Script.Name)),
-                               "_all_models",".pdf"), width = 9, height = 4)
+if (!interactive()) pdf(allmodelspdf, width = 9, height = 4)
 
 ## select metrics for pdf
 wecare <- c("Trimp_Points", "Trimp_Zonal_Points", "EPOC", "Load_2", "TrimpModWeighed")
@@ -310,9 +323,7 @@ if (!interactive()) dev.off()
 
 
 
-if (!interactive()) pdf(paste0("~/LOGs/training_status/",
-                               basename(sub("\\.R$","", Script.Name)),
-                               "_unified",".pdf"), width = 9, height = 4)
+if (!interactive()) pdf(unifiedpdf, width = 9, height = 4)
 
 ####  Plot of unified vars and models  ####
 # days <- pdays[1]
@@ -457,7 +468,7 @@ capture.output({
     pander(monthly[1,])
     # cat(paste(  names(montly), collapse = "\t" ), "\n" )
 
-}, file = "~/LOGs/training_status/Load_tables.md")
+}, file = loadtables)
 
 
 
@@ -556,7 +567,7 @@ capture.output({
     pander(export)
     pander(export[1,])
 
-}, file = "~/LOGs/training_status/Last_Activities.md")
+}, file = lastactivit)
 
 
 
@@ -588,7 +599,7 @@ pppppp <- pppppp[, ..wecc ]
 
 for (va in shortn) {
 
-    png(paste0("/home/athan/LOGs/training_status/",va,".png"), width = 720, height = 1520, units = "px", bg = "transparent")
+    png(paste0("/home/athan/LOGs/training_status/", va, ".png"), width = 720, height = 1520, units = "px", bg = "transparent")
 
     layout(matrix(c(5,1,1,1,1,2,2,2,2,3,3,3,3,4,4), 15, 1, byrow = TRUE))
     # layout.show(4)
@@ -671,7 +682,7 @@ for (va in shortn) {
 
 
 
-
+Rmk_store_dependencies()
 
 
 ####_ END _####
