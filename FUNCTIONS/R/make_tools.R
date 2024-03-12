@@ -164,6 +164,7 @@ Rmk_parse_files <- function(depend.source = c(),
 Rmk_check_dependencies <- function(depend.source = c(),
                                    depend.data   = c(),
                                    targets       = c(),
+                                   data.oldness  = 0.1,
                                    file = ".R_make.mk",
                                    path = "./") {
 
@@ -252,7 +253,7 @@ Rmk_check_dependencies <- function(depend.source = c(),
       return(R_make_$RUN)
     }
 
-    ## Changed hashes
+    ## Changed mtime
     for (ii in 1:nrow(new_d)) {
       item <- new_d[ii, ]
 
