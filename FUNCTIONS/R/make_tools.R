@@ -147,11 +147,12 @@ Rmk_parse_files <- function(depend.source = c(),
 }
 
 
-#' Check dependencies and deside if we need to run
+#' Check dependencies and decide if we need to run
 #'
 #' @param depend.source Source files we depend on (optional)
 #' @param depend.data   Data files we depend on (optional)
 #' @param targets       Target files we produce with the run (optional)
+#' @param data.oldness  Time difference for data mtime check in seconds (optional)
 #' @param file          File to store project dependencies (default ".R_make.mk")
 #' @param path          Folder to store project dependencies (default "./")
 #' @note
@@ -167,6 +168,9 @@ Rmk_check_dependencies <- function(depend.source = c(),
                                    data.oldness  = 0.1,
                                    file = ".R_make.mk",
                                    path = "./") {
+
+  ## seconds to milliseconds
+  d_mtime_lim <- data.oldness * 1000
 
   ## Default file to read depend
   Rmkfile <- paste0(path, "/", file)
@@ -221,7 +225,7 @@ Rmk_check_dependencies <- function(depend.source = c(),
   if (nrow(new_s) > 0) {
     ## New dependencies
     if (any(!(new_s$path %in% old_s$path))){
-      cat("Unrecorded source dependecies !!", "\n")
+      cat("Unrecorded source dependencies !!", "\n")
       R_make_$RUN <- TRUE
       return(R_make_$RUN)
     }
@@ -248,7 +252,7 @@ Rmk_check_dependencies <- function(depend.source = c(),
   if (nrow(new_d) > 0) {
     ## New dependencies
     if (any(!(new_d$path %in% old_d$path))){
-      cat("Unrecorded data dependecies !!", "\n")
+      cat("Unrecorded data dependencies !!", "\n")
       R_make_$RUN <- TRUE
       return(R_make_$RUN)
     }
@@ -257,7 +261,7 @@ Rmk_check_dependencies <- function(depend.source = c(),
     for (ii in 1:nrow(new_d)) {
       item <- new_d[ii, ]
 
-      if (any(abs(old_d[item$path == old_d$path,]$mtime - item$mtime) < 0.001)) {
+      if (any(abs(old_d[item$path == old_d$path,]$mtime - item$mtime) < d_mtime_lim)) {
         cat("Not changed: ", item$path, "\n")
       } else {
         cat("UPDATED:     ", item$path, "\n")
@@ -303,6 +307,7 @@ Rmk_store_dependencies <- function(depend.source = c(),
   ## Store some variables for reuse
   R_make_$file <- Rmkfile
 
+  ## update variables if needed
   if (length(depend.source) > 0) R_make_$depend.source <- depend.source
   if (length(depend.data)   > 0) R_make_$depend.data   <- depend.data
   if (length(targets)       > 0) R_make_$targets       <- targets
@@ -335,7 +340,6 @@ Rmk_store_dependencies <- function(depend.source = c(),
     cat("Written `R_make_` file:", R_make_$file, "\n")
   }
 }
-
 
 ## self example
 # print(Rmk_check_dependencies(depend.source = c("~/CODE/FUNCTIONS/R/make_tools.R") ))
