@@ -198,7 +198,7 @@ Rmk_check_dependencies <- function(depend.source = c(),
     new <- new[!mis_dep, ]
   }
 
-  ## Missing targets
+  ## _ Check for Missing targets  -----------------
   mis_tar <- new$type  == "target" & new$exist == FALSE
   if (any(mis_tar)) {
     cat("Not existing targets:\n")
@@ -207,10 +207,10 @@ Rmk_check_dependencies <- function(depend.source = c(),
     return(R_make_$RUN)
   }
 
-  ## Previous runs
+  ## _ Load Previous runs in make file  -----------------------
   try({
     if (!file.exists(R_make_$file)) {
-      cat("No previous watch file found: ", R_make_$file, "\n")
+      cat("No previous make watch file found: ", R_make_$file, "\n")
       R_make_$RUN <- TRUE
       return(R_make_$RUN)
     } else {
@@ -218,7 +218,7 @@ Rmk_check_dependencies <- function(depend.source = c(),
     }
   }, silent = TRUE)
 
-  ## Checks for source files
+  ## _ Checks for source files -------------------
   new_s <- new[new$type == "source", c("path", "hash")]
   old_s <- old[old$type == "source", c("path", "hash")]
 
@@ -245,7 +245,7 @@ Rmk_check_dependencies <- function(depend.source = c(),
     }
   }
 
-  ## Checks for data files
+  ## _ Checks for data files --------------------
   new_d <- new[new$type == "data", c("path", "mtime") ]
   old_d <- old[old$type == "data", c("path", "mtime") ]
 
