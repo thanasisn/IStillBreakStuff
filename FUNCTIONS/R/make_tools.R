@@ -21,6 +21,18 @@
 R_make_ <- new.env(parent = emptyenv())
 
 
+
+#' Helper function to create consistend file paths
+#'
+#' @param file A file path
+#'
+#' @return     Cleaned file path
+#'
+filename <- function(file) {
+  sub("^./", "", file)
+}
+
+
 #' Helper function to clean text file from spaces and comments
 #'
 #' @param file        Source file to parse
@@ -31,9 +43,9 @@ R_make_ <- new.env(parent = emptyenv())
 #' @return            A string
 #'
 Rmk_detext_source <- function(file,
-                           rm.comment   = TRUE,
-                           rm.space     = TRUE,
-                           comment.char = "#") {
+                              rm.comment   = TRUE,
+                              rm.space     = TRUE,
+                              comment.char = "#") {
   if (rm.comment == TRUE) {
     res <- paste0(gsub(paste0(comment.char, ".*"),
                        "",
@@ -65,7 +77,7 @@ Rmk_id_source <- function(file, ...) {
     data.frame(mtime = ceiling(as.numeric(file.mtime(file)) * 1000),
                atime = as.numeric(Sys.time()),
                ptime = as.character(Sys.time()),
-               path  = file,
+               path  = filename(file),
                exist = TRUE,
                type  = "source",
                hash  = digest(
@@ -78,7 +90,7 @@ Rmk_id_source <- function(file, ...) {
     data.frame(mtime = NA,
                atime = NA,
                ptime = NA,
-               path  = file,
+               path  = filename(file),
                exist = FALSE,
                type  = "source",
                hash  = NA)
@@ -98,7 +110,7 @@ Rmk_id_data <- function(file) {
     data.frame(mtime = ceiling(as.numeric(file.mtime(file))*1000),
                atime = as.numeric(Sys.time()),
                ptime = as.character(Sys.time()),
-               path  = file,
+               path  = filename(file),
                exist = TRUE,
                type  = "data",
                hash  = file.size(file))
@@ -106,7 +118,7 @@ Rmk_id_data <- function(file) {
     data.frame(mtime = NA,
                atime = NA,
                ptime = NA,
-               path  = file,
+               path  = filename(file),
                exist = FALSE,
                type  = "source",
                hash  = NA)
@@ -123,8 +135,8 @@ Rmk_id_data <- function(file) {
 #' @return
 #'
 Rmk_parse_files <- function(depend.source = c(),
-                        depend.data   = c(),
-                        targets       = c()) {
+                            depend.data   = c(),
+                            targets       = c()) {
 
   ## parse source files
   ss <- data.frame()
@@ -177,16 +189,16 @@ Rmk_check_dependencies <- function(depend.source = c(),
 
   ## Store some variables for reuse
   R_make_$file          <- Rmkfile
-  R_make_$depend.source <- depend.source
-  R_make_$depend.data   <- depend.data
-  R_make_$targets       <- targets
+  R_make_$depend.source <- unique(depend.source)
+  R_make_$depend.data   <- unique(depend.data)
+  R_make_$targets       <- unique(targets)
   R_make_$RUN           <- FALSE
 
   ## Parse current dependencies and targets
   new <- Rmk_parse_files(
-    depend.source = depend.source,
-    depend.data   = depend.data,
-    targets       = targets
+    depend.source = R_make_$depend.source,
+    depend.data   = R_make_$depend.data,
+    targets       = R_make_$targets
   )
 
   ## Inform and ignore missing dependencies
@@ -226,6 +238,8 @@ Rmk_check_dependencies <- function(depend.source = c(),
     ## New dependencies
     if (any(!(new_s$path %in% old_s$path))){
       cat("Unrecorded source dependencies !!", "\n")
+      cat("new", paste(new_s), "\n")
+      cat("old", paste(old_s), "\n")
       R_make_$RUN <- TRUE
       return(R_make_$RUN)
     }
@@ -308,9 +322,9 @@ Rmk_store_dependencies <- function(depend.source = c(),
   R_make_$file <- Rmkfile
 
   ## update variables if needed
-  if (length(depend.source) > 0) R_make_$depend.source <- depend.source
-  if (length(depend.data)   > 0) R_make_$depend.data   <- depend.data
-  if (length(targets)       > 0) R_make_$targets       <- targets
+  if (length(depend.source) > 0) R_make_$depend.source <- unique(depend.source)
+  if (length(depend.data)   > 0) R_make_$depend.data   <- unique(depend.data)
+  if (length(targets)       > 0) R_make_$targets       <- unique(targets)
 
   ## Parse current dependencies and targets
   new <- Rmk_parse_files(
