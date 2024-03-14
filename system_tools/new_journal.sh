@@ -24,11 +24,11 @@ datenme="$(date    -d@"${stamp}" +"%Y-%m-%d_%H%M")"
 year="$(date       -d@"${stamp}" +"%Y")"
 goto="11"
 
-## create the year folder
+## Create the year folder  -----------------------------------------------------
 mkdir -p "./${year}"
 filename="./${year}/${datenme}.md"
 
-## open existing file if exist
+## Open existing file if exist  ------------------------------------------------
 if [[ -f "$filename" ]] ; then
   echo "File $filename exist"
   vim -c "$goto" "$filename"
@@ -36,7 +36,7 @@ if [[ -f "$filename" ]] ; then
   exit 0
 fi
 
-## create new file with obsidian template
+## Create new file with obsidian template  -------------------------------------
 echo  "Creating: $filename"
 touch "$filename"
 (

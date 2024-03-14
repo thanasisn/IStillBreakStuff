@@ -2,11 +2,11 @@
 ## created on 2022-12-19
 ## https://github.com/thanasisn <natsisphysicist@gmail.com>
 
-#### Create a quick note and get in the Notes dir. 
+#### Create a quick note and get in the Notes dir.
 ## Run on terminal or as a keybind
 
 ## go to this folder at the end
-NOTESDIR="$HOME/PANDOC/Notes"
+NOTESDIR="$HOME/Notes"
 cd "$NOTESDIR" || exit
 
 ## file name for the note
