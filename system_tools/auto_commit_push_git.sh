@@ -31,16 +31,16 @@ git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" push -u origin master
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" maintenance run --auto
 
 
-echo "---------------"
-cd "$HOME/PANDOC/Deployment_notes"
-cd "./_book"
-ln -f ./Deployment_notes.html ./index.html
-git add -f .
-cd ".."
-pwd
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
-git maintenance run --auto
+# echo "---------------"
+# cd "$HOME/PANDOC/Deployment_notes"
+# cd "./_book"
+# ln -f ./Deployment_notes.html ./index.html
+# git add -f .
+# cd ".."
+# pwd
+# git commit -uno -a -m "Commit $(date +'%F %R')"
+# git push -f -u origin main
+# git maintenance run --auto
 
 
 
