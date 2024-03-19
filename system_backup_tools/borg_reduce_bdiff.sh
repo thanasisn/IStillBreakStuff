@@ -3,9 +3,7 @@
 
 #### Clean bdiff files for easier inspection
 
-
 file="$1"
-
 
 if [ "${file: -6}" == ".bdiff" ]; then
     echo "Got a bdiff file "
@@ -29,11 +27,11 @@ echo "Without ctimes changes:  $(wc -l "$file" | cut -d' ' -f1)"
 sed -i '/\[ctime/d' "$file"
 echo "Without ctimes edits  :  $(wc -l "$file" | cut -d' ' -f1)"
 
-
 ## Remove PROGRAMS changes
 sed -i '/\/PROGRAMS\//d' "$file"
 echo "Without PROGRAMS edits:  $(wc -l "$file" | cut -d' ' -f1)"
 
+## Open file for inspection
+less "$file"
 
-## end coding
-exit 0 
+exit 0
