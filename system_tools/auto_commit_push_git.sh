@@ -107,7 +107,6 @@ git maintenance run --auto
 ## use full paths
 folders=(
     "$HOME/CODE/"
-    "$HOME/CODE/R_POLAr/POLAr/"
     "$HOME/CODE/R_myRtools/myRtools"
     "$HOME/CODE/deploy/"
 )
