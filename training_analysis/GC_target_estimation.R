@@ -67,7 +67,7 @@ DATA <- metrics[ , .(Distance = sum(Total_Distance,  na.rm = T),
                  by = .( date = as.Date((as.numeric(as.Date(metrics$Date)) %/% 7) * 7, origin = "1970-01-01"),
                          sport = Sport) ]
 
-
+## by year
 for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
   ## by sport
   for (as in na.omit(unique(DATA$sport))) {
@@ -275,6 +275,12 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     ylim     = ylimD
   )
 
+  endp <- last(PP_Run[!is.na(Cum_Dist), Cum_Dist, date])
+  endp$date
+  as.Date(paste0(year(endp$date),"-12-31"))
+  lines()
+
+
   ## lm line
   lines(
     PP_Run[, Pre_Dist, date],
@@ -476,10 +482,6 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     lwd = 3,
     col = alpha(cols[cc], 0.7)
   )
-
-
-
-
 
 
 
@@ -846,6 +848,8 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     lwd = 3,
     col = alpha(cols[cc], 0.7)
   )
+
+  stop("TEST")
 
 }
 
