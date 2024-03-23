@@ -4,7 +4,6 @@
 
 ## Used inside Golden Cheetah software
 
-
 ####_ Set environment _####
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
@@ -101,7 +100,7 @@ for (ay in years) {
   par(xpd = TRUE)
 
 
-  ## TRIMP_Points plot ####
+  ## TRIMP_Points plot  --------------------------------------------------------
 
   ## week TRIMP_Points
   cc <- 4
@@ -113,8 +112,19 @@ for (ay in years) {
   axis(side=4, at = pretty(range(data$TRIMP_Points)),
        cex.axis = cex, col.axis = cols[cc] )
   mtext("Weekly TRIMP_Points", side = 4, line = 2, col = cols[cc])
+
+  ## mean line
   abline(h = mean(data$TRIMP_Points, na.rm = T),
          col = alpha(cols[cc], 0.7), lty = 3, lwd = 2)
+  text(
+    x      = last(data$date) + 9,
+    y      = mean(data$TRIMP_Points, na.rm = T),
+    labels = round(mean(data$TRIMP_Points, na.rm = T)),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+
   title(ay)
 
   ## cumulative TRIMP_Points
@@ -127,6 +137,20 @@ for (ay in years) {
        col.axis = cols[cc],
        xlim = xlim, ylim = ylim)
   mtext("TRIMP_Points", side = 2, line = 2, col = cols[cc])
+  ## current line
+  endp <- last(data[!is.na(Cum_Dist), Cum_Dist, date])
+  lines(x   = c(endp$date, as.Date(paste0(year(endp$date),"-12-31"))),
+        y   = c(endp$Cum_Dist, endp$Cum_Dist), lty = 2, lwd = 1,
+        col = alpha(cols[cc], 0.7))
+  text(
+    x      = as.Date(paste0(year(endp$date),"-12-31")),
+    y      = endp$Cum_Dist,
+    labels = round(endp$Cum_Dist),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+
 
   ## lm line
   cc <- 2
@@ -182,7 +206,7 @@ for (ay in years) {
 
 
 
-  ## EPOC plot ####
+  ## EPOC plot  ----------------------------------------------------------------
 
   ## week EPOC
   cc <- 7
@@ -194,8 +218,17 @@ for (ay in years) {
   axis(side=4, at = pretty(range(data$EPOC)),
        cex.axis = cex, col.axis = cols[cc] )
   mtext("Weekly EPOC ", side=4, line = 2, col = cols[cc])
+
+  ## mean line
   abline(h = mean(data$EPOC, na.rm = T),
          col = alpha(cols[cc], 0.7), lty = 3, lwd = 2)
+  text(
+    x      = last(data$date) + 9,
+    y      = mean(data$EPOC, na.rm = T),
+    labels = round(mean(data$EPOC, na.rm = T)),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
 
 
   ## cumulative EPOC
@@ -207,7 +240,19 @@ for (ay in years) {
        cex.axis = cex, lwd = 3, col = alpha(cols[cc], 0.7),
        col.axis = cols[cc],
        xlim = xlim, ylim = ylim)
-  mtext("EPOC", side=2, line=2, col = cols[cc])
+  mtext("EPOC", side = 2, line = 2, col = cols[cc])
+  ## current line
+  endp <- last(data[!is.na(Cum_EPOC), Cum_EPOC, date])
+  lines(x   = c(endp$date, as.Date(paste0(year(endp$date),"-12-31"))),
+        y   = c(endp$Cum_EPOC, endp$Cum_EPOC), lty = 2, lwd = 1,
+        col = alpha(cols[cc], 0.7))
+  text(
+    x      = as.Date(paste0(year(endp$date),"-12-31")),
+    y      = endp$Cum_EPOC,
+    labels = round(endp$Cum_EPOC),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
 
   ## lm line
   cc <- 13
@@ -224,12 +269,7 @@ for (ay in years) {
 
 
 
-
-
-
-
-
-  ## TRIMP_Zonal_Points plot ####
+  ## TRIMP_Zonal_Points plot  --------------------------------------------------
 
   ## week TRIMP_Zonal_Points
   cc <- 8
@@ -241,8 +281,19 @@ for (ay in years) {
   axis(side=4, at = pretty(range(data$TRIMP_Zonal_Points)),
        cex.axis = cex, col.axis = cols[cc] )
   mtext("Weekly TRIMP_Zonal_Points", side=4, line = 2, col = cols[cc])
+
+  ## mean line
   abline(h = mean(data$TRIMP_Zonal_Points, na.rm = T),
          col = alpha(cols[cc], 0.7), lty = 3, lwd = 2)
+  text(
+    x      = last(data$date) + 9,
+    y      = mean(data$TRIMP_Zonal_Points, na.rm = T),
+    labels = round(mean(data$TRIMP_Zonal_Points, na.rm = T)),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+
 
   ## cumulative TRIMP_Zonal_Points
   par(new=TRUE)
@@ -254,6 +305,19 @@ for (ay in years) {
        col.axis = cols[cc],
        xlim = xlim, ylim = ylim)
   mtext("TRIMP_Zonal_Points", side=2, line=2, col = cols[cc])
+  ## current line
+  endp <- last(data[!is.na(Cum_Dura), Cum_Dura, date])
+  lines(x   = c(endp$date, as.Date(paste0(year(endp$date),"-12-31"))),
+        y   = c(endp$Cum_Dura, endp$Cum_Dura), lty = 2, lwd = 1,
+        col = alpha(cols[cc], 0.7))
+  text(
+    x      = as.Date(paste0(year(endp$date),"-12-31")),
+    y      = endp$Cum_Dura,
+    labels = round(endp$Cum_Dura),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
 
   ## lm line
   cc <- 11
@@ -266,12 +330,10 @@ for (ay in years) {
   cc <- 3
   abline(v = Sys.Date(),
          lty = 3, lwd = 3, col = alpha(cols[cc], 0.7) )
+
 }
 
-if (!interactive()) {
-  dev.off()
-}
 
 ####_ END _####
-tac = Sys.time()
+tac <- Sys.time()
 cat(sprintf("\n%s H:%s U:%s S:%s T:%f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))

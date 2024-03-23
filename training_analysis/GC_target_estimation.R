@@ -14,7 +14,6 @@ Script.Name <- "~/CODE/training_analysis/GC_target_estimation.R"
 out_file <- paste0("~/LOGs/training_status/", basename(sub("\\.R$", ".pdf", Script.Name)))
 in_file  <- "~/DATA/Other/GC_json_ride_data_2.Rds"
 
-
 ##  Check if have to run  ------------------------------------------------------
 if (!file.exists(out_file) |
     file.mtime(out_file) < file.mtime(in_file) |
@@ -28,12 +27,11 @@ if (!file.exists(out_file) |
 if (!interactive()) {
   pdf(file = out_file)
 }
+
 ##  Load parsed data
 metrics <- readRDS(in_file)
 
 ####  Copy for GC below  -------------------------------------------------------
-
-
 library(data.table)
 library(scales)
 
@@ -124,14 +122,14 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
   par(xpd = TRUE)
 
 
-  ## Distance plot ------------------------------------------------------------
+  ## Distance plot  ------------------------------------------------------------
   ylimW <- range(0, PP_Bike$Distance, PP_Run$Distance, na.rm = T)
   ylimD <- range(PP_Bike$Cum_Dist, PP_Bike$Pre_Dist,
                  PP_Run$Cum_Dist,  PP_Run$Pre_Dist,
                  na.rm = T)
   if (ylimD[1] < 0) ylimD[1] <- 0
 
-  ## _ Bike -------------------------------------------------------------------
+  ## _ Bike  -------------------------------------------------------------------
   cc <- 4
 
   ## week distance
@@ -143,6 +141,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     ylab     = "",
     axes     = FALSE,
     bty      = "n",
+    lty      = "12",
     cex.axis = cex,
     lwd      = 4,
     col      = alpha(cols[cc], 0.7),
@@ -193,6 +192,21 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     xlim     = xlim,
     ylim     = ylimD
   )
+  ## current line
+  endp <- last(PP_Bike[!is.na(Cum_Dist), Cum_Dist, date])
+  lines(x   = c(endp$date, as.Date(paste0(year(endp$date),"-12-31"))),
+        y   = c(endp$Cum_Dist, endp$Cum_Dist), lty = 2, lwd = 1,
+        col = alpha(cols[cc], 0.7))
+  text(
+    x      = as.Date(paste0(year(endp$date),"-12-31")),
+    y      = endp$Cum_Dist,
+    labels = round(endp$Cum_Dist),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+
+
   axis(
     side = 1,
     at = pretty(range(c(PP_Run$Cum_Dist, PP_Bike$Cum_Dist), na.rm = T)),
@@ -225,7 +239,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
 
 
 
-  ## _ Run -------------------------------------------------------------------
+  ## _ Run  --------------------------------------------------------------------
 
   ## week distance
   par(new = TRUE)
@@ -274,11 +288,19 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     xlim     = xlim,
     ylim     = ylimD
   )
-
+  ## current line
   endp <- last(PP_Run[!is.na(Cum_Dist), Cum_Dist, date])
-  endp$date
-  as.Date(paste0(year(endp$date),"-12-31"))
-  lines()
+  lines(x   = c(endp$date, as.Date(paste0(year(endp$date),"-12-31"))),
+        y   = c(endp$Cum_Dist, endp$Cum_Dist), lty = 2, lwd = 1,
+        col = alpha(cols[cc], 0.7))
+  text(
+    x      = as.Date(paste0(year(endp$date),"-12-31")),
+    y      = endp$Cum_Dist,
+    labels = round(endp$Cum_Dist),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
 
 
   ## lm line
@@ -309,14 +331,14 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
 
 
 
-  ## Duration plot ------------------------------------------------------------
+  ## Duration plot  ------------------------------------------------------------
   ylimW <- range(0, PP_Bike$Duration, PP_Run$Duration, na.rm = T)
   ylimD <- range(PP_Bike$Cum_Dura, PP_Bike$Pre_Dura,
                  PP_Run$Cum_Dura,  PP_Run$Pre_Dura,
                  na.rm = T)
   if (ylimD[1] < 0) ylimD[1] <- 0
 
-  ## _ Bike -------------------------------------------------------------------
+  ## _ Bike  -------------------------------------------------------------------
   cc <- 5
 
   ## week Duration
@@ -328,6 +350,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     ylab     = "",
     axes     = FALSE,
     bty      = "n",
+    lty      = "12",
     cex.axis = cex,
     lwd      = 4,
     col      = alpha(cols[cc], 0.7),
@@ -362,7 +385,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
   )
 
 
-  ## cumulative distance
+  ## cumulative duration
   par(new = TRUE)
   plot(
     PP_Bike[!is.na(Cum_Dura), Cum_Dura, date],
@@ -377,6 +400,20 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     xlim     = xlim,
     ylim     = ylimD
   )
+  ## current line
+  endp <- last(PP_Bike[!is.na(Cum_Dura), Cum_Dura, date])
+  lines(x   = c(endp$date, as.Date(paste0(year(endp$date),"-12-31"))),
+        y   = c(endp$Cum_Dura, endp$Cum_Dura), lty = 2, lwd = 1,
+        col = alpha(cols[cc], 0.7))
+  text(
+    x      = as.Date(paste0(year(endp$date),"-12-31")),
+    y      = endp$Cum_Dura,
+    labels = round(endp$Cum_Dura),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+
   axis(
     side = 1,
     at = pretty(range(c(PP_Run$Cum_Dura, PP_Bike$Cum_Dura), na.rm = T)),
@@ -409,7 +446,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
 
 
 
-  ## _ Run -------------------------------------------------------------------
+  ## _ Run  --------------------------------------------------------------------
 
   ## week distance
   par(new = TRUE)
@@ -458,6 +495,19 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     xlim     = xlim,
     ylim     = ylimD
   )
+  ## current line
+  endp <- last(PP_Run[!is.na(Cum_Dura), Cum_Dura, date])
+  lines(x   = c(endp$date, as.Date(paste0(year(endp$date),"-12-31"))),
+        y   = c(endp$Cum_Dura, endp$Cum_Dura), lty = 2, lwd = 1,
+        col = alpha(cols[cc], 0.7))
+  text(
+    x      = as.Date(paste0(year(endp$date),"-12-31")),
+    y      = endp$Cum_Dura,
+    labels = round(endp$Cum_Dura),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
 
   ## lm line
   lines(
@@ -489,14 +539,14 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
 
 
 
-  ## Ascent plot ------------------------------------------------------------
+  ## Ascent plot  --------------------------------------------------------------
   ylimW <- range(0, PP_Bike$Ascent, PP_Run$Ascent, na.rm = T)
   ylimD <- range(PP_Bike$Cum_Asce, PP_Bike$Pre_Asce,
                  PP_Run$Cum_Asce,  PP_Run$Pre_Asce,
                  na.rm = T)
   if (ylimD[1] < 0) ylimD[1] <- 0
 
-  ## _ Bike -------------------------------------------------------------------
+  ## _ Bike  -------------------------------------------------------------------
   cc <- 6
 
   ## week Ascent
@@ -508,6 +558,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     ylab     = "",
     axes     = FALSE,
     bty      = "n",
+    lty      = "12",
     cex.axis = cex,
     lwd      = 4,
     col      = alpha(cols[cc], 0.7),
@@ -542,7 +593,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
   )
 
 
-  ## cumulative distance
+  ## cumulative ascend
   par(new = TRUE)
   plot(
     PP_Bike[!is.na(Cum_Asce), Cum_Asce, date],
@@ -557,6 +608,19 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     xlim     = xlim,
     ylim     = ylimD
   )
+  ## current line
+  endp <- last(PP_Bike[!is.na(Cum_Asce), Cum_Asce, date])
+  lines(x   = c(endp$date, as.Date(paste0(year(endp$date),"-12-31"))),
+        y   = c(endp$Cum_Asce, endp$Cum_Asce), lty = 2, lwd = 1,
+        col = alpha(cols[cc], 0.7))
+  text(
+    x      = as.Date(paste0(year(endp$date),"-12-31")),
+    y      = endp$Cum_Asce,
+    labels = round(endp$Cum_Asce),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
   axis(
     side = 1,
     at = pretty(range(c(PP_Run$Cum_Asce, PP_Bike$Cum_Asce), na.rm = T)),
@@ -589,9 +653,9 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
 
 
 
-  ## _ Run -------------------------------------------------------------------
+  ## _ Run  --------------------------------------------------------------------
 
-  ## week distance
+  ## week ascent
   par(new = TRUE)
   cc <- 10
   plot(
@@ -608,7 +672,6 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     xlim     = xlim,
     ylim     = c(ylimW[1], ylimW[2] * 1.1 )
   )
-
   abline(
     h   = mean(PP_Run$Ascent, na.rm = T),
     col = alpha(cols[cc], 0.7),
@@ -623,7 +686,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     col    = alpha(cols[cc], 0.7)
   )
 
-  ## cumulative distance
+  ## cumulative ascent
   par(new = TRUE)
   plot(
     PP_Run[!is.na(Cum_Asce), Cum_Asce, date],
@@ -638,6 +701,19 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     xlim     = xlim,
     ylim     = ylimD
   )
+  ## current line
+  endp <- last(PP_Run[!is.na(Cum_Asce), Cum_Asce, date])
+  lines(x   = c(endp$date, as.Date(paste0(year(endp$date),"-12-31"))),
+        y   = c(endp$Cum_Asce, endp$Cum_Asce), lty = 2, lwd = 1,
+        col = alpha(cols[cc], 0.7))
+  text(
+    x      = as.Date(paste0(year(endp$date),"-12-31")),
+    y      = endp$Cum_Asce,
+    labels = round(endp$Cum_Asce),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
 
   ## lm line
   lines(
@@ -674,7 +750,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
 
 
 
-  ## Calories plot ------------------------------------------------------------
+  ## Calories plot  ------------------------------------------------------------
   ylimW <- range(0, PP_Bike$Calories, PP_Run$Calories, na.rm = T)
   ylimD <- range(PP_Bike$Cum_Calo, PP_Bike$Pre_Calo,
                  PP_Run$Cum_Calo,  PP_Run$Pre_Calo,
@@ -682,7 +758,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
   if (ylimD[1] < 0) ylimD[1] <- 0
 
 
-  ## _ Bike -------------------------------------------------------------------
+  ## _ Bike  -------------------------------------------------------------------
   cc <- 7
 
   ## week Calories
@@ -694,6 +770,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     ylab     = "",
     axes     = FALSE,
     bty      = "n",
+    lty      = "12",
     cex.axis = cex,
     lwd      = 4,
     col      = alpha(cols[cc], 0.7),
@@ -728,7 +805,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
   )
 
 
-  ## cumulative distance
+  ## cumulative calories
   par(new = TRUE)
   plot(
     PP_Bike[!is.na(Cum_Calo), Cum_Calo, date],
@@ -743,6 +820,19 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     xlim     = xlim,
     ylim     = ylimD
   )
+  ## current line
+  endp <- last(PP_Bike[!is.na(Cum_Calo), Cum_Calo, date])
+  lines(x   = c(endp$date, as.Date(paste0(year(endp$date),"-12-31"))),
+        y   = c(endp$Cum_Calo, endp$Cum_Calo), lty = 2, lwd = 1,
+        col = alpha(cols[cc], 0.7))
+  text(
+    x      = as.Date(paste0(year(endp$date),"-12-31")),
+    y      = endp$Cum_Calo,
+    labels = round(endp$Cum_Calo),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
   axis(
     side = 1,
     at = pretty(range(c(PP_Run$Cum_Calo, PP_Bike$Cum_Calo), na.rm = T)),
@@ -775,7 +865,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
 
 
 
-  ## _ Run -------------------------------------------------------------------
+  ## _ Run  --------------------------------------------------------------------
 
   ## week distance
   par(new = TRUE)
@@ -809,7 +899,7 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     col    = alpha(cols[cc], 0.7)
   )
 
-  ## cumulative distance
+  ## cumulative calories
   par(new = TRUE)
   plot(
     PP_Run[!is.na(Cum_Calo), Cum_Calo, date],
@@ -824,6 +914,21 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     xlim     = xlim,
     ylim     = ylimD
   )
+  ## current line
+  endp <- last(PP_Run[!is.na(Cum_Calo), Cum_Calo, date])
+  lines(x   = c(endp$date, as.Date(paste0(year(endp$date),"-12-31"))),
+        y   = c(endp$Cum_Calo, endp$Cum_Calo), lty = 2, lwd = 1,
+        col = alpha(cols[cc], 0.7))
+  text(
+    x      = as.Date(paste0(year(endp$date),"-12-31")),
+    y      = endp$Cum_Calo,
+    labels = round(endp$Cum_Calo),
+    pos    = 3,
+    col    = alpha(cols[cc], 0.7)
+  )
+
+
+
 
   ## lm line
   lines(
@@ -848,9 +953,6 @@ for (ay in sort(unique(year(DATA$date)), decreasing = T)) {
     lwd = 3,
     col = alpha(cols[cc], 0.7)
   )
-
-  stop("TEST")
-
 }
 
 
