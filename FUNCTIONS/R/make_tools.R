@@ -178,15 +178,17 @@ Rmk_parse_files <- function(depend.source = c(),
 #'
 #' @return              TRUE: have to run, FALSE: no need to run
 #'
-Rmk_check_dependencies <- function(depend.source = c(),
-                                   depend.data   = c(),
-                                   targets       = c(),
-                                   data.oldness  = 0.1,
+Rmk_check_dependencies <- function(depend.source  = c(),
+                                   depend.data    = c(),
+                                   targets        = c(),
+                                   data.oldness   = 0.1,
+                                   target.oldness = 0.1,
                                    file = ".R_make.mk",
                                    path = "./") {
 
   ## seconds to milliseconds
-  d_mtime_lim <- data.oldness * 1000
+  d_mtime_lim <- data.oldness   * 1000
+  t_mtime_lim <- target.oldness * 1000
 
   ## Default file to read depend
   Rmkfile <- paste0(path, "/", file)
@@ -221,6 +223,14 @@ Rmk_check_dependencies <- function(depend.source = c(),
     cat(paste(" < ", new[mis_tar, "path"]), sep = "\n")
     R_make_$RUN <- TRUE
     return(R_make_$RUN)
+  }
+
+  ## _ Check target oldness -------
+  ## TODO
+  new_t <- new[new$type == "target", c("mtime", "path")]
+  if (sum(!is.na(new_t$path)) > 0) {
+   ## check oldness
+   ## message
   }
 
   ## _ Load Previous runs in make file  -----------------------
