@@ -585,7 +585,7 @@ pppppp <- pppppp[, ..wecc ]
 
 for (va in shortn) {
 
-    png(paste0("/home/athan/LOGs/training_status/",va,".png"), width = 720, height = 1520, units = "px", bg = "transparent")
+    png(paste0("/home/athan/LOGs/training_status/", va, ".png"), width = 720, height = 1520, units = "px", bg = "transparent")
 
     layout(matrix(c(5,1,1,1,1,2,2,2,2,3,3,3,3,4,4), 15, 1, byrow = TRUE))
     # layout.show(4)

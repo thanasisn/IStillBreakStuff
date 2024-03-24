@@ -26,49 +26,53 @@ unifiedpdf   <- paste0("~/LOGs/training_status/", basename(sub("\\.R$","", Scrip
 loadtables   <- "~/LOGs/training_status/Load_tables.md"
 lastactivit  <- "~/LOGs/training_status/Last_Activities.md"
 
-# paste0("/home/athan/LOGs/training_status/", va, ".png")
 
-
-library(data.table)
-library(lubridate)
-library(pander)
-library(caTools)
+library(data.table, quietly = TRUE, warn.conflicts = FALSE)
+library(lubridate , quietly = TRUE, warn.conflicts = FALSE)
+library(pander    , quietly = TRUE, warn.conflicts = FALSE)
+library(caTools   , quietly = TRUE, warn.conflicts = FALSE)
 
 source("~/CODE/FUNCTIONS/R/make_tools.R")
 source("~/CODE/FUNCTIONS/R/data.R")
 
-Rmk_check_dependencies(depend.source = Script.Name,
-                       depend.data   = storagefl,
-                       targets       = c(loadtables))
+DEBUG <- FALSE
 
 
-#### Load last data to plot ----------------------------------------------------
-# source(datascript)
+if (DEBUG ||
+    Rmk_check_dependencies(depend.source = Script.Name,
+                           depend.data   = storagefl,
+                           targets       = c(loadtables,
+                                             unifiedpdf,
+                                             allmodelspdf,
+                                             lastactivit)
+    ))
+{
 
-metrics <- readRDS(storagefl)
-metrics <- metrics[as.Date(Date) > Sys.Date() - daysback, ]
-metrics <- metrics[Sport %in% c("Run", "Bike")]
+
+  #### Load last data to plot  -------------------------------------------------
+  metrics <- readRDS(storagefl)
+  metrics <- metrics[as.Date(Date) > Sys.Date() - daysback, ]
+  metrics <- metrics[Sport %in% c("Run", "Bike")]
+
+  epoc_extra <- fread("~/CODE/training_analysis/epoc.next", col.names = "value")
 
 
-epoc_extra <- fread("~/CODE/training_analysis/epoc.next", col.names = "value")
+  #### Models parameters  ------------------------------------------------------
+  fATL1 <- 1 / 7             ## Short term days variable
+  fATL2 <- 1 - exp(-fATL1)
+  fCTL1 <- 1 / 42            ## Long term days variable
+  fCTL2 <- 1 - exp(-fCTL1)
 
+  #### Define models  ----------------------------------------------------------
 
-#### Models parameters ---------------------------------------------------------
-fATL1 <- 1 / 7             ## Short term days variable
-fATL2 <- 1 - exp(-fATL1)
-fCTL1 <- 1 / 42            ## Long term days variable
-fCTL2 <- 1 - exp(-fCTL1)
-
-#### Define models -------------------------------------------------------------
-
-# fitness = 0;
-# for(i=0, i < count(TRIMP); i++) {
-#     fitness = fitness * exp(-1/r1) + TRIMP[i];
-#     fatigue = fatigue * exp(-1/r2) + TRIMP[i];
-#     performance = fitness * k1 - fatigue * k2;
-# }
-# k1=1.0, k2=1.8-2.0, r1=49-50, r2=11.
-banister <- function(fitness, fatigue, trimp, k1 = 1.0, k2 = 1.8, r1 = 49, r2 = 11) {
+  # fitness = 0;
+  # for(i=0, i < count(TRIMP); i++) {
+  #     fitness = fitness * exp(-1/r1) + TRIMP[i];
+  #     fatigue = fatigue * exp(-1/r2) + TRIMP[i];
+  #     performance = fitness * k1 - fatigue * k2;
+  # }
+  # k1=1.0, k2=1.8-2.0, r1=49-50, r2=11.
+  banister <- function(fitness, fatigue, trimp, k1 = 1.0, k2 = 1.8, r1 = 49, r2 = 11) {
     fitness     <- fitness * exp(-1 / r1) + trimp
     fatigue     <- fatigue * exp(-1 / r2) + trimp
     performance <- fitness * k1 - fatigue * k2
@@ -76,9 +80,9 @@ banister <- function(fitness, fatigue, trimp, k1 = 1.0, k2 = 1.8, r1 = 49, r2 = 
     list(fitness     = fitness,
          fatigue     = fatigue,
          performance = performance)
-}
+  }
 
-busso <- function(fitness, fatigue, trimp, par2 , k1 = 0.031, k3 = 0.000035, r1 = 30.8, r2 = 16.8, r3 = 2.3) {
+  busso <- function(fitness, fatigue, trimp, par2 , k1 = 0.031, k3 = 0.000035, r1 = 30.8, r2 = 16.8, r3 = 2.3) {
     fitness     <- fitness * exp(-1 / r1) + trimp
     fatigue     <- fatigue * exp(-1 / r2) + trimp
     par2        <- fatigue * exp(-1 / r3) + par2
@@ -89,24 +93,24 @@ busso <- function(fitness, fatigue, trimp, par2 , k1 = 0.031, k3 = 0.000035, r1 
          fatigue     = fatigue,
          performance = performance,
          par2        = par2)
-}
+  }
 
 
 
-if (!interactive()) pdf(allmodelspdf, width = 9, height = 4)
+  if (!interactive()) pdf(allmodelspdf, width = 9, height = 4)
 
-## select metrics for pdf
-wecare <- c("Trimp_Points", "Trimp_Zonal_Points", "EPOC", "Load_2", "TrimpModWeighed")
-shortn <- c(          "TP",                 "TZ",   "EP",     "L2",              "TW")
-extend <- 30
-pdays  <- c(100, 450, daysback)
+  ## select metrics for pdf
+  wecare <- c("Trimp_Points", "Trimp_Zonal_Points", "EPOC", "Load_2", "TrimpModWeighed")
+  shortn <- c(          "TP",                 "TZ",   "EP",     "L2",              "TW")
+  extend <- 30
+  pdays  <- c(100, 450, daysback)
 
 
-if (interactive()) pdays <- c(100)
+  if (interactive()) pdays <- c(100)
 
-### compute metrics for all models ####
-gather <- data.table()
-for (ii in 1:length(wecare)) {
+  ### compute metrics for all models  ------------------------------------------
+  gather <- data.table()
+  for (ii in 1:length(wecare)) {
     avar <- wecare[ii]
     snam <- shortn[ii]
 
@@ -120,18 +124,18 @@ for (ii in 1:length(wecare)) {
                by = .(Date = as.Date(time))]
     last <- pp[ Date == max(Date), ]
     pp   <- merge(
-        data.table(Date = seq.Date(from = min(pp$Date),
-                                   to   = max(pp$Date) + extend,
-                                   by   = "day")),
-        pp, all = T)
+      data.table(Date = seq.Date(from = min(pp$Date),
+                                 to   = max(pp$Date) + extend,
+                                 by   = "day")),
+      pp, all = T)
     pp[is.na(value), value := 0]
 
     ## test future program
     if (avar == "EPOC") {
-        epoc_extra$Date <- Sys.Date()
-        epoc_extra$Date <- epoc_extra$Date + 1:nrow(epoc_extra)
-        ## assuming everything is sorted witout gaps
-        pp[ Date %in% epoc_extra$Date, value := epoc_extra$value ]
+      epoc_extra$Date <- Sys.Date()
+      epoc_extra$Date <- epoc_extra$Date + 1:nrow(epoc_extra)
+      ## assuming everything is sorted witout gaps
+      pp[ Date %in% epoc_extra$Date, value := epoc_extra$value ]
     }
 
     names(pp)[names(pp) == "value"]  <- paste0(snam,".","VAL")
@@ -150,27 +154,27 @@ for (ii in 1:length(wecare)) {
     pp[[paste0(snam,".","BUS_pr2")]] <- 1
 
     for (nr in 2:nrow(pp)) {
-        ## calculate impulse
-        pp[[paste0(snam,".","PMC_FAT")]][nr] <-
-            fATL1 * pp[[paste0(snam,".","VAL")]][nr] + (1 - fATL1) * pp[[paste0(snam,".","PMC_FAT")]][nr - 1]
-        pp[[paste0(snam,".","PMC_FIT")]][nr] <-
-            fCTL1 * pp[[paste0(snam,".","VAL")]][nr] + (1 - fCTL1) * pp[[paste0(snam,".","PMC_FIT")]][nr - 1]
-        ## calculate banister
-        res <- banister(fitness = pp[[paste0(snam,".","BAN_FIT")]][nr-1],
-                        fatigue = pp[[paste0(snam,".","BAN_FAT")]][nr-1],
-                        trimp   = pp[[paste0(snam,".","VAL")]][nr] )
-        pp[[paste0(snam,".","BAN_FAT")]][nr] <- res$fatigue
-        pp[[paste0(snam,".","BAN_FIT")]][nr] <- res$fitness
-        pp[[paste0(snam,".","BAN_PER")]][nr] <- res$performance
-        ## calculate busso
-        res <- busso(fitness = pp[[paste0(snam,".","BUS_FIT")]][nr-1],
-                     fatigue = pp[[paste0(snam,".","BUS_FAT")]][nr-1],
-                     par2    = pp[[paste0(snam,".","BUS_pr2")]][nr-1],
-                     trimp   = pp[[paste0(snam,".","VAL")]][nr] )
-        pp[[paste0(snam,".","BUS_FAT")]][nr] <- res$fatigue
-        pp[[paste0(snam,".","BUS_FIT")]][nr] <- res$fitness
-        pp[[paste0(snam,".","BUS_PER")]][nr] <- res$performance
-        pp[[paste0(snam,".","BUS_pr2")]][nr] <- res$par2
+      ## calculate impulse
+      pp[[paste0(snam,".","PMC_FAT")]][nr] <-
+        fATL1 * pp[[paste0(snam,".","VAL")]][nr] + (1 - fATL1) * pp[[paste0(snam,".","PMC_FAT")]][nr - 1]
+      pp[[paste0(snam,".","PMC_FIT")]][nr] <-
+        fCTL1 * pp[[paste0(snam,".","VAL")]][nr] + (1 - fCTL1) * pp[[paste0(snam,".","PMC_FIT")]][nr - 1]
+      ## calculate banister
+      res <- banister(fitness = pp[[paste0(snam,".","BAN_FIT")]][nr-1],
+                      fatigue = pp[[paste0(snam,".","BAN_FAT")]][nr-1],
+                      trimp   = pp[[paste0(snam,".","VAL")]][nr] )
+      pp[[paste0(snam,".","BAN_FAT")]][nr] <- res$fatigue
+      pp[[paste0(snam,".","BAN_FIT")]][nr] <- res$fitness
+      pp[[paste0(snam,".","BAN_PER")]][nr] <- res$performance
+      ## calculate busso
+      res <- busso(fitness = pp[[paste0(snam,".","BUS_FIT")]][nr-1],
+                   fatigue = pp[[paste0(snam,".","BUS_FAT")]][nr-1],
+                   par2    = pp[[paste0(snam,".","BUS_pr2")]][nr-1],
+                   trimp   = pp[[paste0(snam,".","VAL")]][nr] )
+      pp[[paste0(snam,".","BUS_FAT")]][nr] <- res$fatigue
+      pp[[paste0(snam,".","BUS_FIT")]][nr] <- res$fitness
+      pp[[paste0(snam,".","BUS_PER")]][nr] <- res$performance
+      pp[[paste0(snam,".","BUS_pr2")]][nr] <- res$par2
     }
 
     pp[[paste0(snam,".","BAN_VAL")]] <- pp[[paste0(snam,".","VAL")]]
@@ -180,25 +184,25 @@ for (ii in 1:length(wecare)) {
 
     pp[[paste0(snam,".","BUS_pr2")]] <- NULL
     pp[[paste0(snam,".","PMC_PER")]] <- pp[[paste0(snam,".","PMC_FIT")]] -
-                                        pp[[paste0(snam,".","PMC_FAT")]]
+      pp[[paste0(snam,".","PMC_FAT")]]
 
     if (ii == 1) {
-        gather <- pp
+      gather <- pp
     } else {
-        gather <- merge(pp, gather, by = c("Date","VO2max_Detected") )
+      gather <- merge(pp, gather, by = c("Date","VO2max_Detected") )
     }
-}
+  }
 
 
 
-####  Normal plot of all vars and models  ####
-for (days in pdays) {
+  ####  Normal plot of all vars and models  ------------------------------------
+  for (days in pdays) {
     ## limit graphs to last days
     pppppp <- gather[ Date >= max(Date) - days - extend, ]
     pppppp <- data.table(pppppp)
     models <- c("PMC", "BAN", "BUS")
 
-    ####  each day bar plot of metrics  ####
+    ####  each day bar plot of metrics  ----------------------------------------
     wwca <- c("EP.BAN_VAL", "TZ.BAN_VAL", "TP.BAN_VAL")
     ylim <- range(pppppp[ , ..wwca ], na.rm = T)
 
@@ -214,7 +218,7 @@ for (days in pdays) {
     abline(h = pretty(ylim, n = 15), col = "grey", lty = 3)
     axis(4)
 
-    ####  each week metrics bar plot  ####
+    ####  each week metrics bar plot  ------------------------------------------
     # weekly  <- pppppp[, .(EP.BAN_VAL = sum(EP.BAN_VAL, na.rm = TRUE),
     #                       TZ.BAN_VAL = sum(TZ.BAN_VAL, na.rm = TRUE),
     #                       TP.BAN_VAL = sum(TP.BAN_VAL, na.rm = TRUE)),
@@ -224,7 +228,7 @@ for (days in pdays) {
     weekly  <- pppppp[, .(EP.BAN_VAL = sum(EP.BAN_VAL, na.rm = TRUE),
                           TZ.BAN_VAL = sum(TZ.BAN_VAL, na.rm = TRUE),
                           TP.BAN_VAL = sum(TP.BAN_VAL, na.rm = TRUE)),
-                       by = .(Date = floor_date(Date, unit = "week", week_start = 1) )]
+                      by = .(Date = floor_date(Date, unit = "week", week_start = 1) )]
 
     par("mar" = c(2,2,0.1,2), xpd = FALSE)
     ylim <- range(weekly[ , ..wwca ], na.rm = T)
@@ -240,94 +244,94 @@ for (days in pdays) {
     abline(v = weekly$Date - 0.5,    col = "grey", lty = 2)
     axis(4)
 
-    #### normalize data ####
+    #### normalize data  -------------------------------------------------------
     wecare <- grep("Date|VO2max", names(pppppp), invert = T, value = T)
     for (ac in wecare) {
-        pppppp[[ac]] <- 100 * scale(x      = pppppp[[ac]],
-                                    center = min(pppppp[[ac]]),
-                                    scale  = diff(range(pppppp[[ac]])))
+      pppppp[[ac]] <- 100 * scale(x      = pppppp[[ac]],
+                                  center = min(pppppp[[ac]]),
+                                  scale  = diff(range(pppppp[[ac]])))
     }
 
 
-    ####  Plot for each metric and model  ####
+    ####  Plot for each metric and model  --------------------------------------
     for (va in shortn) {
-        for (mo in models) {
-            wp <- c(grep(paste0(va,".",mo), names(pppppp), value = TRUE),
-                    "Date", "VO2max_Detected")
-            pp <- pppppp[, ..wp]
-            ## easy names
-            vfit <- grep("FIT", wp, value = T)
-            vfat <- grep("FAT", wp, value = T)
-            vper <- grep("PER", wp, value = T)
-            vval <- grep("VAL", wp, value = T)
+      for (mo in models) {
+        wp <- c(grep(paste0(va,".",mo), names(pppppp), value = TRUE),
+                "Date", "VO2max_Detected")
+        pp <- pppppp[, ..wp]
+        ## easy names
+        vfit <- grep("FIT", wp, value = T)
+        vfat <- grep("FAT", wp, value = T)
+        vper <- grep("PER", wp, value = T)
+        vval <- grep("VAL", wp, value = T)
 
-            ## Training Impulse model plot
-            par("mar" = c(2,0,2,0), xpd = TRUE)
+        ## Training Impulse model plot
+        par("mar" = c(2,0,2,0), xpd = TRUE)
 
-            pp[[vval]][pp[[vval]] == 0] <- NA
-            plot(pp$Date, pp[[vval]]/4, ylim = range(0, pp[[vval]], na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
-            pp[[vval]][is.na(pp[[vval]])] <- 0
-            lines(pp$Date, caTools::runmean(pp[[vval]], k = 9, align = "right")/2, col = "#71717171", lwd = 1.1)
-            par(new = T)
-            ylim <- range(45, 53, pp$VO2max_Detected, na.rm = T)
-            plot( pp$Date, pp$VO2max_Detected, ylim = ylim, col = "pink", pch = "-", cex = 2 )
-            par(new = T)
-            ylim    <- range(pp[[vfit]], pp[[vfat]], pp[[vper]], na.rm = T)
-            ylim[2] <- ylim[2] * 1.09
-            plot(pp$Date, pp[[vfat]], col = 3, lwd = 1.1, "l", yaxt = "n", ylim = ylim)
-            abline(v = Sys.Date(), col = "green", lty = 2)
-            par(new = T)
-            plot(pp$Date, pp[[vfit]], col = 5, lwd = 2.5, "l", yaxt = "n", ylim = ylim)
-            par(new = T)
-            plot(pp$Date, pp[[vper]], col = 6, lwd = 2.5, "l", yaxt = "n", ylim = ylim)
+        pp[[vval]][pp[[vval]] == 0] <- NA
+        plot(pp$Date, pp[[vval]]/4, ylim = range(0, pp[[vval]], na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
+        pp[[vval]][is.na(pp[[vval]])] <- 0
+        lines(pp$Date, caTools::runmean(pp[[vval]], k = 9, align = "right")/2, col = "#71717171", lwd = 1.1)
+        par(new = T)
+        ylim <- range(45, 53, pp$VO2max_Detected, na.rm = T)
+        plot( pp$Date, pp$VO2max_Detected, ylim = ylim, col = "pink", pch = "-", cex = 2 )
+        par(new = T)
+        ylim    <- range(pp[[vfit]], pp[[vfat]], pp[[vper]], na.rm = T)
+        ylim[2] <- ylim[2] * 1.09
+        plot(pp$Date, pp[[vfat]], col = 3, lwd = 1.1, "l", yaxt = "n", ylim = ylim)
+        abline(v = Sys.Date(), col = "green", lty = 2)
+        par(new = T)
+        plot(pp$Date, pp[[vfit]], col = 5, lwd = 2.5, "l", yaxt = "n", ylim = ylim)
+        par(new = T)
+        plot(pp$Date, pp[[vper]], col = 6, lwd = 2.5, "l", yaxt = "n", ylim = ylim)
 
-            legend("top", bty = "n", ncol = 3, lty = 1, inset = c(0, -0.01),
-                   cex = 0.7, text.col = "grey",
-                   legend = c("Fatigue", "Fitness","Performance"),
-                   col    = c(       3 ,        5 ,           6 ) )
+        legend("top", bty = "n", ncol = 3, lty = 1, inset = c(0, -0.01),
+               cex = 0.7, text.col = "grey",
+               legend = c("Fatigue", "Fitness","Performance"),
+               col    = c(       3 ,        5 ,           6 ) )
 
-            ## decoration on plots
-            prediction <- pp[ Date > last$Date, ]
-            best       <- prediction[ which.max(prediction[[vper]]) ]
-            abline(v = best$Date, col = "yellow", lty = 2)
-            abline(h = best[[vper]], col = "yellow", lty = 2)
+        ## decoration on plots
+        prediction <- pp[ Date > last$Date, ]
+        best       <- prediction[ which.max(prediction[[vper]]) ]
+        abline(v = best$Date, col = "yellow", lty = 2)
+        abline(h = best[[vper]], col = "yellow", lty = 2)
 
-            abline(h = pp[[vper]][ pp$Date == Sys.Date() ], col = 6, lty = 2)
-            text(pp[ which.max(pp[[vper]]), Date ], pp[[vper]][which.max(pp[[vper]])],
-                 labels = round(pp[[vper]][which.max(pp[[vper]])]), col = 6, pos = 3 )
-            text(Sys.Date(), pp[[vper]][pp$Date == Sys.Date()],
-                 labels = round(pp[[vper]][pp$Date == Sys.Date()]), col = 6, pos = 4 )
+        abline(h = pp[[vper]][ pp$Date == Sys.Date() ], col = 6, lty = 2)
+        text(pp[ which.max(pp[[vper]]), Date ], pp[[vper]][which.max(pp[[vper]])],
+             labels = round(pp[[vper]][which.max(pp[[vper]])]), col = 6, pos = 3 )
+        text(Sys.Date(), pp[[vper]][pp$Date == Sys.Date()],
+             labels = round(pp[[vper]][pp$Date == Sys.Date()]), col = 6, pos = 4 )
 
-            abline(h = pp[[vfit]][ pp$Date == Sys.Date() ], col = 5, lty = 2)
-            text(pp[ which.max(pp[[vfit]]), Date ], pp[[vfit]][which.max(pp[[vfit]])],
-                 labels = round(pp[[vfit]][which.max(pp[[vfit]])]), col = 5, pos = 3 )
-            text(Sys.Date(), pp[[vfit]][pp$Date == Sys.Date()],
-                 labels = round(pp[[vfit]][pp$Date == Sys.Date()]), col = 5, pos = 4 )
+        abline(h = pp[[vfit]][ pp$Date == Sys.Date() ], col = 5, lty = 2)
+        text(pp[ which.max(pp[[vfit]]), Date ], pp[[vfit]][which.max(pp[[vfit]])],
+             labels = round(pp[[vfit]][which.max(pp[[vfit]])]), col = 5, pos = 3 )
+        text(Sys.Date(), pp[[vfit]][pp$Date == Sys.Date()],
+             labels = round(pp[[vfit]][pp$Date == Sys.Date()]), col = 5, pos = 4 )
 
-            # abline(h = pp[[vfat]][ pp$Date == Sys.Date() ], col = 3, lty = 2)
-            text(pp[ which.max(pp[[vfat]]), Date ], pp[[vfat]][which.max(pp[[vfat]])],
-                 labels = round(pp[[vfat]][which.max(pp[[vfat]])]), col = 3, pos = 3 )
-            text(Sys.Date(), pp[[vfat]][pp$Date == Sys.Date()],
-                 labels = round(pp[[vfat]][pp$Date == Sys.Date()]), col = 3, pos = 4 )
+        # abline(h = pp[[vfat]][ pp$Date == Sys.Date() ], col = 3, lty = 2)
+        text(pp[ which.max(pp[[vfat]]), Date ], pp[[vfat]][which.max(pp[[vfat]])],
+             labels = round(pp[[vfat]][which.max(pp[[vfat]])]), col = 3, pos = 3 )
+        text(Sys.Date(), pp[[vfat]][pp$Date == Sys.Date()],
+             labels = round(pp[[vfat]][pp$Date == Sys.Date()]), col = 3, pos = 4 )
 
-            axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "black", col.ticks = "black")
-            axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
+        axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "black", col.ticks = "black")
+        axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
 
-            title(paste(days,"d ", va, " ", mo, "  best:", best$Date), cex = .7)
-        }
+        title(paste(days,"d ", va, " ", mo, "  best:", best$Date), cex = .7)
+      }
     }
-}
+  }
 
-if (!interactive()) dev.off()
-
-
+  if (!interactive()) dev.off()
 
 
-if (!interactive()) pdf(unifiedpdf, width = 9, height = 4)
 
-####  Plot of unified vars and models  ####
-# days <- pdays[1]
-for (days in pdays) {
+
+  if (!interactive()) pdf(unifiedpdf, width = 9, height = 4)
+
+  ####  Plot of unified vars and models  ---------------------------------------
+  # days <- pdays[1]
+  for (days in pdays) {
 
     ## limit graph to last days
     pppppp <- gather[ Date >= max(Date) - days - extend, ]
@@ -337,18 +341,18 @@ for (days in pdays) {
     ## normalize data
     wecare <- grep("Date|VO2max", names(pppppp), invert = T, value = T)
     for (ac in wecare) {
-        pppppp[[ac]] <- 100 * scale(x      = pppppp[[ac]],
-                                    center = min(pppppp[[ac]]),
-                                    scale  = diff(range(pppppp[[ac]])))
+      pppppp[[ac]] <- 100 * scale(x      = pppppp[[ac]],
+                                  center = min(pppppp[[ac]]),
+                                  scale  = diff(range(pppppp[[ac]])))
     }
 
-    #### unified by model ####
+    #### unified by model  -----------------------------------------------------
     unifid <- pppppp[, .(Date, VO2max_Detected)]
     for (met in c("EP","TZ","TP")) {
-        for (mod in c("PER","FAT","FIT")) {
-            wem <- grep(paste0(met,".*",mod), names(pppppp), value = T)
-            unifid[[paste0(met,"_",mod)]] <- rowMeans( pppppp[,  ..wem ] )
-        }
+      for (mod in c("PER","FAT","FIT")) {
+        wem <- grep(paste0(met,".*",mod), names(pppppp), value = T)
+        unifid[[paste0(met,"_",mod)]] <- rowMeans( pppppp[,  ..wem ] )
+      }
     }
 
     par("mar" = c(2,2,2,0), xpd = TRUE)
@@ -383,13 +387,13 @@ for (days in pdays) {
     axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "black", col.ticks = "black")
     axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
 
-    #### unified by metric ####
+    #### unified by metric  ----------------------------------------------------
     unifid <- pppppp[, .(Date, VO2max_Detected)]
     for (met in c("BUS","BAN","PMC")) {
-        for (mod in c("PER","FAT","FIT")) {
-            wem <- grep(paste0(met,"_",mod), names(pppppp), value = T)
-            unifid[[paste0(met,"_",mod)]] <- rowMeans(pppppp[, ..wem])
-        }
+      for (mod in c("PER","FAT","FIT")) {
+        wem <- grep(paste0(met,"_",mod), names(pppppp), value = T)
+        unifid[[paste0(met,"_",mod)]] <- rowMeans(pppppp[, ..wem])
+      }
     }
 
     plot(unifid$Date, unifid$PMC_PER,"l", col = 6, ylim = c(0,100))
@@ -422,17 +426,14 @@ for (days in pdays) {
     axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "black", col.ticks = "black")
     axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
 
-}
+  }
 
 
 
 
+  ##TODO Yearly
 
-
-
-##TODO Yearly
-
-capture.output({
+  capture.output({
     metrics <- metrics[as.Date(Date) > Sys.Date() - 400, ]
     weekly  <- metrics[, .(TRIMP_Points       = round(sum(Trimp_Points,       na.rm = TRUE)),
                            TRIMP_Zonal_Points = round(sum(Trimp_Zonal_Points, na.rm = TRUE)),
@@ -468,35 +469,35 @@ capture.output({
     pander(monthly[1,])
     # cat(paste(  names(montly), collapse = "\t" ), "\n" )
 
-}, file = loadtables)
+  }, file = loadtables)
 
 
 
-par("mar" = c(3,2,2,1), xpd = FALSE)
-weekly <- tail(weekly,10)
-ylim   <- range(0, weekly$TRIMP_Points, weekly$TRIMP_Zonal_Points, weekly$EPOC,
-                weekly$Load_2, weekly$TrimpModWeighed/100,
-                weekly$Calories/1000, na.rm = T)
-plot( weekly$Date,  weekly$TRIMP_Points, "l",   lwd = 2, col = 4, ylim = ylim)
-lines(weekly$Date,  weekly$TRIMP_Zonal_Points,  lwd = 2, col = 3 )
-lines(weekly$Date,  weekly$EPOC,                lwd = 2, col = 2 )
-lines(weekly$Date,  weekly$Load_2,              lwd = 2, col = 5 )
-lines(weekly$Date,  weekly$TrimpModWeighed/100, lwd = 2, col = 7 )
+  par("mar" = c(3,2,2,1), xpd = FALSE)
+  weekly <- tail(weekly,10)
+  ylim   <- range(0, weekly$TRIMP_Points, weekly$TRIMP_Zonal_Points, weekly$EPOC,
+                  weekly$Load_2, weekly$TrimpModWeighed/100,
+                  weekly$Calories/1000, na.rm = T)
+  plot( weekly$Date,  weekly$TRIMP_Points, "l",   lwd = 2, col = 4, ylim = ylim)
+  lines(weekly$Date,  weekly$TRIMP_Zonal_Points,  lwd = 2, col = 3 )
+  lines(weekly$Date,  weekly$EPOC,                lwd = 2, col = 2 )
+  lines(weekly$Date,  weekly$Load_2,              lwd = 2, col = 5 )
+  lines(weekly$Date,  weekly$TrimpModWeighed/100, lwd = 2, col = 7 )
 
 
-lines(weekly$Date,  weekly$Calories/10,        lwd = 2, col = 6 )
-# abline(v = Sys.Date(), lty = 2, col = "green")
+  lines(weekly$Date,  weekly$Calories/10,        lwd = 2, col = 6 )
+  # abline(v = Sys.Date(), lty = 2, col = "green")
 
-legend("topleft", bty = "n", lty = 1, lwd = 2, cex = .8,
-       legend = c("TRIMP", "TRIMP Zoned", "EPOC", "Load_2", "TrimpModWeighed/100", "Calories/10"),
-       col    = c(      4,             3,      2,        5,                     7,     6))
-
-
-if (!interactive()) dev.off()
+  legend("topleft", bty = "n", lty = 1, lwd = 2, cex = .8,
+         legend = c("TRIMP", "TRIMP Zoned", "EPOC", "Load_2", "TrimpModWeighed/100", "Calories/10"),
+         col    = c(      4,             3,      2,        5,                     7,     6))
 
 
+  if (!interactive()) dev.off()
 
-capture.output({
+
+
+  capture.output({
     wecare <- names(metrics)
     wecare <- grep("Average_Heart_Rate", wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
     wecare <- grep("Average_Temp",       wecare, invert = TRUE, value = TRUE, ignore.case = TRUE)
@@ -567,37 +568,37 @@ capture.output({
     pander(export)
     pander(export[1,])
 
-}, file = lastactivit)
+  }, file = lastactivit)
 
 
 
-#### For mobile png 720 x 1520  ------------------------------------------------
-days <- 100
+  #### For mobile png 720 x 1520  ----------------------------------------------
+  days <- 100
 
-## limit graph to last days
-pppppp <- gather[ Date >= max(Date) - days - extend, ]
-pppppp <- pppppp[ Date <= Sys.Date() + 10 ]
-pppppp <- data.table(pppppp)
-models <- c("PMC", "BAN", "BUS")
+  ## limit graph to last days
+  pppppp <- gather[ Date >= max(Date) - days - extend, ]
+  pppppp <- pppppp[ Date <= Sys.Date() + 10 ]
+  pppppp <- data.table(pppppp)
+  models <- c("PMC", "BAN", "BUS")
 
-## each day plot
-shortn <- c(        "TP",         "TZ",         "EP")
-wwca   <- c("EP.BAN_VAL", "TZ.BAN_VAL", "TP.BAN_VAL")
-ylim   <- range(pppppp[ , ..wwca ], na.rm = T)
+  ## each day plot
+  shortn <- c(        "TP",         "TZ",         "EP")
+  wwca   <- c("EP.BAN_VAL", "TZ.BAN_VAL", "TP.BAN_VAL")
+  ylim   <- range(pppppp[ , ..wwca ], na.rm = T)
 
-## normalize data
-wecare <- grep("Date|VO2max", names(pppppp), invert = T, value = T)
-for (ac in wecare) {
+  ## normalize data
+  wecare <- grep("Date|VO2max", names(pppppp), invert = T, value = T)
+  for (ac in wecare) {
     pppppp[[ac]] <- 100 * scale(x      = pppppp[[ac]],
                                 center = min(pppppp[[ac]]),
                                 scale  = diff(range(pppppp[[ac]])))
-}
+  }
 
-wecc <- grep( "^RP" ,names(pppppp), invert = T, value = T)
-pppppp <- pppppp[, ..wecc ]
+  wecc <- grep( "^RP" ,names(pppppp), invert = T, value = T)
+  pppppp <- pppppp[, ..wecc ]
 
 
-for (va in shortn) {
+  for (va in shortn) {
 
     png(paste0("/home/athan/LOGs/training_status/", va, ".png"), width = 720, height = 1520, units = "px", bg = "transparent")
 
@@ -605,86 +606,87 @@ for (va in shortn) {
     # layout.show(4)
 
     for (mo in models) {
-        wp <- c(grep(paste0(va,".",mo), names(pppppp), value = TRUE),
-                "Date", "VO2max_Detected")
-        pp <- pppppp[, ..wp]
-        ## easy names
-        vfit <- grep("FIT",wp,value = T)
-        vfat <- grep("FAT",wp,value = T)
-        vper <- grep("PER",wp,value = T)
-        vval <- grep("VAL",wp,value = T)
+      wp <- c(grep(paste0(va,".",mo), names(pppppp), value = TRUE),
+              "Date", "VO2max_Detected")
+      pp <- pppppp[, ..wp]
+      ## easy names
+      vfit <- grep("FIT",wp,value = T)
+      vfat <- grep("FAT",wp,value = T)
+      vper <- grep("PER",wp,value = T)
+      vval <- grep("VAL",wp,value = T)
 
-        #### Training Impulse model plot ####
-        par("mar" = c(2,0,1,0),
-            xpd = FALSE,
-            col      = "grey",
-            col.axis = "grey",
-            col.lab  = "grey",
-            yaxt     = "n")
+      #### Training Impulse model plot  ----------------------------------------
+      par("mar" = c(2,0,1,0),
+          xpd = FALSE,
+          col      = "grey",
+          col.axis = "grey",
+          col.lab  = "grey",
+          yaxt     = "n")
 
-        pp[[vval]][pp[[vval]] == 0] <- NA
-        plot(pp$Date, pp[[vval]]/4, ylim = range(0, pp[[vval]], na.rm = T), type = "h", bty = "n", lwd = 4, col = "#959595" )
-        pp[[vval]][is.na(pp[[vval]])] <- 0
-        lines(pp$Date, caTools::runmean(pp[[vval]], k = 9, align = "right")/2, col = "#959595", lwd = 2)
-        box(col="white")
-        par(new = T)
-        ylim <-range( 45,53, pp$VO2max_Detected, na.rm = T)
-        plot( pp$Date, pp$VO2max_Detected, ylim = ylim, col = "pink", pch = "-", cex = 4 )
-        box(col="white")
-        par(new = T)
-        ylim    <- range(pp[[vfit]], pp[[vfat]], pp[[vper]], na.rm = T)
-        ylim[2] <- ylim[2] * 1.09
-        plot(pp$Date, pp[[vfat]], col = 3, lwd = 2, "l", yaxt = "n", ylim = ylim)
-        abline(v=Sys.Date(),col="green",lty=2)
-        box(col="white")
-        par(new = T)
-        plot(pp$Date, pp[[vfit]], col = 5, lwd = 4, "l", yaxt = "n", ylim = ylim)
-        box(col="white")
-        par(new = T)
-        plot(pp$Date, pp[[vper]], col = 6, lwd = 4, "l", yaxt = "n", ylim = ylim)
+      pp[[vval]][pp[[vval]] == 0] <- NA
+      plot(pp$Date, pp[[vval]]/4, ylim = range(0, pp[[vval]], na.rm = T), type = "h", bty = "n", lwd = 4, col = "#959595" )
+      pp[[vval]][is.na(pp[[vval]])] <- 0
+      lines(pp$Date, caTools::runmean(pp[[vval]], k = 9, align = "right")/2, col = "#959595", lwd = 2)
+      box(col="white")
+      par(new = T)
+      ylim <-range( 45,53, pp$VO2max_Detected, na.rm = T)
+      plot( pp$Date, pp$VO2max_Detected, ylim = ylim, col = "pink", pch = "-", cex = 4 )
+      box(col="white")
+      par(new = T)
+      ylim    <- range(pp[[vfit]], pp[[vfat]], pp[[vper]], na.rm = T)
+      ylim[2] <- ylim[2] * 1.09
+      plot(pp$Date, pp[[vfat]], col = 3, lwd = 2, "l", yaxt = "n", ylim = ylim)
+      abline(v=Sys.Date(),col="green",lty=2)
+      box(col="white")
+      par(new = T)
+      plot(pp$Date, pp[[vfit]], col = 5, lwd = 4, "l", yaxt = "n", ylim = ylim)
+      box(col="white")
+      par(new = T)
+      plot(pp$Date, pp[[vper]], col = 6, lwd = 4, "l", yaxt = "n", ylim = ylim)
 
-        # legend("top", bty = "n", ncol = 3, lty = 1, inset = c(0, -0.01),
-        #        cex = 0.7, text.col = "grey",
-        #        legend = c("Fatigue", "Fitness","Performance"),
-        #        col    = c(    3 ,     5 ,    6 ) )
+      # legend("top", bty = "n", ncol = 3, lty = 1, inset = c(0, -0.01),
+      #        cex = 0.7, text.col = "grey",
+      #        legend = c("Fatigue", "Fitness","Performance"),
+      #        col    = c(    3 ,     5 ,    6 ) )
 
-        legend("topleft", bty = "n", title = paste(va, mo, best$Date), legend = c(""), cex = 4)
+      legend("topleft", bty = "n", title = paste(va, mo, best$Date), legend = c(""), cex = 4)
 
-        prediction <- pp[ Date > last$Date, ]
-        best       <- prediction[ which.max(prediction[[vper]]) ]
-        abline(v = best$Date,    col = "yellow", lty = 2, lwd = 2)
-        abline(h = best[[vper]], col = "yellow", lty = 2, lwd = 2)
+      prediction <- pp[ Date > last$Date, ]
+      best       <- prediction[ which.max(prediction[[vper]]) ]
+      abline(v = best$Date,    col = "yellow", lty = 2, lwd = 2)
+      abline(h = best[[vper]], col = "yellow", lty = 2, lwd = 2)
 
-        abline(h = pp[[vper]][ pp$Date == Sys.Date() ], col = 6, lty = 2, lwd = 2)
-        text(pp[ which.max(pp[[vper]]), Date ], pp[[vper]][which.max(pp[[vper]])],
-             labels = round(pp[[vper]][which.max(pp[[vper]])]), col = 6, pos = 3, cex = 2 )
-        text(Sys.Date(), pp[[vper]][pp$Date == Sys.Date()],
-             labels = round(pp[[vper]][pp$Date == Sys.Date()]), col = 6, pos = 4, cex = 2 )
+      abline(h = pp[[vper]][ pp$Date == Sys.Date() ], col = 6, lty = 2, lwd = 2)
+      text(pp[ which.max(pp[[vper]]), Date ], pp[[vper]][which.max(pp[[vper]])],
+           labels = round(pp[[vper]][which.max(pp[[vper]])]), col = 6, pos = 3, cex = 2 )
+      text(Sys.Date(), pp[[vper]][pp$Date == Sys.Date()],
+           labels = round(pp[[vper]][pp$Date == Sys.Date()]), col = 6, pos = 4, cex = 2 )
 
-        abline(h = pp[[vfit]][ pp$Date == Sys.Date() ], col = 5, lty = 2, lwd = 2)
-        text(pp[ which.max(pp[[vfit]]), Date ], pp[[vfit]][which.max(pp[[vfit]])],
-             labels = round(pp[[vfit]][which.max(pp[[vfit]])]), col = 5, pos = 3, cex = 2 )
-        text(Sys.Date(), pp[[vfit]][pp$Date == Sys.Date()],
-             labels = round(pp[[vfit]][pp$Date == Sys.Date()]), col = 5, pos = 4, cex = 2 )
+      abline(h = pp[[vfit]][ pp$Date == Sys.Date() ], col = 5, lty = 2, lwd = 2)
+      text(pp[ which.max(pp[[vfit]]), Date ], pp[[vfit]][which.max(pp[[vfit]])],
+           labels = round(pp[[vfit]][which.max(pp[[vfit]])]), col = 5, pos = 3, cex = 2 )
+      text(Sys.Date(), pp[[vfit]][pp$Date == Sys.Date()],
+           labels = round(pp[[vfit]][pp$Date == Sys.Date()]), col = 5, pos = 4, cex = 2 )
 
-        # abline(h = pp[[vfat]][ pp$Date == Sys.Date() ], col = 3, lty = 2)
-        text(pp[ which.max(pp[[vfat]]), Date ], pp[[vfat]][which.max(pp[[vfat]])],
-             labels = round(pp[[vfat]][which.max(pp[[vfat]])]), col = 3, pos = 3, cex = 2 )
-        text(Sys.Date(), pp[[vfat]][pp$Date == Sys.Date()],
-             labels = round(pp[[vfat]][pp$Date == Sys.Date()]), col = 3, pos = 4, cex = 2 )
+      # abline(h = pp[[vfat]][ pp$Date == Sys.Date() ], col = 3, lty = 2)
+      text(pp[ which.max(pp[[vfat]]), Date ], pp[[vfat]][which.max(pp[[vfat]])],
+           labels = round(pp[[vfat]][which.max(pp[[vfat]])]), col = 3, pos = 3, cex = 2 )
+      text(Sys.Date(), pp[[vfat]][pp$Date == Sys.Date()],
+           labels = round(pp[[vfat]][pp$Date == Sys.Date()]), col = 3, pos = 4, cex = 2 )
 
-        axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "grey", col.ticks = "grey")
-        axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "grey", col.ticks = "grey", lwd.ticks = 3)
+      axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "grey", col.ticks = "grey")
+      axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "grey", col.ticks = "grey", lwd.ticks = 3)
 
     }
     dev.off()
+  }
+
+  Rmk_store_dependencies()
+
+}  else {
+  cat("Don't have to run", Script.Name, "\n")
 }
 
-
-
-Rmk_store_dependencies()
-
-
 ####_ END _####
-tac = Sys.time()
+tac <- Sys.time()
 cat(sprintf("\n%s H:%s U:%s S:%s T:%f mins\n\n",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")))

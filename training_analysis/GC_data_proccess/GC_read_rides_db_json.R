@@ -692,7 +692,7 @@ if (DEBUG ||
   Rmk_store_dependencies()
 
 } else {
-  cat("Don't have to parse json data base\n")
+  cat("Don't have to run", Script.Name, "\n")
 }
 
 

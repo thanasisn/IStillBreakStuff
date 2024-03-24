@@ -18,11 +18,15 @@
 
 
 ## Will use an environment for some arguments passing
-R_make_ <- new.env(parent = emptyenv())
+if (exists("R_make_", mode = "environment")) {
+  # cat("R_make_ environment exist!\n")
+} else {
+  R_make_ <- new.env(parent = emptyenv())
+  # cat("R_make_ environment created\n")
+}
 
 
-
-#' Helper function to create consistend file paths
+#' Helper function to create consistent file paths
 #'
 #' @param file A file path
 #'
@@ -35,12 +39,12 @@ filename <- function(file) {
 
 #' Helper function to clean text file from spaces and comments
 #'
-#' @param file        Source file to parse
-#' @param rm.comment  Remove comments default `TRUE`
-#' @param rm.space    Remove empty space default `TRUE`
+#' @param file          Source file to parse
+#' @param rm.comment    Remove comments default `TRUE`
+#' @param rm.space      Remove empty space default `TRUE`
 #' @param comment.char  First character of comments default `#`
 #'
-#' @return            A string
+#' @return              A string
 #'
 Rmk_detext_source <- function(file,
                               rm.comment   = TRUE,
