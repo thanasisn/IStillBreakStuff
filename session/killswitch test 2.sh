@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2017-05-25
 
 #### Example of a kill switch use in bash script

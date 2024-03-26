@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2021-11-16
 
 #### Continuously Update dwm status bar

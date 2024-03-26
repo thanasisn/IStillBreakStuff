@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2017-05-25
 
 #### Remove kill switches

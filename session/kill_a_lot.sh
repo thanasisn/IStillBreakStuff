@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2014-08-15
 
 #### Kill programs and services in order to obtain more POWERrrr

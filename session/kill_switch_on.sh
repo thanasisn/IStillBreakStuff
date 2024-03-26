@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 ## created on 2017-05-25
 
 #### Switch on a kill switch for a list of appropriate scripts
