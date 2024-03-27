@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #### Ping my hosts and print for conky
 
@@ -12,7 +12,7 @@ hosts=(
   "tyler   10.12.12.6    100.119.4.3      X.X          "
   "victor  10.12.12.7    X.X              X.X          "
   "a34     10.12.12.9    100.120.166.39   X.X          "
-  "nixVM   10.12.12.88   100.66.181.21    X.X          "
+  "nixVM   10.12.12.88   100.67.181.21    X.X          "
   "door    10.12.12.10   X.X              X.X          "
   "yperos  10.12.12.101  100.102.113.56   155.207.10.70"
   "Y       10.12.14.97   X.X              X.X          "
