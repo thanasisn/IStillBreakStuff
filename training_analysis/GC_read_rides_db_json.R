@@ -1,1 +1,0 @@
-/home/athan/CODE/training_analysis/GC_data_proccess/GC_read_rides_db_json.R

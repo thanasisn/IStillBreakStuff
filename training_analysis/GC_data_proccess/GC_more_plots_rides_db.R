@@ -32,8 +32,8 @@ library(lubridate , quietly = TRUE, warn.conflicts = FALSE)
 library(pander    , quietly = TRUE, warn.conflicts = FALSE)
 library(caTools   , quietly = TRUE, warn.conflicts = FALSE)
 
-source("~/CODE/FUNCTIONS/R/make_tools.R")
 source("~/CODE/FUNCTIONS/R/data.R")
+source("~/CODE/FUNCTIONS/R/make_tools.R")
 
 DEBUG <- FALSE
 
@@ -53,7 +53,7 @@ if (DEBUG ||
 }
 
 
-#### Load data to plot  -------------------------------------------------
+#### Load last data to plot ----------------------------------------------------
 metrics <- readRDS(storagefl)
 metrics <- metrics[as.Date(Date) > Sys.Date() - daysback, ]
 metrics <- metrics[Sport %in% c("Run", "Bike")]
