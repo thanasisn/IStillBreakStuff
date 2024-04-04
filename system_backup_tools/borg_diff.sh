@@ -3,7 +3,7 @@
 #### Inspect the differece of borg snapshots within a repo
 
 ## Uses predifined profile files with variables
-## Created 2018-11-06      
+## Created 2018-11-06
 
 
 ## executable path
@@ -67,9 +67,7 @@ if ! flock -n 9  ; then
     exit 99
 fi
 
-
-
-## filter the original to a new file
+## filter the original profile to a new file
 grep -E '^#|^[^ ]* *= *[^;&]*'  "$CONF_FILE" | sed 's/ \+= \+/=/g' > "$CONF_SECU"
 CONF_FILE="$CONF_SECU"
 
@@ -86,7 +84,6 @@ trap 'echo ; echo ; echo $( date ) Comparison for ${PROFILE} interrupted >&2; ex
 
 ## read the configuration file
 source "$CONF_FILE"
-
 
 if [ "$LOCAL_BORG_REP" = true ]; then
     ## Repo is on local ##
@@ -258,7 +255,8 @@ done < <( cat "${diffile}" | grep "^added[ ]\+[0-9]" | cut -c-20 | sed 's/added 
 
 ## display summaries
 echo ""
-echo "(Filtered out: git,rdd)"
+echo "source $CONF_FILE"
+echo "Filtered out: git,rdd"
 echo ""
 printf "Removed: %5s %12s\n" "$(cat "${diffile}" | grep -c "^removed")"  "$(bytesToHR $Rsum)"
 printf "Added  : %5s %12s\n" "$(cat "${diffile}" | grep -c "^added")" "$(bytesToHR $Asum)"
