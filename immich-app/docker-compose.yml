@@ -101,7 +101,7 @@ services:
       SCHEDULE: "@daily"
       BACKUP_DIR: /db_dumps
     volumes:
-      - ./db_dumps:/db_dumps
+      - /home/folder/immich-app/db_dumps:/db_dumps
     depends_on:
       - database
 
