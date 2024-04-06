@@ -72,6 +72,9 @@ services:
     env_file:
       - .env
     restart: always
+    # test opening ports?
+    ports:
+      - 3003:3003
 
   redis:
     container_name: immich_redis
