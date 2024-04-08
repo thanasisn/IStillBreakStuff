@@ -15,7 +15,7 @@ services:
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
     command: ['start.sh', 'immich']
     volumes:
-      - ${LIBRARY_LOCATION}:/usr/src/app/upload/library
+      # - ${LIBRARY_LOCATION}:/usr/src/app/upload/library
       - ${UPLOAD_LOCATION}:/usr/src/app/upload/upload
       - ${THUMBS_LOCATION}:/usr/src/app/upload/thumbs
       - ${PROFILE_LOCATION}:/usr/src/app/upload/profile
@@ -23,8 +23,8 @@ services:
       - /home/athan/Pictures:/home/athan/Pictures:ro
       - /home/folder/CAMERATTA:/home/folder/CAMERATTA:ro
       - /etc/localtime:/etc/localtime:ro
-        # - ${UPLOAD_LOCATION}:/usr/src/app/upload
-        # - /home/athan/Pictures/Import_IM:/home/athan/Pictures/Import_IM
+      # - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      # - /home/athan/Pictures/Import_IM:/home/athan/Pictures/Import_IM
     env_file:
       - .env
     ports:
@@ -42,7 +42,7 @@ services:
     #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
     command: ['start.sh', 'microservices']
     volumes:
-      - ${LIBRARY_LOCATION}:/usr/src/app/upload/library
+      # - ${LIBRARY_LOCATION}:/usr/src/app/upload/library
       - ${UPLOAD_LOCATION}:/usr/src/app/upload/upload
       - ${THUMBS_LOCATION}:/usr/src/app/upload/thumbs
       - ${PROFILE_LOCATION}:/usr/src/app/upload/profile
