@@ -28,16 +28,19 @@ clean="$(echo "$dirty" | cut -d" " -f1)"
 
 ## if empty ignore file
 if [ -z "${clean}" ]; then
-  echo "Empty for: $FILE"
+  echo "Empty tag for: $FILE"
   exit 0
 fi
 
 ## check output before run
 printf "%8s   -> %8s   ::  %s\n" "$dirty" "$clean" "$FILE"
 
-## uncomment to replace tag
+## check the above output and then uncomment to replace tag
 ## will update mtime in all files with or without correct value
-exiftool -"$TAG"="$clean" "$FILE"
+# exiftool -"$TAG"="$clean" "$FILE"
+
+
+
 
 
 
