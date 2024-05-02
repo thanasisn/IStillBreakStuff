@@ -21,6 +21,7 @@ scraper = Scraper("www.cpubenchmark.net")
 CPU = [
     "G3460",              # blue
     "Ryzen 5 5500U",
+    "Ryzen 3 4300G",
     "Ryzen 5 5600G",
     "Ryzen 7 Pro 5850U",
     "Ryzen 7 5700G",
