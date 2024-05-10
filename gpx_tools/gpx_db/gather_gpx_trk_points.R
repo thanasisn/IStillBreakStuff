@@ -15,9 +15,9 @@ if(!interactive())pdf(file=sub("\\.R$",".pdf",Script.Name))
 sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
 
 library(sf)
+library(trip)
 library(dplyr)
 library(data.table)
-library(trip)
 library(myRtools)
 library(R.utils)
 
@@ -121,7 +121,7 @@ for (af in gpxlist) {
     temp   <- cbind(temp, latlon)
 
     ## data to keep
-    temp   <- temp[, .(time,X,Y,Xdeg,Ydeg,dist,timediff, filename = af, F_mtime = file.mtime(af))]
+    temp   <- temp[, .(time, X, Y, Xdeg, Ydeg, dist, timediff, filename = af, F_mtime = file.mtime(af))]
 
     ## some files don't have tracks
     if (!nrow(temp)>0) { next() }
