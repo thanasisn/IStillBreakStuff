@@ -71,6 +71,36 @@ library(FITfileR, quietly = TRUE, warn.conflicts = FALSE)
 
 
 
+expfiles <- list.files(path       = "~/TRAIN/Garmin_Exports/original/",
+                       # pattern    = "*.fit",
+                       recursive  = T,
+                       full.names = T)
+
+tempfl <- "/dev/shm/tmp_fit/"
+
+for (af in expfiles) {
+  ## check for fit file
+  stopifnot( nrow(unzip(af, list = T)) == 1 )
+  if (!grepl(".fit$", unzip(af, list = T)$Name)) {
+    cat("NOT A FIT FILE!!:", af, "\n")
+    next()
+  }
+
+  ## create in memory file
+  unzip(af, unzip(af, list = T)$Name, overwrite = T, exdir = tempfl)
+  from   <- paste0(tempfl, unzip(af, list = T)$Name)
+  target <- paste0(tempfl, "temp.fit")
+  file.rename(from, target)
+
+
+  readFitFile(target)
+
+  stop()
+}
+
+
+
+
 fitfiles <- list.files(path       = "~/TRAIN/GoldenCheetah/Athan/imports/",
                        pattern    = "*.fit",
                        full.names = T)
