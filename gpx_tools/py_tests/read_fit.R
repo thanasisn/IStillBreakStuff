@@ -65,16 +65,42 @@ library(FITfileR, quietly = TRUE, warn.conflicts = FALSE)
 
 
 
-
-
-
 #'
-#' https://msmith.de/FITfileR/articles/FITfileR.html#:~:text=Introduction,or%20other%20FIT%20parsing%20tools.
+#' https://msmith.de/FITfileR/articles/FITfileR.html
 #'
 
 
 
+fitfiles <- list.files(path       = "~/TRAIN/GoldenCheetah/Athan/imports/",
+                       pattern    = "*.fit",
+                       full.names = T)
 
+for (af in fitfiles) {
+  res <- readFitFile(af)
+
+  rest <- listMessageTypes(res)[!listMessageTypes(res) %in% c("record", "lap", "file_id")]
+
+  for (at in rest) {
+    dat <- getMessagesByType(res, message_type = at)
+
+    cat(paste(at), "\n")
+    cat(paste(dat), "\n")
+
+  }
+
+
+
+  ## may return multiple tables or a list of tables
+  records(res)
+
+  laps(res)
+  file_id(res)
+  hrv(res)
+  monitoring(res)
+
+
+  stop()
+}
 
 
 
