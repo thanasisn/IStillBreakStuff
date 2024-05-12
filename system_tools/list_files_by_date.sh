@@ -7,7 +7,7 @@
 FOLDER="$@"
 
 find $FOLDER -type f -print0           |\
-    xargs -0 stat --format '%Y :%y %n' |\
+    xargs -0 stat --format '%Y :%y %n %s' |\
     sort -n                            |\
     cut -d: -f2-
 

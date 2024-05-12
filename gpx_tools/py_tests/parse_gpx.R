@@ -78,7 +78,7 @@ library(filelock,   quietly = TRUE, warn.conflicts = FALSE)
 #'
 
 DATASET    <- "/home/athan/DATA/Other/Track_points"
-BATCH      <- 100
+BATCH      <- 50
 EPSG_WGS84 <- 4326
 EPSG       <- 3857
 
