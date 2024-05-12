@@ -83,7 +83,7 @@ EPSG       <- 3857
 
 if (file.exists(DATASET)) {
   DB <- open_dataset(DATASET,
-                     partitioning  = c("year", "month"),
+                     partitioning  = c("year"),
                      unify_schemas = T)
   db_rows <- unlist(DB |> tally() |> collect())
 } else {
@@ -152,16 +152,13 @@ TP <- DB |> filter(time > as.POSIXct("1971-01-01") & !is.na(time))
 cat(paste(TP |> count() |> collect()), "\n")
 
 
-## create speed
-TP <- TP |> mutate(kph = (dist/1000) / (timediff/3600)) |> collapse()
-
 
 
 
 TP |> count() |> collect()
 
 
-
+## files on same date
 TP |>
   select(filename, time) |>
   mutate(time = as.Date(time)) |> unique() |> collect()
