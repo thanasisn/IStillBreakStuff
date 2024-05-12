@@ -83,7 +83,7 @@ EPSG_WGS84 <- 4326
 EPSG       <- 3857
 
 ## make sure only one parser is working
-lock(paste0(DATASET, ".lock"), exclusive = TRUE, timeout = 2000)
+lock(paste0(DATASET, ".lock"))
 
 if (file.exists(DATASET)) {
   DB <- open_dataset(DATASET,
