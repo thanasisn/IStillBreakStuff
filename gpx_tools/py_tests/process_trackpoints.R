@@ -159,9 +159,14 @@ TP |> count() |> collect()
 
 
 ## files on same date
-TP |>
-  select(filename, time) |>
-  mutate(time = as.Date(time)) |> unique() |> collect()
+test <- TP |>
+  select(filename, time, sport, name, sub_sport, source) |>
+  mutate(time = as.Date(time)) |>
+  unique() |> collect() |> data.table()
+
+test_d <- test[, .N, by = time]
+
+test <- test[time %in% test_d[N>1, time]]
 
 names(TP)
 
