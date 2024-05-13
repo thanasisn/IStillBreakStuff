@@ -147,28 +147,54 @@ stop()
 cat(paste(DB |> count() |> collect()), "\n")
 
 
-## sanity points
-TP <- DB |> filter(time > as.POSIXct("1971-01-01") & !is.na(time))
-cat(paste(TP |> count() |> collect()), "\n")
+# ## sanity points
+# TP <- DB |> filter(time > as.POSIXct("1971-01-01") & !is.na(time))
+# cat(paste(TP |> count() |> collect()), "\n")
 
 
 
 
 
-TP |> count() |> collect()
+DB |> count() |> collect()
+
+sameday <- DB |>
+  select(filename, time) |>
+  mutate(time = as.Date(time)) |>
+  unique() |> collect() |> data.table()
+
+
+
+samedays <- sameday[, .N, by = time]
+samedays <- samedays[N > 1, time]
+
+
+for (ad in samedays) {
+  DB |> filter(as.Date(time) == as.Date(ad)) |> collect()
+
+
+  stop()
+}
+
+
+
+
+
+
+
 
 
 ## files on same date
-test <- TP |>
+test <- DB |>
   select(filename, time, sport, name, sub_sport, source) |>
   mutate(time = as.Date(time)) |>
   unique() |> collect() |> data.table()
+
+
 
 test_d <- test[, .N, by = time]
 
 test <- test[time %in% test_d[N>1, time]]
 
-names(TP)
 
 
 

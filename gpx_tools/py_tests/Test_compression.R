@@ -29,10 +29,10 @@ for (algo in c("gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
 
 
 results <- "~/CODE/gpx_tools/py_tests/DB_compression_test.Rds"
-DATASET <- "/home/athan/ZHOST/testfit"
+DATASET <- "/home/athan/DATA/Other/Track_points"
 
 DB <- open_dataset(DATASET,
-                   partitioning  = c("year", "month"),
+                   partitioning  = c("year"),
                    unify_schemas = T)
 currentsize <- as.numeric(strsplit(system(paste("du -s", DATASET), intern = TRUE), "\t")[[1]][1])
 
@@ -55,7 +55,7 @@ for (algo in c("gzip", "brotli", "zstd", "lz4", "lzo")) {
                         compression       = algo,
                         compression_level = comLev,
                         format            = "parquet",
-                        partitioning      = c("year", "month"),
+                        partitioning      = c("year"),
                         hive_style        = FALSE),
           gcFirst = TRUE
         )
