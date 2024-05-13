@@ -248,7 +248,7 @@ new <- unique(gather[, year])
 
 write_dataset(DB |> filter(year %in% new),
               DATASET,
-              compression            = "lz4",
+              compression            = "brotli",
               compression_level      = 5,
               format                 = "parquet",
               partitioning           = c("year"),

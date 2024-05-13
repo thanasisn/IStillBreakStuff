@@ -9,6 +9,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/Test_compression.R"
 
+stop("This is dissabled")
 
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
@@ -38,13 +39,19 @@ currentsize <- as.numeric(strsplit(system(paste("du -s", DATASET), intern = TRUE
 
 
 
-gatherDB    <- data.frame()
+gatherDB <- data.frame()
+codecs   <- c("gzip", "brotli", "zstd", "lz4", "lzo")
+levels   <- unique(c(1:11, 20, 50))
 
-for (algo in c("gzip", "brotli", "zstd", "lz4", "lzo")) {
+## use to re-compress
+# codecs <- "brotli"
+# levels <- 5
+
+for (algo in codecs) {
   if (codec_is_available(algo)) {
     targetdb <- paste0(DATASET, "_temp")
     # for (comLev in c(2, 3, 5, 7, 9, 10, 11, 20)) {
-    for (comLev in unique(c(1:11, 20, 50))) {
+    for (comLev in levels) {
       cat("Algo: ", algo, " Level:", comLev, "\n")
       try({
         ## remove target dir
@@ -103,11 +110,11 @@ stop()
 
 DATA <- readRDS(results)
 
-# DATA <- DATA[Host == "sagan",   ]
+DATA <- DATA[Host == "sagan",   ]
 # DATA <- DATA[Current > 2000000, ]
-DATA <- DATA[User    < 100,     ]
+DATA <- DATA[User    < 1000,     ]
 DATA <- DATA[Ratio   <   1,     ]
-DATA <- DATA[Ratio   <  .7,     ]
+# DATA <- DATA[Ratio   <  .7,     ]
 DATA <- DATA[Size    >  20,     ]
 DATA <- DATA[Date > "2023-12-01"]
 # DATA[, col := 1 + as.numeric(factor(Algo))]
