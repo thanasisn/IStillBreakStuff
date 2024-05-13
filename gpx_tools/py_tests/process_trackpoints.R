@@ -135,14 +135,6 @@ if (file.exists(DATASET)) {
 #; }
 
 
-
-stop()
-
-
-
-
-
-
 ## total points
 cat(paste(DB |> count() |> collect()), "\n")
 
@@ -154,9 +146,6 @@ cat(paste(DB |> count() |> collect()), "\n")
 
 
 
-
-DB |> count() |> collect()
-
 sameday <- DB |>
   select(filename, time) |>
   mutate(time = as.Date(time)) |>
@@ -167,17 +156,23 @@ sameday <- DB |>
 samedays <- sameday[, .N, by = time]
 samedays <- samedays[N > 1, time]
 
-
+## check in common days files
 for (ad in samedays) {
-  DB |> filter(as.Date(time) == as.Date(ad)) |> collect()
 
+  yy   <- year(ad)
+  test <- DB |> filter(year == yy & as.Date(time) == as.Date(ad)) |> collect()
 
-  stop()
+  dups <- duplicated(test[, .(Xdeg, Ydeg, time)])
+  if (any(dups)) {
+
+    cat(unique(test[dups, filename]), sep = "\n")
+    cat("\n")
+
+    # test[dups,]
+
+  }
+
 }
-
-
-
-
 
 
 
