@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "hhh "
+#' title:         "Parse gpx file to datavase"
 #' author:
 #'   - Natsis Athanasios^[natsisphysicist@gmail.com]
 #'
@@ -43,7 +43,7 @@
 
 #+ echo=FALSE, include=TRUE
 knitr::opts_chunk$set(comment    = ""       )
-knitr::opts_chunk$set(dev        = c("pdf", "png")) ## expected option
+knitr::opts_chunk$set(dev        = c("pdf")) ## expected option
 # knitr::opts_chunk$set(dev        = "png"    )       ## for too much data
 knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
@@ -82,7 +82,7 @@ BATCH      <- 50
 EPSG_WGS84 <- 4326
 EPSG       <- 3857
 
-## make sure only one parser is working
+## make sure only one parser is working??
 lock(paste0(DATASET, ".lock"))
 
 if (file.exists(DATASET)) {

@@ -1,11 +1,56 @@
 #!/usr/bin/env Rscript
+# /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
+#' ---
+#' title:         "Golden Cheetah read activities summary directly from individual files"
+#' author:
+#'   - Natsis Athanasios^[natsisphysicist@gmail.com]
+#'
+#' documentclass:  article
+#' classoption:    a4paper,oneside
+#' fontsize:       10pt
+#' geometry:       "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+#' link-citations: yes
+#' colorlinks:     yes
+#'
+#' header-includes:
+#' - \usepackage{caption}
+#' - \usepackage{placeins}
+#' - \captionsetup{font=small}
+#'
+#' output:
+#'   bookdown::pdf_document2:
+#'     number_sections: no
+#'     fig_caption:     no
+#'     keep_tex:        yes
+#'     latex_engine:    xelatex
+#'     toc:             yes
+#'     toc_depth:       4
+#'     fig_width:       7
+#'     fig_height:      4.5
+#'   html_document:
+#'     toc:             true
+#'     keep_md:         yes
+#'     fig_width:       7
+#'     fig_height:      4.5
+#'
+#' date: "`r format(Sys.time(), '%F')`"
+#'
+#' ---
+
+#+ echo=F, include=T
 
 #### Golden Cheetah read activities summary directly from individual files
 
-## TODO?
-## Not usually used, we favor reading the whole Ridedb.json
-## More detail's in individual files
-## Should have the same output with Ridedb
+## __ Document options  --------------------------------------------------------
+
+#+ echo=FALSE, include=TRUE
+knitr::opts_chunk$set(comment    = ""       )
+knitr::opts_chunk$set(dev        = c("pdf")) ## expected option
+# knitr::opts_chunk$set(dev        = "png"    )       ## for too much data
+knitr::opts_chunk$set(out.width  = "100%"   )
+knitr::opts_chunk$set(fig.align  = "center" )
+knitr::opts_chunk$set(cache      =  FALSE   )  ## !! breaks calculations
+knitr::opts_chunk$set(fig.pos    = '!h'     )
 
 ###TODO explore this tools
 # library(cycleRtools)
@@ -14,307 +59,254 @@
 # GC_metrics("Athan")
 # read_ride(file = af)
 
-####_ Set environment _####
-# Sys.setenv(TZ = "UTC")
-# Script.Name = funr::sys.script()
+
+#+ echo=FALSE, include=TRUE
+## __ Set environment  ---------------------------------------------------------
+Sys.setenv(TZ = "UTC")
+Script.Name <- "~/CODE/training_analysis/GC_read_activities_json.R"
 
 
-library(myRtools)
-library(data.table)
-library(jsonlite)
-library(arrow)
-source("~/CODE/FUNCTIONS/R/data.R")
-
-
-warning("time variable is different between data")
-
-## data paths
-storagefl <- "~/DATA/Other/GC_json_activities.Rds"
-gcfolder  <- "~/TRAIN/GoldenCheetah/Athan/activities/"
-inputdata <- "~/LOGs/GCmetrics.Rds"
-pdfout1   <- "~/LOGs/training_status/GC_all_plots.pdf"
-pdfout2   <- "~/LOGs/training_status/GC_all_plots_last.pdf"
-export    <- "~/DATA/Other/Train_metrics.Rds"
-
-
-## we may read the actual GC database same-day?
-
-####  Read data from json activities files  ####################################
-file       <- list.files( path       = gcfolder,
-                          pattern    = "*.json",
-                          full.names = TRUE)
-filesmtime <- file.mtime(file)
-check      <- data.table(file, filesmtime)
-
-file <- sort(file, decreasing = T)
-
-
-# ## start with read data
-# if (file.exists(storagefl)) {
-#     gather <- readRDS(storagefl)
-#     ## find files to read
-#     test   <- gather[, file, filemtime]
-#     test2  <- merge(test, check , by = "file", all = T)
-#     files  <- test2[ filemtime != filesmtime | is.na(filemtime) , file ]
-#     ## drop preexisting files
-#     gather <- gather[ ! file %in% files ]
-# } else {
-#     gather <- data.table()
-#     files  <- check$file
-# }
-#
-# files <- sort(files,decreasing = T)
-
-# files <- sample(file,30)
-
-
-
-## misses XDATA
-# ride  <- read_json_arrow(files[1])
-# ride  <- ride$RIDE
-
-af <- file[1]
-
-af <- "/home/athan/TRAIN/GoldenCheetah/Athan/activities//2024_05_09_08_51_57.json"
-af <- "/home/athan/TRAIN/GoldenCheetah/Athan/activities///2022_11_28_12_37_41.json"
-
-jride <- fromJSON(af)$RIDE
-
-
-jride$STARTTIME
-jride$OVERRIDES[[1]]
-jride$TAGS
-jride$SAMPLES
-jride$XDATA
-
-dfs <- names(jride)
-
-
-for (af in dfs) {
-  cat(af, length(jride[[af]]), "\n")
-  cat(af, class(jride[[af]]), "\n")
+if (!interactive()) {
+  dir.create("./runtime/", showWarnings = F, recursive = T)
+  pdf( file = paste0("./runtime/", basename(sub("\\.R$",".pdf", Script.Name))))
 }
 
-act_DT <- data.table()
+#+ echo=F, include=T
+library(data.table, quietly = TRUE, warn.conflicts = FALSE)
+library(arrow,      quietly = TRUE, warn.conflicts = FALSE)
+library(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
+library(filelock,   quietly = TRUE, warn.conflicts = FALSE)
+library(jsonlite,   quietly = TRUE, warn.conflicts = FALSE)
+library(lubridate,  quietly = TRUE, warn.conflicts = FALSE)
 
-act_ME <- data.table(
-  ## get general meta data
-  file       = af,
-  filemtime  = file.mtime(af),
-  time       = as.POSIXct(ride$STARTTIME),
-  parsed     = Sys.time(),
-  RECINTSECS = ride$RECINTSECS,
-  DEVICETYPE = ride$DEVICETYPE,
-  IDENTIFIER = ride$IDENTIFIER,
-  ## get metrics
-  data.frame(ride$TAGS)
-)
 
-act_ME$Month   <- NULL
-act_ME$Weekday <- NULL
-act_ME$Year    <- NULL
+## data paths
+gcfolder <- "~/TRAIN/GoldenCheetah/Athan/activities"
+DATASET  <- "/home/athan/DATA/Other/Activities_list"
+
+
+
+##  List files
+file <- list.files(path       = gcfolder,
+                   pattern    = "*.json",
+                   full.names = TRUE)
+
+file <- data.table(file      = file,
+                   filemtime = floor_date(file.mtime(file), unit = "seconds"))
+
+
+##  Open dataset
+if (file.exists(DATASET)) {
+  DB <- open_dataset(DATASET,
+                     partitioning  = c("year"),
+                     unify_schemas = T)
+  db_rows <- unlist(DB |> tally() |> collect())
+} else {
+  stop("Init DB manually!")
+}
+
+
+
+##  Check what to do
+wehave <- DB |> select(file, filemtime) |> unique() |> collect() |> data.table()
+
+##  Ignore files with the same name and mtime
+file <- file[ !(file %in% wehave$file & filemtime %in% wehave$filemtime) ]
+
+
+
+##  TODO remove changed files from DB
+##  TODO remove deleted files from DB
+
+
+
+
+# files <- sample(file$file, 10)
+
+files <- unique(c(head(file$file, 366),
+                  tail(file$file, 366)))
+
+
+if (length(files) < 1) {
+  stop("Nothing to do!")
+}
+
+
+data <- data.table()
+for (af in files) {
+  cat(af,"\n")
+
+  jride <- fromJSON(af)$RIDE
+
+  # jride$STARTTIME
+  # jride$OVERRIDES[[1]]
+  # jride$TAGS
+  # jride$SAMPLES
+  # jride$XDATA
+
+  # dfs <- names(jride)
+  # for (a in dfs) {
+  #   cat(a, length(jride[[a]]), "\n")
+  #   cat(a, class(jride[[a]]), "\n")
+  # }
+
+  act_ME <- data.table(
+    ## get general meta data
+    file       = af,
+    filemtime  = floor_date(file.mtime(af), unit = "seconds"),
+    time       = as.POSIXct(strptime(jride$STARTTIME, "%Y/%m/%d %T", tz = "UTC")),
+    parsed     = Sys.time(),
+    RECINTSECS = jride$RECINTSECS,
+    DEVICETYPE = jride$DEVICETYPE,
+    IDENTIFIER = jride$IDENTIFIER,
+    ## get metrics
+    data.frame(jride$TAGS)
+  )
+
+  ## drop some data
+  act_ME$Month    <- NULL
+  act_ME$Weekday  <- NULL
+  act_ME$Year     <- NULL
+  act_ME$Filename <- NULL
+
+  ## read manual edited values
+  if (!is.null(jride$OVERRIDES)) {
+    ss        <- data.frame(t(diag(as.matrix(jride$OVERRIDES))))
+    names(ss) <- paste0("OVRD_", names(jride$OVERRIDES))
+    act_ME    <- cbind(act_ME, ss)
+    rm(ss)
+  }
+
+  data <- rbind(data, act_ME, fill = TRUE)
+}
+
+
+## convert types if possible
+for (avar in names(data)) {
+  if (is.character(data[[avar]])) {
+    ## find empty and replace
+    data[[avar]] <- sub("[ ]*$",        "", data[[avar]])
+    data[[avar]] <- sub("^[ ]*",        "", data[[avar]])
+    data[[avar]] <- sub("^[ ]*$",       NA, data[[avar]])
+    data[[avar]] <- sub("^[ ]*NA[ ]*$", NA, data[[avar]])
+    if (!all(is.na((as.numeric(data[[avar]]))))) {
+      data[[avar]] <- as.numeric(data[[avar]])
+    }
+  }
+}
+
+data <- data.table(data)
+data[, year := as.integer(year(time)) ]
+
+## TODO check for new variables in the db
+
+
+## merge all rows
+DB <- DB |> full_join(data) |> compute()
+
+cat("\nNew rows:", nrow(DB) - db_rows, "\n")
+
+## write only new months within gather
+new <- unique(data[, year])
+
+cat("\nUpdate:", new, "\n")
+
+write_dataset(DB |> filter(year %in% new),
+              DATASET,
+              compression            = "brotli",
+              compression_level      = 5,
+              format                 = "parquet",
+              partitioning           = c("year"),
+              existing_data_behavior = "delete_matching",
+              hive_style             = F)
+
+
+
+
+
+
+
+
+
+
+
+
+## Init data base manually
+# stop()
+# write_dataset(data,
+#               DATASET,
+#               compression            = "brotli",
+#               compression_level      = 5,
+#               format       = "parquet",
+#               partitioning = c("year"),
+#               existing_data_behavior = "delete_matching",
+#               hive_style   = F)
+
+
 
 
 stop()
-####  Parse chosen files  ####
-if (length(files) != 0) {
-    cat(paste("\nNew activities to parse\n"))
-    ## read files
-    for (af in files) {
-        ## get file
 
+## read files
+for (af in files) {
+  ## get file
 
-        ## read manual edited values
-        if (!is.null( ride$OVERRIDES )) {
-            ss        <- data.frame(t(diag(as.matrix(ride$OVERRIDES))))
-            names(ss) <- paste0("OVRD_", names(ride$OVERRIDES))
-            temp      <- cbind(temp,ss)
-            rm(ss)
-        }
-
-        ## convert types
-        for (avar in names(temp)) {
-            if (is.character(temp[[avar]])) {
-                ## find empty and replace
-                temp[[avar]] <- sub("[ ]*$",        "", temp[[avar]])
-                temp[[avar]] <- sub("^[ ]*",        "", temp[[avar]])
-                temp[[avar]] <- sub("^[ ]*$",       NA, temp[[avar]])
-                temp[[avar]] <- sub("^[ ]*NA[ ]*$", NA, temp[[avar]])
-                if (!all(is.na((as.numeric(temp[[avar]]))))) {
-                    temp[[avar]] <- as.numeric(temp[[avar]])
-                }
-            }
-        }
-
-        ## we ignore intervals for now
-        # ride$INTERVALS
-
-        ## recorded data
-        # ride$SAMPLES
-        # ride$XDATA
-
-        gather <- rbind(gather, temp, fill = T)
-        rm(temp)
-    }
-
-    gather <- rm.cols.dups.DT(gather)
-    gather <- rm.cols.NA.DT(gather)
-    ## for testing
-    for (avar in names(gather)) {
-        if (is.numeric(gather[[avar]])) {
-            hist(gather[[avar]], breaks = 50, main = avar )
-        }
-    }
-
-    ## drop zeros on some columns
-    wecare <- c()
-    wecare <- c(
-        "Average.Heart.Rate",
-        "CP",
-        "Calories",
-        "Daniels.Points",
-        "Duration",
-        "OVRD_time_riding",
-        "RECINTSECS",
-        "RPE",
-        "Recovery.Time",
-        "Time.Moving",
-        "RPE",
-        "Feel",
-        "Work",
-        "cc",
-        "xPower",
-        NULL)
-    wecare <- names(gather)[names(gather) %in% wecare]
-
-    wecare <- unique(wecare, grep("detected", names(gather), value = TRUE, ignore.case = TRUE))
-    wecare <- unique(wecare, grep("speed",    names(gather), value = TRUE, ignore.case = TRUE))
-    wecare <- unique(wecare, grep("effect",   names(gather), value = TRUE, ignore.case = TRUE))
-    wecare <- unique(wecare, grep("distance", names(gather), value = TRUE, ignore.case = TRUE))
-    wecare <- unique(wecare, grep("weight",   names(gather), value = TRUE, ignore.case = TRUE))
-    wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
-    wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
-
-    for (avar in wecare) {
-        gather[[avar]][gather[[avar]] == 0] <- NA
-    }
-
-    ## drop columns with zero or NA only
-    for (avar in names(gather)) {
-        if (all(gather[[avar]] %in% c(NA, 0))) {
-            gather[[avar]] <- NULL
-        }
-    }
-    gather[, Year  := NULL]
-    gather[, Data  := NULL]
-    gather[, color := NULL]
-
-    gather <- rm.cols.dups.DT(gather)
-    gather <- rm.cols.NA.DT(gather)
-    gather <- unique(gather)
-    setorder(gather,time)
-
-    stop()
-    ## write data
-    write_RDS(gather, storagefl)
-} else {
-    cat(paste("\nNo new activities\n"))
-}
-
-
-
-
-####  Read data from GC exports  ###############################################
-
-## load outside Goldencheetah
-metrics <- readRDS(inputdata)
-metrics <- data.frame(metrics)
-setorder(metrics,time)
-## get this from direct read
-
-## covert types
-for (avar in names(metrics)) {
-    if (is.character(metrics[[avar]])) {
-        ## find empty and replace
-        metrics[[avar]] <- sub("[ ]*$",        "", metrics[[avar]])
-        metrics[[avar]] <- sub("^[ ]*",        "", metrics[[avar]])
-        metrics[[avar]] <- sub("^[ ]*$",       NA, metrics[[avar]])
-        metrics[[avar]] <- sub("^[ ]*NA[ ]*$", NA, metrics[[avar]])
-        if (!all(is.na((as.numeric(metrics[[avar]]))))) {
-            metrics[[avar]] <- as.numeric(metrics[[avar]])
-        }
-    }
-}
-
-
-## drop zeros on some columns
-wecare <- c()
-wecare <- c(
+  ## drop zeros on some columns
+  wecare <- c(
     "Average.Heart.Rate",
     "CP",
     "Calories",
     "Daniels.Points",
-    "Distance",
     "Duration",
     "OVRD_time_riding",
-    "OVRD_total_distance",
     "RECINTSECS",
     "RPE",
     "Recovery.Time",
     "Time.Moving",
-    "Work",
     "RPE",
     "Feel",
+    "Work",
     "cc",
     "xPower",
     NULL)
-wecare <- names(metrics)[names(metrics) %in% wecare]
+  wecare <- names(gather)[names(gather) %in% wecare]
 
-wecare <- unique(wecare, grep("detected", names(gather), value = TRUE, ignore.case = TRUE))
-wecare <- unique(wecare, grep("speed",    names(gather), value = TRUE, ignore.case = TRUE))
-wecare <- unique(wecare, grep("effect",   names(gather), value = TRUE, ignore.case = TRUE))
-wecare <- unique(wecare, grep("distance", names(gather), value = TRUE, ignore.case = TRUE))
-wecare <- unique(wecare, grep("weight",   names(gather), value = TRUE, ignore.case = TRUE))
-wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
+  wecare <- unique(wecare, grep("detected", names(gather), value = TRUE, ignore.case = TRUE))
+  wecare <- unique(wecare, grep("speed",    names(gather), value = TRUE, ignore.case = TRUE))
+  wecare <- unique(wecare, grep("effect",   names(gather), value = TRUE, ignore.case = TRUE))
+  wecare <- unique(wecare, grep("distance", names(gather), value = TRUE, ignore.case = TRUE))
+  wecare <- unique(wecare, grep("weight",   names(gather), value = TRUE, ignore.case = TRUE))
+  wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
+  wecare <- unique(wecare, grep("cadence",  names(gather), value = TRUE, ignore.case = TRUE))
 
+  for (avar in wecare) {
+    gather[[avar]][gather[[avar]] == 0] <- NA
+  }
 
-for (avar in wecare) {
-    if (!is.character(metrics[[avar]])) {
-        metrics[[avar]][metrics[[avar]] == 0] <- NA
+  ## drop columns with zero or NA only
+  for (avar in names(gather)) {
+    if (all(gather[[avar]] %in% c(NA, 0))) {
+      gather[[avar]] <- NULL
     }
+  }
+  gather[, Year  := NULL]
+  gather[, Data  := NULL]
+  gather[, color := NULL]
+
+  gather <- rm.cols.dups.DT(gather)
+  gather <- rm.cols.NA.DT(gather)
+  gather <- unique(gather)
+  setorder(gather,time)
+
 }
-metrics <- data.table(metrics)
-metrics[, Notes := NULL]
-metrics[, color := NULL]
-metrics[, Data  := NULL]
-metrics <- rm.cols.dups.DT(metrics)
-metrics <- rm.cols.NA.DT(metrics)
+
+
+
+
 
 
 
 ### homogenize data ####
-
-
-####  Calories ####
-## gather$Calories has old problematic replacement values probably
-# ee <- data.frame(metrics$Calories, gather$Calories)
-# gather[!is.na(gather$Calories),time,Calories]
-gather$Calories <- NULL
-
-#### Device:  we don't need that ####
-# gather[ Device == "unknown", Device := NA ]
-# ee <- data.frame(metrics$Device, gather$Device)
-gather$Device  <- NULL
-metrics$Device <- NULL
-
-#### Route ####
-# ee <- data.frame(metrics$Route, gather$Route)
-# table(ee)
-gather$Route  <- NULL
-metrics$Route <- NULL
-
-#### Bike ####
-gather$Bike <- NULL
 
 
 ## find duplicate names to check
@@ -331,23 +323,6 @@ for (avar in tocheck) {
 }
 
 
-gather$Sport
-metrics$Sport
-
-## more problems
-metrics$Distance
-gather$Distance
-test <- cbind(gather[, time, Distance],metrics[, time, Distance])
-
-
-
-
-
-###  merge and hope for the best!!!  ####
-warning("Not the same time!!")
-## due to local time and summer time differences
-metrics <- unique(merge(metrics, gather, by = "time", all = T))
-setorder(metrics,time)
 
 ## duplicate name columns check
 for (avar in tocheck) {
@@ -500,79 +475,9 @@ if (all(metrics$Sport.x == metrics$Sport.y, na.rm = T)) {
 }
 
 
-## set color and symbol for each activity type
-
-table( metrics$Sport )
-table( metrics$Workout_Code)
-
-metrics[ Sport == "Bike", Col := "red"  ]
-metrics[ Sport == "Run",  Col := "blue" ]
-table(metrics$Col)
-
-metrics[,  Pch :=  1 ]
-
-metrics[ Sport == "Bike", Pch := 1 ]
-metrics[ Sport == "Run",  Pch := 1 ]
-
-metrics[ Workout_Code == "Bike Road",       Pch :=  6 ]
-metrics[ Workout_Code == "Bike Dirt",       Pch :=  1 ]
-metrics[ Workout_Code == "Bike Static",     Pch :=  4 ]
-metrics[ Workout_Code == "Bike Elliptical", Pch :=  4 ]
-metrics[ Workout_Code == "Run Hills",       Pch :=  1 ]
-metrics[ Workout_Code == "Run Track",       Pch :=  6 ]
-metrics[ Workout_Code == "Run Trail",       Pch :=  8 ]
-metrics[ Workout_Code == "Run Race",        Pch :=  9 ]
-metrics[ Workout_Code == "Walk",            Pch :=  0 ]
-metrics[ Workout_Code == "Walk Hike Heavy", Pch :=  7 ]
-metrics[ Workout_Code == "Walk Hike",       Pch := 12 ]
-
-table(metrics$Pch)
-
-grep("Run|Walk", unique(metrics$Workout_Code), ignore.case = T , value = T)
-
-grep("Bike", unique(metrics$Workout_Code), ignore.case = T , value = T)
-
-## create some new metrics
-metrics$Intensity_TRIMP       <- metrics$TRIMP_Points       / metrics$Duration.x
-metrics$Intensity_TRIMP_Zonal <- metrics$TRIMP_Zonal_Points / metrics$Duration.x
-metrics$Intensity_EPOC        <- metrics$EPOC               / metrics$Duration.x
-metrics$Intensity_Calories    <- metrics$Calories           / metrics$Duration.x
-
-
-## TODO
-## Hear rate at rest
-## MAx heart rate
-grep("heart|hr" ,names(metrics), value = T, ignore.case = T)
-
-
-
-
-for (an in names(metrics)) {
-    uni <- unique(metrics[[an]])
-    uni <- uni[!is.na(uni)]
-    if (length(uni) == 1) {
-        metrics[[an]] <- NULL
-    }
-}
-
-
-for (an in names(metrics)) {
-    uni <- unique(metrics[[an]])
-    uni <- uni[!is.na(uni)]
-    if (length(uni) < 3 ) {
-        cat(an,"\n")
-        cat(uni,"\n\n")
-    }
-}
-
-
-
-
-
 
 
 ####  Export for others  ####
-write_RDS(metrics, file = export, clean = TRUE)
 
 
 # #### compare all columns ####
@@ -616,44 +521,7 @@ if (!interactive()) {
 }
 
 
-## investigate load metrics
-par(mar = c(4,4,1,1))
 
-plot(metrics$EPOC, metrics$TRIMP_Points,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,
-     xlab = "EPOC", ylab = "TRIMP")
-
-plot(metrics$EPOC, metrics$TRIMP_Zonal_Points,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,
-     xlab = "EPOC", ylab = "TRIMP Zonal")
-
-plot(metrics$TRIMP_Points, metrics$TRIMP_Zonal_Points,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,
-     xlab = "TRIMP", ylab = "TRIMP Zonal")
-
-plot(metrics$Calories, metrics$TRIMP_Points,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-plot(metrics$Calories, metrics$TRIMP_Zonal_Points,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-plot(metrics$Calories, metrics$EPOC,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-
-plot(metrics$Duration.x, metrics$TRIMP_Points/metrics$EPOC,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-
-plot(metrics$Distance.x, metrics$TRIMP_Points/metrics$EPOC,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-
-plot(metrics$Distance.x, metrics$Distance.y,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-plot(metrics$Duration.x, metrics$Time_Recording,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-plot(metrics$Duration.x, metrics$Time_Carrying,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-plot(metrics$Duration.x, metrics$Time_Moving,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-plot(metrics$Duration.x, metrics$Time.Moving,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
 
 
 
@@ -696,30 +564,6 @@ plot(metrics$EPOC, metrics$TRIMP_Zonal_Points,
 plot(metrics$TRIMP_Points, metrics$TRIMP_Zonal_Points,
      col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,
      xlab = "TRIMP", ylab = "TRIMP Zonal")
-
-plot(metrics$Calories, metrics$TRIMP_Points,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-plot(metrics$Calories, metrics$TRIMP_Zonal_Points,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-plot(metrics$Calories, metrics$EPOC,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-
-plot(metrics$Duration.x, metrics$TRIMP_Points/metrics$EPOC,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-
-plot(metrics$Distance.x, metrics$TRIMP_Points/metrics$EPOC,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-
-plot(metrics$Distance.x, metrics$Distance.y,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-plot(metrics$Duration.x, metrics$Time_Recording,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-plot(metrics$Duration.x, metrics$Time_Carrying,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-plot(metrics$Duration.x, metrics$Time_Moving,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
-plot(metrics$Duration.x, metrics$Time.Moving,
-     col  = metrics$Col, pch  = metrics$Pch, cex  = 0.6,)
 
 
 
