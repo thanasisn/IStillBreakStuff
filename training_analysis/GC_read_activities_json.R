@@ -46,6 +46,8 @@ file       <- list.files( path       = gcfolder,
 filesmtime <- file.mtime(file)
 check      <- data.table(file, filesmtime)
 
+file <- sort(file, decreasing = T)
+
 
 # ## start with read data
 # if (file.exists(storagefl)) {
@@ -66,17 +68,52 @@ check      <- data.table(file, filesmtime)
 # files <- sample(file,30)
 
 
-jride <- fromJSON(files[1])
-jride <- jride$RIDE
 
-ride  <- read_json_arrow(files[1])
-ride  <- ride$RIDE
+## misses XDATA
+# ride  <- read_json_arrow(files[1])
+# ride  <- ride$RIDE
+
+af <- file[1]
+
+af <- "/home/athan/TRAIN/GoldenCheetah/Athan/activities//2024_05_09_08_51_57.json"
+af <- "/home/athan/TRAIN/GoldenCheetah/Athan/activities///2022_11_28_12_37_41.json"
+
+jride <- fromJSON(af)$RIDE
 
 
-ride$RIDE$STARTTIME
-ride$RIDE$OVERRIDES[[1]]
-ride$RIDE$TAGS
-ride$RIDE$SAMPLES
+jride$STARTTIME
+jride$OVERRIDES[[1]]
+jride$TAGS
+jride$SAMPLES
+jride$XDATA
+
+dfs <- names(jride)
+
+
+for (af in dfs) {
+  cat(af, length(jride[[af]]), "\n")
+  cat(af, class(jride[[af]]), "\n")
+}
+
+act_DT <- data.table()
+
+act_ME <- data.table(
+  ## get general meta data
+  file       = af,
+  filemtime  = file.mtime(af),
+  time       = as.POSIXct(ride$STARTTIME),
+  parsed     = Sys.time(),
+  RECINTSECS = ride$RECINTSECS,
+  DEVICETYPE = ride$DEVICETYPE,
+  IDENTIFIER = ride$IDENTIFIER,
+  ## get metrics
+  data.frame(ride$TAGS)
+)
+
+act_ME$Month   <- NULL
+act_ME$Weekday <- NULL
+act_ME$Year    <- NULL
+
 
 stop()
 ####  Parse chosen files  ####
@@ -86,44 +123,6 @@ if (length(files) != 0) {
     for (af in files) {
         ## get file
 
-        ## filterout bad json character
-        # ridejson <- fromJSON(
-        #     paste(
-        #         system(
-        #             paste("sed '1 s/^\xef\xbb\xbf//'", af),
-        #             ignore.stdout = F, intern = T ),
-        #         collapse = "\n")
-        # )
-
-        ride <- fromJSON(af)
-        ride <- ride$RIDE
-        cat(paste(basename(af)),"\n")
-
-        ## check data structure
-        stopifnot(
-            all(names(ride) %in%
-                    c("STARTTIME",
-                      "OVERRIDES",
-                      "RECINTSECS",
-                      "DEVICETYPE",
-                      "IDENTIFIER",
-                      "TAGS",
-                      "SAMPLES",
-                      "XDATA",
-                      "INTERVALS"))
-        )
-
-        temp <- data.frame(
-            ## get general meta data
-            file       = af,
-            filemtime  = file.mtime(af),
-            time       = as.POSIXct(ride$STARTTIME),
-            RECINTSECS = ride$RECINTSECS,
-            DEVICETYPE = ride$DEVICETYPE,
-            IDENTIFIER = ride$IDENTIFIER,
-            ## get metrics
-            data.frame(ride$TAGS)
-        )
 
         ## read manual edited values
         if (!is.null( ride$OVERRIDES )) {
