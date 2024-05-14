@@ -63,10 +63,15 @@ check      <- data.table(file, filesmtime)
 #
 # files <- sort(files,decreasing = T)
 
-files <- sample(file,30)
+# files <- sample(file,30)
+
 
 jride <- fromJSON(files[1])
+jride <- jride$RIDE
+
 ride  <- read_json_arrow(files[1])
+ride  <- ride$RIDE
+
 
 ride$RIDE$STARTTIME
 ride$RIDE$OVERRIDES[[1]]
