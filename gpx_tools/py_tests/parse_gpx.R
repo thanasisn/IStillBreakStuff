@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Parse gpx file to datavase"
+#' title:         "Parse gpx file to database"
 #' author:
 #'   - Natsis Athanasios^[natsisphysicist@gmail.com]
 #'
@@ -39,12 +39,13 @@
 
 #+ echo=F, include=T
 
+#### Parse gpx file to database"
+
 ## __ Document options  --------------------------------------------------------
 
 #+ echo=FALSE, include=TRUE
 knitr::opts_chunk$set(comment    = ""       )
 knitr::opts_chunk$set(dev        = c("pdf")) ## expected option
-# knitr::opts_chunk$set(dev        = "png"    )       ## for too much data
 knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
 knitr::opts_chunk$set(cache      =  FALSE   )  ## !! breaks calculations
@@ -71,11 +72,7 @@ library(trip,       quietly = TRUE, warn.conflicts = FALSE)
 library(filelock,   quietly = TRUE, warn.conflicts = FALSE)
 
 
-#'
-#' https://msmith.de/FITfileR/articles/FITfileR.html
-#'
-#' Have to run it manually for the first time to init the DB
-#'
+
 
 DATASET    <- "/home/athan/DATA/Other/Track_points"
 BATCH      <- 50
