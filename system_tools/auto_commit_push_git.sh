@@ -123,6 +123,7 @@ folders=(
 	"$HOME/BBand_LAP"
 	"$HOME/CM_21_GLB/"
 	"$HOME/CODE/nixos"
+	"$HOME/CODE/training_location_analysis"
 	"$HOME/CS_id/"
 	"$HOME/MANUSCRIPTS/01_2022_sdr_trends"
 	"$HOME/MANUSCRIPTS/02_enhancement"
