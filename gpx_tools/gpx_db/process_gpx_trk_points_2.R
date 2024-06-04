@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 #### Process track points data
-## Filter, aggregate, analyze points and tracks
+## Filter, aggregate, analyse points and tracks
 ## Find possible bad or duplicate data
 ## Create reports
 
@@ -9,11 +9,14 @@
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic = Sys.time()
-Script.Name = funr::sys.script()
-if(!interactive())pdf(file=sub("\\.R$",".pdf",Script.Name),width = 14)
-sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
+tic <- Sys.time()
+Script.Name <- "~/CODE/gpx_tools/gpx_db/process_gpx_trk_points_2.R"
 
+if (!interactive()) {
+  dir.create("../runtime/", showWarnings = F, recursive = T)
+  pdf( file = paste0("../runtime/", basename(sub("\\.R$",".pdf", Script.Name))))
+  sink(file = paste0("../runtime/", basename(sub("\\.R$",".out", Script.Name))),split=TRUE)
+}
 
 
 library(data.table)
@@ -49,9 +52,9 @@ DT2 <- DT2[ !is.na(time), ]
 
 ## find Google data we should include due to missing data
 setorder(DT2, time )
-setorder(DT,  time )
+setorder(DT,  time)
 near    <- myRtools::nearest(as.numeric( DT2$time),
-                             as.numeric( DT$time ) )
+                             as.numeric( DT$time ))
 timdiff <- abs( as.numeric(DT[ near, ]$time - DT2$time))
 DT2     <- DT2[ timdiff >= google_threshold ]
 

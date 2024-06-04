@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 #### Process track points data
-## Filter, aggregate, analyze points and tracks
+## Filter, aggregate, analyse points and tracks
 ## Find possible bad or duplicate data
 ## Create reports
 
@@ -9,11 +9,14 @@
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic = Sys.time()
-Script.Name = funr::sys.script()
-if(!interactive())pdf(file=sub("\\.R$",".pdf",Script.Name),width = 14)
-sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
+tic <- Sys.time()
+Script.Name <- "~/CODE/gpx_tools/gpx_db/process_gpx_trk_points.R"
 
+if (!interactive()) {
+  dir.create("../runtime/", showWarnings = F, recursive = T)
+  pdf( file = paste0("../runtime/", basename(sub("\\.R$",".pdf", Script.Name))))
+  sink(file = paste0("../runtime/", basename(sub("\\.R$",".out", Script.Name))),split=TRUE)
+}
 
 
 library(data.table)
@@ -24,7 +27,6 @@ source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 
 ## google use data from google if no other data within n seconds
 google_threshold <- 6 * 60
-
 
 ## TODO find files in bb 23.67452854,39.90723739,23.72368429,39.94759822
 ## 22.94751066,40.59749471,23.02471994,40.65515229
@@ -50,9 +52,9 @@ DT2 <- DT2[ !is.na(time), ]
 
 ## find Google data we should include due to missing data
 setorder(DT2, time )
-setorder(DT, time  )
-near <- myRtools::nearest( as.numeric( DT2$time),
-                           as.numeric( DT$time ) )
+setorder(DT,  time)
+near    <- myRtools::nearest(as.numeric( DT2$time),
+                             as.numeric( DT$time ))
 timdiff <- abs( as.numeric(DT[ near, ]$time - DT2$time))
 DT2     <- DT2[ timdiff >= google_threshold ]
 
@@ -84,7 +86,6 @@ if ( nrow(DT[ is.na(X) |
     cat("\nMissing coordinates!!\n")
     cat("Add some code to fix!!\n")
 }
-
 
 ## FIXME this is pointless here!!
 if ( nrow( DT[ is.na(time)] ) > 0 ) {
@@ -177,7 +178,7 @@ gdata::write.fwf(dup_points[,.(Set, filename, DupPnts, TotPnts, Cover, STime, ET
 
 
 
-####  Filter data by speed  #####
+##  Filter data by speed  ------------------------------------------------------
 
 ##TODO
 hist(DT$timediff)
@@ -209,7 +210,7 @@ DT[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(timedi
 
 
 
-#### Bin points in grids ####
+##  Bin points in grids  -------------------------------------------------------
 
 ## no need for all data for griding
 DT[, kph      := NULL]
