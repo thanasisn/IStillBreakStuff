@@ -81,6 +81,8 @@ fi
 
 numlockx on
 
+kill_run zeitgeist-daemon 
+
 
 # killall -s 9 evolution
 # nohup $HOME/BASH/deamonize.sh "evolution -c calendar --name Evolution_i3" &
