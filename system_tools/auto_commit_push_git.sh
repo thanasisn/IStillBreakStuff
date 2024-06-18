@@ -150,42 +150,43 @@ for i in "${folders[@]}"; do
 	(
 		## add files we care about
 		find . -type f \( -iname '*.bas' \
-			-o -iname '*.Rmd' \
-			-o -iname '*.bas' \
-			-o -iname '*.bib' \
-			-o -iname '*.c' \
-			-o -iname '*.conf' \
-			-o -iname '*.cpp' \
-			-o -iname '*.cs' \
-			-o -iname '*.css' \
-			-o -iname '*.dia' \
-			-o -iname '*.dot' \
-			-o -iname '*.ex' \
-			-o -iname '*.f90' \
-			-o -iname '*.frm' \
-			-o -iname '*.gnu' \
-			-o -iname '*.gp' \
-			-o -iname '*.h' \
-			-o -iname '*.jl' \
-			-o -iname '*.list' \
-			-o -iname '*.lua' \
+			-o -iname '*.Rmd'      \
+			-o -iname '*.bas'      \
+			-o -iname '*.bib'      \
+			-o -iname '*.c'        \
+			-o -iname '*.conf'     \
+			-o -iname '*.cpp'      \
+			-o -iname '*.cs'       \
+			-o -iname '*.css'      \
+			-o -iname '*.dia'      \
+			-o -iname '*.dot'      \
+			-o -iname '*.ex'       \
+			-o -iname '*.f90'      \
+			-o -iname '*.frm'      \
+			-o -iname '*.gnu'      \
+			-o -iname '*.gp'       \
+			-o -iname '*.h'        \
+			-o -iname '*.jl'       \
+			-o -iname '*.list'     \
+			-o -iname '*.lua'      \
 			-o -iname '*.makefile' \
-			-o -iname '*.md' \
-			-o -iname '*.nix' \
-			-o -iname '*.par' \
-			-o -iname '*.pbs' \
-			-o -iname '*.py' \
-			-o -iname '*.qgs' \
-			-o -iname '*.qmd' \
-			-o -iname '*.r' \
-			-o -iname '*.rmd' \
-			-o -iname '*.sh' \
-			-o -iname '*.tex' \
-			-o -iname '*.txt' \
-			-o -iname '*.yaml' \
-			-o -iname '*.yml' \
+			-o -iname '*.md'       \
+			-o -iname '*.nix'      \
+			-o -iname '*.par'      \
+			-o -iname '*.pbs'      \
+			-o -iname '*.py'       \
+			-o -iname '*.qgs'      \
+			-o -iname '*.qmd'      \
+			-o -iname '*.r'        \
+			-o -iname '*.rmd'      \
+			-o -iname '*.sh'       \
+			-o -iname '*.tex'      \
+			-o -iname '*.txt'      \
+			-o -iname '*.vim'      \
+			-o -iname '*.yaml'     \
+			-o -iname '*.yml'      \
 			-o -iname 'flake.lock' \
-			-o -iname 'makefile' \) -print0 |
+			-o -iname 'makefile'   \) -print0 |
 			xargs -t -0 git add
 		## commit and push
 		git commit -uno -a -m "Commit $(date +'%F %R')"
@@ -236,42 +237,42 @@ for i in "${folders[@]}"; do
 		rm -f "${i}/.git/index.lock"
 		## add files we care about
 		find . -type f \( -iname '*.bas' \
-			-o -iname '*.Rmd' \
-			-o -iname '*.bas' \
-			-o -iname '*.bib' \
-			-o -iname '*.c' \
-			-o -iname '*.conf' \
-			-o -iname '*.cpp' \
-			-o -iname '*.cs' \
-			-o -iname '*.css' \
-			-o -iname '*.dia' \
-			-o -iname '*.dot' \
-			-o -iname '*.ex' \
-			-o -iname '*.f90' \
-			-o -iname '*.frm' \
-			-o -iname '*.gnu' \
-			-o -iname '*.gp' \
-			-o -iname '*.h' \
-			-o -iname '*.jl' \
-			-o -iname '*.list' \
-			-o -iname '*.lua' \
+			-o -iname '*.Rmd'      \
+			-o -iname '*.bas'      \
+			-o -iname '*.bib'      \
+			-o -iname '*.c'        \
+			-o -iname '*.conf'     \
+			-o -iname '*.cpp'      \
+			-o -iname '*.cs'       \
+			-o -iname '*.css'      \
+			-o -iname '*.dia'      \
+			-o -iname '*.dot'      \
+			-o -iname '*.ex'       \
+			-o -iname '*.f90'      \
+			-o -iname '*.frm'      \
+			-o -iname '*.gnu'      \
+			-o -iname '*.gp'       \
+			-o -iname '*.h'        \
+			-o -iname '*.jl'       \
+			-o -iname '*.list'     \
+			-o -iname '*.lua'      \
 			-o -iname '*.makefile' \
-			-o -iname '*.md' \
-			-o -iname '*.nix' \
-			-o -iname '*.par' \
-			-o -iname '*.pbs' \
-			-o -iname '*.py' \
-			-o -iname '*.qgs' \
-			-o -iname '*.qmd' \
-			-o -iname '*.r' \
-			-o -iname '*.rmd' \
-			-o -iname '*.sh' \
-			-o -iname '*.tex' \
-			-o -iname '*.txt' \
-			-o -iname '*.yaml' \
-			-o -iname '*.yml' \
+			-o -iname '*.md'       \
+			-o -iname '*.nix'      \
+			-o -iname '*.par'      \
+			-o -iname '*.pbs'      \
+			-o -iname '*.py'       \
+			-o -iname '*.qgs'      \
+			-o -iname '*.qmd'      \
+			-o -iname '*.r'        \
+			-o -iname '*.rmd'      \
+			-o -iname '*.sh'       \
+			-o -iname '*.tex'      \
+			-o -iname '*.txt'      \
+			-o -iname '*.yaml'     \
+			-o -iname '*.yml'      \
 			-o -iname 'flake.lock' \
-			-o -iname 'makefile' \) -print0 |
+			-o -iname 'makefile'   \) -print0 |
 			xargs -t -0 git add
 		## commit to local repo
 		git commit -uno -a -m "Commit $(date +'%F %R')"
