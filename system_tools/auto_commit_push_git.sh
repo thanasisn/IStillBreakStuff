@@ -197,7 +197,7 @@ for i in "${folders[@]}"; do
 done
 
 ## ADD and COMMIT only for LOCAL repos ########################################
-#
+
 ## use full paths
 folders=(
 	"$HOME/.dot_files_private"
@@ -205,13 +205,13 @@ folders=(
 	"$HOME/BASH/"
 	"$HOME/DATA_ARC/10_TODO/JOURNAL"
 	"$HOME/Ecotime_machine/Scripts/"
-	"$HOME/Formal/CV"
 	"$HOME/Improved_Aerosols_O3/"
 	"$HOME/LibRadTranG"
 	"$HOME/LifeAsti"
 	"$HOME/MISC/Redmi7_internal/documents"
 	"$HOME/NOTES"
 	"$HOME/NOTES/01_PROJECTS/Aerosols"
+  "$HOME/NOTES/05_CV/"
 	"$HOME/NOTES/08_JOURNAL"
 	"$HOME/NOTES/09_JOURNAL_WORK"
 	"$HOME/NOTES/12_WRITINGS/po"
