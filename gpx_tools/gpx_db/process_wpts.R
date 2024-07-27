@@ -16,6 +16,7 @@ sink(file = sub("\\.R$", ".out", Script.Name), split = TRUE)
 library(sf)
 library(data.table)
 library(dplyr)
+library(stringr)
 
 ## read vars
 source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
@@ -111,7 +112,7 @@ wecare <- c("ele",
 ffff <- readRDS(wpt_seed3)
 
 
-####  Get all waypoints from files  ####
+####  Get all waypoints from files  ---------------------------------
 if (length(gpxlist) > 0) {
   update <- TRUE
   for (af in gpxlist) {
@@ -391,24 +392,31 @@ gather_wpt$file  <- NULL
 gather_wpt$mtime <- NULL
 
 ## characterize missing regions
-gather_wpt$Region[ is.na( gather_wpt$Region ) ] <- "Other"
+gather_wpt$Region[is.na(gather_wpt$Region)] <- "Other"
 
 ## Clean waypoints names  ------------------------------------------------------
-gather_wpt <- gather_wpt[grep("[[:space:]]*Follow the.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Follow it.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Arrive at.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Descending.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Borderline.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep(".*go straight.*",                              gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep(".*χαιντου από μαύρη.*",                        gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep(".*Following a path.*",                         gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Arrive at.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep("[[:space:]]*Ascending.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Straight .*",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Go[[:space:]]*right.*",            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Borderline.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Borderline.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Descending.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Monopati erev.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep("[[:space:]]*Dromos[0-9]*[[:space:]]*",         gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Trail Head[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Entry path.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Follow it.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Follow the.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep("[[:space:]]*GRA[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep("[[:space:]]*GRE[0-9]*[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Go[[:space:]]*right.*",            gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep("[[:space:]]*Head [a-z]+",                      gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep("[[:space:]]*PIN[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Parkplatz.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Path entry.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Straight .*",                      gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Trail Head[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep("[[:space:]]*Turn .*",                          gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep("[[:space:]]*WPT[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep("[[:space:]]*XDRXRD.*[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
@@ -489,7 +497,9 @@ gather_wpt <- gather_wpt[grep("hotmail.com",                                  ga
 gather_wpt$name <- gsub("Aussichtspunkt", "Viewpoint", gather_wpt$name)
 
 
-## TODO capitalizee
+## TODO capitalize for consistency don't use for ROUT!!
+gather_wpt$names <- str_to_title(gather_wpt$name)
+
 
 gather_wpt <- unique(gather_wpt)
 
@@ -509,11 +519,11 @@ drop_files <- c(
 ##  Export GPX waypoints by region  --------------------------------------------
 for (ar in unique(gather_wpt$Region)) {
 
-  temp <- gather_wpt[gather_wpt$Region == ar ,]
+  temp <- gather_wpt[gather_wpt$Region == ar, ]
   temp$Region <- NULL
   temp <- temp[order(temp$name),]
 
-  cat(paste("export",nrow(temp),"wpt",ar,"\n"))
+  cat(paste("export", nrow(temp), "wpt", ar, "\n"))
 
   ## ignore some files
   for (ast in drop_files) {
@@ -550,11 +560,16 @@ write_sf(gather_wpt, '~/LOGs/waypoints/WPT_ALL.gpx',
 
 
 
-## compute distance matrix filtered ####
+##  Compute distance matrix filtered  ------------------------------------------
 distm <- raster::pointDistance(p1 = gather_wpt, lonlat = T, allpairs = T)
 
 ## find close points
 dd <- which(distm < close_flag, arr.ind = T)
+
+## TODO fix table efficiency
+# lower.tri()
+
+
 ## remove diagonal
 dd <- dd[dd[,1] != dd[,2], ]
 cat(paste( nrow(dd), "point couples under", close_flag, "m distance" ),"\n")
@@ -567,7 +582,7 @@ dd <- unique(dd)
 cat(paste( nrow(dd), "point couples under", close_flag, "m distance" ), "\n")
 
 
-## indentify suspects
+## identify suspects
 suspects <- data.table(
   name_A = gather_wpt$name    [dd[,1]],
   geom_A = gather_wpt$geometry[dd[,1]],
@@ -596,7 +611,6 @@ myRtools::write_dat(object = filescnt,
                     file   = "~/GISdata/Layers/Suspect_point_to_clean_filtered.csv",
                     clean  = TRUE)
 
-
 wecare <- grep("geom", names(suspects),invert = T,value = T )
 wecare <- c("Dist", "name_A", "name_B", "file_A", "file_B")
 
@@ -606,7 +620,7 @@ myRtools::write_dat(object = suspects[,..wecare],
                     clean  = TRUE)
 
 
-## export all points for gps devices
+## export all points for GPS devices
 gather_wpt$Region <- NULL
 gather_wpt$cmt    <- NA
 gather_wpt$desc   <- NA
