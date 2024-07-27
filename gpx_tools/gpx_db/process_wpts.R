@@ -45,33 +45,33 @@ file.remove(fl_waypoints)
 
 ## check if we need to update data ####
 if (file.exists(fl_waypoints)) {
-    ## load old data
-    gather_wpt <- readRDS(fl_waypoints)
-    gather_wpt <- unique(gather_wpt)
+  ## load old data
+  gather_wpt <- readRDS(fl_waypoints)
+  gather_wpt <- unique(gather_wpt)
 
-    ## remove all data from missing files
-    gather_wpt <- gather_wpt[ file.exists(gather_wpt$file), ]
+  ## remove all data from missing files
+  gather_wpt <- gather_wpt[ file.exists(gather_wpt$file), ]
 
-    ## list parsed files
-    dblist <- gather_wpt[, c("file","mtime") ]
-    dblist$geometry <- NULL
-    dblist <- unique( dblist )
+  ## list parsed files
+  dblist <- gather_wpt[, c("file","mtime") ]
+  dblist$geometry <- NULL
+  dblist <- unique( dblist )
 
-    ## list all files
-    fllist <- data.frame(file = gpxlist,
-                         mtime = file.mtime(gpxlist),
-                         stringsAsFactors = F)
+  ## list all files
+  fllist <- data.frame(file = gpxlist,
+                       mtime = file.mtime(gpxlist),
+                       stringsAsFactors = F)
 
-    ## files to do
-    ddd <- anti_join( fllist, dblist )
+  ## files to do
+  ddd <- anti_join( fllist, dblist )
 
-    ## remove data from changed files
-    gather_wpt <- gather_wpt[ ! gather_wpt$file %in% ddd$file, ]
+  ## remove data from changed files
+  gather_wpt <- gather_wpt[ ! gather_wpt$file %in% ddd$file, ]
 
-    gpxlist <- ddd$file
+  gpxlist <- ddd$file
 
 } else {
-    gather_wpt <- readRDS(wpt_seed)
+  gather_wpt <- readRDS(wpt_seed)
 }
 
 
@@ -113,143 +113,143 @@ ffff <- readRDS(wpt_seed3)
 
 ####  Get all waypoints from files  ####
 if (length(gpxlist) > 0) {
-    update <- TRUE
-    for (af in gpxlist) {
-        if (!file.exists(af)) { next() }
-        cat(paste(af,"\n"))
+  update <- TRUE
+  for (af in gpxlist) {
+    if (!file.exists(af)) { next() }
+    cat(paste(af,"\n"))
 
-        ####  get waypoints  ####
-        gpx     <- read_sf(af, layer = "waypoints")
-        if (nrow(gpx) > 0) {
+    ####  get waypoints  ####
+    gpx     <- read_sf(af, layer = "waypoints")
+    if (nrow(gpx) > 0) {
 
-            wpt        <- st_transform(gpx, EPSG) # apply transformation to points sf
+      wpt        <- st_transform(gpx, EPSG) # apply transformation to points sf
 
-            ## get waypoints for the region
-            wpt$file   <- af
-            wpt$Region <- NA
-            wpt$mtime  <- file.mtime(af)
+      ## get waypoints for the region
+      wpt$file   <- af
+      wpt$Region <- NA
+      wpt$mtime  <- file.mtime(af)
 
-            gather_wpt <- rbind(gather_wpt,
-                                wpt[,wecare])
-            ## seed
-            # saveRDS(wpt[,wecare] ,wpt_seed )
-            # cat(paste(names(selc), collapse = '", "'))
+      gather_wpt <- rbind(gather_wpt,
+                          wpt[,wecare])
+      ## seed
+      # saveRDS(wpt[,wecare] ,wpt_seed )
+      # cat(paste(names(selc), collapse = '", "'))
 
-        } else {
-            ## keep track of empty files
-            ff         <- ffff
-            ff$file    <- af
-            ff$Region  <- NA
-            ff$mtime   <- file.mtime(af)
-            gather_wpt <- rbind(gather_wpt,  ff)
-        }
+    } else {
+      ## keep track of empty files
+      ff         <- ffff
+      ff$file    <- af
+      ff$Region  <- NA
+      ff$mtime   <- file.mtime(af)
+      gather_wpt <- rbind(gather_wpt,  ff)
     }
+  }
 }
 
 
 ## Add drinking water from OSM ####
 if (DRINKING_WATER) {
-    ## load drinking water data
-    dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs_Gr.gpx"
-    dw        <- read_sf(dw_fl, layer = "waypoints")
-    ## clean data
-    dw$desc   <- gsub("\n", " ", dw$desc)
-    dw$name   <- gsub("\n", " ", dw$name)
-    ## set a name for display in case empty
-    dw$name[is.na(dw$name)] <- "Nero"
-    dw$link <- NA
+  ## load drinking water data
+  dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs_Gr.gpx"
+  dw        <- read_sf(dw_fl, layer = "waypoints")
+  ## clean data
+  dw$desc   <- gsub("\n", " ", dw$desc)
+  dw$name   <- gsub("\n", " ", dw$name)
+  ## set a name for display in case empty
+  dw$name[is.na(dw$name)] <- "Nero"
+  dw$link <- NA
 
-    ## overpass web interface
-    ## parse drinking water
-    # indx <- grep("amenity=drinking_water",dw$desc)
-    # dw$desc[indx]   <- gsub("amenity=drinking_water","βρύση OSM",dw$desc[indx])
-    # dw$name[indx]   <- sub("node/[0-9]+","vris",dw$name[indx])
-    ## parse springs
-    # indx <- grep("natural=spring",dw$desc)
-    # dw$desc[indx]   <- gsub("natural=spring","Πηγή OSM",dw$desc[indx])
-    # dw$name[indx]   <- sub("node/[0-9]+","pigi",dw$name[indx])
+  ## overpass web interface
+  ## parse drinking water
+  # indx <- grep("amenity=drinking_water",dw$desc)
+  # dw$desc[indx]   <- gsub("amenity=drinking_water","βρύση OSM",dw$desc[indx])
+  # dw$name[indx]   <- sub("node/[0-9]+","vris",dw$name[indx])
+  ## parse springs
+  # indx <- grep("natural=spring",dw$desc)
+  # dw$desc[indx]   <- gsub("natural=spring","Πηγή OSM",dw$desc[indx])
+  # dw$name[indx]   <- sub("node/[0-9]+","pigi",dw$name[indx])
 
-    # dw$name   <- paste("OSM",dw$name)
-    dw$file   <- dw_fl
-    dw$Region <- NA
-    dw$mtime  <- file.mtime(dw_fl)
-    dw        <- dw[wecare]
+  # dw$name   <- paste("OSM",dw$name)
+  dw$file   <- dw_fl
+  dw$Region <- NA
+  dw$mtime  <- file.mtime(dw_fl)
+  dw        <- dw[wecare]
 
-    ## reproject to meters
-    dwm <- st_transform(dw, EPSG) # apply transformation to points sf
+  ## reproject to meters
+  dwm <- st_transform(dw, EPSG) # apply transformation to points sf
 
-    # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T)
-    # distmwt <- round(distmwt, digits = 3)
+  # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T)
+  # distmwt <- round(distmwt, digits = 3)
 
-    ## find close points
-    # dd <- which(distmwt < 5, arr.ind = T)
+  ## find close points
+  # dd <- which(distmwt < 5, arr.ind = T)
 
-    gather_wpt <- rbind( gather_wpt, dwm)
-    rm(dw, dwm)
+  gather_wpt <- rbind( gather_wpt, dwm)
+  rm(dw, dwm)
 }
 
 
 ## Add waterfalls from OSM ####
 if (WATERFALLS) {
 
-    ## load water falls data
-    dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Waterfalls_Gr.gpx"
-    dw        <- read_sf(dw_fl, layer = "waypoints")
-    ## clean data
-    dw$desc   <- gsub("\n"," ",dw$desc)
+  ## load water falls data
+  dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Waterfalls_Gr.gpx"
+  dw        <- read_sf(dw_fl, layer = "waypoints")
+  ## clean data
+  dw$desc   <- gsub("\n"," ",dw$desc)
 
-    ## set a name for display in case empty
-    dw$name[is.na(dw$name)] <- "Waterfall"
+  ## set a name for display in case empty
+  dw$name[is.na(dw$name)] <- "Waterfall"
 
-    # dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
-    # dw$name   <- sub("node/[0-9]+","falls",dw$name)
+  # dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
+  # dw$name   <- sub("node/[0-9]+","falls",dw$name)
 
-    dw$file   <- dw_fl
-    dw$Region <- NA
-    dw$mtime  <- file.mtime(dw_fl)
-    dw        <- dw[wecare]
+  dw$file   <- dw_fl
+  dw$Region <- NA
+  dw$mtime  <- file.mtime(dw_fl)
+  dw        <- dw[wecare]
 
-    ## reproject to meters
-    dwm <- st_transform(dw, EPSG) # apply transformation to points sf
+  ## reproject to meters
+  dwm <- st_transform(dw, EPSG) # apply transformation to points sf
 
-    # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
-    ## find close points
-    # dd <- which(distmwt < 5, arr.ind = T)
+  # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
+  ## find close points
+  # dd <- which(distmwt < 5, arr.ind = T)
 
-    gather_wpt <- rbind( gather_wpt, dwm )
-    rm(dw, dwm)
+  gather_wpt <- rbind( gather_wpt, dwm )
+  rm(dw, dwm)
 }
 
 
 ## Add caves from OSM ####
 if (CAVES) {
 
-    ## load water falls data
-    dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Caves_Gr.gpx"
-    dw        <- read_sf(dw_fl, layer = "waypoints")
-    ## clean data
-    dw$desc   <- gsub("\n"," ",dw$desc)
+  ## load water falls data
+  dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Caves_Gr.gpx"
+  dw        <- read_sf(dw_fl, layer = "waypoints")
+  ## clean data
+  dw$desc   <- gsub("\n"," ",dw$desc)
 
-    ## set a name for display in case empty
-    dw$name[is.na(dw$name)] <- "Cave"
+  ## set a name for display in case empty
+  dw$name[is.na(dw$name)] <- "Cave"
 
-    # dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
-    # dw$name   <- sub("node/[0-9]+","falls",dw$name)
+  # dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
+  # dw$name   <- sub("node/[0-9]+","falls",dw$name)
 
-    dw$file   <- dw_fl
-    dw$Region <- NA
-    dw$mtime  <- file.mtime(dw_fl)
-    dw        <- dw[wecare]
+  dw$file   <- dw_fl
+  dw$Region <- NA
+  dw$mtime  <- file.mtime(dw_fl)
+  dw        <- dw[wecare]
 
-    ## reproject to meters
-    dwm <- st_transform(dw, EPSG) # apply transformation to points sf
+  ## reproject to meters
+  dwm <- st_transform(dw, EPSG) # apply transformation to points sf
 
-    # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
-    ## find close points
-    # dd <- which(distmwt < 5, arr.ind = T)
+  # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
+  ## find close points
+  # dd <- which(distmwt < 5, arr.ind = T)
 
-    gather_wpt <- rbind( gather_wpt, dwm )
-    rm(dw,dwm)
+  gather_wpt <- rbind( gather_wpt, dwm )
+  rm(dw,dwm)
 }
 gather_wpt <- unique(gather_wpt)
 
@@ -257,18 +257,18 @@ gather_wpt <- unique(gather_wpt)
 ## characterize all waypoints within each polygon
 for (ii in 1:length(regions$Name)) {
 
-    cat(paste("Characterize", regions$Name[ii],"\n"))
-    vec <- apply(st_intersects(regions$geometry[ii], gather_wpt$geometry, sparse = FALSE), 2,
-                 function(x) { x })
-    gather_wpt$Region[ vec ] <- regions$Name[ii]
+  cat(paste("Characterize", regions$Name[ii],"\n"))
+  vec <- apply(st_intersects(regions$geometry[ii], gather_wpt$geometry, sparse = FALSE), 2,
+               function(x) { x })
+  gather_wpt$Region[ vec ] <- regions$Name[ii]
 
 }
 table( gather_wpt$Region )
 
 ## store for all R
 if (update) {
-    gather_wpt <- unique(gather_wpt)
-    myRtools::write_RDS(gather_wpt, fl_waypoints)
+  gather_wpt <- unique(gather_wpt)
+  myRtools::write_RDS(gather_wpt, fl_waypoints)
 }
 
 ## remove dummy data for analysis ####
@@ -312,7 +312,7 @@ paste( nrow(dd), "point couples under", close_flag, "m distance")
 
 ## remove pairs 2,3 == 3,2
 for (i in 1:nrow(dd)) {
-    dd[i, ] = sort(dd[i, ])
+  dd[i, ] = sort(dd[i, ])
 }
 
 # pA <- gather_wpt[dd[,1],]
@@ -333,16 +333,16 @@ paste( nrow(dd), "point couples under", close_flag, "m distance" )
 
 ####
 suspects <- data.table(
-    name_A = gather_wpt$name    [dd[,1]],
-    geom_A = gather_wpt$geometry[dd[,1]],
-    file_A = gather_wpt$file    [dd[,1]],
-    name_B = gather_wpt$name    [dd[,2]],
-    geom_B = gather_wpt$geometry[dd[,2]],
-    file_B = gather_wpt$file    [dd[,2]],
-    time_A = gather_wpt$time    [dd[,1]],
-    time_B = gather_wpt$time    [dd[,2]],
-    elev_A = gather_wpt$ele     [dd[,1]],
-    elev_B = gather_wpt$ele     [dd[,2]]
+  name_A = gather_wpt$name    [dd[,1]],
+  geom_A = gather_wpt$geometry[dd[,1]],
+  file_A = gather_wpt$file    [dd[,1]],
+  name_B = gather_wpt$name    [dd[,2]],
+  geom_B = gather_wpt$geometry[dd[,2]],
+  file_B = gather_wpt$file    [dd[,2]],
+  time_A = gather_wpt$time    [dd[,1]],
+  time_B = gather_wpt$time    [dd[,2]],
+  elev_A = gather_wpt$ele     [dd[,1]],
+  elev_B = gather_wpt$ele     [dd[,2]]
 )
 suspects$Dist <- distm[ cbind(dd[,2],dd[,1]) ]
 suspects      <- suspects[order(suspects$Dist, decreasing = T) , ]
@@ -376,7 +376,7 @@ gdata::write.fwf(filescnt,
 
 
 
-####  Export filtered gpx for usage  ###########################################
+####  Export filtered GPX for usage  ###########################################
 
 ## deduplicate WPT
 gather_wpt <- unique(gather_wpt)
@@ -393,89 +393,103 @@ gather_wpt$mtime <- NULL
 ## characterize missing regions
 gather_wpt$Region[ is.na( gather_wpt$Region ) ] <- "Other"
 
-## Clean waypoints names
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Arrive at.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Dromos[0-9]*[[:space:]]*",         gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*GRA[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*GRE[0-9]*[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Head [a-z]+",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*PIN[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Turn .*",                          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*WPT[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*XDRXRD.*[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*[0-9]+![[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*[0-9]+R",                          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*[0-9]+[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*arxh",                             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*arxi[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*asf-xom[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*at roundab[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*aσφμον[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*dasmon[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*dexia[[:space:]]*",                gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*dias[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*end$",                             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*finish[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*foto[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*from[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*go left[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*hotmail.com",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*kato[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*keep .*",                          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*lap [0-9].*[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*life [0-9]+",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*monxom[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*null$",                            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*pagida *[0-9]+[[:space:]]*",       gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*pagida a[0-9]+[[:space:]]*",       gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*photo",                            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*photo[[:space:]]*",                gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*scat [0-9]+[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*scat$",                            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*skat [0-9]+[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*skat[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*start[[:space:]]*",                gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*strofi[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*summit[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*to[[:space:]]*",                   gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*tor *[0-9]*[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*via[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*xdr[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Αρκ [0-1]+[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Αρκ![[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Αρκ[[:space:]]*",                  gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Αρχή Μονοπατιού.*[[:space:]]*",    gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Γουρ!$",                           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Δείγ Ερθρλ",                       gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Δεξιά[[:space:]]*",                gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Διασταυρωση$",                     gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Διασταύρωση Junction[[:space:]]*", gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Διασταύρωση[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Κάτω δεξιά[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Κατω δεξιά[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Κατω δεξια[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Λυκ?",                             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Μονοπάτι[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*Μονοπατι[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*άσφαλτος[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*από εδώ[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*αριστερά[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*αριστερα[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*αρχή μονοπάτι[[:space:]]*",        gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*ασφμον[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*γου[[:space:]]*",                  gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*γουρ[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*διαδρομή[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*εδω[[:space:]]*",                  gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*εδώ[[:space:]]*",                  gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*κ[0-9]+[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*σκατ[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*τριχεσ[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*χωματoδρομος[[:space:]]*",         gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*χωματόδρομος[[:space:]]*",         gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("[[:space:]]*ως εδώ[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[ grep("hotmail.com",                                  gather_wpt$name, invert = T, ignore.case = T), ]
+## Clean waypoints names  ------------------------------------------------------
+gather_wpt <- gather_wpt[grep("[[:space:]]*Follow the.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Follow it.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Arrive at.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Descending.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Borderline.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep(".*go straight.*",                              gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Ascending.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Straight .*",                      gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Go[[:space:]]*right.*",            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Dromos[0-9]*[[:space:]]*",         gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Trail Head[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*GRA[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*GRE[0-9]*[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Head [a-z]+",                      gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*PIN[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Turn .*",                          gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*WPT[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*XDRXRD.*[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*[0-9]+![[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*[0-9]+R",                          gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*[0-9]+[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*arxh",                             gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*arxi[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*asf-xom[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*at roundab[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*aσφμον[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*dasmon[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*dexia[[:space:]]*",                gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*dias[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*end$",                             gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*finish[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*foto[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*from[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*go left[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*hotmail.com",                      gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*kato[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*keep .*",                          gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*lap [0-9].*[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*life [0-9]+",                      gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*monxom[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*null$",                            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*pagida *[0-9]+[[:space:]]*",       gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*pagida a[0-9]+[[:space:]]*",       gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*photo",                            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*photo[[:space:]]*",                gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*scat [0-9]+[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*scat$",                            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*skat [0-9]+[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*skat[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*start[[:space:]]*",                gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*strofi[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*summit[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*to[[:space:]]*",                   gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*tor *[0-9]*[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*via[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*xdr[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Αρκ [0-1]+[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Αρκ![[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Αρκ[[:space:]]*",                  gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Αρχή Μονοπατιού.*[[:space:]]*",    gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Γουρ!$",                           gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Δείγ Ερθρλ",                       gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Δεξιά[[:space:]]*",                gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Διασταυρωση$",                     gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Διασταύρωση Junction[[:space:]]*", gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Διασταύρωση[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Κάτω δεξιά[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Κατω δεξιά[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Κατω δεξια[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Λυκ?",                             gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Μονοπάτι[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Μονοπατι[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*άσφαλτος[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*από εδώ[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*αριστερά[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*αριστερα[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*αρχή μονοπάτι[[:space:]]*",        gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*ασφμον[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*γου[[:space:]]*",                  gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*γουρ[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*διαδρομή[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*εδω[[:space:]]*",                  gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*εδώ[[:space:]]*",                  gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*κ[0-9]+[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*σκατ[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*τριχεσ[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*χωματoδρομος[[:space:]]*",         gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*χωματόδρομος[[:space:]]*",         gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*ως εδώ[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("hotmail.com",                                  gather_wpt$name, invert = T, ignore.case = T), ]
 
+## Translate waypoints names  --------------------------------------------------
+gather_wpt$name <- gsub("Aussichtspunkt", "Viewpoint", gather_wpt$name)
+
+
+## TODO capitalizee
 
 gather_wpt <- unique(gather_wpt)
 
@@ -485,44 +499,44 @@ cat(paste("\n", nrow(gather_wpt),"waypoints after filtering \n\n" ))
 
 ## ignore some waypoints files not relevant to our usage
 drop_files <- c(
-    "grammos2012/Acquired_from_GPS.gpx",
-    "WPT_hair_traps_rodopi_2015-06-28.gpx",
-    "WPT_stanes_rodopi.gpx"
+  "grammos2012/Acquired_from_GPS.gpx",
+  "WPT_hair_traps_rodopi_2015-06-28.gpx",
+  "WPT_stanes_rodopi.gpx"
 )
 
 
 
-## export gpx waypoints by region ####
+##  Export GPX waypoints by region  --------------------------------------------
 for (ar in unique(gather_wpt$Region)) {
 
-    temp <- gather_wpt[gather_wpt$Region == ar ,]
-    temp$Region <- NULL
-    temp <- temp[order(temp$name),]
+  temp <- gather_wpt[gather_wpt$Region == ar ,]
+  temp$Region <- NULL
+  temp <- temp[order(temp$name),]
 
-    cat(paste("export",nrow(temp),"wpt",ar,"\n"))
+  cat(paste("export",nrow(temp),"wpt",ar,"\n"))
 
-    ## ignore some files
-    for (ast in drop_files) {
-        sel  <- !grepl(ast, temp$desc)
-        temp <- temp[sel,]
-    }
-    temp <- unique(temp)
+  ## ignore some files
+  for (ast in drop_files) {
+    sel  <- !grepl(ast, temp$desc)
+    temp <- temp[sel,]
+  }
+  temp <- unique(temp)
 
-    ## export all data for qgis with all metadata
-    if (nrow(temp) < 1) { next() }
-    write_sf(temp,
-             paste0("~/LOGs/waypoints/wpt_",ar,".gpx"),
-             driver = "GPX", append = F, overwrite = T)
+  ## export all data for qgis with all metadata
+  if (nrow(temp) < 1) { next() }
+  write_sf(temp,
+           paste0("~/LOGs/waypoints/wpt_",ar,".gpx"),
+           driver = "GPX", append = F, overwrite = T)
 
-    ## remove a lot of data for gpx devices
-    ##TODO you are removing useful info!!
-    temp$cmt  <- NA
-    temp$desc <- NA
-    temp$src  <- NA
+  ## remove a lot of data for gpx devices
+  ##TODO you are removing useful info!!
+  temp$cmt  <- NA
+  temp$desc <- NA
+  temp$src  <- NA
 
-    write_sf(temp,
-             paste0("~/LOGs/waypoints_etrex//wpt_",ar,".gpx"),
-             driver = "GPX", append = F, overwrite = T)
+  write_sf(temp,
+           paste0("~/LOGs/waypoints_etrex//wpt_",ar,".gpx"),
+           driver = "GPX", append = F, overwrite = T)
 }
 
 ## export all points for qgis
@@ -547,7 +561,7 @@ cat(paste( nrow(dd), "point couples under", close_flag, "m distance" ),"\n")
 
 ## remove pairs 2,3 == 3,2
 for (i in 1:nrow(dd)) {
-    dd[i, ] = sort(dd[i, ])
+  dd[i, ] = sort(dd[i, ])
 }
 dd <- unique(dd)
 cat(paste( nrow(dd), "point couples under", close_flag, "m distance" ), "\n")
@@ -555,16 +569,16 @@ cat(paste( nrow(dd), "point couples under", close_flag, "m distance" ), "\n")
 
 ## indentify suspects
 suspects <- data.table(
-    name_A = gather_wpt$name    [dd[,1]],
-    geom_A = gather_wpt$geometry[dd[,1]],
-    file_A = gather_wpt$desc    [dd[,1]],
-    name_B = gather_wpt$name    [dd[,2]],
-    geom_B = gather_wpt$geometry[dd[,2]],
-    file_B = gather_wpt$desc    [dd[,2]],
-    time_A = gather_wpt$time    [dd[,1]],
-    time_B = gather_wpt$time    [dd[,2]],
-    elev_A = gather_wpt$ele     [dd[,1]],
-    elev_B = gather_wpt$ele     [dd[,2]]
+  name_A = gather_wpt$name    [dd[,1]],
+  geom_A = gather_wpt$geometry[dd[,1]],
+  file_A = gather_wpt$desc    [dd[,1]],
+  name_B = gather_wpt$name    [dd[,2]],
+  geom_B = gather_wpt$geometry[dd[,2]],
+  file_B = gather_wpt$desc    [dd[,2]],
+  time_A = gather_wpt$time    [dd[,1]],
+  time_B = gather_wpt$time    [dd[,2]],
+  elev_A = gather_wpt$ele     [dd[,1]],
+  elev_B = gather_wpt$ele     [dd[,2]]
 )
 suspects$Dist <- distm[ cbind(dd[,2],dd[,1]) ]
 suspects      <- suspects[order(suspects$Dist, decreasing = T), ]
