@@ -46,13 +46,14 @@ tic <- Sys.time()
 Script.Name <- "~/CODE/training_analysis/GAR_read_download.R"
 
 # Input folder
-datalocation <- "~/ZHOST/ggg/6d2aff5b-0e5a-4608-9799-f5e304c02b77_1/"
+datalocation <- "~/Downloads/c53532cb-f34b-4e85-85cb-33c513c83e75_1/"
 
-system2(paste0('dos2unix ' , datalocation, '**/*.json'))
+## not expanding globs
+# system2(paste0('dos2unix ', datalocation, '**/*.json'))
 
 library(data.table)
 library(jsonlite)
-source("~/FUNCTIONS/R/data.R")
+source("~/CODE/FUNCTIONS/R/data.R")
 source("~/CODE/R_myRtools/myRtools/R/write_.R")
 
 outbase <- "~/DATA/Other/Garmin/"
