@@ -30,14 +30,13 @@ suppressPackageStartupMessages({
 })
 
 
-stop()
 ## read vars
-source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
+source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
 
 options(warn = 1)
 
 
-gpx_repo     <- "~/GISdata/GPX/"
+stop()
 
 wpt_seed     <- "~/GISdata/seed2.Rds"
 wpt_seed3    <- "~/GISdata/seed3.Rds"
