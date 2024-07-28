@@ -61,7 +61,6 @@ if (file.exists(fl_waypoints)) {
 
 ####  Get all waypoints from files  ---------------------------------
 if (length(gpxlist$file) > 0) {
-
   for (af in gpxlist$file) {
     if (!file.exists(af)) { next() }
     cat(paste(af,"\n"))
@@ -69,28 +68,23 @@ if (length(gpxlist$file) > 0) {
     ##  Read a file
     gpx  <- read_sf(af, layer = "waypoints")
 
+    meta <- data.table(file   = af,
+                       Region = NA,
+                       mtime  = file.mtime(af))
+
     if (nrow(gpx) > 0) {
-      wpt        <- st_transform(gpx, EPSG_WGS84)
+      ## gather points
+      wpt  <- st_transform(gpx, EPSG_WGS84)
 
-      ## get waypoints for the region
-      wpt$file   <- af
-      wpt$Region <- NA
-      wpt$mtime  <- file.mtime(af)
-
-      stop("Dd")
-      gather_wpt <- rbind(gather_wpt,
-                          wpt[, wecare])
-      ## seed
-      # saveRDS(wpt[,wecare] ,wpt_seed )
-      # cat(paste(names(selc), collapse = '", "'))
+      DATA <- rbind(DATA,
+                    cbind(wpt, meta),
+                    fill = T)
 
     } else {
       ## keep track of empty files
-      ff         <- ffff
-      ff$file    <- af
-      ff$Region  <- NA
-      ff$mtime   <- file.mtime(af)
-      gather_wpt <- rbind(gather_wpt,  ff)
+      DATA <- rbind(DATA,
+                    meta,
+                    fill = T)
     }
   }
 }
@@ -175,51 +169,7 @@ wecare <- c("ele",
             "mtime")
 
 
-# gather     <- data.table()
-# ff <- gather_wpt[1,]
-# ff$geometry[[1]][1] <- 0
-# ff$geometry[[1]][2] <- 0
-# ff <- st_transform(ff,EPSG)
-# saveRDS(ff, wpt_seed3)
 
-
-ffff <- readRDS(wpt_seed3)
-
-
-####  Get all waypoints from files  ---------------------------------
-if (length(gpxlist) > 0) {
-  update <- TRUE
-  for (af in gpxlist) {
-    if (!file.exists(af)) { next() }
-    cat(paste(af,"\n"))
-
-    ####  get waypoints  ####
-    gpx     <- read_sf(af, layer = "waypoints")
-    if (nrow(gpx) > 0) {
-
-      wpt        <- st_transform(gpx, EPSG) # apply transformation to points sf
-
-      ## get waypoints for the region
-      wpt$file   <- af
-      wpt$Region <- NA
-      wpt$mtime  <- file.mtime(af)
-
-      gather_wpt <- rbind(gather_wpt,
-                          wpt[,wecare])
-      ## seed
-      # saveRDS(wpt[,wecare] ,wpt_seed )
-      # cat(paste(names(selc), collapse = '", "'))
-
-    } else {
-      ## keep track of empty files
-      ff         <- ffff
-      ff$file    <- af
-      ff$Region  <- NA
-      ff$mtime   <- file.mtime(af)
-      gather_wpt <- rbind(gather_wpt,  ff)
-    }
-  }
-}
 
 
 ## Add drinking water from OSM ####
@@ -251,7 +201,7 @@ if (DRINKING_WATER) {
   dw        <- dw[wecare]
 
   ## reproject to meters
-  dwm <- st_transform(dw, EPSG) # apply transformation to points sf
+  dwm <- st_transform(dw, EPSG_WGS84) # apply transformation to points sf
 
   # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T)
   # distmwt <- round(distmwt, digits = 3)
