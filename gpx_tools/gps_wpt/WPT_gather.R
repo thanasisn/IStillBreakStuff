@@ -27,6 +27,7 @@ suppressPackageStartupMessages({
   library(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
   library(sf,         quietly = TRUE, warn.conflicts = FALSE)
   library(stringr,    quietly = TRUE, warn.conflicts = FALSE)
+  library(janitor,    quietly = TRUE, warn.conflicts = FALSE)
 })
 
 
@@ -34,6 +35,12 @@ suppressPackageStartupMessages({
 source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
 
 options(warn = 1)
+
+
+DRINKING_WATER <- TRUE
+WATERFALLS     <- TRUE
+CAVES          <- TRUE
+
 
 #### list GPX files ####
 gpxlist   <- list.files(gpx_repo,
@@ -59,7 +66,7 @@ if (file.exists(fl_waypoints)) {
 
 
 
-####  Get all waypoints from files  ---------------------------------
+##  Get all waypoints from files  ----------------------------------------------
 if (length(gpxlist$file) > 0) {
   for (af in gpxlist$file) {
     if (!file.exists(af)) { next() }
@@ -74,7 +81,7 @@ if (length(gpxlist$file) > 0) {
 
     if (nrow(gpx) > 0) {
       ## gather points
-      wpt  <- st_transform(gpx, EPSG_WGS84)
+      wpt  <- st_transform(gpx, EPSG_MERCA)
 
       DATA <- rbind(DATA,
                     cbind(wpt, meta),
@@ -91,6 +98,148 @@ if (length(gpxlist$file) > 0) {
 
 
 
+##  Add drinking water from OSM  -----------------------------------------------
+if (DRINKING_WATER) {
+  dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs_Gr.gpx"
+  dw        <- read_sf(dw_fl, layer = "waypoints")
+  ## clean data
+  dw$desc   <- gsub("\n", " ", dw$desc)
+  dw$name   <- gsub("\n", " ", dw$name)
+  ## set a name for display in case of empty
+  dw$name[is.na(dw$name)] <- "Nero"
+  dw$link <- NA
+
+  ## overpass web interface
+  ## parse drinking water
+  # indx <- grep("amenity=drinking_water",dw$desc)
+  # dw$desc[indx]   <- gsub("amenity=drinking_water","βρύση OSM",dw$desc[indx])
+  # dw$name[indx]   <- sub("node/[0-9]+","vris",dw$name[indx])
+  ## parse springs
+  # indx <- grep("natural=spring",dw$desc)
+  # dw$desc[indx]   <- gsub("natural=spring","Πηγή OSM",dw$desc[indx])
+  # dw$name[indx]   <- sub("node/[0-9]+","pigi",dw$name[indx])
+
+  meta <- data.table(file   = dw_fl,
+                     Region = NA,
+                     mtime  = file.mtime(dw_fl))
+  dw   <- cbind(dw, meta)
+
+  dw   <- st_transform(dw, EPSG_MERCA)
+
+  # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T)
+  # distmwt <- round(distmwt, digits = 3)
+
+  ## find close points
+  # dd <- which(distmwt < 5, arr.ind = T)
+
+  DATA <- rbind(DATA,
+                dw,
+                fill = T)
+  rm(dw)
+}
+
+
+##  Add waterfalls from OSM  ---------------------------------------------------
+if (WATERFALLS) {
+  dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Waterfalls_Gr.gpx"
+  dw        <- read_sf(dw_fl, layer = "waypoints")
+  ## clean data
+  dw$desc   <- gsub("\n", " ", dw$desc)
+  dw$name   <- gsub("\n", " ", dw$name)
+  ## set a name for display in case of empty
+  dw$name[is.na(dw$name)] <- "Waterfall"
+  dw$link <- NA
+
+  meta <- data.table(file   = dw_fl,
+                     Region = NA,
+                     mtime  = file.mtime(dw_fl))
+  dw   <- cbind(dw, meta)
+
+  dw   <- st_transform(dw, EPSG_MERCA)
+
+  # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
+  ## find close points
+  # dd <- which(distmwt < 5, arr.ind = T)
+
+  DATA <- rbind(DATA,
+                dw,
+                fill = T)
+  rm(dw)
+}
+
+
+##  Add caves from OSM  --------------------------------------------------------
+if (CAVES) {
+  dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Caves_Gr.gpx"
+  dw        <- read_sf(dw_fl, layer = "waypoints")
+  ## clean data
+  dw$desc   <- gsub("\n", " ", dw$desc)
+  dw$name   <- gsub("\n", " ", dw$name)
+  ## set a name for display in case of empty
+  dw$name[is.na(dw$name)] <- "Cave"
+  dw$link <- NA
+
+  meta <- data.table(file   = dw_fl,
+                     Region = NA,
+                     mtime  = file.mtime(dw_fl))
+  dw   <- cbind(dw, meta)
+
+  ## reproject to meters
+  dw  <- st_transform(dw, EPSG_MERCA)
+
+  # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
+  ## find close points
+  # dd <- which(distmwt < 5, arr.ind = T)
+
+  DATA <- rbind(DATA,
+                dw,
+                fill = T)
+  rm(dw)
+}
+
+DATA <- remove_empty(DATA, which = "cols")
+
+
+##  ID regions  -----------------------
+
+##  Read polygons for the regions
+regions <- st_read(fl_regions, stringsAsFactors = FALSE)
+regions <- st_transform(regions, EPSG_MERCA)
+regions$NFiles  <- 0
+regions$NPoints <- 0
+
+valid_wpt  <- !st_is_empty(st_sfc(DATA$geometry))
+DATA_wpt   <- DATA[ valid_wpt, ]
+DATA_empty <- DATA[!valid_wpt, ]
+
+## characterize all waypoints within each polygon
+for (ii in 1:length(regions$Name)) {
+
+  cat(paste("Characterize", regions$Name[ii],"\n"))
+
+  ## mark region
+  vec <- apply(
+    st_intersects(
+      regions$geometry[ii],
+      DATA_wpt$geometry,
+      sparse = FALSE
+    ),
+    2,
+    function(x) { x }
+  )
+
+  ## set region
+  DATA_wpt$Region[ vec ] <- regions$Name[ii]
+}
+
+DATA <- rbind(DATA_wpt, DATA_empty, fill = T)
+rm(DATA_wpt, DATA_empty)
+
+table(DATA$Region)
+
+
+
+
 
 
 
@@ -102,9 +251,6 @@ stop()
 wpt_seed     <- "~/GISdata/seed2.Rds"
 wpt_seed3    <- "~/GISdata/seed3.Rds"
 
-DRINKING_WATER <- TRUE
-WATERFALLS     <- TRUE
-CAVES          <- TRUE
 
 update         <- FALSE
 
@@ -144,11 +290,6 @@ if (file.exists(fl_waypoints)) {
 }
 
 
-####  Read polygons for the regions  ####
-regions <- st_read(fl_regions, stringsAsFactors = FALSE)
-regions <- st_transform(regions, EPSG)
-regions$NFiles  <- 0
-regions$NPoints <- 0
 
 
 wecare <- c("ele",
@@ -172,129 +313,19 @@ wecare <- c("ele",
 
 
 
-## Add drinking water from OSM ####
-if (DRINKING_WATER) {
-  ## load drinking water data
-  dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Drinking_water_springs_Gr.gpx"
-  dw        <- read_sf(dw_fl, layer = "waypoints")
-  ## clean data
-  dw$desc   <- gsub("\n", " ", dw$desc)
-  dw$name   <- gsub("\n", " ", dw$name)
-  ## set a name for display in case empty
-  dw$name[is.na(dw$name)] <- "Nero"
-  dw$link <- NA
 
-  ## overpass web interface
-  ## parse drinking water
-  # indx <- grep("amenity=drinking_water",dw$desc)
-  # dw$desc[indx]   <- gsub("amenity=drinking_water","βρύση OSM",dw$desc[indx])
-  # dw$name[indx]   <- sub("node/[0-9]+","vris",dw$name[indx])
-  ## parse springs
-  # indx <- grep("natural=spring",dw$desc)
-  # dw$desc[indx]   <- gsub("natural=spring","Πηγή OSM",dw$desc[indx])
-  # dw$name[indx]   <- sub("node/[0-9]+","pigi",dw$name[indx])
-
-  # dw$name   <- paste("OSM",dw$name)
-  dw$file   <- dw_fl
-  dw$Region <- NA
-  dw$mtime  <- file.mtime(dw_fl)
-  dw        <- dw[wecare]
-
-  ## reproject to meters
-  dwm <- st_transform(dw, EPSG_WGS84) # apply transformation to points sf
-
-  # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T)
-  # distmwt <- round(distmwt, digits = 3)
-
-  ## find close points
-  # dd <- which(distmwt < 5, arr.ind = T)
-
-  gather_wpt <- rbind( gather_wpt, dwm)
-  rm(dw, dwm)
-}
-
-
-## Add waterfalls from OSM ####
-if (WATERFALLS) {
-
-  ## load water falls data
-  dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Waterfalls_Gr.gpx"
-  dw        <- read_sf(dw_fl, layer = "waypoints")
-  ## clean data
-  dw$desc   <- gsub("\n"," ",dw$desc)
-
-  ## set a name for display in case empty
-  dw$name[is.na(dw$name)] <- "Waterfall"
-
-  # dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
-  # dw$name   <- sub("node/[0-9]+","falls",dw$name)
-
-  dw$file   <- dw_fl
-  dw$Region <- NA
-  dw$mtime  <- file.mtime(dw_fl)
-  dw        <- dw[wecare]
-
-  ## reproject to meters
-  dwm <- st_transform(dw, EPSG) # apply transformation to points sf
-
-  # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
-  ## find close points
-  # dd <- which(distmwt < 5, arr.ind = T)
-
-  gather_wpt <- rbind( gather_wpt, dwm )
-  rm(dw, dwm)
-}
-
-
-## Add caves from OSM ####
-if (CAVES) {
-
-  ## load water falls data
-  dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_Caves_Gr.gpx"
-  dw        <- read_sf(dw_fl, layer = "waypoints")
-  ## clean data
-  dw$desc   <- gsub("\n"," ",dw$desc)
-
-  ## set a name for display in case empty
-  dw$name[is.na(dw$name)] <- "Cave"
-
-  # dw$desc   <- gsub("waterway=waterfall","καταρράκτης OSM",dw$desc)
-  # dw$name   <- sub("node/[0-9]+","falls",dw$name)
-
-  dw$file   <- dw_fl
-  dw$Region <- NA
-  dw$mtime  <- file.mtime(dw_fl)
-  dw        <- dw[wecare]
-
-  ## reproject to meters
-  dwm <- st_transform(dw, EPSG) # apply transformation to points sf
-
-  # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
-  ## find close points
-  # dd <- which(distmwt < 5, arr.ind = T)
-
-  gather_wpt <- rbind( gather_wpt, dwm )
-  rm(dw,dwm)
-}
-gather_wpt <- unique(gather_wpt)
-
-
-## characterize all waypoints within each polygon
-for (ii in 1:length(regions$Name)) {
-
-  cat(paste("Characterize", regions$Name[ii],"\n"))
-  vec <- apply(st_intersects(regions$geometry[ii], gather_wpt$geometry, sparse = FALSE), 2,
-               function(x) { x })
-  gather_wpt$Region[ vec ] <- regions$Name[ii]
-
-}
-table( gather_wpt$Region )
 
 ## store for all R
 if (update) {
   gather_wpt <- unique(gather_wpt)
   myRtools::write_RDS(gather_wpt, fl_waypoints)
 }
+
+
+
+
+
+
 
 ## remove dummy data for analysis ####
 ssel       <- gather_wpt$geometry == ffff$geometry
