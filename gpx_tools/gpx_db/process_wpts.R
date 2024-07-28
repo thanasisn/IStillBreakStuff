@@ -21,7 +21,7 @@ library(stringr)
 ## read vars
 source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 
-options(warn=1)
+options(warn = 1)
 
 
 gpx_repo     <- "~/GISdata/GPX/"
@@ -532,27 +532,28 @@ for (ar in unique(gather_wpt$Region)) {
   }
   temp <- unique(temp)
 
-  ## export all data for qgis with all metadata
+  ## export all data for QGIS with all metadata
   if (nrow(temp) < 1) { next() }
   write_sf(temp,
-           paste0("~/LOGs/waypoints/wpt_",ar,".gpx"),
+           paste0("~/LOGs/waypoints/wpt_", ar, ".gpx"),
            driver = "GPX", append = F, overwrite = T)
 
-  ## remove a lot of data for gpx devices
-  ##TODO you are removing useful info!!
+  ## remove a lot of data for GPX devices
+  ## TODO you are removing useful info!!
   temp$cmt  <- NA
   temp$desc <- NA
   temp$src  <- NA
 
   write_sf(temp,
-           paste0("~/LOGs/waypoints_etrex//wpt_",ar,".gpx"),
+           paste0("~/LOGs/waypoints_etrex//wpt_", ar, ".gpx"),
            driver = "GPX", append = F, overwrite = T)
 }
 
-## export all points for qgis
+## export all points for QGIS
 gather_wpt$Region <- NULL
 write_sf(gather_wpt, '~/GISdata/Layers/Gathered_wpt.gpx',
          driver = "GPX", append = F, overwrite = T)
+
 ## export all with all metadata
 write_sf(gather_wpt, '~/LOGs/waypoints/WPT_ALL.gpx',
          driver = "GPX", append = F, overwrite = T)
@@ -595,7 +596,7 @@ suspects <- data.table(
   elev_A = gather_wpt$ele     [dd[,1]],
   elev_B = gather_wpt$ele     [dd[,2]]
 )
-suspects$Dist <- distm[ cbind(dd[,2],dd[,1]) ]
+suspects$Dist <- distm[ cbind(dd[,2], dd[,1]) ]
 suspects      <- suspects[order(suspects$Dist, decreasing = T), ]
 
 ## ignore points in the same file
