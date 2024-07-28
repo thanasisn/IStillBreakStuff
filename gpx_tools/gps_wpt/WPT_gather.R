@@ -66,19 +66,21 @@ if (length(gpxlist$file) > 0) {
     if (!file.exists(af)) { next() }
     cat(paste(af,"\n"))
 
-    ####  get waypoints  ####
-    gpx     <- read_sf(af, layer = "waypoints")
-    if (nrow(gpx) > 0) {
+    ##  Read a file
+    gpx  <- read_sf(af, layer = "waypoints")
 
-      wpt        <- st_transform(gpx, EPSG) # apply transformation to points sf
+    if (nrow(gpx) > 0) {
+      ## to mercator
+      wpt        <- st_transform(gpx, EPSG_MERCA)
 
       ## get waypoints for the region
       wpt$file   <- af
       wpt$Region <- NA
       wpt$mtime  <- file.mtime(af)
 
+      stop("Dd")
       gather_wpt <- rbind(gather_wpt,
-                          wpt[,wecare])
+                          wpt[, wecare])
       ## seed
       # saveRDS(wpt[,wecare] ,wpt_seed )
       # cat(paste(names(selc), collapse = '", "'))
