@@ -396,6 +396,7 @@ gather_wpt$Region[is.na(gather_wpt$Region)] <- "Other"
 
 ## Clean waypoints names  ------------------------------------------------------
 gather_wpt <- gather_wpt[grep(".*go straight.*",                              gather_wpt$name, invert = T, ignore.case = T), ]
+gather_wpt <- gather_wpt[grep("[[:space:]]*Ankerplatz[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep(".*χαιντου από μαύρη.*",                        gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep(".*Following a path.*",                         gather_wpt$name, invert = T, ignore.case = T), ]
 gather_wpt <- gather_wpt[grep("[[:space:]]*Arrive at.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
@@ -498,7 +499,7 @@ gather_wpt$name <- gsub("Aussichtspunkt", "Viewpoint", gather_wpt$name)
 
 
 ## TODO capitalize for consistency don't use for ROUT!!
-gather_wpt$names <- str_to_title(gather_wpt$name)
+gather_wpt$name <- str_to_title(gather_wpt$name)
 
 
 gather_wpt <- unique(gather_wpt)
