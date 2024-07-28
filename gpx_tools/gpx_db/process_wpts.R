@@ -500,7 +500,7 @@ gather_wpt$name <- gsub("Aussichtspunkt", "Viewpoint", gather_wpt$name)
 
 ## TODO capitalize for consistency don't use for ROUT!!
 gather_wpt$name <- str_to_title(gather_wpt$name)
-
+stringi::stri_trans_general("πατατα", "Greek-Latin/UNGEGN")
 
 gather_wpt <- unique(gather_wpt)
 
