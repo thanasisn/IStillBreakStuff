@@ -70,8 +70,7 @@ if (length(gpxlist$file) > 0) {
     gpx  <- read_sf(af, layer = "waypoints")
 
     if (nrow(gpx) > 0) {
-      ## to mercator
-      wpt        <- st_transform(gpx, EPSG_MERCA)
+      wpt        <- st_transform(gpx, EPSG_WGS84)
 
       ## get waypoints for the region
       wpt$file   <- af
