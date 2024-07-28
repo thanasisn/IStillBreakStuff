@@ -35,6 +35,72 @@ source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
 
 options(warn = 1)
 
+#### list GPX files ####
+gpxlist   <- list.files(gpx_repo,
+                        pattern     = ".gpx$",
+                        recursive   = T,
+                        full.names  = T,
+                        ignore.case = T)
+
+gpxlist <- data.table(file  = gpxlist,
+                      mtime = file.mtime(gpxlist))
+
+
+if (file.exists(fl_waypoints)) {
+  DATA <- readRDS(fl_waypoints)
+
+  ## remove readed files
+  ## reread edited files
+
+
+} else {
+  DATA <- data.table()
+}
+
+
+
+####  Get all waypoints from files  ---------------------------------
+if (length(gpxlist$file) > 0) {
+
+  for (af in gpxlist$file) {
+    if (!file.exists(af)) { next() }
+    cat(paste(af,"\n"))
+
+    ####  get waypoints  ####
+    gpx     <- read_sf(af, layer = "waypoints")
+    if (nrow(gpx) > 0) {
+
+      wpt        <- st_transform(gpx, EPSG) # apply transformation to points sf
+
+      ## get waypoints for the region
+      wpt$file   <- af
+      wpt$Region <- NA
+      wpt$mtime  <- file.mtime(af)
+
+      gather_wpt <- rbind(gather_wpt,
+                          wpt[,wecare])
+      ## seed
+      # saveRDS(wpt[,wecare] ,wpt_seed )
+      # cat(paste(names(selc), collapse = '", "'))
+
+    } else {
+      ## keep track of empty files
+      ff         <- ffff
+      ff$file    <- af
+      ff$Region  <- NA
+      ff$mtime   <- file.mtime(af)
+      gather_wpt <- rbind(gather_wpt,  ff)
+    }
+  }
+}
+
+
+
+
+
+
+
+
 
 stop()
 
@@ -47,11 +113,6 @@ CAVES          <- TRUE
 
 update         <- FALSE
 
-#### list GPX files ####
-gpxlist   <- list.files(gpx_repo, ".gpx$",
-                        recursive   = T,
-                        full.names  = T,
-                        ignore.case = T)
 
 ##FIXME duplicates work around
 file.remove(fl_waypoints)
