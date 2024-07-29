@@ -118,7 +118,11 @@ DATA_wpt$name <- gsub("[ ]{2,}", " ", DATA_wpt$name)
 
 
 ## __ Translate names  ---------------------------------------------------------
-DATA_wpt$name <- gsub("Aussichtspunkt", "Viewpoint", DATA_wpt$name)
+DATA_wpt$name <- gsub("Aussichtspunkt", "Viewpoint", DATA_wpt$name, ignore.case = T)
+DATA_wpt$name <- gsub("Beach",          "Παραλία",   DATA_wpt$name, ignore.case = T)
+DATA_wpt$name <- gsub("Vrisi",          "Βρύση",     DATA_wpt$name, ignore.case = T)
+DATA_wpt$name <- gsub("pigi",           "Πηγή",      DATA_wpt$name, ignore.case = T)
+
 
 ## __ Drop points by name  -----------------------------------------------------
 DATA_wpt <- DATA_wpt[grep(".*Following a path.*",                         DATA_wpt$name, invert = T, ignore.case = T), ]
@@ -128,6 +132,7 @@ DATA_wpt <- DATA_wpt[grep("[[:space:]]*Ankerplatz[[:space:]]*",           DATA_w
 DATA_wpt <- DATA_wpt[grep("[[:space:]]*Arrive at.*",                      DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("[[:space:]]*Ascending.*",                      DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("[[:space:]]*Borderline.*",                     DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Intersection[[:space:]]*",         DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("[[:space:]]*Descending.*",                     DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("[[:space:]]*Dromos[0-9]*[[:space:]]*",         DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("[[:space:]]*Entry path.*",                     DATA_wpt$name, invert = T, ignore.case = T), ]
@@ -264,6 +269,17 @@ cat(nrow(dd), "point pairs under", close_flag, "m distance\n")
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 stop("ggg")
 
 
@@ -289,6 +305,7 @@ suspects <- data.table(
 suspects$Dist <- distm[ cbind(dd[,2],dd[,1]) ]
 suspects      <- suspects[order(suspects$Dist, decreasing = T) , ]
 
+## FIXME change method
 # suspects$S_Dist <- levenshteinDist(suspects$name_A, suspects$name_B)
 suspects$S_Sim  <- levenshteinSim(suspects$name_A, suspects$name_B)
 
@@ -302,20 +319,27 @@ setorder(suspects, S_Sim)
 suspects$time_A <- format(suspects$time_A, "%FT%R:%S")
 suspects$time_B <- format(suspects$time_B, "%FT%R:%S")
 
-gdata::write.fwf(suspects[, c("Dist", "S_Sim", "name_A", "name_B", "file_A", "file_B")],
-                 sep = "; ", quote = TRUE,
+gdata::write.fwf(suspects[, c("Dist",   "S_Sim",
+                              "name_A", "name_B",
+                              "orig_A", "orig_B",
+                              "file_A", "file_B")],
+                 sep  = ";", quote = TRUE,
                  file = "~/DATA/GIS/WPT/Suspects_wpt.csv")
 
 
-
 ## count cases in files
-filescnt <- suspects[, .(file_A,file_B) ]
-filescnt <- filescnt[, .N , by = (paste(file_A,file_B))]
+filescnt <- suspects[, .(file_A, file_B)]
+filescnt <- filescnt[, .N, by = (paste(file_A, file_B))]
 filescnt$Max_dist <- close_flag
 setorder(filescnt, N)
 gdata::write.fwf(filescnt,
-                 sep = "; ", quote = TRUE,
+                 sep  = ";", quote = TRUE,
                  file = "~/GISdata/Suspect_wpt_to_clean.csv" )
+
+
+
+
+stop("ggg")
 
 
 

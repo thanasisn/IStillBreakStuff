@@ -78,6 +78,7 @@ if (length(gpxlist$file) > 0) {
 
     meta <- data.table(file   = path.expand(af),
                        Region = NA,
+                       type   = "GPX",
                        mtime  = file.mtime(af))
 
     if (nrow(gpx) > 0) {
@@ -121,6 +122,7 @@ if (DRINKING_WATER) {
 
   meta <- data.table(file   = path.expand(dw_fl),
                      Region = NA,
+                     type   = "OSM",
                      mtime  = file.mtime(dw_fl))
   dw   <- cbind(dw, meta)
 
@@ -152,6 +154,7 @@ if (WATERFALLS) {
 
   meta <- data.table(file   = path.expand(dw_fl),
                      Region = NA,
+                     type   = "OSM",
                      mtime  = file.mtime(dw_fl))
   dw   <- cbind(dw, meta)
 
@@ -181,6 +184,7 @@ if (CAVES) {
 
   meta <- data.table(file   = path.expand(dw_fl),
                      Region = NA,
+                     type   = "OSM",
                      mtime  = file.mtime(dw_fl))
   dw   <- cbind(dw, meta)
 
