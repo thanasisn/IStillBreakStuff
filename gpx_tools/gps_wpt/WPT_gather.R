@@ -56,30 +56,15 @@ gpxlist <- data.table(file  = gpxlist,
 if (file.exists(fl_waypoints)) {
   DATA <- readRDS(fl_waypoints)
 
-  ## remove all data from missing files
-  # DATA <- DATA[file.exists(DATA$file), ]
+  ## keep existing files with not modified date
+  DATA <- DATA[file.exists(DATA$file) & file.mtime(DATA$file) == mtime ]
 
-
-  DATA[ file.exists(DATA$file) & file.mtime(DATA$file) != mtime ]
-
-
-  stop()
-
-
-  ## ignore existing and not modified files
+  ## ignore existing and not modified files from reading
   gpxlist <- gpxlist[ !(file %in% DATA$file & mtime %in% DATA$mtime) ]
-
-  ## remove modified files from data
-
-
-
-
-  stop()
 
 } else {
   DATA <- data.table()
 }
-
 
 
 ##  Get all waypoints from files  ----------------------------------------------

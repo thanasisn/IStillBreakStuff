@@ -232,14 +232,20 @@ DATA_wpt$name <- str_to_title(DATA_wpt$name)
 
 DATA_wpt |> distinct_at(vars(name,geometry))
 
-exact_dupes <- get_dupes(DATA_wpt, name,geometry)
+
+exact_dupes <- get_dupes(DATA_wpt, geometry)
+
+cat("There are")
+
+
+
+stop("ggg")
 
 ##  Compute distance matrix
 distm <- raster::pointDistance(p1 = DATA_wpt, lonlat = T, allpairs = T)
 distm <- round(distm, digits = 3)
 
 
-stop("ggg")
 
 
 
