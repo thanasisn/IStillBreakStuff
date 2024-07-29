@@ -22,13 +22,15 @@ if (!interactive()) {
 
 #+ echo=F, include=T
 suppressPackageStartupMessages({
-  library(arrow,      quietly = TRUE, warn.conflicts = FALSE)
-  library(data.table, quietly = TRUE, warn.conflicts = FALSE)
-  library(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
-  library(sf,         quietly = TRUE, warn.conflicts = FALSE)
-  library(stringr,    quietly = TRUE, warn.conflicts = FALSE)
-  library(stringi,    quietly = TRUE, warn.conflicts = FALSE)
-  library(janitor,    quietly = TRUE, warn.conflicts = FALSE)
+  library(arrow,         quietly = TRUE, warn.conflicts = FALSE)
+  library(data.table,    quietly = TRUE, warn.conflicts = FALSE)
+  library(dplyr,         quietly = TRUE, warn.conflicts = FALSE)
+  library(sf,            quietly = TRUE, warn.conflicts = FALSE)
+  library(stringr,       quietly = TRUE, warn.conflicts = FALSE)
+  library(stringi,       quietly = TRUE, warn.conflicts = FALSE)
+  library(janitor,       quietly = TRUE, warn.conflicts = FALSE)
+  library(RecordLinkage, quietly = TRUE, warn.conflicts = FALSE)
+  library(stringdist,    quietly = TRUE, warn.conflicts = FALSE)
 })
 
 source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
@@ -228,7 +230,7 @@ DATA_wpt$name <- str_to_title(DATA_wpt$name)
 
 
 
-## __ Distance test  ---------
+## __ Distance test  -----------------------------------------------------------
 
 ## test exact location dupes
 exact_dupes <- get_dupes(
@@ -242,12 +244,7 @@ cat("There are", nrow(exact_dupes), "exact location dupes\n")
 ## work on distinct names and places
 DATA_wpt <- DATA_wpt |>
   filter( !grepl("Plans/ROUT", file)) |>
-  distinct_at(vars(name, geometry))
-
-
-
-
-stop("ggg")
+  distinct_at(vars(name, geometry), .keep_all = TRUE)
 
 ##  Compute distance matrix for all pairs
 distm <- raster::pointDistance(p1 = DATA_wpt, lonlat = T, allpairs = T)
@@ -257,53 +254,49 @@ dd <- which(distm < close_flag, arr.ind = T)
 ## remove diagonal
 dd <- dd[dd[,1] != dd[,2], ]
 
-
-
-#######################3
-
-distm <- round(distm, digits = 3)
-
-
-## find close points
-
-paste( nrow(dd), "point couples under", close_flag, "m distance")
-
 ## remove pairs 2,3 == 3,2
 for (i in 1:nrow(dd)) {
   dd[i, ] = sort(dd[i, ])
 }
-
-# pA <- gather_wpt[dd[,1],]
-# pA <- data.table(pA)
-# pA <- pA[, .(Total_Dups = .N),by=file]
-# for (ii in 1:nrow(pA)){
-#     afi <- unlist(pA[ii,file])
-#     pA[ii,Total_Dups]
-#     gather_wpt$file == afi
-# }
-
-
-
 dd <- unique(dd)
-paste( nrow(dd), "point couples under", close_flag, "m distance" )
+
+cat(nrow(dd), "point pairs under", close_flag, "m distance\n")
 
 
 
-####
+stop("ggg")
+
+
+#######################
+
+
+
+##  Check suspect points  ----------------
 suspects <- data.table(
-  name_A = gather_wpt$name    [dd[,1]],
-  geom_A = gather_wpt$geometry[dd[,1]],
-  file_A = gather_wpt$file    [dd[,1]],
-  name_B = gather_wpt$name    [dd[,2]],
-  geom_B = gather_wpt$geometry[dd[,2]],
-  file_B = gather_wpt$file    [dd[,2]],
-  time_A = gather_wpt$time    [dd[,1]],
-  time_B = gather_wpt$time    [dd[,2]],
-  elev_A = gather_wpt$ele     [dd[,1]],
-  elev_B = gather_wpt$ele     [dd[,2]]
+  name_A = DATA_wpt$name     [dd[,1]],
+  geom_A = DATA_wpt$geometry [dd[,1]],
+  file_A = DATA_wpt$file     [dd[,1]],
+  time_A = DATA_wpt$time     [dd[,1]],
+  elev_A = DATA_wpt$ele      [dd[,1]],
+  orig_A = DATA_wpt$name_orig[dd[,1]],
+  name_B = DATA_wpt$name     [dd[,2]],
+  geom_B = DATA_wpt$geometry [dd[,2]],
+  file_B = DATA_wpt$file     [dd[,2]],
+  time_B = DATA_wpt$time     [dd[,2]],
+  elev_B = DATA_wpt$ele      [dd[,2]],
+  orig_B = DATA_wpt$name_orig[dd[,2]]
 )
 suspects$Dist <- distm[ cbind(dd[,2],dd[,1]) ]
 suspects      <- suspects[order(suspects$Dist, decreasing = T) , ]
+
+# stringdist(suspects$name_A, suspects$name_B)
+
+
+suspects$S_Dist <- levenshteinDist(suspects$name_A, suspects$name_B)
+suspects$S_Sim  <- levenshteinSim(suspects$name_A, suspects$name_B)
+
+suspects[, c("name_A", "name_B", "S_Dist", "S_Sim", "Dist", "file_A", "file_B")]
+
 # suspects <- suspects[order(suspects$file_A,suspects$file_B, decreasing = T) , ]
 
 
