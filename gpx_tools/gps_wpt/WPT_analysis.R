@@ -269,25 +269,7 @@ cat(nrow(dd), "point pairs under", close_flag, "m distance\n")
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-stop("ggg")
-
-
-#######################
-
-
-
-##  Check suspect points  ----------------
+##  Check suspect points  ------------------------------------------------------
 suspects <- data.table(
   name_A = DATA_wpt$name     [dd[,1]],
   geom_A = DATA_wpt$geometry [dd[,1]],
@@ -302,8 +284,8 @@ suspects <- data.table(
   elev_B = DATA_wpt$ele      [dd[,2]],
   orig_B = DATA_wpt$name_orig[dd[,2]]
 )
-suspects$Dist <- distm[ cbind(dd[,2],dd[,1]) ]
-suspects      <- suspects[order(suspects$Dist, decreasing = T) , ]
+suspects$Dist <- distm[cbind(dd[,2], dd[,1])]
+suspects      <- suspects[order(suspects$Dist, decreasing = T), ]
 
 ## FIXME change method
 # suspects$S_Dist <- levenshteinDist(suspects$name_A, suspects$name_B)
@@ -334,10 +316,11 @@ filescnt$Max_dist <- close_flag
 setorder(filescnt, N)
 gdata::write.fwf(filescnt,
                  sep  = ";", quote = TRUE,
-                 file = "~/GISdata/Suspect_wpt_to_clean.csv" )
+                 file = "~/DATA/GIS/WPT/Suspect_wpt_to_clean.csv")
 
 
 
+#######################
 
 stop("ggg")
 

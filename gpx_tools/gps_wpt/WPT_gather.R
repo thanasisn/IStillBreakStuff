@@ -76,10 +76,10 @@ if (length(gpxlist$file) > 0) {
     ##  Read a file
     gpx  <- read_sf(af, layer = "waypoints")
 
-    meta <- data.table(file   = path.expand(af),
-                       Region = NA,
-                       type   = "GPX",
-                       mtime  = file.mtime(af))
+    meta <- data.table(file     = path.expand(af),
+                       Region   = NA,
+                       Src_Type = "GPX",
+                       mtime    = file.mtime(af))
 
     if (nrow(gpx) > 0) {
       ## gather points
@@ -120,10 +120,10 @@ if (DRINKING_WATER) {
   # dw$desc[indx]   <- gsub("natural=spring","Πηγή OSM",dw$desc[indx])
   # dw$name[indx]   <- sub("node/[0-9]+","pigi",dw$name[indx])
 
-  meta <- data.table(file   = path.expand(dw_fl),
-                     Region = NA,
-                     type   = "OSM",
-                     mtime  = file.mtime(dw_fl))
+  meta <- data.table(file     = path.expand(dw_fl),
+                     Region   = NA,
+                     Src_Type = "OSM_Water",
+                     mtime    = file.mtime(dw_fl))
   dw   <- cbind(dw, meta)
 
   dw   <- st_transform(dw, EPSG_MERCA)
@@ -152,10 +152,10 @@ if (WATERFALLS) {
   dw$name[is.na(dw$name)] <- "Waterfall"
   dw$link <- NA
 
-  meta <- data.table(file   = path.expand(dw_fl),
-                     Region = NA,
-                     type   = "OSM",
-                     mtime  = file.mtime(dw_fl))
+  meta <- data.table(file     = path.expand(dw_fl),
+                     Region   = NA,
+                     Src_Type = "OSM_Fall",
+                     mtime    = file.mtime(dw_fl))
   dw   <- cbind(dw, meta)
 
   dw   <- st_transform(dw, EPSG_MERCA)
@@ -182,10 +182,10 @@ if (CAVES) {
   dw$name[is.na(dw$name)] <- "Cave"
   dw$link <- NA
 
-  meta <- data.table(file   = path.expand(dw_fl),
-                     Region = NA,
-                     type   = "OSM",
-                     mtime  = file.mtime(dw_fl))
+  meta <- data.table(file     = path.expand(dw_fl),
+                     Region   = NA,
+                     Src_Type = "OSM_Cave",
+                     mtime    = file.mtime(dw_fl))
   dw   <- cbind(dw, meta)
 
   ## reproject to meters
