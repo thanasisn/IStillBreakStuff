@@ -33,7 +33,7 @@ suppressPackageStartupMessages({
 source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
 source("~/CODE/R_myRtools/myRtools/R/write_.R")
 
-options(warn = 1)
+# options(warn = 1)
 
 if (file.exists(fl_waypoints)) {
   DATA <- readRDS(fl_waypoints)
@@ -61,7 +61,9 @@ wecare <- c("ele",
 
 
 
+
 ## remove dummy data for analysis ####
+wec        <- intersect(names(DATA), wecare)
 valid_wpt  <- !st_is_empty(st_sfc(DATA$geometry))
 DATA_wpt   <- DATA[ valid_wpt, ]
 DATA_empty <- DATA[!valid_wpt, ]
@@ -74,31 +76,48 @@ cat(paste("\n", nrow(DATA_wpt), "waypoints loaded \n\n" ))
 
 
 
-##  Export unfiltered GPX ------
-copywpt   <- DATA_wpt
-export_fl <- '~/GISdata/Layers/Gathered_unfilter_wpt.gpx'
+##  Export unfiltered GPX  ------
+copywpt   <- DATA_wpt[, wec]
+export_fl <- '~/DATA/GIS/WPT/Gathered_unfilter_wpt.gpx'
 
 ## rename
 names(copywpt)[names(copywpt) == "file"] <- 'desc'
 
 if (!file.exists(export_fl) | any(copywpt$mtime > file.mtime(export_fl))) {
   file.remove(export_fl)
+
   ## drop data
   copywpt$file   <- NULL
   copywpt$mtime  <- NULL
   copywpt$Region <- NULL
-
-  copywpt[, wecare]
 
   write_sf(copywpt,
            export_fl,
            driver    = "GPX",
            append    = F,
            overwrite = T)
-
+  cat("Updated file: ", export_fl, "\n")
 }
+rm(copywpt)
 
 stop("ggg")
+
+##  Clean points  -------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
