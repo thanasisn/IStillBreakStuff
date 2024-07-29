@@ -230,12 +230,20 @@ DATA_wpt$name <- str_to_title(DATA_wpt$name)
 
 ## __ Distance test  ---------
 
-DATA_wpt |> distinct_at(vars(name,geometry))
+## test exact location dupes
+exact_dupes <- get_dupes(
+  DATA_wpt |>
+    filter(!grepl("Plans/ROUT", file)),
+  geometry)
+
+cat("There are", nrow(exact_dupes), "exact location dupes\n")
 
 
-exact_dupes <- get_dupes(DATA_wpt, geometry)
+## work on distinct names and places
+DATA_wpt <- DATA_wpt |>
+  filter( !grepl("Plans/ROUT", file)) |>
+  distinct_at(vars(name, geometry))
 
-cat("There are")
 
 
 
@@ -249,6 +257,8 @@ distm <- round(distm, digits = 3)
 
 
 
+
+#######################3
 
 ## compute distance matrix unfiltered ####
 distm <- raster::pointDistance(p1 = gather_wpt, lonlat = T, allpairs = T)

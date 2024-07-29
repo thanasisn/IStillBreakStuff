@@ -76,7 +76,7 @@ if (length(gpxlist$file) > 0) {
     ##  Read a file
     gpx  <- read_sf(af, layer = "waypoints")
 
-    meta <- data.table(file   = af,
+    meta <- data.table(file   = path.expand(af),
                        Region = NA,
                        mtime  = file.mtime(af))
 
@@ -96,7 +96,6 @@ if (length(gpxlist$file) > 0) {
     }
   }
 }
-
 
 
 ##  Add drinking water from OSM  -----------------------------------------------
@@ -120,7 +119,7 @@ if (DRINKING_WATER) {
   # dw$desc[indx]   <- gsub("natural=spring","Πηγή OSM",dw$desc[indx])
   # dw$name[indx]   <- sub("node/[0-9]+","pigi",dw$name[indx])
 
-  meta <- data.table(file   = dw_fl,
+  meta <- data.table(file   = path.expand(dw_fl),
                      Region = NA,
                      mtime  = file.mtime(dw_fl))
   dw   <- cbind(dw, meta)
@@ -151,7 +150,7 @@ if (WATERFALLS) {
   dw$name[is.na(dw$name)] <- "Waterfall"
   dw$link <- NA
 
-  meta <- data.table(file   = dw_fl,
+  meta <- data.table(file   = path.expand(dw_fl),
                      Region = NA,
                      mtime  = file.mtime(dw_fl))
   dw   <- cbind(dw, meta)
@@ -180,7 +179,7 @@ if (CAVES) {
   dw$name[is.na(dw$name)] <- "Cave"
   dw$link <- NA
 
-  meta <- data.table(file   = dw_fl,
+  meta <- data.table(file   = path.expand(dw_fl),
                      Region = NA,
                      mtime  = file.mtime(dw_fl))
   dw   <- cbind(dw, meta)
