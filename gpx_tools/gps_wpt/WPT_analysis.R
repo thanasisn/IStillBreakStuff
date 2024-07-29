@@ -37,7 +37,7 @@ source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
 source("~/CODE/R_myRtools/myRtools/R/write_.R")
 
 EXPORT <- FALSE
-EXPORT <- TRUE
+# EXPORT <- TRUE
 
 # options(warn = 1)
 
@@ -331,12 +331,6 @@ gdata::write.fwf(filescnt,
 
 
 
-#######################
-
-stop("ggg")
-
-
-
 ##  Export filtered GPX for usage  ---------------------------------------------
 
 ## deduplicate WPT
@@ -370,22 +364,13 @@ for (ast in drop_files) {
 }
 
 
-
-
-
-
-
-
-
-
-
 ##  Export GPX waypoints by region  --------------------------------------------
 for (ar in unique(DATA_wpt$Region)) {
 
-  temp <- DATA_wpt[DATA_wpt$Region == ar, ]
+  temp        <- DATA_wpt[DATA_wpt$Region == ar, ]
   temp$Region <- NULL
-  temp <- temp[order(temp$name), ]
-  wec  <- intersect(names(temp), wecare)
+  temp        <- temp[order(temp$name), ]
+  wec         <- intersect(names(temp), wecare)
 
   cat(paste("export", nrow(temp), "wpt", ar, "\n"))
 
@@ -407,7 +392,7 @@ for (ar in unique(DATA_wpt$Region)) {
            driver = "GPX", append = F, overwrite = T)
 }
 
-## export all points for QGIS
+## export all points for QGIS with more data
 write_sf(DATA_wpt,
          '~/DATA/GIS/WPT/Gathered_filtered_wpt.gpx',
          driver          = "GPX",
@@ -415,8 +400,11 @@ write_sf(DATA_wpt,
          append          = FALSE,
          overwrite       = TRUE)
 
-## export all with all metadata
-write_sf(DATA_wpt[, intersect(names(DATA_wpt), wecare)],
+## export all with few metadata
+wec <- intersect(names(DATA_wpt), wecare)
+wec <- grep("Region", wec, invert = T, value = T)
+
+write_sf(DATA_wpt[, wec],
          '~/LOGs/waypoints_etrex/WPT_ALL.gpx',
          driver          = "GPX",
          append          = FALSE,
@@ -424,17 +412,24 @@ write_sf(DATA_wpt[, intersect(names(DATA_wpt), wecare)],
 
 
 
+## export by source
+for (st in unique(DATA_wpt$Src_Type)) {
+  temp <- DATA_wpt |> filter(Src_Type == st)
+  temp <- temp[, wec]
+  temp$Region <- NULL
+  wec  <- intersect(names(temp), wecare)
+
+  cat(paste("export", nrow(temp), "wpt", st, "\n"))
+
+  ## export all data for QGIS with all metadata
+  if (nrow(temp) < 1) { next() }
+
+  write_sf(temp[, wec],
+           paste0("~/LOGs/waypoints_etrex//", st, "_WPT.gpx"),
+           driver = "GPX", append = F, overwrite = T)
+}
 
 
-
-
-## export all points for GPS devices
-gather_wpt$Region <- NULL
-gather_wpt$cmt    <- NA
-gather_wpt$desc   <- NA
-gather_wpt$src    <- NA
-write_sf(gather_wpt, '~/LOGs/waypoints_etrex/WPT_ALL.gpx',
-         driver = "GPX", append = F, overwrite = T)
 
 
 
