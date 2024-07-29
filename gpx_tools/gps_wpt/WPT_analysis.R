@@ -269,7 +269,7 @@ cat(nrow(dd), "point pairs under", close_flag, "m distance\n")
 
 
 
-##  Check suspect points  ------------------------------------------------------
+## __ Check suspect points  ----------------------------------------------------
 suspects <- data.table(
   name_A = DATA_wpt$name     [dd[,1]],
   geom_A = DATA_wpt$geometry [dd[,1]],
@@ -326,38 +326,35 @@ stop("ggg")
 
 
 
-####  Export filtered GPX for usage  ###########################################
+##  Export filtered GPX for usage  ---------------------------------------------
 
 ## deduplicate WPT
-gather_wpt <- unique(gather_wpt)
-gather_wpt <- gather_wpt %>% distinct_at(vars(-file, -mtime), .keep_all = T)
+DATA_wpt <- DATA_wpt |> distinct_at(vars(name, geometry), .keep_all = T)
 
 ## rename vars
-gather_wpt$desc <- NULL
-names(gather_wpt)[names(gather_wpt) == "file"] <- 'desc'
+DATA_wpt$desc <- NULL
+names(DATA_wpt)[names(DATA_wpt) == "file"] <- 'desc'
 
 ## drop data
-gather_wpt$file  <- NULL
-gather_wpt$mtime <- NULL
+DATA_wpt$file  <- NULL
+DATA_wpt$mtime <- NULL
 
 ## characterize missing regions
-gather_wpt$Region[is.na(gather_wpt$Region)] <- "Other"
+DATA_wpt$Region[is.na(DATA_wpt$Region)] <- "Other"
 
+cat(paste("\n", nrow(DATA_wpt), "waypoints after filtering\n" ))
 
-
-
-gather_wpt <- unique(gather_wpt)
-
-ttt <- table(gather_wpt$name)
-
-cat(paste("\n", nrow(gather_wpt),"waypoints after filtering \n\n" ))
-
-## ignore some waypoints files not relevant to our usage
+## ignore some waypoints files not relevant for our usage
 drop_files <- c(
   "grammos2012/Acquired_from_GPS.gpx",
   "WPT_hair_traps_rodopi_2015-06-28.gpx",
   "WPT_stanes_rodopi.gpx"
 )
+
+
+
+
+
 
 
 
@@ -406,64 +403,7 @@ write_sf(gather_wpt, '~/LOGs/waypoints/WPT_ALL.gpx',
 
 
 
-##  Compute distance matrix filtered  ------------------------------------------
-distm <- raster::pointDistance(p1 = gather_wpt, lonlat = T, allpairs = T)
 
-## find close points
-dd <- which(distm < close_flag, arr.ind = T)
-
-## TODO fix table efficiency
-# lower.tri()
-
-
-## remove diagonal
-dd <- dd[dd[,1] != dd[,2], ]
-cat(paste( nrow(dd), "point couples under", close_flag, "m distance" ),"\n")
-
-## remove pairs 2,3 == 3,2
-for (i in 1:nrow(dd)) {
-  dd[i, ] = sort(dd[i, ])
-}
-dd <- unique(dd)
-cat(paste( nrow(dd), "point couples under", close_flag, "m distance" ), "\n")
-
-
-## identify suspects
-suspects <- data.table(
-  name_A = gather_wpt$name    [dd[,1]],
-  geom_A = gather_wpt$geometry[dd[,1]],
-  file_A = gather_wpt$desc    [dd[,1]],
-  name_B = gather_wpt$name    [dd[,2]],
-  geom_B = gather_wpt$geometry[dd[,2]],
-  file_B = gather_wpt$desc    [dd[,2]],
-  time_A = gather_wpt$time    [dd[,1]],
-  time_B = gather_wpt$time    [dd[,2]],
-  elev_A = gather_wpt$ele     [dd[,1]],
-  elev_B = gather_wpt$ele     [dd[,2]]
-)
-suspects$Dist <- distm[ cbind(dd[,2], dd[,1]) ]
-suspects      <- suspects[order(suspects$Dist, decreasing = T), ]
-
-## ignore points in the same file
-suspects <- suspects[name_A != name_B]
-
-## count cases in files
-filescnt <- suspects[, .(file_A,file_B) ]
-filescnt <- filescnt[, .N , by = (paste(file_A,file_B))]
-filescnt$Max_dist <- close_flag
-setorder(filescnt, N)
-# write.csv(filescnt, "~/GISdata/Layers/Suspect_point_to_clean_filtered.csv", row.names = FALSE)
-myRtools::write_dat(object = filescnt,
-                    file   = "~/GISdata/Layers/Suspect_point_to_clean_filtered.csv",
-                    clean  = TRUE)
-
-wecare <- grep("geom", names(suspects),invert = T,value = T )
-wecare <- c("Dist", "name_A", "name_B", "file_A", "file_B")
-
-# write.csv(suspects[,..wecare], "~/GISdata/Suspects_filtered.csv", row.names = FALSE)
-myRtools::write_dat(object = suspects[,..wecare],
-                    file   = "~/GISdata/Suspects_filtered.csv",
-                    clean  = TRUE)
 
 
 ## export all points for GPS devices
