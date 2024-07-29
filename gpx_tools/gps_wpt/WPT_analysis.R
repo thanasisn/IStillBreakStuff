@@ -249,26 +249,23 @@ DATA_wpt <- DATA_wpt |>
 
 stop("ggg")
 
-##  Compute distance matrix
+##  Compute distance matrix for all pairs
 distm <- raster::pointDistance(p1 = DATA_wpt, lonlat = T, allpairs = T)
-distm <- round(distm, digits = 3)
 
-
-
+##  Investigate closest
+dd <- which(distm < close_flag, arr.ind = T)
+## remove diagonal
+dd <- dd[dd[,1] != dd[,2], ]
 
 
 
 #######################3
 
-## compute distance matrix unfiltered ####
-distm <- raster::pointDistance(p1 = gather_wpt, lonlat = T, allpairs = T)
 distm <- round(distm, digits = 3)
 
 
 ## find close points
-dd <- which(distm < close_flag, arr.ind = T)
-## remove diagonal
-dd <- dd[dd[,1] != dd[,2], ]
+
 paste( nrow(dd), "point couples under", close_flag, "m distance")
 
 ## remove pairs 2,3 == 3,2
