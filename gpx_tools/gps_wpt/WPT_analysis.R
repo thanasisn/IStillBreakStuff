@@ -36,6 +36,9 @@ suppressPackageStartupMessages({
 source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
 source("~/CODE/R_myRtools/myRtools/R/write_.R")
 
+EXPORT <- FALSE
+EXPORT <- TRUE
+
 # options(warn = 1)
 
 if (file.exists(fl_waypoints)) {
@@ -87,21 +90,29 @@ copywpt$ctx_CreationTimeExtension <- NULL
 copywpt$wptx1_WaypointExtension   <- NULL
 copywpt$gpxx_WaypointExtension    <- NULL
 
-if (!file.exists(export_fl) | any(copywpt$mtime > file.mtime(export_fl))) {
+if (EXPORT | !file.exists(export_fl) | any(copywpt$mtime > file.mtime(export_fl))) {
   file.remove(export_fl)
+
+  EXPORT <- TRUE
 
   ## drop data
   copywpt$file   <- NULL
   copywpt$mtime  <- NULL
   copywpt$Region <- NULL
 
+  copywpt$name      <- copywpt$name_orig
+  copywpt$name_orig <- NULL
+
   write_sf(copywpt,
            export_fl,
-           driver    = "GPX",
+           driver          = "GPX",
            dataset_options = "GPX_USE_EXTENSIONS=YES",
-           append    = F,
-           overwrite = T)
+           append          = FALSE,
+           overwrite       = TRUE)
   cat("Updated file: ", export_fl, "\n")
+} else {
+  cat("No new data\n")
+  stop(" --- Exit here --- ")
 }
 rm(copywpt)
 
@@ -339,6 +350,9 @@ names(DATA_wpt)[names(DATA_wpt) == "file"] <- 'desc'
 DATA_wpt$file  <- NULL
 DATA_wpt$mtime <- NULL
 
+DATA_wpt$name      <- DATA_wpt$name_orig
+DATA_wpt$name_orig <- NULL
+
 ## characterize missing regions
 DATA_wpt$Region[is.na(DATA_wpt$Region)] <- "Other"
 
@@ -351,6 +365,13 @@ drop_files <- c(
   "WPT_stanes_rodopi.gpx"
 )
 
+for (ast in drop_files) {
+  DATA_wpt <- DATA_wpt |> filter(!grepl(ast, desc))
+}
+
+
+
+
 
 
 
@@ -359,24 +380,19 @@ drop_files <- c(
 
 
 ##  Export GPX waypoints by region  --------------------------------------------
-for (ar in unique(gather_wpt$Region)) {
+for (ar in unique(DATA_wpt$Region)) {
 
-  temp <- gather_wpt[gather_wpt$Region == ar, ]
+  temp <- DATA_wpt[DATA_wpt$Region == ar, ]
   temp$Region <- NULL
-  temp <- temp[order(temp$name),]
+  temp <- temp[order(temp$name), ]
+  wec  <- intersect(names(temp), wecare)
 
   cat(paste("export", nrow(temp), "wpt", ar, "\n"))
 
-  ## ignore some files
-  for (ast in drop_files) {
-    sel  <- !grepl(ast, temp$desc)
-    temp <- temp[sel,]
-  }
-  temp <- unique(temp)
-
   ## export all data for QGIS with all metadata
   if (nrow(temp) < 1) { next() }
-  write_sf(temp,
+
+  write_sf(temp[, wec],
            paste0("~/LOGs/waypoints/wpt_", ar, ".gpx"),
            driver = "GPX", append = F, overwrite = T)
 
@@ -386,19 +402,25 @@ for (ar in unique(gather_wpt$Region)) {
   temp$desc <- NA
   temp$src  <- NA
 
-  write_sf(temp,
-           paste0("~/LOGs/waypoints_etrex//wpt_", ar, ".gpx"),
+  write_sf(temp[, wec],
+           paste0("~/LOGs/waypoints_etrex/wpt_", ar, ".gpx"),
            driver = "GPX", append = F, overwrite = T)
 }
 
 ## export all points for QGIS
-gather_wpt$Region <- NULL
-write_sf(gather_wpt, '~/GISdata/Layers/Gathered_wpt.gpx',
-         driver = "GPX", append = F, overwrite = T)
+write_sf(DATA_wpt,
+         '~/DATA/GIS/WPT/Gathered_filtered_wpt.gpx',
+         driver          = "GPX",
+         dataset_options = "GPX_USE_EXTENSIONS=YES",
+         append          = FALSE,
+         overwrite       = TRUE)
 
 ## export all with all metadata
-write_sf(gather_wpt, '~/LOGs/waypoints/WPT_ALL.gpx',
-         driver = "GPX", append = F, overwrite = T)
+write_sf(DATA_wpt[, intersect(names(DATA_wpt), wecare)],
+         '~/LOGs/waypoints_etrex/WPT_ALL.gpx',
+         driver          = "GPX",
+         append          = FALSE,
+         overwrite       = TRUE)
 
 
 
