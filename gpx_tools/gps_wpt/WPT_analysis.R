@@ -27,6 +27,7 @@ suppressPackageStartupMessages({
   library(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
   library(sf,         quietly = TRUE, warn.conflicts = FALSE)
   library(stringr,    quietly = TRUE, warn.conflicts = FALSE)
+  library(stringi,    quietly = TRUE, warn.conflicts = FALSE)
   library(janitor,    quietly = TRUE, warn.conflicts = FALSE)
 })
 
@@ -60,28 +61,29 @@ wecare <- c("ele",
             "mtime")
 
 
-
-
 ## remove dummy data for analysis ####
-wec        <- intersect(names(DATA), wecare)
 valid_wpt  <- !st_is_empty(st_sfc(DATA$geometry))
 DATA_wpt   <- DATA[ valid_wpt, ]
 DATA_empty <- DATA[!valid_wpt, ]
 
-
-## transform to degrees
+## project to degrees
 DATA_wpt <- st_transform(DATA_wpt, EPSG_WGS84)
 
 cat(paste("\n", nrow(DATA_wpt), "waypoints loaded \n\n" ))
 
 
-
-##  Export unfiltered GPX  ------
-copywpt   <- DATA_wpt[, wec]
+##  Export unfiltered GPX  -----------------------------------------------------
 export_fl <- '~/DATA/GIS/WPT/Gathered_unfilter_wpt.gpx'
+copywpt   <- DATA_wpt
 
-## rename
 names(copywpt)[names(copywpt) == "file"] <- 'desc'
+wec       <- intersect(names(copywpt), wecare)
+copywpt   <- copywpt[, wec]
+copywpt$urlname <- copywpt$desc
+
+copywpt$ctx_CreationTimeExtension <- NULL
+copywpt$wptx1_WaypointExtension   <- NULL
+copywpt$gpxx_WaypointExtension    <- NULL
 
 if (!file.exists(export_fl) | any(copywpt$mtime > file.mtime(export_fl))) {
   file.remove(export_fl)
@@ -94,29 +96,150 @@ if (!file.exists(export_fl) | any(copywpt$mtime > file.mtime(export_fl))) {
   write_sf(copywpt,
            export_fl,
            driver    = "GPX",
+           dataset_options = "GPX_USE_EXTENSIONS=YES",
            append    = F,
            overwrite = T)
   cat("Updated file: ", export_fl, "\n")
 }
 rm(copywpt)
 
+
+##  Clean points  --------------------------------------------------------------
+
+
+## __ Remove extra spaces  -----------------------------------------------------
+DATA_wpt$name <- gsub("^[ ]+",    "", DATA_wpt$name)
+DATA_wpt$name <- gsub("[ ]+$",    "", DATA_wpt$name)
+DATA_wpt$name <- gsub("[ ]{2,}", " ", DATA_wpt$name)
+
+# grep("[ ]{2,}", DATA_wpt$name)
+
+
+## __ Translate names  ---------------------------------------------------------
+DATA_wpt$name <- gsub("Aussichtspunkt", "Viewpoint", DATA_wpt$name)
+
+## __ Drop points by name  -----------------------------------------------------
+DATA_wpt <- DATA_wpt[grep(".*Following a path.*",                         DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep(".*go straight.*",                              DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep(".*χαιντου από μαύρη.*",                        DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Ankerplatz[[:space:]]*",           DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Arrive at.*",                      DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Ascending.*",                      DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Borderline.*",                     DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Descending.*",                     DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Dromos[0-9]*[[:space:]]*",         DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Entry path.*",                     DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Follow it.*",                      DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Follow the.*",                     DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*GRA[0-9]+[[:space:]]*",            DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*GRE[0-9]*[[:space:]]*",            DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Go[[:space:]]*right.*",            DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Head [a-z]+",                      DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Monopati erev.*",                  DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*PIN[0-9]+[[:space:]]*",            DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Parkplatz.*",                      DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Path entry.*",                     DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Straight .*",                      DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Trail Head[[:space:]]*",           DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Turn .*",                          DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*WPT[0-9]+[[:space:]]*",            DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*XDRXRD.*[[:space:]]*",             DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*[0-9]+![[:space:]]*",              DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*[0-9]+R",                          DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*[0-9]+[[:space:]]*",               DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*arxh",                             DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*arxi[[:space:]]*",                 DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*asf-xom[[:space:]]*",              DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*at roundab[[:space:]]*",           DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*aσφμον[[:space:]]*",               DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*dasmon[[:space:]]*",               DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*dexia[[:space:]]*",                DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*dias[[:space:]]*",                 DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*end$",                             DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*finish[[:space:]]*",               DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*foto[[:space:]]*",                 DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*from[[:space:]]*",                 DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*go left[[:space:]]*",              DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*hotmail.com",                      DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*kato[[:space:]]*",                 DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*keep .*",                          DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*lap [0-9].*[[:space:]]*",          DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*life [0-9]+",                      DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*monxom[[:space:]]*",               DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*null$",                            DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*pagida *[0-9]+[[:space:]]*",       DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*pagida a[0-9]+[[:space:]]*",       DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*photo",                            DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*photo[[:space:]]*",                DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*scat [0-9]+[[:space:]]*",          DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*scat$",                            DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*skat [0-9]+[[:space:]]*",          DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*skat[[:space:]]*",                 DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*start[[:space:]]*",                DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*strofi[[:space:]]*",               DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*summit[[:space:]]*",               DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*to[[:space:]]*",                   DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*tor *[0-9]*[[:space:]]*",          DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*via[0-9]+[[:space:]]*",            DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*xdr[0-9]+[[:space:]]*",            DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Αρκ [0-1]+[[:space:]]*",           DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Αρκ![[:space:]]*",                 DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Αρκ[[:space:]]*",                  DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Αρχή Μονοπατιού.*[[:space:]]*",    DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Γουρ!$",                           DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Δείγ Ερθρλ",                       DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Δεξιά[[:space:]]*",                DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Διασταυρωση$",                     DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Διασταύρωση Junction[[:space:]]*", DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Διασταύρωση[[:space:]]*",          DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Κάτω δεξιά[[:space:]]*",           DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Κατω δεξιά[[:space:]]*",           DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Κατω δεξια[[:space:]]*",           DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Λυκ?",                             DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Μονοπάτι[[:space:]]*",             DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*Μονοπατι[[:space:]]*",             DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*άσφαλτος[[:space:]]*",             DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*από εδώ[[:space:]]*",              DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*αριστερά[[:space:]]*",             DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*αριστερα[[:space:]]*",             DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*αρχή μονοπάτι[[:space:]]*",        DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*ασφμον[[:space:]]*",               DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*γου[[:space:]]*",                  DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*γουρ[[:space:]]*",                 DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*διαδρομή[[:space:]]*",             DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*εδω[[:space:]]*",                  DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*εδώ[[:space:]]*",                  DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*κ[0-9]+[[:space:]]*",              DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*σκατ[[:space:]]*",                 DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*τριχεσ[[:space:]]*",               DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*χωματoδρομος[[:space:]]*",         DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*χωματόδρομος[[:space:]]*",         DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("[[:space:]]*ως εδώ[[:space:]]*",               DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("hotmail.com",                                  DATA_wpt$name, invert = T, ignore.case = T), ]
+
+## Keep original name
+DATA_wpt$name_orig <- DATA_wpt$name
+
+## __ Make consistent names  -----------
+DATA_wpt$name <- stri_trans_general(DATA_wpt$name, "Greek-Latin/UNGEGN")
+
+## FIXME capitalize for consistency don't use for ROUT!!
+DATA_wpt$name <- str_to_title(DATA_wpt$name)
+
+
+
+## __ Distance test  ---------
+
+DATA_wpt |> distinct_at(vars(name,geometry))
+
+exact_dupes <- get_dupes(DATA_wpt, name,geometry)
+
+##  Compute distance matrix
+distm <- raster::pointDistance(p1 = DATA_wpt, lonlat = T, allpairs = T)
+distm <- round(distm, digits = 3)
+
+
 stop("ggg")
-
-##  Clean points  -------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -215,113 +338,8 @@ gather_wpt$mtime <- NULL
 ## characterize missing regions
 gather_wpt$Region[is.na(gather_wpt$Region)] <- "Other"
 
-## Clean waypoints names  ------------------------------------------------------
-gather_wpt <- gather_wpt[grep(".*go straight.*",                              gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Ankerplatz[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep(".*χαιντου από μαύρη.*",                        gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep(".*Following a path.*",                         gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Arrive at.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Ascending.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Borderline.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Borderline.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Descending.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Monopati erev.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Dromos[0-9]*[[:space:]]*",         gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Entry path.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Follow it.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Follow the.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*GRA[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*GRE[0-9]*[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Go[[:space:]]*right.*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Head [a-z]+",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*PIN[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Parkplatz.*",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Path entry.*",                     gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Straight .*",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Trail Head[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Turn .*",                          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*WPT[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*XDRXRD.*[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*[0-9]+![[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*[0-9]+R",                          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*[0-9]+[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*arxh",                             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*arxi[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*asf-xom[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*at roundab[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*aσφμον[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*dasmon[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*dexia[[:space:]]*",                gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*dias[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*end$",                             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*finish[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*foto[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*from[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*go left[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*hotmail.com",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*kato[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*keep .*",                          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*lap [0-9].*[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*life [0-9]+",                      gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*monxom[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*null$",                            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*pagida *[0-9]+[[:space:]]*",       gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*pagida a[0-9]+[[:space:]]*",       gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*photo",                            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*photo[[:space:]]*",                gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*scat [0-9]+[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*scat$",                            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*skat [0-9]+[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*skat[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*start[[:space:]]*",                gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*strofi[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*summit[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*to[[:space:]]*",                   gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*tor *[0-9]*[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*via[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*xdr[0-9]+[[:space:]]*",            gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Αρκ [0-1]+[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Αρκ![[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Αρκ[[:space:]]*",                  gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Αρχή Μονοπατιού.*[[:space:]]*",    gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Γουρ!$",                           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Δείγ Ερθρλ",                       gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Δεξιά[[:space:]]*",                gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Διασταυρωση$",                     gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Διασταύρωση Junction[[:space:]]*", gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Διασταύρωση[[:space:]]*",          gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Κάτω δεξιά[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Κατω δεξιά[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Κατω δεξια[[:space:]]*",           gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Λυκ?",                             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Μονοπάτι[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*Μονοπατι[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*άσφαλτος[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*από εδώ[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*αριστερά[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*αριστερα[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*αρχή μονοπάτι[[:space:]]*",        gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*ασφμον[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*γου[[:space:]]*",                  gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*γουρ[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*διαδρομή[[:space:]]*",             gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*εδω[[:space:]]*",                  gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*εδώ[[:space:]]*",                  gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*κ[0-9]+[[:space:]]*",              gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*σκατ[[:space:]]*",                 gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*τριχεσ[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*χωματoδρομος[[:space:]]*",         gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*χωματόδρομος[[:space:]]*",         gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("[[:space:]]*ως εδώ[[:space:]]*",               gather_wpt$name, invert = T, ignore.case = T), ]
-gather_wpt <- gather_wpt[grep("hotmail.com",                                  gather_wpt$name, invert = T, ignore.case = T), ]
-
-## Translate waypoints names  --------------------------------------------------
-gather_wpt$name <- gsub("Aussichtspunkt", "Viewpoint", gather_wpt$name)
 
 
-## TODO capitalize for consistency don't use for ROUT!!
-gather_wpt$name <- str_to_title(gather_wpt$name)
-stringi::stri_trans_general("πατατα", "Greek-Latin/UNGEGN")
 
 gather_wpt <- unique(gather_wpt)
 
