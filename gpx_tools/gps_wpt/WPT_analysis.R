@@ -289,32 +289,24 @@ suspects <- data.table(
 suspects$Dist <- distm[ cbind(dd[,2],dd[,1]) ]
 suspects      <- suspects[order(suspects$Dist, decreasing = T) , ]
 
-# stringdist(suspects$name_A, suspects$name_B)
-
-
-suspects$S_Dist <- levenshteinDist(suspects$name_A, suspects$name_B)
+# suspects$S_Dist <- levenshteinDist(suspects$name_A, suspects$name_B)
 suspects$S_Sim  <- levenshteinSim(suspects$name_A, suspects$name_B)
-
-suspects[, c("name_A", "name_B", "S_Dist", "S_Sim", "Dist", "file_A", "file_B")]
-
-# suspects <- suspects[order(suspects$file_A,suspects$file_B, decreasing = T) , ]
-
-
-
-## reformat for faster cvs use
-suspects$time_A <- format( suspects$time_A, "%FT%R:%S" )
-suspects$time_B <- format( suspects$time_B, "%FT%R:%S" )
-
-wecare <- grep("geom", names(suspects),invert = T,value = T )
-wecare <- c("Dist","elev_A","time_A","name_A","name_B","file_A","file_B" )
-
-gdata::write.fwf(suspects[, ..wecare],
-                 sep = " ; ", quote = TRUE,
-                 file = "~/GISdata/Suspects_wpt.csv" )
-
 
 ## ignore points in the same file
 suspects <- suspects[name_A != name_B]
+
+
+setorder(suspects, S_Sim)
+
+## reformat for faster cvs use
+suspects$time_A <- format(suspects$time_A, "%FT%R:%S")
+suspects$time_B <- format(suspects$time_B, "%FT%R:%S")
+
+gdata::write.fwf(suspects[, c("Dist", "S_Sim", "name_A", "name_B", "file_A", "file_B")],
+                 sep = "; ", quote = TRUE,
+                 file = "~/DATA/GIS/WPT/Suspects_wpt.csv")
+
+
 
 ## count cases in files
 filescnt <- suspects[, .(file_A,file_B) ]
@@ -322,7 +314,7 @@ filescnt <- filescnt[, .N , by = (paste(file_A,file_B))]
 filescnt$Max_dist <- close_flag
 setorder(filescnt, N)
 gdata::write.fwf(filescnt,
-                 sep = " ; ", quote = TRUE,
+                 sep = "; ", quote = TRUE,
                  file = "~/GISdata/Suspect_wpt_to_clean.csv" )
 
 
