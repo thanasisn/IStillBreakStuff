@@ -74,12 +74,23 @@ DATA_empty <- DATA[!valid_wpt, ]
 ## project to degrees
 DATA_wpt <- st_transform(DATA_wpt, EPSG_WGS84)
 
-cat(paste("\n", nrow(DATA_wpt), "waypoints loaded \n\n" ))
+cat(paste("\n", nrow(DATA_wpt), "waypoints loaded \n" ))
 
 
 ##  Export unfiltered GPX  -----------------------------------------------------
 export_fl <- '~/DATA/GIS/WPT/Gathered_unfilter_wpt.gpx'
 copywpt   <- DATA_wpt
+
+## __ Execution control  -------------------------------------------------------
+if (EXPORT |
+    !file.exists(export_fl) |
+    file.mtime(export_fl) < file.mtime(fl_waypoints)) {
+  cat("Going on with analysis and export\n")
+} else {
+  cat("No new data for analysis\n")
+  stop(" --- Exit here --- ")
+}
+
 
 names(copywpt)[names(copywpt) == "file"] <- 'desc'
 wec       <- intersect(names(copywpt), wecare)
@@ -90,50 +101,43 @@ copywpt$ctx_CreationTimeExtension <- NULL
 copywpt$wptx1_WaypointExtension   <- NULL
 copywpt$gpxx_WaypointExtension    <- NULL
 
-if (EXPORT | !file.exists(export_fl) | any(copywpt$mtime > file.mtime(export_fl))) {
-  file.remove(export_fl)
 
-  EXPORT <- TRUE
 
-  ## drop data
-  copywpt$file   <- NULL
-  copywpt$mtime  <- NULL
-  copywpt$Region <- NULL
 
-  copywpt$name      <- copywpt$name_orig
-  copywpt$name_orig <- NULL
+file.remove(export_fl)
+EXPORT <- TRUE
 
-  write_sf(copywpt,
-           export_fl,
-           driver          = "GPX",
-           dataset_options = "GPX_USE_EXTENSIONS=YES",
-           append          = FALSE,
-           overwrite       = TRUE)
-  cat("Updated file: ", export_fl, "\n")
-} else {
-  cat("No new data\n")
-  stop(" --- Exit here --- ")
-}
+## drop data
+copywpt$file   <- NULL
+copywpt$mtime  <- NULL
+copywpt$Region <- NULL
+
+copywpt$name      <- copywpt$name_orig
+copywpt$name_orig <- NULL
+
+write_sf(copywpt,
+         export_fl,
+         driver          = "GPX",
+         dataset_options = "GPX_USE_EXTENSIONS=YES",
+         append          = FALSE,
+         overwrite       = TRUE)
+cat("Updated file: ", export_fl, "\n")
 rm(copywpt)
 
 
 ##  Clean points  --------------------------------------------------------------
 
-
 ## __ Remove extra spaces  -----------------------------------------------------
 DATA_wpt$name <- gsub("^[ ]+",    "", DATA_wpt$name)
 DATA_wpt$name <- gsub("[ ]+$",    "", DATA_wpt$name)
 DATA_wpt$name <- gsub("[ ]{2,}", " ", DATA_wpt$name)
-
 # grep("[ ]{2,}", DATA_wpt$name)
-
 
 ## __ Translate names  ---------------------------------------------------------
 DATA_wpt$name <- gsub("Aussichtspunkt", "Viewpoint", DATA_wpt$name, ignore.case = T)
 DATA_wpt$name <- gsub("Beach",          "Παραλία",   DATA_wpt$name, ignore.case = T)
 DATA_wpt$name <- gsub("Vrisi",          "Βρύση",     DATA_wpt$name, ignore.case = T)
 DATA_wpt$name <- gsub("pigi",           "Πηγή",      DATA_wpt$name, ignore.case = T)
-
 
 ## __ Drop points by name  -----------------------------------------------------
 DATA_wpt <- DATA_wpt[grep(".*Following a path.*",                         DATA_wpt$name, invert = T, ignore.case = T), ]
@@ -243,7 +247,6 @@ DATA_wpt$name <- stri_trans_general(DATA_wpt$name, "Greek-Latin/UNGEGN")
 
 ## FIXME capitalize for consistency don't use for ROUT!!
 DATA_wpt$name <- str_to_title(DATA_wpt$name)
-
 
 
 ## __ Distance test  -----------------------------------------------------------
@@ -410,6 +413,13 @@ write_sf(DATA_wpt[, wec],
          append          = FALSE,
          overwrite       = TRUE)
 
+write_sf(DATA_wpt,
+         '~/LOGs/waypoints/WPT_ALL.gpx',
+         driver          = "GPX",
+         dataset_options = "GPX_USE_EXTENSIONS=YES",
+         append          = FALSE,
+         overwrite       = TRUE)
+
 
 
 ## export by source
@@ -424,9 +434,26 @@ for (st in unique(DATA_wpt$Src_Type)) {
   ## export all data for QGIS with all metadata
   if (nrow(temp) < 1) { next() }
 
+
+  write_sf(temp,
+           paste0("~/LOGs/waypoints/", st, "_WPT.gpx"),
+           driver          = "GPX",
+           dataset_options = "GPX_USE_EXTENSIONS=YES",
+           append          = F,
+           overwrite       = T)
+
+  temp$cmt  <- NA
+  temp$desc <- NA
+  temp$src  <- NA
+
   write_sf(temp[, wec],
-           paste0("~/LOGs/waypoints_etrex//", st, "_WPT.gpx"),
-           driver = "GPX", append = F, overwrite = T)
+           paste0("~/LOGs/waypoints_etrex/", st, "_WPT.gpx"),
+           driver = "GPX",
+           append = F,
+           overwrite = T)
+
+
+
 }
 
 
