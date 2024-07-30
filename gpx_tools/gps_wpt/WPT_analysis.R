@@ -37,7 +37,7 @@ source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
 source("~/CODE/R_myRtools/myRtools/R/write_.R")
 
 EXPORT <- FALSE
-# EXPORT <- TRUE
+EXPORT <- TRUE
 
 # options(warn = 1)
 
@@ -78,7 +78,7 @@ cat(paste("\n", nrow(DATA_wpt), "waypoints loaded \n" ))
 
 
 ##  Export unfiltered GPX  -----------------------------------------------------
-export_fl <- '~/DATA/GIS/WPT/Gathered_unfilter_wpt.gpx'
+export_fl <- "~/DATA/GIS/WPT/Gathered_unfilter_wpt.gpx"
 copywpt   <- DATA_wpt
 
 ## __ Execution control  -------------------------------------------------------
@@ -332,6 +332,18 @@ gdata::write.fwf(filescnt,
                  sep  = ";", quote = TRUE,
                  file = "~/DATA/GIS/WPT/Suspect_wpt_to_clean.csv")
 
+## export suspects
+ex_sus <- rbind(
+  DATA_wpt[dd[,2],],
+  DATA_wpt[dd[,1],]
+) |> distinct()
+
+write_sf(ex_sus,
+         "~/DATA/GIS/WPT/Suspects_wpt.gpx",
+         driver          = "GPX",
+         dataset_options = "GPX_USE_EXTENSIONS=YES",
+         append          = FALSE,
+         overwrite       = TRUE)
 
 
 ##  Export filtered GPX for usage  ---------------------------------------------
