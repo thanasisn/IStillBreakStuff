@@ -45,6 +45,7 @@ require(data.table, quietly = TRUE, warn.conflicts = FALSE)
 require(stringr,    quietly = TRUE, warn.conflicts = FALSE)
 require(ggplot2,    quietly = TRUE, warn.conflicts = FALSE)
 require(plotly,     quietly = TRUE, warn.conflicts = FALSE)
+require(DT,         quietly = TRUE, warn.conflicts = FALSE)
 
 
 #' Text is here
@@ -125,19 +126,43 @@ ggplotly(p)
 
 ## bigest by depth
 
+#+ include=FALSE
+htmltools::tagList(datatable(cars))
+htmltools::tagList(ggplotly(ggplot()))
+
+library(kableExtra)
+
+#+ results='asis', echo = F
 for (ad in sort(unique(DATA$Depth))) {
-  ad =1
 
   temp <- DATA[DATA[Depth == ad, .I[which.max(Date)], by = file]$V1, ]
 
   setorder(temp, -size)
-  print(temp)
+  temp$size <- NULL
+  temp$Date <- NULL
+
+  cat(paste("\n## Depth: ", ad, "\n\n"))
+
+  # temp <- head(temp, 20)
 
 
+  # cat(pander::pander(temp))
+
+  # print(
+  #   temp %>%
+  #     kbl() %>%
+  #     kable_material(c("striped", "hover")) |>
+  #     kable_styling(bootstrap_options = c("striped", "hover"))
+  # )
+  cat("\n\n")
+
+  print(htmltools::tagList(
+    datatable(temp,
+              style = 'bootstrap',
+              class = 'table-bordered table-condensed')
+  ))
 
 }
-
-
 
 
 # }
