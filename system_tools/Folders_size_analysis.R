@@ -82,7 +82,9 @@ for (af in datafls) {
   ## TODO check not changing folder
 
 
+
   cat(length(unique(DATA$file)), "Folders with changed size\n")
+
 
 
   ## to monitor change
