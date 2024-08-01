@@ -83,49 +83,64 @@ DATA <- DATA[DATA[, .I[which.min(Date)], by = .(file, size) ]$V1]
 ## keep only folder with changed size
 DATA <- DATA[DATA[, .I[.N > 1], by = .(file)]$V1, ]
 
-if (nrow(DATA) > 0){
+# if (nrow(DATA) > 0){
 
-  ## TODO check not changing folder
+## TODO check not changing folder
 
-  cat(length(unique(DATA$file)), "Folders with changed size\n")
+cat(length(unique(DATA$file)), "Folders with changed size\n")
 
-  ## to monitor absolute change
-  DATA[, Ratio := size / min(size), by = file]
-  DATA[, Diff  := (size - min(size)) / 1024 ^ 2, by = file]
-
-
-  p <- ggplot(DATA,
-              aes(x = Date, y = Diff, colour = file)) +
-    geom_line() +
-    theme(legend.position = "none")
-
-  p <- add_trace(p, x = DATA$Date, y = DATA$Diff,
-                 # text      = DATA$file,
-                 # name      = DATA$file,
-                 hoverinfo = "text",
-                 mode      = "lines",
-                 type      = "scatter")
-  ggplotly(p)
+DATA[, Ratio := size / min(size), by = file]
+DATA[, Diff  := as.integer((size - min(size)) / 1024 ^ 2), by = file]
 
 
+## to monitor absolute change
+p <- ggplot(DATA,
+            aes(x = Date, y = Diff, colour = file)) +
+  geom_line() +
+  theme(legend.position = "none")
 
-  p <- ggplot(DATA,
-              aes(x = Date, y = Ratio, colour = file)) +
-    geom_line() +
-    theme(legend.position = "none")
+p <- add_trace(p, x = DATA$Date, y = DATA$Diff,
+               # text      = DATA$file,
+               # name      = DATA$file,
+               hoverinfo = "text",
+               mode      = "lines",
+               type      = "scatter")
+ggplotly(p)
 
-  p <- add_trace(p, x = DATA$Date, y = DATA$Ratio,
-                 # text      = DATA$file,
-                 # name      = DATA$file,
-                 hoverinfo = "text",
-                 mode      = "lines",
-                 type      = "scatter")
-  ggplotly(p)
 
+## to monitor relative change
+p <- ggplot(DATA,
+            aes(x = Date, y = Ratio, colour = file)) +
+  geom_line() +
+  theme(legend.position = "none")
+
+p <- add_trace(p, x = DATA$Date, y = DATA$Ratio,
+               # text      = DATA$file,
+               # name      = DATA$file,
+               hoverinfo = "text",
+               mode      = "lines",
+               type      = "scatter")
+ggplotly(p)
+
+
+## bigest by depth
+
+for (ad in sort(unique(DATA$Depth))) {
+  ad =1
+
+  temp <- DATA[DATA[Depth == ad, .I[which.max(Date)], by = file]$V1, ]
+
+  setorder(temp, -size)
+  print(temp)
 
 
 
 }
+
+
+
+
+# }
 
 ## % change per day
 ## % total change
