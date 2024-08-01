@@ -60,9 +60,10 @@ datafls <- list.files(path         = "/home/athan/LOGs/SYSTEM_LOGS",
 ##  Analysis  -----------------------------------------------
 
 for (af in datafls) {
-  cat(af, "\n")
   host <- sub("Log_folders_size_", "", sub(".Rds", "", basename(af)))
   DATA <- data.table(readRDS(af))
+
+  cat("\n", host, "\n")
 
   ## clean and prepare
   DATA       <- DATA[ size > 2, ]
@@ -70,6 +71,28 @@ for (af in datafls) {
   DATA$Date  <- as.Date(DATA$Date, origin = "1970-01-01")
   DATA[, Depth := str_count(file, "/")]
 
+
+  ## keep the oldest unchanged row only
+  ## assume the size is constant since last day
+  DATA <- DATA[DATA[, .I[which.min(Date)], by = .(file, size) ]$V1]
+
+  ## keep only folder with changed size
+  DATA <- DATA[DATA[, .I[.N > 1], by = .(file)]$V1, ]
+
+  ## TODO check not changing folder
+
+
+  cat(length(unique(DATA$file)), "Folders with changed size\n")
+
+
+  ## to monitor change
+
+  ## % change per day
+  ## % total change
+  ## min max current
+
+  ## Table and plots
+  ## the most offending
 
 
 
@@ -80,13 +103,6 @@ for (af in datafls) {
 
 
 
-
-
-## some vars
-
-
-## % change per day
-## % change
 
 
 

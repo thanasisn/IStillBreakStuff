@@ -22,7 +22,7 @@ root_folders <- c("/")
 depth_limit  <- 10
 
 ## ignore small folders
-size_limit   <- 300 * 1024^2
+size_limit   <- 200 * 1024^2
 
 ## just to count the analysed folders
 cnf <- 0
