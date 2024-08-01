@@ -2,9 +2,10 @@
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 ####  Log directories sizes on multiple depths
+## Use full names
 
 rm(list = (ls()[ls() != ""]))
-Script.Name <- "/home/athan/CODE/system_tools/Folders_size_log,R"
+Script.Name <- "/home/athan/CODE/system_tools/Folders_size_log.R"
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 
@@ -16,10 +17,7 @@ data_fl      <- paste0("/home/athan/LOGs/SYSTEM_LOGS/Log_folders_size_", Sys.inf
 
 ## folders to monitor
 root_folders <- c("/")
-# root_folders <- c("/home/athan/DATA/")
-
-## don't go deeper
-depth_limit  <- 10
+# root_folders <- c("/home/athan/DATA/")   ## test
 
 ## ignore small folders
 size_limit   <- 200 * 1024^2
