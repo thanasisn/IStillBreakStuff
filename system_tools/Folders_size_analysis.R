@@ -61,7 +61,9 @@ datafls <- list.files(path         = "/home/athan/LOGs/SYSTEM_LOGS",
 
 ##  Analysis  -----------------------------------------------
 
-af <- datafls[2]
+af <- datafls[3] # yperos
+af <- datafls[1] # sagan
+af <- datafls[2] # tyler
 
 # for (af in datafls) {
 host <- sub("Log_folders_size_", "", sub(".Rds", "", basename(af)))
@@ -83,10 +85,17 @@ DATA[, Depth := str_count(file, "/")]
 
 ## keep the oldest unchanged row only
 ## assume the size is constant since last day
-DATA <- DATA[DATA[, .I[which.min(Date)], by = .(file, size) ]$V1]
+DATA <- DATA[DATA[, .I[which.min(Date)], by = .(file, size) ]$V1, ]
+
+# ALL <- DATA
+
+## just for the first run of the log
+if (length(unique(DATA$Date)) == 1) cc <- 0
+if (length(unique(DATA$Date)) != 1) cc <- 1
+
 
 ## keep only folder with changed size
-DATA <- DATA[DATA[, .I[.N > 1], by = .(file)]$V1, ]
+DATA <- DATA[DATA[, .I[.N > cc], by = .(file)]$V1, ]
 
 # if (nrow(DATA) > 0){
 
@@ -155,7 +164,6 @@ for (ad in sort(unique(DATA$Depth))) {
   cat(paste("\n## Depth: ", ad, "\n\n"))
 
   # temp <- head(temp, 20)
-
 
   # cat(pander::pander(temp))
 
