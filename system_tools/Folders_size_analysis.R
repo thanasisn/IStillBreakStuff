@@ -1,17 +1,17 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:  "......."
+#' title:  "Folders Disk Usage"
+#'
 #' author: "Natsis Athanasios"
-#' institute: "AUTH"
-#' affiliation: "Laboratory of Atmospheric Physics"
-#' abstract: "........."
+#'
 #' output:
 #'   html_document:
 #'     toc: true
 #'     fig_width:  9
 #'     fig_height: 4
 #'   pdf_document:
+#'
 #' date: "`r format(Sys.time(), '%F')`"
 #' ---
 
@@ -48,7 +48,6 @@ require(plotly,     quietly = TRUE, warn.conflicts = FALSE)
 require(DT,         quietly = TRUE, warn.conflicts = FALSE)
 
 
-#' Text is here
 #+ echo=F, include=T
 
 data_fl      <- paste0("/home/athan/LOGs/SYSTEM_LOGS/Log_folders_size_", Sys.info()["nodename"], ".Rds")
@@ -68,7 +67,12 @@ af <- datafls[2]
 host <- sub("Log_folders_size_", "", sub(".Rds", "", basename(af)))
 DATA <- data.table(readRDS(af))
 
-cat("\n", host, "\n")
+
+
+#'
+#' # `r host`
+#'
+#+ echo=F, include=T
 
 ## clean and prepare
 DATA       <- DATA[ size > 2, ]
@@ -88,19 +92,24 @@ DATA <- DATA[DATA[, .I[.N > 1], by = .(file)]$V1, ]
 
 ## TODO check not changing folder
 
-cat(length(unique(DATA$file)), "Folders with changed size\n")
+# cat(length(unique(DATA$file)), "Folders with changed size\n")
 
-DATA[, Ratio := size / min(size), by = file]
-DATA[, Diff  := as.integer((size - min(size)) / 1024 ^ 2), by = file]
+#'
+#' ### `r length(unique(DATA$file))` Folders with changed size
+#'
+#+ echo=F, include=T
+
+DATA[, Ratio   := size / min(size), by = file]
+DATA[, Diff_MB := as.integer((size - min(size)) / 1024 ^ 2), by = file]
 
 
 ## to monitor absolute change
 p <- ggplot(DATA,
-            aes(x = Date, y = Diff, colour = file)) +
+            aes(x = Date, y = Diff_MB, colour = file)) +
   geom_line() +
   theme(legend.position = "none")
 
-p <- add_trace(p, x = DATA$Date, y = DATA$Diff,
+p <- add_trace(p, x = DATA$Date, y = DATA$Diff_MB,
                # text      = DATA$file,
                # name      = DATA$file,
                hoverinfo = "text",
@@ -138,8 +147,10 @@ for (ad in sort(unique(DATA$Depth))) {
   temp <- DATA[DATA[Depth == ad, .I[which.max(Date)], by = file]$V1, ]
 
   setorder(temp, -size)
-  temp$size <- NULL
-  temp$Date <- NULL
+  temp$size  <- NULL
+  # temp$Date  <- NULL
+  temp$Depth <- NULL
+  temp$Ratio <- round(temp$Ratio, 3)
 
   cat(paste("\n## Depth: ", ad, "\n\n"))
 
@@ -158,6 +169,8 @@ for (ad in sort(unique(DATA$Depth))) {
 
   print(htmltools::tagList(
     datatable(temp,
+              colnames = c('ID' = 1),
+              options = list(pageLength = 30),
               style = 'bootstrap',
               class = 'table-bordered table-condensed')
   ))
