@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript
+# /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:  "......."
@@ -43,6 +43,8 @@ knitr::opts_chunk$set(fig.pos    = '!h'     )
 ## __  Set environment ---------------------------------------------------------
 require(data.table, quietly = TRUE, warn.conflicts = FALSE)
 require(stringr,    quietly = TRUE, warn.conflicts = FALSE)
+require(ggplot2,    quietly = TRUE, warn.conflicts = FALSE)
+require(plotly,     quietly = TRUE, warn.conflicts = FALSE)
 
 
 #' Text is here
@@ -59,59 +61,90 @@ datafls <- list.files(path         = "/home/athan/LOGs/SYSTEM_LOGS",
 
 ##  Analysis  -----------------------------------------------
 
-for (af in datafls) {
-  host <- sub("Log_folders_size_", "", sub(".Rds", "", basename(af)))
-  DATA <- data.table(readRDS(af))
+af <- datafls[2]
 
-  cat("\n", host, "\n")
+# for (af in datafls) {
+host <- sub("Log_folders_size_", "", sub(".Rds", "", basename(af)))
+DATA <- data.table(readRDS(af))
 
-  ## clean and prepare
-  DATA       <- DATA[ size > 2, ]
-  DATA$Bytes <- gdata::humanReadable(DATA$size)
-  DATA$Date  <- as.Date(DATA$Date, origin = "1970-01-01")
-  DATA[, Depth := str_count(file, "/")]
+cat("\n", host, "\n")
+
+## clean and prepare
+DATA       <- DATA[ size > 2, ]
+DATA$Bytes <- gdata::humanReadable(DATA$size)
+DATA$Date  <- as.Date(DATA$Date, origin = "1970-01-01")
+DATA[, Depth := str_count(file, "/")]
 
 
-  ## keep the oldest unchanged row only
-  ## assume the size is constant since last day
-  DATA <- DATA[DATA[, .I[which.min(Date)], by = .(file, size) ]$V1]
+## keep the oldest unchanged row only
+## assume the size is constant since last day
+DATA <- DATA[DATA[, .I[which.min(Date)], by = .(file, size) ]$V1]
 
-  ## keep only folder with changed size
-  DATA <- DATA[DATA[, .I[.N > 1], by = .(file)]$V1, ]
+## keep only folder with changed size
+DATA <- DATA[DATA[, .I[.N > 1], by = .(file)]$V1, ]
+
+if (nrow(DATA) > 0){
 
   ## TODO check not changing folder
 
-
-
   cat(length(unique(DATA$file)), "Folders with changed size\n")
 
+  ## to monitor absolute change
+  DATA[, Ratio := size / min(size), by = file]
+  DATA[, Diff  := (size - min(size)) / 1024 ^ 2, by = file]
 
 
-  ## to monitor change
+  p <- ggplot(DATA,
+              aes(x = Date, y = Diff, colour = file)) +
+    geom_line() +
+    theme(legend.position = "none")
 
-  ## % change per day
-  ## % total change
-  ## min max current
+  p <- add_trace(p, x = DATA$Date, y = DATA$Diff,
+                 # text      = DATA$file,
+                 # name      = DATA$file,
+                 hoverinfo = "text",
+                 mode      = "lines",
+                 type      = "scatter")
+  ggplotly(p)
 
-  ## Table and plots
-  ## the most offending
+
+
+  p <- ggplot(DATA,
+              aes(x = Date, y = Ratio, colour = file)) +
+    geom_line() +
+    theme(legend.position = "none")
+
+  p <- add_trace(p, x = DATA$Date, y = DATA$Ratio,
+                 # text      = DATA$file,
+                 # name      = DATA$file,
+                 hoverinfo = "text",
+                 mode      = "lines",
+                 type      = "scatter")
+  ggplotly(p)
 
 
 
 
 }
 
+## % change per day
+## % total change
+## min max current
+
+## Table and plots
+## the most offendin
+
+
+# }
 
 
 
 
 
 
-
-
-# # ~  Universal Footer  ~ # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #' **END**
 #+ include=T, echo=F
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n", Sys.time(), Sys.info()["login"],
             Sys.info()["nodename"], basename(Script.Name), difftime(tac,tic,units = "mins")))
+
