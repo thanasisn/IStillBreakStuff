@@ -22,6 +22,10 @@ root_folders <- c("/")
 ## ignore small folders
 size_limit   <- 200 * 1024^2
 
+## Use incremental data storage mostly for debbuging
+INCREMENTAL_STORAGE <- FALSE
+INCREMENTAL_STORAGE <- TRUE
+
 ## just to count the analysed folders
 cnf <- 0
 lev <- 0
@@ -46,6 +50,21 @@ get_size <- function(path, slim = size_limit) {
 }
 
 
+#' Save data to file with deduplication
+#'
+#' @param data  A data frame to save
+#' @param file  A path for the .Rds file
+#'
+#' @return      Nothing, writes to disk
+#'
+store_data <- function(data, file) {
+  data <- data[!duplicated(data[c("file", "Date")]),]
+  saveRDS(data, file = file)
+  Sys.chmod(file, "777", use_umask = FALSE)
+  cat(nrow(data), "Folder sizes logged! ->", file, "\n\n")
+}
+
+
 #' Recursive function to log sizes of folders under conditions
 #'
 #' @param paths The root paths of folders to monitor
@@ -53,7 +72,7 @@ get_size <- function(path, slim = size_limit) {
 #' @return      A data.frame and/or a `.Rds` with the results
 #' @export
 #'
-log.dirs.size <- function(paths, data_store) {
+log.dirs.size <- function(paths, data_store, use_data_store = FALSE) {
   res <-
     unique(
       sub("/[/]+", "/",
@@ -78,61 +97,37 @@ log.dirs.size <- function(paths, data_store) {
   # print(get)
   cat("Depth:", lev, " Checked:", cnf, " Gathered", nrow(get),"\n")
 
-  ## incremental store on every level
-  ## remove and use return of fuction
-  #; if (file.exists(data_store)) {
-  #;   DATA <- rbind(readRDS(data_store), get, fill = T)
-  #;   DATA <- DATA[!duplicated(DATA[c("file", "Date")]),]
-  #;   saveRDS(DATA, file = data_store)
-  #;   Sys.chmod(data_store, "777", use_umask = FALSE)
-  #;   cat(nrow(DATA), "Folder sizes logged! ->", data_store, "\n\n")
-  #; } else {
-  #;   DATA <- unique(get)
-  #;   saveRDS(DATA, file = data_store)
-  #;   Sys.chmod(data_store, "777", use_umask = FALSE)
-  #;   cat(nrow(DATA), "Folder sizes logged! ->", data_store, "\n\n")
-  #; }
+  ## incremental store on every level no need to return data from function
+  if (use_data_store) {
+    if (file.exists(data_store)) {
+      DATA <- rbind(readRDS(data_store), get, fill = T)
+      store_data(data = DATA, file = data_store)
+    } else {
+      store_data(data = get, file = data_store)
+    }
+  }
 
   ## get results on the next level
-  ## FIXME the return of the data frame may not be needed
+  ## FIXME the return of the data frame may not be needed if incremental storage in use
 
   if (length(get$file) > 0) {
 
     nextfl <- get$file[file.exists(get$file)]
-    cat(nextfl, "\n\n")
+    # cat(nextfl, "\n\n")
     if (length(nextfl) > 0) {
       # cat(depth, "run again\n")
-      add <- log.dirs.size(paths      = nextfl,
-                           data_store = data_store)
-      ## Function output
-      return(rbind(get, add))
+      add <- log.dirs.size(paths          = nextfl,
+                           data_store     = data_store,
+                           use_data_store = use_data_store)
+      if (!use_data_store) { return(rbind(get, add)) }
     } else {
       # cat(depth, "run last\n")
-      ## Function output
-      return(get)
+      if (!use_data_store) { return(get) }
     }
-
-
   } else {
     # cat(depth, "run last\n")
-    ## Function output
-    return(get)
+    if (!use_data_store) { return(get) }
   }
-
-
-  # nextfl <- get$file[file.exists(get$file)]
-  # cat(nextfl, "\n\n")
-  # if (length(nextfl) > 0) {
-  #   # cat(depth, "run again\n")
-  #   add <- log.dirs.size(paths      = nextfl,
-  #                        data_store = data_store)
-  #   ## Function output
-  #   rbind(get, add)
-  # } else {
-  #   # cat(depth, "run last\n")
-  #   ## Function output
-  #   get
-  # }
 }
 
 
@@ -141,21 +136,22 @@ cat("\nRoot dirs:\n")
 cat(paste("            ", root_folders), sep = "\n")
 cat("\n")
 
-new <- log.dirs.size(paths      = root_folders,
-                     data_store = data_fl)
+DATA <- log.dirs.size(paths      = root_folders,
+                     data_store     = data_fl,
+                     use_data_store = INCREMENTAL_STORAGE)
 
-if (nrow(new) > 0) {
-  if (file.exists(data_fl)) {
-    DATA <- rbind(readRDS(data_fl), new, fill = T)
-    DATA <- DATA[!duplicated(DATA[c("file", "Date")]),]
-    saveRDS(DATA, file = data_fl)
-    Sys.chmod(data_fl, "777", use_umask = FALSE)
-    cat(nrow(DATA), "Folder sizes logged! ->", data_fl, "\n\n")
-  } else {
-    DATA <- unique(new)
-    saveRDS(DATA, file = data_fl)
-    Sys.chmod(data_fl, "777", use_umask = FALSE)
-    cat(nrow(DATA), "Folder sizes logged! ->", data_fl, "\n\n")
+# DATA <- log.dirs.size(paths          = c("/home/athan/ZHOST"),
+#                      data_store     = data_fl,
+#                      use_data_store = INCREMENTAL_STORAGE)
+
+if (!INCREMENTAL_STORAGE) {
+  if (nrow(new) > 0) {
+    if (file.exists(data_fl)) {
+      DATA <- rbind(readRDS(data_fl), DATA, fill = T)
+      store_data(data = DATA, file = data_fl)
+    } else {
+      store_data(data = DATA, file = data_fl)
+    }
   }
 }
 
