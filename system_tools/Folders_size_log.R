@@ -95,19 +95,44 @@ log.dirs.size <- function(paths, data_store) {
 
   ## get results on the next level
   ## FIXME the return of the data frame may not be needed
-  nextfl <- get$file[file.exists(get$file)]
-  cat(nextfl, "\n\n")
-  if (length(nextfl) > 0) {
-    # cat(depth, "run again\n")
-    add <- log.dirs.size(paths      = nextfl,
-                         data_store = data_store)
-    ## Function output
-    rbind(get, add)
+
+  if (length(get$file) > 0) {
+
+    nextfl <- get$file[file.exists(get$file)]
+    cat(nextfl, "\n\n")
+    if (length(nextfl) > 0) {
+      # cat(depth, "run again\n")
+      add <- log.dirs.size(paths      = nextfl,
+                           data_store = data_store)
+      ## Function output
+      return(rbind(get, add))
+    } else {
+      # cat(depth, "run last\n")
+      ## Function output
+      return(get)
+    }
+
+
   } else {
     # cat(depth, "run last\n")
     ## Function output
-    get
+    return(get)
   }
+
+
+  # nextfl <- get$file[file.exists(get$file)]
+  # cat(nextfl, "\n\n")
+  # if (length(nextfl) > 0) {
+  #   # cat(depth, "run again\n")
+  #   add <- log.dirs.size(paths      = nextfl,
+  #                        data_store = data_store)
+  #   ## Function output
+  #   rbind(get, add)
+  # } else {
+  #   # cat(depth, "run last\n")
+  #   ## Function output
+  #   get
+  # }
 }
 
 
@@ -118,7 +143,6 @@ cat("\n")
 
 new <- log.dirs.size(paths      = root_folders,
                      data_store = data_fl)
-
 
 if (nrow(new) > 0) {
   if (file.exists(data_fl)) {
