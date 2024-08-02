@@ -57,13 +57,14 @@ datafls <- list.files(path         = "/home/athan/LOGs/SYSTEM_LOGS",
                       full.names   = TRUE,
                       recursive    = FALSE,
                       include.dirs = FALSE)
-
+datafls <- sort(datafls)
 
 ##  Analysis  -----------------------------------------------
 
-af <- datafls[3] # yperos
-af <- datafls[1] # sagan
-af <- datafls[2] # tyler
+af <- datafls[1] # blue
+af <- datafls[3] # tyler
+af <- datafls[4] # yperos
+af <- datafls[2] # sagan
 
 # for (af in datafls) {
 host <- sub("Log_folders_size_", "", sub(".Rds", "", basename(af)))
@@ -208,4 +209,3 @@ for (ad in sort(unique(DATA$Depth))) {
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n", Sys.time(), Sys.info()["login"],
             Sys.info()["nodename"], basename(Script.Name), difftime(tac,tic,units = "mins")))
-

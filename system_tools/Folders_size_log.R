@@ -22,9 +22,9 @@ root_folders <- c("/")
 ## ignore small folders
 size_limit   <- 200 * 1024^2
 
-## Use incremental data storage mostly for debbuging
+## Use incremental data storage mostly for debugging
 INCREMENTAL_STORAGE <- FALSE
-INCREMENTAL_STORAGE <- TRUE
+# INCREMENTAL_STORAGE <- TRUE
 
 ## just to count the analysed folders
 cnf <- 0
@@ -61,7 +61,7 @@ store_data <- function(data, file) {
   data <- data[!duplicated(data[c("file", "Date")]),]
   saveRDS(data, file = file)
   Sys.chmod(file, "777", use_umask = FALSE)
-  cat(nrow(data), "Folder sizes logged! ->", file, "\n\n")
+  cat(nrow(data), "Folder sizes records ->", file, "\n\n")
 }
 
 
@@ -82,20 +82,24 @@ log.dirs.size <- function(paths, data_store, use_data_store = FALSE) {
 
   ## prune dirs
   res <- grep(".git/.*", res, value = T, invert = TRUE)
-  res <- grep("^/media", res, value = T, invert = TRUE)
-  res <- grep("^/mnt",   res, value = T, invert = TRUE)
+  # res <- grep("^/media", res, value = T, invert = TRUE)
+  # res <- grep("^/mnt",   res, value = T, invert = TRUE)
   res <- grep("^/proc",  res, value = T, invert = TRUE)
   res <- grep("^/sys",   res, value = T, invert = TRUE)
   res <- grep("^/dev",   res, value = T, invert = TRUE)
   res <- grep("^/run",   res, value = T, invert = TRUE)
 
   ## get results on this level as a data.frame
-  get <- do.call(rbind, lapply(res, get_size))
+  # cat(res, "\n")
+  get <-   do.call(rbind, lapply(res, get_size))
   cnf <<- cnf + length(res)
   lev <<- lev + 1
   ## Display this level results
   # print(get)
-  cat("Depth:", lev, " Checked:", cnf, " Gathered", nrow(get),"\n")
+  cat(
+    sprintf("Depth: %2g  Gathered: %3g  Checked: %5g/%g ",
+                   lev,           nrow(get), length(res), cnf),
+    "\n")
 
   ## incremental store on every level no need to return data from function
   if (use_data_store) {
@@ -131,12 +135,12 @@ log.dirs.size <- function(paths, data_store, use_data_store = FALSE) {
 }
 
 
-##  Log sizes !! ---------------------------------------------------------------
+##  Main Log sizes !! ----------------------------------------------------------
 cat("\nRoot dirs:\n")
 cat(paste("            ", root_folders), sep = "\n")
 cat("\n")
 
-DATA <- log.dirs.size(paths      = root_folders,
+DATA <- log.dirs.size(paths         = root_folders,
                      data_store     = data_fl,
                      use_data_store = INCREMENTAL_STORAGE)
 
@@ -145,7 +149,7 @@ DATA <- log.dirs.size(paths      = root_folders,
 #                      use_data_store = INCREMENTAL_STORAGE)
 
 if (!INCREMENTAL_STORAGE) {
-  if (nrow(new) > 0) {
+  if (nrow(DATA) > 0) {
     if (file.exists(data_fl)) {
       DATA <- rbind(readRDS(data_fl), DATA, fill = T)
       store_data(data = DATA, file = data_fl)
@@ -154,7 +158,6 @@ if (!INCREMENTAL_STORAGE) {
     }
   }
 }
-
 
 ## END ##
 tac <- Sys.time()
