@@ -37,7 +37,7 @@ source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
 source("~/CODE/R_myRtools/myRtools/R/write_.R")
 
 EXPORT <- FALSE
-# EXPORT <- TRUE
+# EXPORT <- TRUE  ## for debug
 
 # options(warn = 1)
 
@@ -91,7 +91,7 @@ if (EXPORT |
 }
 
 
-
+## __ Export unfiltered WPT  ---------------------------------------------------
 names(copywpt)[names(copywpt) == "file"] <- 'desc'
 wec       <- intersect(names(copywpt), wecare)
 copywpt   <- copywpt[, wec]
@@ -100,7 +100,6 @@ copywpt$urlname <- copywpt$desc
 copywpt$ctx_CreationTimeExtension <- NULL
 copywpt$wptx1_WaypointExtension   <- NULL
 copywpt$gpxx_WaypointExtension    <- NULL
-
 
 file.remove(export_fl)
 EXPORT <- TRUE
@@ -246,6 +245,9 @@ DATA_wpt$name <- stri_trans_general(DATA_wpt$name, "Greek-Latin/UNGEGN")
 
 ## FIXME capitalize for consistency don't use for ROUT!!
 DATA_wpt$name <- str_to_title(DATA_wpt$name)
+
+## Drop unnamed points
+DATA_wpt <- DATA_wpt[!is.na(DATA_wpt$name), ]
 
 
 ## __ Distance test  -----------------------------------------------------------
