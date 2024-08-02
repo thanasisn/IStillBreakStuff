@@ -96,7 +96,7 @@ log.dirs.size <- function(paths, data_store) {
   ## get results on the next level
   ## FIXME the return of the data frame may not be needed
   nextfl <- get$file[file.exists(get$file)]
-  # cat(nextfl, "\n\n")
+  cat(nextfl, "\n\n")
   if (length(nextfl) > 0) {
     # cat(depth, "run again\n")
     add <- log.dirs.size(paths      = nextfl,
