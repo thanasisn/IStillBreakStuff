@@ -64,9 +64,9 @@ datafls <- sort(datafls)
 SIZE_LIM <- 300 * 1024 ^ 2
 
 af <- datafls[1] # blue
-af <- datafls[3] # tyler
-af <- datafls[2] # sagan
 af <- datafls[4] # yperos
+af <- datafls[2] # sagan
+af <- datafls[3] # tyler
 
 # for (af in datafls) {
 host <- sub("Log_folders_size_", "", sub(".Rds", "", basename(af)))
@@ -148,10 +148,10 @@ ggplotly(p)
 ## bigest by depth
 
 #+ include=FALSE
+## init use of ggplot and html tables in loops
 htmltools::tagList(datatable(cars))
 htmltools::tagList(ggplotly(ggplot()))
 
-library(kableExtra)
 
 #+ results='asis', echo = F
 for (ad in sort(unique(DATA$Depth))) {
@@ -164,11 +164,8 @@ for (ad in sort(unique(DATA$Depth))) {
   temp$Depth <- NULL
   temp$Ratio <- round(temp$Ratio, 3)
 
-  cat(paste("\n## Depth: ", ad, "\n\n"))
+  cat(paste("\n## Depth: ", ad, "folders:", nrow(temp), "\n\n"))
 
-  # temp <- head(temp, 20)
-
-  # cat(pander::pander(temp))
 
   # print(
   #   temp %>%
