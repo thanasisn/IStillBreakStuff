@@ -6,14 +6,14 @@
 ## Run on terminal or as a keybind
 
 ## go to this folder at the end
-NOTESDIR="$HOME/Notes"
+NOTESDIR="$HOME/NOTES"
 cd "$NOTESDIR" || exit
 
 ## file name for the note
 newfile="${NOTESDIR}/Quick_Note_$(date +'%F_%H%M')"
 
-## use a script
-new_note.sh "$newfile"
+## use the template script
+"$HOME/CODE/system_tools/new_note.sh" "$newfile"
 
 ## leave the shell in the current dir
 $SHELL
