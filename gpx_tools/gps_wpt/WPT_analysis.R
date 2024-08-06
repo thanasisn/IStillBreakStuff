@@ -74,6 +74,7 @@ DATA_empty <- DATA[!valid_wpt, ]
 ## project to degrees
 DATA_wpt <- st_transform(DATA_wpt, EPSG_WGS84)
 
+
 cat(paste("\n", nrow(DATA_wpt), "waypoints loaded \n" ))
 
 ##  Export unfiltered GPX  -----------------------------------------------------
