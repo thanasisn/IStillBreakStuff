@@ -108,11 +108,6 @@ if ( nrow( DT[ is.na(time)] ) > 0 ) {
 
 ####  List file points in a bounding box for cleaning up
 
-# files_bb <- DT[ Xdeg >= bb[1] &
-#                 Xdeg <= bb[3] &
-#                 Ydeg >= bb[2] &
-#                 Ydeg <= bb[4] &
-#                 grepl(".*.gpx", filename, ignore.case = T), .(Hits = .N), by = filename ]
 
 
 
