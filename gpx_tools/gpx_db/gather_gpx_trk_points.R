@@ -28,7 +28,6 @@ source("~/CODE/gpx_tools/gpx_db/DEFINITIONS.R")
 # options(warn=2)
 options(warn=1)
 
-## TODO add compressed gpx files or use fit files
 
 ## gather all gpx files
 gpxlist <- c()
