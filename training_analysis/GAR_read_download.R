@@ -113,33 +113,33 @@ groups <- sub("dangas","", groups)
 #+ echo=F, include=T
 ## parse all files
 for (ag in groups) {
-    pfiles <- agrep(ag, jsonfls, value = T)
-    cat("\n\nGroup:", ag, length(pfiles),"\n")
-    cat(pfiles,"\n")
-    gather <- data.table()
-    for (af in pfiles) {
-        cat(basename(af),"\n")
-        tmp    <- fromJSON(af, flatten = TRUE)
-        ## unwrap lists
-        while (length(tmp) == 1) {
-            tmp <- tmp[[1]]
-        }
-        if (typeof(tmp) == "list") {
-            tmp$preferredLocale <- NULL
-            tmp$handedness      <- NULL
-            tmp <- list2DF(tmp)
-            # tmp <- as.data.frame(do.call(cbind, tmp))
-            # tmp <- as.data.frame(do.call(rbind, tmp))
-            # tmp <- rbindlist(tmp, fill = T)
-        }
-        gather <- rbind(gather, tmp, fill = TRUE)
+  pfiles <- agrep(ag, jsonfls, value = T)
+  cat("\n\nGroup:", ag, length(pfiles),"\n")
+  cat(pfiles,"\n")
+  gather <- data.table()
+  for (af in pfiles) {
+    cat(basename(af),"\n")
+    tmp    <- fromJSON(af, flatten = TRUE)
+    ## unwrap lists
+    while (length(tmp) == 1) {
+      tmp <- tmp[[1]]
     }
-    # gather <- unique(gather)
-    gather <- rm.cols.NA.DT(gather)
-    gather <- rm.cols.dups.DT(gather)
-    ag     <- paste0("GData_", ag)
-    assign(ag, gather)
-    rm(gather, tmp)
+    if (typeof(tmp) == "list") {
+      tmp$preferredLocale <- NULL
+      tmp$handedness      <- NULL
+      tmp <- list2DF(tmp)
+      # tmp <- as.data.frame(do.call(cbind, tmp))
+      # tmp <- as.data.frame(do.call(rbind, tmp))
+      # tmp <- rbindlist(tmp, fill = T)
+    }
+    gather <- rbind(gather, tmp, fill = TRUE)
+  }
+  # gather <- unique(gather)
+  gather <- rm.cols.NA.DT(gather)
+  gather <- rm.cols.dups.DT(gather)
+  ag     <- paste0("GData_", ag)
+  assign(ag, gather)
+  rm(gather, tmp)
 }
 
 
@@ -154,12 +154,12 @@ GData_RunRacePredictions$calendarDate <- as.Date( GData_RunRacePredictions$calen
 
 wecare <- grep("Date" , names(GData_RunRacePredictions), value = T, invert = T)
 for (av in wecare) {
-    par(mar = c(2,2,2,1))
-    ## skip non info
-    if (length(unique(na.omit(GData_RunRacePredictions[[av]]))) <= 1) next()
+  par(mar = c(2,2,2,1))
+  ## skip non info
+  if (length(unique(na.omit(GData_RunRacePredictions[[av]]))) <= 1) next()
 
-    plot(GData_RunRacePredictions$calendarDate , GData_RunRacePredictions[[av]],
-    xlab = "", ylab = "", main = av, cex = 0.6 )
+  plot(GData_RunRacePredictions$calendarDate , GData_RunRacePredictions[[av]],
+       xlab = "", ylab = "", main = av, cex = 0.6 )
 }
 write_RDS(object = GData_RunRacePredictions,
           file   = paste0(outbase, "/", "Garmin_Run_Race_Predictions"))
@@ -180,13 +180,13 @@ GData_fitnessAgeData$rhrLastEntryDate        <- as.POSIXct(strptime(GData_fitnes
 wecare <- names(GData_fitnessAgeData)
 wecare <- grep("date|timestamp", wecare, ignore.case = T, invert = T, value = T)
 for (av in wecare) {
-    par(mar = c(3,2,2,1))
-    ## skip non info
-    if (length(unique(na.omit(GData_fitnessAgeData[[av]]))) <= 1) next()
+  par(mar = c(3,2,2,1))
+  ## skip non info
+  if (length(unique(na.omit(GData_fitnessAgeData[[av]]))) <= 1) next()
 
-    plot(GData_fitnessAgeData$asOfDateGmt, GData_fitnessAgeData[[av]],
-         ylab = "", xlab = "", cex = 0.6, type = "o")
-    title(av)
+  plot(GData_fitnessAgeData$asOfDateGmt, GData_fitnessAgeData[[av]],
+       ylab = "", xlab = "", cex = 0.6, type = "o")
+  title(av)
 }
 write_RDS(object = GData_fitnessAgeData,
           file   = paste0(outbase, "/", "Garmin_Fitness_Age_Data"))
@@ -209,19 +209,19 @@ GData_MetricsAcuteTrainingLoad$acwrStatus <- factor(GData_MetricsAcuteTrainingLo
 
 wecare <- grep("Date|time" , names(GData_MetricsAcuteTrainingLoad), value = T, invert = T, ignore.case = T)
 for (av in wecare) {
-    par(mar = c(3,2,2,1))
-    if (is.character(GData_MetricsAcuteTrainingLoad[[av]])) {
-        GData_MetricsAcuteTrainingLoad[[av]] <- factor(GData_MetricsAcuteTrainingLoad[[av]])
-    }
-    ## skip non info
-    if (length(unique(na.omit(GData_MetricsAcuteTrainingLoad[[av]]))) <= 1) next()
+  par(mar = c(3,2,2,1))
+  if (is.character(GData_MetricsAcuteTrainingLoad[[av]])) {
+    GData_MetricsAcuteTrainingLoad[[av]] <- factor(GData_MetricsAcuteTrainingLoad[[av]])
+  }
+  ## skip non info
+  if (length(unique(na.omit(GData_MetricsAcuteTrainingLoad[[av]]))) <= 1) next()
 
-    plot(GData_MetricsAcuteTrainingLoad$Date, GData_MetricsAcuteTrainingLoad[[av]],
-         ylab = "", xlab = "", cex = 0.6, type = "o", col = GData_MetricsAcuteTrainingLoad$acwrStatus)
-    title(av)
-    legend("top", pch = 1, cex = 0.7, bty = "n", ncol = 2,
-           legend = levels(GData_MetricsAcuteTrainingLoad$acwrStatus),
-           col    = 1:4 )
+  plot(GData_MetricsAcuteTrainingLoad$Date, GData_MetricsAcuteTrainingLoad[[av]],
+       ylab = "", xlab = "", cex = 0.6, type = "o", col = GData_MetricsAcuteTrainingLoad$acwrStatus)
+  title(av)
+  legend("top", pch = 1, cex = 0.7, bty = "n", ncol = 2,
+         legend = levels(GData_MetricsAcuteTrainingLoad$acwrStatus),
+         col    = 1:4 )
 }
 write_RDS(object = GData_MetricsAcuteTrainingLoad,
           file   = paste0(outbase, "/", "Garmin_Metrics_Acute_Training_Load"))
@@ -244,13 +244,13 @@ GData_HydrationLogFile[, timestampLocal        := NULL]
 
 wecare <- grep("Date|time|activityId" , names(GData_HydrationLogFile), value = T, invert = T, ignore.case = T)
 for (av in wecare) {
-    par(mar = c(3,2,2,1))
-    ## skip non info
-    if (length(unique(na.omit(GData_HydrationLogFile[[av]]))) <= 1) next()
+  par(mar = c(3,2,2,1))
+  ## skip non info
+  if (length(unique(na.omit(GData_HydrationLogFile[[av]]))) <= 1) next()
 
-    plot(GData_HydrationLogFile$Date, GData_HydrationLogFile[[av]],
-         ylab = "", xlab = "", cex = 0.6, type = "o")
-    title(av)
+  plot(GData_HydrationLogFile$Date, GData_HydrationLogFile[[av]],
+       ylab = "", xlab = "", cex = 0.6, type = "o")
+  title(av)
 }
 write_RDS(object = GData_HydrationLogFile,
           file   = paste0(outbase, "/", "Garmin_Hydration_Log_File"))
@@ -273,12 +273,16 @@ GData_MetricsMaxMetData$subSport   <- as.factor(GData_MetricsMaxMetData$subSport
 
 wecare <- grep("Date|time" , names(GData_MetricsMaxMetData), value = T, invert = T, ignore.case = T)
 for (av in wecare) {
-    par(mar = c(3,2,2,1))
-    ## skip non info
-    if (length(unique(na.omit(GData_MetricsMaxMetData[[av]]))) <= 1) next()
-    plot(GData_MetricsMaxMetData$Date, GData_MetricsMaxMetData[[av]],
-         ylab = "", xlab = "", cex = 0.6, type = "o")
-    title(av)
+  par(mar = c(3,2,2,1))
+  ## skip non info
+  if (class(GData_MetricsMaxMetData[[av]]) == "character") {
+    GData_MetricsMaxMetData[[av]] <- as.factor(GData_MetricsMaxMetData[[av]])
+  }
+
+  if (length(unique(na.omit(GData_MetricsMaxMetData[[av]]))) <= 1) next()
+  plot(GData_MetricsMaxMetData$Date, GData_MetricsMaxMetData[[av]],
+       ylab = "", xlab = "", cex = 0.6, type = "o")
+  title(av)
 }
 write_RDS(object = GData_MetricsMaxMetData,
           file   = paste0(outbase, "/", "Garmin_Metrics_Max_Met_Data"))
@@ -300,15 +304,15 @@ GData_summarizedActivities[, beginTimestamp := as.POSIXct(beginTimestamp/1000, o
 
 wecare <- grep("startTimeGmt|activityid|deviceid|courseid", names(GData_summarizedActivities), value = T, invert = T, ignore.case = T)
 for (av in wecare) {
-    par(mar = c(3,2,2,1))
-    if (is.character(GData_summarizedActivities[[av]])) next()
-    if (is.list(GData_summarizedActivities[[av]]))      next()
-    ## skip non info
-    if (length(unique(na.omit(GData_summarizedActivities[[av]]))) <= 1) next()
+  par(mar = c(3,2,2,1))
+  if (is.character(GData_summarizedActivities[[av]])) next()
+  if (is.list(GData_summarizedActivities[[av]]))      next()
+  ## skip non info
+  if (length(unique(na.omit(GData_summarizedActivities[[av]]))) <= 1) next()
 
-    plot(GData_summarizedActivities$startTimeGmt, GData_summarizedActivities[[av]],
-         ylab = "", xlab = "", cex = 0.6, type = "o")
-    title(av)
+  plot(GData_summarizedActivities$startTimeGmt, GData_summarizedActivities[[av]],
+       ylab = "", xlab = "", cex = 0.6, type = "o")
+  title(av)
 }
 write_RDS(object = GData_summarizedActivities,
           file   = paste0(outbase, "/", "Garmin_Summarized_Activities_Data"),
@@ -335,15 +339,15 @@ grep("timestamp" ,names(GData_UDSFile), ignore.case = T, value = T)
 
 wecare <- grep("calendarDate|includes|version|timestamp", names(GData_UDSFile), value = T, invert = T, ignore.case = T)
 for (av in wecare) {
-    par(mar = c(3,2,2,1))
-    if (is.character(GData_UDSFile[[av]])) next()
-    if (is.list(GData_UDSFile[[av]]))      next()
-    ## skip non info
-    if (length(unique(na.omit(GData_UDSFile[[av]]))) <= 1) next()
+  par(mar = c(3,2,2,1))
+  if (is.character(GData_UDSFile[[av]])) next()
+  if (is.list(GData_UDSFile[[av]]))      next()
+  ## skip non info
+  if (length(unique(na.omit(GData_UDSFile[[av]]))) <= 1) next()
 
-    plot(GData_UDSFile$calendarDate, GData_UDSFile[[av]],
-         ylab = "", xlab = "", cex = 0.6, type = "o")
-    title(av)
+  plot(GData_UDSFile$calendarDate, GData_UDSFile[[av]],
+       ylab = "", xlab = "", cex = 0.6, type = "o")
+  title(av)
 }
 write_RDS(object = GData_UDSFile,
           file   = paste0(outbase, "/", "Garmin_UDS_File_Data"),
@@ -370,17 +374,17 @@ lines(GData_TrainingHistory$timestamp, GData_TrainingHistory$loadTunnelMax, col 
 
 wecare <- grep("timestamp|Date", names(GData_TrainingHistory), value = T, invert = T, ignore.case = T)
 for (av in wecare) {
-    par(mar = c(3,2,2,1))
-    if (is.character(GData_TrainingHistory[[av]])) {
-        GData_TrainingHistory[[av]] <- as.factor(GData_TrainingHistory[[av]])
-    }
-    if (is.list(GData_TrainingHistory[[av]]))      next()
-    ## skip non info
-    if (length(unique(na.omit(GData_TrainingHistory[[av]]))) <= 1) next()
+  par(mar = c(3,2,2,1))
+  if (is.character(GData_TrainingHistory[[av]])) {
+    GData_TrainingHistory[[av]] <- as.factor(GData_TrainingHistory[[av]])
+  }
+  if (is.list(GData_TrainingHistory[[av]]))      next()
+  ## skip non info
+  if (length(unique(na.omit(GData_TrainingHistory[[av]]))) <= 1) next()
 
-    plot(GData_TrainingHistory$timestamp, GData_TrainingHistory[[av]],
-         ylab = "", xlab = "", cex = 0.6, type = "o")
-    title(av)
+  plot(GData_TrainingHistory$timestamp, GData_TrainingHistory[[av]],
+       ylab = "", xlab = "", cex = 0.6, type = "o")
+  title(av)
 }
 write_RDS(object = GData_TrainingHistory,
           file   = paste0(outbase, "/", "Garmin_Training_History"))
@@ -428,11 +432,11 @@ export <- export[rowSums(!is.na(export[, ..wecare])) > 0, ]
 
 
 exporte <-
-    export[, .(avgHr            = mean(avgHr, na.rm = T),
-               rhr              = mean(rhr,   na.rm = T),
-               restingHeartRate = mean(restingHeartRate,   na.rm = T),
-               maxHr            = mean(maxHr, na.rm = T)),
-           by = .(Date = as.Date(asOfDateGmt) - 1)]
+  export[, .(avgHr            = mean(avgHr, na.rm = T),
+             rhr              = mean(rhr,   na.rm = T),
+             restingHeartRate = mean(restingHeartRate,   na.rm = T),
+             maxHr            = mean(maxHr, na.rm = T)),
+         by = .(Date = as.Date(asOfDateGmt) - 1)]
 
 xlim <- range(exporte[!is.na(rhr), Date], exporte[!is.na(restingHeartRate), Date] )
 ylim <- range(exporte[, rhr, restingHeartRate], na.rm = T)
