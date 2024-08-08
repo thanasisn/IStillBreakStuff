@@ -37,6 +37,7 @@ layers_out       <- "~/GISdata/Layers/Auto/"
 fl_gis_data      <-  paste0(layers_out,"/Grid_mega.gpkg")
 fl_gis_data_test <-  paste0(layers_out,"/Grid_mega_temporal.gpkg")
 
+
 ## Spatial aggregation
 rsls <- unique(c(
     10,
