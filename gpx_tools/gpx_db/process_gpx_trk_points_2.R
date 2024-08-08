@@ -99,108 +99,92 @@ if ( nrow( DT[ is.na(time)] ) > 0 ) {
     ## write to file
     gdata::write.fwf(mistime[,.(N,filename)],
                      sep  = " ; ",
-                     file = fl_notimes )
+                     file = fl_notimes)
     ## clean bad data
     DT <- DT[!is.na(time)]
 }
 
 
 
-####  List file points in a bounding box for cleaning up
 
-# files_bb <- DT[ Xdeg >= bb[1] &
-#                 Xdeg <= bb[3] &
-#                 Ydeg >= bb[2] &
-#                 Ydeg <= bb[4] &
-#                 grepl(".*.gpx", filename, ignore.case = T), .(Hits = .N), by = filename ]
-
-
-
-
-####  Detect possible duplicate files  ####
-cat(paste("Get possible duplicate files\n"))
-
-## get files with points in the same date
-file_dates <- DT[, .N, by = .(Date = as.Date(time), filename)]
-same_date  <- list()
-for (ad in unique(file_dates$Date)) {
-    ad   <- as.Date(ad, origin = "1970-01-01")
-    temp <- file_dates[Date == ad]
-    if (nrow(temp) > 1 ) {
-        # cat(paste(temp$file),"\n")
-        same_date <- c(same_date, list(t(temp$filename)))
-    }
-}
-
-## check the files if have dups points
-dup_points <- data.frame()
-for (il in 1:length(same_date)) {
-
-    temp <- DT[ filename %in% same_date[[il]]]
-
-    ## only when we have time
-    temp <- temp[ !is.na(time) ]
-
-    setkey(temp, time, X, Y)
-    dups <- duplicated(temp, by = key(temp))
-    temp[, fD := dups | c(tail(dups, -1), FALSE)]
-    duppoints <- temp[fD == TRUE]
-
-    ## files with dups points
-    countP <- duppoints[ , .(DupPnts = .N, STime = min(time), ETime = max(time)) , by = .(filename) ]
-    countP$TotPnts <- 0
-    countP$Set     <- il
-    for (af in unique(countP$filename)) {
-        countP[ filename == af, TotPnts := DT[ filename == af, .N] ]
-    }
-    dup_points <- rbind(dup_points, countP)
-}
-
-dup_points[, Cover := DupPnts / TotPnts]
-
-cat(paste(nrow(duppoints), "Duplicate points found\n"))
-
-dup_points$STime <- format( dup_points$STime, "%FT%R:%S" )
-dup_points$ETime <- format( dup_points$ETime, "%FT%R:%S" )
+# ####  Detect possible duplicate files  ####
+# cat(paste("Get possible duplicate files\n"))
+#
+# ## get files with points in the same date
+# file_dates <- DT[, .N, by = .(Date = as.Date(time), filename)]
+# same_date  <- list()
+# for (ad in unique(file_dates$Date)) {
+#     ad   <- as.Date(ad, origin = "1970-01-01")
+#     temp <- file_dates[Date == ad]
+#     if (nrow(temp) > 1 ) {
+#         # cat(paste(temp$file),"\n")
+#         same_date <- c(same_date, list(t(temp$filename)))
+#     }
+# }
+#
+# ## check the files if have dups points
+# dup_points <- data.frame()
+# for (il in 1:length(same_date)) {
+#
+#     temp <- DT[ filename %in% same_date[[il]]]
+#
+#     ## only when we have time
+#     temp <- temp[ !is.na(time) ]
+#
+#     setkey(temp, time, X, Y)
+#     dups <- duplicated(temp, by = key(temp))
+#     temp[, fD := dups | c(tail(dups, -1), FALSE)]
+#     duppoints <- temp[fD == TRUE]
+#
+#     ## files with dups points
+#     countP <- duppoints[ , .(DupPnts = .N, STime = min(time), ETime = max(time)) , by = .(filename) ]
+#     countP$TotPnts <- 0
+#     countP$Set     <- il
+#     for (af in unique(countP$filename)) {
+#         countP[ filename == af, TotPnts := DT[ filename == af, .N] ]
+#     }
+#     dup_points <- rbind(dup_points, countP)
+# }
+#
+# dup_points[, Cover := DupPnts / TotPnts]
+#
+# cat(paste(nrow(duppoints), "Duplicate points found\n"))
+#
+# dup_points$STime <- format( dup_points$STime, "%FT%R:%S" )
+# dup_points$ETime <- format( dup_points$ETime, "%FT%R:%S" )
 
 
-## get sets with big coverage
-gdata::write.fwf(dup_points[ Set %in% unique(dup_points[ Cover >= cover_threshold, Set]),
-                             .(Set, filename, DupPnts, TotPnts, Cover, STime, ETime) ],
-                 sep   = " ; ",
-                 quote = FALSE,
-                 file  = fl_suspctpt )
-
-## get all sets
-gdata::write.fwf(dup_points[,.(Set, filename, DupPnts, TotPnts, Cover, STime, ETime)],
-                 sep = " ; ", quote = FALSE,
-                 file = fl_suspctpt_all )
+# ## get sets with big coverage
+# gdata::write.fwf(dup_points[ Set %in% unique(dup_points[ Cover >= cover_threshold, Set]),
+#                              .(Set, filename, DupPnts, TotPnts, Cover, STime, ETime) ],
+#                  sep   = " ; ",
+#                  quote = FALSE,
+#                  file  = fl_suspctpt )
+#
+# ## get all sets
+# gdata::write.fwf(dup_points[,.(Set, filename, DupPnts, TotPnts, Cover, STime, ETime)],
+#                  sep = " ; ", quote = FALSE,
+#                  file = fl_suspctpt_all )
 
 
 
 ##  Filter data by speed  ------------------------------------------------------
 
-##TODO
-hist(DT$timediff)
-hist(DT$dist)
-hist(DT$kph)
-
-# table((DT$timediff %/% 5) * 5 )
-# table((DT$dist     %/% 1000) * 1000 )
-# table(abs(DT$kph   %/% 200) * 200 )
-
-cat(paste("\nGreat distances\n"))
-DT[dist > 100000, .( .N, MaxDist = max(dist)) , by = filename]
-
-cat(paste("\nGreat speeds\n"))
-DT[kph > 500000 & !is.infinite(kph), .(.N, MaxKph = max(kph), time[which.max(kph)]) , by = filename ]
-
-cat(paste("\nGreat times\n"))
-DT[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(timediff)]) , by = filename ]
+# hist(DT$timediff)
+# hist(DT$dist)
+# hist(DT$kph)
+#
+# cat(paste("\nGreat distances\n"))
+# DT[dist > 100000, .( .N, MaxDist = max(dist)) , by = filename]
+#
+# cat(paste("\nGreat speeds\n"))
+# DT[kph > 500000 & !is.infinite(kph), .(.N, MaxKph = max(kph), time[which.max(kph)]) , by = filename ]
+#
+# cat(paste("\nGreat times\n"))
+# DT[timediff > 600 , .(.N, MaxTDiff = max(timediff), time = time[which.max(timediff)]) , by = filename ]
 
 
 # esss <- DT[kph > 200, .(file, kph, timediff, dist ,time) ]
-# setorder(esss, kph)
 # DT[dist > 200, .(max(kph), time[which.max(kph)] ), by = file ]
 # DT[timediff==0]
 # DT[dist==0 & timediff==0]
@@ -235,14 +219,14 @@ DT[ grep("/TRAIN/", filename ), Source := "Train" ]
 DT[ , filename := NULL ]
 
 #### Change temporal resolution ####
-DT[ , time :=  (as.numeric(time) %/% rsltemp * rsltemp) + (rsltemp/2)]
-DT[ , time :=  as.POSIXct( time, origin = "1970-01-01") ]
+DT[ , time := (as.numeric(time) %/% rsltemp * rsltemp) + (rsltemp/2)]
+DT[ , time := as.POSIXct( time, origin = "1970-01-01") ]
 
 ## Count points in the minimum resolution of time and space
 min_res <- min(rsls)
 
-DT[ , X :=  (X %/% min_res * min_res) + (min_res/2) ]
-DT[ , Y :=  (Y %/% min_res * min_res) + (min_res/2) ]
+DT[ , X := (X %/% min_res * min_res) + (min_res/2) ]
+DT[ , Y := (Y %/% min_res * min_res) + (min_res/2) ]
 DT <- DT[ , .(Points = .N) ,  by = .(X,Y,Source, time) ]
 
 ## create other indexes to use
@@ -265,21 +249,8 @@ for (res in sort(rsls,decreasing = T)) {
                                     Hours   = length(unique(hour))), by = .(X,Y,Source,day) ]
     points_by_day$res    <- res
     points_by_day        <- st_as_sf( points_by_day,  coords = c("X", "Y"), crs = EPSG, agr = "constant")
+    stop("wait")
     st_write(points_by_day, fl_gis_data_test, layer = sprintf("Days   %5d m",res), append = FALSE, delete_layer= TRUE)
-
-
-    ####  One pixel every hour ####
-    # points_by_hour       <- dt[ , .(Points  = sum(Points, na.rm = T)) , by = .(X,Y,Source,hour) ]
-    # points_by_hour$res   <- res
-    # points_by_hour       <- st_as_sf( points_by_hour,  coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    # st_write(points_by_hour, fl_gis_data_test, layer = sprintf("Hours  %5d m",res), append = FALSE, delete_layer= TRUE)
-
-
-    ## should do that in gis
-    # points_by_source     <- dt[ , .N , by = .(X,Y,Source, time) ]
-    # points_by_source$res <- res
-    # points_by_source     <- st_as_sf( points_by_source,  coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    # st_write(points_by_source, fl_gis_data_test, layer = sprintf("Source %5d m",res), append = FALSE, delete_layer= TRUE)
 
 }
 
