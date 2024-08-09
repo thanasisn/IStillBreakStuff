@@ -265,29 +265,81 @@ cat("Set symbol:", icon, "\n")
 DATA_wpt$sym[agrep("αδιέξοδο", DATA_wpt$name,      ignore.case = T)] <- icon
 DATA_wpt$sym[agrep("αδιέξοδο", DATA_wpt$name_orig, ignore.case = T)] <- icon
 
-icon <- "Beach"
-cat("Set symbol:", icon, "\n")
-ids <- unique(c(
-  agrep("παραλια", DATA_wpt$name),
-  agrep("paralia", DATA_wpt$name),
-  agrep("beach",   DATA_wpt$name),
-  agrep("παραλια", DATA_wpt$name_orig),
-  agrep("paralia", DATA_wpt$name_orig),
-  agrep("beach",   DATA_wpt$name_orig),
-  NULL
-))
-DATA_wpt$sym[ids] <- icon
 
 terms <- c("διασταυρωση", "crossin")
 icon <- "Crossing"
 cat("Set symbol:", icon, "\n")
 ids <- unique(unlist(lapply(
   terms,
-  function(x) unique(c(agrep(x, DATA_wpt$name), agrep(x, DATA_wpt$name_orig)))
+  function(x) unique(c(agrep(x, DATA_wpt$name, ignore.case = T), agrep(x, DATA_wpt$name_orig, ignore.case = T)))
 )))
-DATA_wpt[ids, c("name", "name_orig")]
-DATA_wpt$name
-DATA_wpt$name
+# DATA_wpt[ids, c("name", "name_orig")]
+DATA_wpt$sym[ids] <- icon
+
+
+terms <- c("καταφύγιο", "refuge")
+icon <- "lodge"
+cat("Set symbol:", icon, "\n")
+ids <- unique(unlist(lapply(
+  terms,
+  function(x) unique(c(agrep(x, DATA_wpt$name, ignore.case = T), agrep(x, DATA_wpt$name_orig, ignore.case = T)))
+)))
+# DATA_wpt[ids, c("name", "name_orig")]
+DATA_wpt$sym[ids] <- icon
+
+
+terms <- c("κορυφή", "peak")
+icon <- "Summit"
+cat("Set symbol:", icon, "\n")
+ids <- unique(unlist(lapply(
+  terms,
+  function(x) unique(c(agrep(x, DATA_wpt$name, ignore.case = T), agrep(x, DATA_wpt$name_orig, ignore.case = T)))
+)))
+# View(DATA_wpt[ids, c("name", "name_orig","file")])
+DATA_wpt$sym[ids] <- icon
+
+
+terms <- c("beach", "paralia", "παραλια")
+icon <- "Beach"
+cat("Set symbol:", icon, "\n")
+ids <- unique(unlist(lapply(
+  terms,
+  function(x) unique(c(agrep(x, DATA_wpt$name, ignore.case = T), agrep(x, DATA_wpt$name_orig, ignore.case = T)))
+)))
+# View(DATA_wpt[ids, c("name", "name_orig","file")])
+DATA_wpt$sym[ids] <- icon
+
+terms <- c("viewpoint", "θέα")
+icon <- "Scenic area"
+cat("Set symbol:", icon, "\n")
+ids <- unique(unlist(lapply(
+  terms,
+  function(x) unique(c(grep(x, DATA_wpt$name, ignore.case = T), grep(x, DATA_wpt$name_orig, ignore.case = T)))
+)))
+# View(DATA_wpt[ids, c("name", "name_orig","file")])
+DATA_wpt$sym[ids] <- icon
+
+
+terms <- c("πηγή", "βρύση", "spring", "ποτίστρα", "νερό", "water")
+icon <- "Drinking water"
+cat("Set symbol:", icon, "\n")
+ids <- unique(unlist(lapply(
+  terms,
+  function(x) unique(c(agrep(x, DATA_wpt$name, ignore.case = T), agrep(x, DATA_wpt$name_orig, ignore.case = T)))
+)))
+View(DATA_wpt[ids, c("name", "name_orig", "sym","file")])
+DATA_wpt$sym[ids] <- icon
+
+terms <- c("camp", "κατασκήνωση")
+icon <- "Drinking water"
+cat("Set symbol:", icon, "\n")
+ids <- unique(unlist(lapply(
+  terms,
+  function(x) unique(c(agrep(x, DATA_wpt$name, ignore.case = T), agrep(x, DATA_wpt$name_orig, ignore.case = T)))
+)))
+View(DATA_wpt[ids, c("name", "name_orig", "sym","file")])
+# DATA_wpt$sym[ids] <- icon
+
 stop()
 
 
