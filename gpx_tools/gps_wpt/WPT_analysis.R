@@ -265,7 +265,6 @@ cat("Set symbol:", icon, "\n")
 DATA_wpt$sym[agrep("αδιέξοδο", DATA_wpt$name,      ignore.case = T)] <- icon
 DATA_wpt$sym[agrep("αδιέξοδο", DATA_wpt$name_orig, ignore.case = T)] <- icon
 
-
 icon <- "Beach"
 cat("Set symbol:", icon, "\n")
 ids <- unique(c(
@@ -279,7 +278,17 @@ ids <- unique(c(
 ))
 DATA_wpt$sym[ids] <- icon
 
-
+terms <- c("διασταυρωση", "crossin")
+icon <- "Crossing"
+cat("Set symbol:", icon, "\n")
+ids <- unique(unlist(lapply(
+  terms,
+  function(x) unique(c(agrep(x, DATA_wpt$name), agrep(x, DATA_wpt$name_orig)))
+)))
+DATA_wpt[ids, c("name", "name_orig")]
+DATA_wpt$name
+DATA_wpt$name
+stop()
 
 
 ## __ Distance test  -----------------------------------------------------------
