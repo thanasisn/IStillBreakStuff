@@ -15,9 +15,9 @@ Script.Name <- "~/CODE/gpx_tools/gps_wpt/WPT_analysis.R"
 if (!interactive()) pdf(file = sub("\\.R$", ".pdf", Script.Name), width = 14)
 
 if (!interactive()) {
-  dir.create("../runtime/", showWarnings = F, recursive = T)
-  pdf( file = paste0("../runtime/", basename(sub("\\.R$",".pdf", Script.Name))))
-  sink(file = paste0("../runtime/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
+  dir.create("~/CODE/gpx_tools/gps_wpt/runtime/", showWarnings = F, recursive = T)
+  # pdf( file = paste0("~/CODE/gpx_tools/gps_wpt/runtime/", basename(sub("\\.R$",".pdf", Script.Name))))
+  sink(file = paste0("~/CODE/gpx_tools/gps_wpt/runtime/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
 }
 
 #+ echo=F, include=T
@@ -255,28 +255,6 @@ DATA_wpt <- DATA_wpt[!is.na(DATA_wpt$name), ]
 
 ##  Set icons by name  ---------------------------------------------------------
 
-icon <- "Flag, Yellow"
-cat("Set symbol:", icon, "\n")
-DATA_wpt$sym[grep("tomap", DATA_wpt$name,      ignore.case = T)] <- icon
-DATA_wpt$sym[grep("tomap", DATA_wpt$name_orig, ignore.case = T)] <- icon
-
-icon <- "Circle with x"
-cat("Set symbol:", icon, "\n")
-DATA_wpt$sym[agrep("αδιέξοδο", DATA_wpt$name,      ignore.case = T)] <- icon
-DATA_wpt$sym[agrep("αδιέξοδο", DATA_wpt$name_orig, ignore.case = T)] <- icon
-
-
-terms <- c("διασταυρωση", "crossin")
-icon <- "Crossing"
-cat("Set symbol:", icon, "\n")
-ids <- unique(unlist(lapply(
-  terms,
-  function(x) unique(c(agrep(x, DATA_wpt$name, ignore.case = T), agrep(x, DATA_wpt$name_orig, ignore.case = T)))
-)))
-# DATA_wpt[ids, c("name", "name_orig")]
-DATA_wpt$sym[ids] <- icon
-
-
 terms <- c("καταφύγιο", "refuge")
 icon <- "lodge"
 cat("Set symbol:", icon, "\n")
@@ -309,6 +287,7 @@ ids <- unique(unlist(lapply(
 # View(DATA_wpt[ids, c("name", "name_orig","file")])
 DATA_wpt$sym[ids] <- icon
 
+
 terms <- c("viewpoint", "θέα")
 icon <- "Scenic area"
 cat("Set symbol:", icon, "\n")
@@ -327,20 +306,61 @@ ids <- unique(unlist(lapply(
   terms,
   function(x) unique(c(agrep(x, DATA_wpt$name, ignore.case = T), agrep(x, DATA_wpt$name_orig, ignore.case = T)))
 )))
-View(DATA_wpt[ids, c("name", "name_orig", "sym","file")])
+# View(DATA_wpt[ids, c("name", "name_orig", "sym","file")])
 DATA_wpt$sym[ids] <- icon
 
+# terms <- c("scat", "σκατ", "τρίχες", "toros", "τορός")
+# icon <- "Campground"
+# cat("Set symbol:", icon, "\n")
+# ids <- unique(unlist(lapply(
+#   terms,
+#   function(x) unique(c(grep(x, DATA_wpt$name, ignore.case = T), grep(x, DATA_wpt$name_orig, ignore.case = T)))
+# )))
+# View(DATA_wpt[ids, c("name", "name_orig", "sym","file")])
+# DATA_wpt$sym[ids] <- icon
+
 terms <- c("camp", "κατασκήνωση")
-icon <- "Drinking water"
+icon <- "Campground"
+cat("Set symbol:", icon, "\n")
+ids <- unique(unlist(lapply(
+  terms,
+  function(x) unique(c(grep(x, DATA_wpt$name, ignore.case = T), grep(x, DATA_wpt$name_orig, ignore.case = T)))
+)))
+# View(DATA_wpt[ids, c("name", "name_orig", "sym","file")])
+DATA_wpt$sym[ids] <- icon
+
+
+terms <- c("διασταυρωση", "crossin")
+icon <- "Crossing"
 cat("Set symbol:", icon, "\n")
 ids <- unique(unlist(lapply(
   terms,
   function(x) unique(c(agrep(x, DATA_wpt$name, ignore.case = T), agrep(x, DATA_wpt$name_orig, ignore.case = T)))
 )))
-View(DATA_wpt[ids, c("name", "name_orig", "sym","file")])
-# DATA_wpt$sym[ids] <- icon
+# DATA_wpt[ids, c("name", "name_orig")]
+DATA_wpt$sym[ids] <- icon
 
-stop()
+
+terms <- c("αδιέξοδο", "dead end")
+icon <- "Circle with x"
+cat("Set symbol:", icon, "\n")
+ids <- unique(unlist(lapply(
+  terms,
+  function(x) unique(c(agrep(x, DATA_wpt$name, ignore.case = T), agrep(x, DATA_wpt$name_orig, ignore.case = T)))
+)))
+# View(DATA_wpt[ids, c("name", "name_orig", "sym","file")])
+DATA_wpt$sym[ids] <- icon
+
+
+terms <- c("tomap")
+icon <- "Flag, Yellow"
+cat("Set symbol:", icon, "\n")
+ids <- unique(unlist(lapply(
+  terms,
+  function(x) unique(c(grep(x, DATA_wpt$name, ignore.case = T), grep(x, DATA_wpt$name_orig, ignore.case = T)))
+)))
+# View(DATA_wpt[ids, c("name", "name_orig", "sym","file")])
+DATA_wpt$sym[ids] <- icon
 
 
 ## __ Distance test  -----------------------------------------------------------
