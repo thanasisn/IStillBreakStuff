@@ -109,6 +109,7 @@ EXPORT <- TRUE
 copywpt$file   <- NULL
 copywpt$mtime  <- NULL
 copywpt$Region <- NULL
+copywpt$type   <- NULL
 
 copywpt$name      <- copywpt$name_orig
 copywpt$name_orig <- NULL
@@ -124,6 +125,7 @@ rm(copywpt)
 
 
 ##  Clean points  --------------------------------------------------------------
+DATA_wpt$type <- NULL
 
 ## __ Remove extra spaces  -----------------------------------------------------
 DATA_wpt$name <- gsub("^[ ]+",    "", DATA_wpt$name)
@@ -253,12 +255,29 @@ DATA_wpt <- DATA_wpt[!is.na(DATA_wpt$name), ]
 
 ##  Set icons by name  ---------------------------------------------------------
 
-icon <- "Flat, Yellow"
+icon <- "Flag, Yellow"
+cat("Set symbol:", icon, "\n")
 DATA_wpt$sym[grep("tomap", DATA_wpt$name,      ignore.case = T)] <- icon
-DATA_wpt$sym[grep("tomap", DATA_wpt$name_orig, ignore.case = T)] <- "Flat, Yellow"
+DATA_wpt$sym[grep("tomap", DATA_wpt$name_orig, ignore.case = T)] <- icon
 
-DATA_wpt$sym[agrep("αδιέξοδο", DATA_wpt$name,      ignore.case = T)] <- "Circle with x"
-DATA_wpt$sym[agrep("αδιέξοδο", DATA_wpt$name_orig, ignore.case = T)] <- "Circle with x"
+icon <- "Circle with x"
+cat("Set symbol:", icon, "\n")
+DATA_wpt$sym[agrep("αδιέξοδο", DATA_wpt$name,      ignore.case = T)] <- icon
+DATA_wpt$sym[agrep("αδιέξοδο", DATA_wpt$name_orig, ignore.case = T)] <- icon
+
+
+icon <- "Beach"
+cat("Set symbol:", icon, "\n")
+ids <- unique(c(
+  agrep("παραλια", DATA_wpt$name),
+  agrep("paralia", DATA_wpt$name),
+  agrep("beach",   DATA_wpt$name),
+  agrep("παραλια", DATA_wpt$name_orig),
+  agrep("paralia", DATA_wpt$name_orig),
+  agrep("beach",   DATA_wpt$name_orig),
+  NULL
+))
+DATA_wpt$sym[ids] <- icon
 
 
 
