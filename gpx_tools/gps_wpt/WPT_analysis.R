@@ -37,7 +37,7 @@ source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
 source("~/CODE/R_myRtools/myRtools/R/write_.R")
 
 EXPORT <- FALSE
-# EXPORT <- TRUE  ## for debug
+EXPORT <- TRUE  ## for debug
 
 # options(warn = 1)
 
@@ -249,6 +249,18 @@ DATA_wpt$name <- str_to_title(DATA_wpt$name)
 
 ## Drop unnamed points
 DATA_wpt <- DATA_wpt[!is.na(DATA_wpt$name), ]
+
+
+##  Set icons by name  ---------------------------------------------------------
+
+icon <- "Flat, Yellow"
+DATA_wpt$sym[grep("tomap", DATA_wpt$name,      ignore.case = T)] <- icon
+DATA_wpt$sym[grep("tomap", DATA_wpt$name_orig, ignore.case = T)] <- "Flat, Yellow"
+
+DATA_wpt$sym[agrep("αδιέξοδο", DATA_wpt$name,      ignore.case = T)] <- "Circle with x"
+DATA_wpt$sym[agrep("αδιέξοδο", DATA_wpt$name_orig, ignore.case = T)] <- "Circle with x"
+
+
 
 
 ## __ Distance test  -----------------------------------------------------------
