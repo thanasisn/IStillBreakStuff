@@ -36,19 +36,19 @@ tempdir  <- "/dev/shm/glh/"
 dir.create(storedir, showWarnings = F )
 dir.create(tempdir,  showWarnings = F )
 
-# nfile <- paste0(tempdir, "master_temp.json")
+nfile <- paste0(tempdir, "master_temp.json")
 
 ## create a copy of working file
-# file.copy(Bfile, nfile)
+file.copy(Bfile, nfile)
 
 
 ## remove some decorations of the file
-# system(paste("sed -i '/\"locations\" :/d'", nfile ))
-# system(paste("sed -i 's/^{$/[ {/'", nfile ))
-# system(paste("sed -i '$d'", nfile ))
+system(paste("sed -i '/\"locations\" :/d'", nfile ))
+system(paste("sed -i 's/^{$/[ {/'", nfile ))
+system(paste("sed -i '$d'", nfile ))
 
-## read the file
-# lines <- readLines(nfile)
+## read the file?!
+lines <- readLines(nfile)
 
 ## find the location of each point in the file
 # ntim <- grep("timestampMs", lines)
@@ -120,7 +120,7 @@ dir.create(tempdir,  showWarnings = F )
 #                         full.names = T)
 
 
-
+stop("dont export yet")
 
 ## read directly the main file
 filestodo <- Bfile
