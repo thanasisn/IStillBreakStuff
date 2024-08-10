@@ -22,17 +22,17 @@ library(myRtools)
 breaks   <- 10000
 
 ## input file path
-Bfile     <- "~/DATA_RAW/Other/Google_Takeout/Location History (Timeline)/Records.json"
+Bfile    <- "~/DATA_RAW/Other/Google_Takeout/Location History (Timeline)/Records.json"
 
 ## raw output location
 storedir <- "~/DATA_RAW/Other/GLH/Raw"
 
 ## temp output base
-tempdir  <- "/dev/shm/glh/"
-
+tempdir  <- "/home/athan/ZHOST/glh_temp/"
 
 #### _ MAIN _ ####
 
+unlink(tempdir, recursive=TRUE)
 dir.create(storedir, showWarnings = F )
 dir.create(tempdir,  showWarnings = F )
 
@@ -51,73 +51,76 @@ system(paste("sed -i '$d'", nfile ))
 lines <- readLines(nfile)
 
 ## find the location of each point in the file
-# ntim <- grep("timestampMs", lines)
-# nlat <- grep("latitudeE7",  lines)
-# nlon <- grep("longitudeE7", lines)
-## move indexes same as ntime
-# nlat <- nlat - 1
-# nlon <- nlon - 2
+ntim <- grep("timestamp",   lines)
+nlat <- grep("latitudeE7",  lines)
+nlon <- grep("longitudeE7", lines)
+# move indexes same as ntime
+nlat <- nlat - 1
+nlon <- nlon - 2
 
 ## these are sets anyway
-# stopifnot( all(nlat == nlon) )
+stopifnot(all(nlat == nlon))
 
 ## the location of every point start
-# npoints <- intersect(ntim,nlat)
+npoints <- intersect(ntim, nlat)
 ## distribute the point to chunks for breaking
-# targets <- which( npoints %% breaks == 1)
+targets <- which( npoints %% breaks == 1)
 ## index of split points
-# spltlin <- c(1,npoints[targets], length(lines))
+spltlin <- c(1, npoints[targets], length(lines))
 
-# #### Split json in smaller json files ####
-# for ( ii in 1:(length(spltlin)-1) ) {
-#     from  <- spltlin[ii]
-#     until <- spltlin[ii+1]
-#
-#     cat(paste("Part:",ii),"\n")
-#     cat(paste(from, until,"\n"))
-#
-#     ## inspect chunk
-#     # head(temp)
-#     # tail(temp)
-#
-#     temp <- lines[(from-1):(until-1)]
-#
-#     ## fix proper ends
-#     if (grepl("\\}, \\{", temp[length(temp)])) {
-#         temp[length(temp)] <- "} ]"
-#     }
-#
-#     ## fix proper starts
-#     if (grepl("\\}, \\{", temp[1])) {
-#         temp[1] <- "[ {"
-#     }
-#
-#     ## fix end all for the last chunk
-#     ## FIXME not writing to the end every time works on manual runs
-#     if ( ii == length(spltlin)-1 ) {
-#         ## remove last comma
-#         ## although this mean that some lines at the end may be missing
-#         temp[length(temp)] <- sub(",$","", temp[length(temp)])
-#         temp <- c(temp,"} ]")
-#     }
-#
-#     ## inspect output
-#     cat("HEAD:......\n")
-#     cat(head(temp),sep = "\n")
-#     cat("TAIL:......\n")
-#     cat(tail(temp),sep = "\n")
-#     cat("......\n")
-#
-#     ## write spitted files
-#     writeLines( temp, paste0(tempdir,"GLH_part_", sprintf("%04d",ii), ".json"))
-# }
-# rm(lines)
-#
-# cat(paste("May need to do manual corrections to the last splitted json files"),"\n")
-#
-# filestodo <- list.files(path       = tempdir,
-#                         pattern    = "GLH_part.*.json",
-#                         full.names = T)
+#### Split json in smaller json files ####
+for ( ii in 1:(length(spltlin) - 1) ) {
+    from  <- spltlin[ii]
+    until <- spltlin[ii + 1]
+
+    cat(paste("Part:",ii),"\n")
+    cat(paste(from, until,"\n"))
+
+    ## inspect chunk
+    # head(temp)
+    # tail(temp)
+
+    temp <- lines[(from - 1):(until - 1)]
+
+    ## fix proper ends
+    if (grepl("\\}, \\{", temp[length(temp)])) {
+        temp[length(temp)] <- "} ]"
+    }
+
+    ## fix proper starts
+    if (grepl("\\}, \\{", temp[1])) {
+        temp[1] <- "[ {"
+    }
+
+    ## fix end all for the last chunk
+    ## FIXME not writing to the end every time works on manual runs
+    if ( ii == length(spltlin) - 1 ) {
+        ## remove last comma
+        ## although this mean that some lines at the end may be missing
+        temp[length(temp)] <- sub(",$","", temp[length(temp)])
+        temp <- c(temp,"} ]")
+    }
+
+    ## inspect output
+    cat("HEAD:......\n")
+    cat(head(temp),sep = "\n")
+    cat("TAIL:......\n")
+    cat(tail(temp),sep = "\n")
+    cat("......\n")
+
+    ## write spitted files
+    writeLines( temp, paste0(tempdir,"GLH_part_", sprintf("%04d",ii), ".json"))
+
+    tempJ <- data.table(jsonlite::fromJSON(af))
+    stop()
+}
+rm(lines)
+
+cat(paste("May need to do manual corrections to the last splitted json files"),"\n")
+
+filestodo <- list.files(path       = tempdir,
+                        pattern    = "GLH_part.*.json",
+                        full.names = T)
 
 
 stop("dont export yet")
