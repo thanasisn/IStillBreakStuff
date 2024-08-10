@@ -14,9 +14,6 @@ goolgepoints_fl <- "~/DATA/Other/GLH/Count_GlL_3857.Rds"
 ## Layer with multiple polygons in which the gpx files may be
 fl_regions      <- "~/GISdata/Layers/path_regions.shp"
 
-## Pahts with gpx file to parse
-gpx_repos <- c("~/GISdata/GPX/",
-               "~/TRAIN/GoldenCheetah/")
 
 
 ## Files to evaluate track problems  -------------------------------------------

@@ -12,11 +12,6 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/CODE/gpx_tools/gpx_db/process_gpx_trk_points_2.R"
 
-if (!interactive()) {
-  dir.create("../runtime/", showWarnings = F, recursive = T)
-  pdf( file = paste0("../runtime/", basename(sub("\\.R$",".pdf", Script.Name))))
-  sink(file = paste0("../runtime/", basename(sub("\\.R$",".out", Script.Name))),split=TRUE)
-}
 
 
 library(data.table)
@@ -191,69 +186,6 @@ if ( nrow( DT[ is.na(time)] ) > 0 ) {
 # DT[dist>0 & dist < 10 & timediff==0]
 # DT[is.infinite(kph), .(max(dist), time[which.max(dist)]) ,by = file]
 # DT[dist<0]
-
-
-
-##  Bin points in grids  -------------------------------------------------------
-
-## no need for all data for griding
-DT[, kph      := NULL]
-DT[, timediff := NULL]
-DT[, dist     := NULL]
-DT[, Xdeg     := NULL]
-DT[, Ydeg     := NULL]
-
-## keep only existing coordinates
-DT <- DT[ !is.na(X) ]
-DT <- DT[ !is.na(Y) ]
-
-cat(paste( length(unique( DT$filename )), "files to bin\n" ))
-cat(paste( nrow( DT ), "points to bin\n" ))
-
-## set flags for each category ##
-DT[, Source := "Rest"]
-DT[ grep("/Plans/", filename ), Source := "Plans" ]
-DT[ grep("/ROUT/",  filename ), Source := "Plans" ]
-DT[ grep("/TRAIN/", filename ), Source := "Train" ]
-
-DT[ , filename := NULL ]
-
-#### Change temporal resolution ####
-DT[ , time := (as.numeric(time) %/% rsltemp * rsltemp) + (rsltemp/2)]
-DT[ , time := as.POSIXct( time, origin = "1970-01-01") ]
-
-## Count points in the minimum resolution of time and space
-min_res <- min(rsls)
-
-DT[ , X := (X %/% min_res * min_res) + (min_res/2) ]
-DT[ , Y := (Y %/% min_res * min_res) + (min_res/2) ]
-DT <- DT[ , .(Points = .N) ,  by = .(X,Y,Source, time) ]
-
-## create other indexes to use
-DT[ , day  := as.Date(time) ]
-DT[ , hour := as.POSIXct(as.numeric(time) %/% 3600 * 3600, origin = "1970-01-01") ]
-
-## export different spatial resolutions
-for (res in sort(rsls,decreasing = T)) {
-    resolname <- sprintf("Res %8d m",res)
-
-    dt <- copy(DT)
-    ## drop the resolution of the data
-    dt[ , X :=  (X %/% res * res) + (res/2) ]
-    dt[ , Y :=  (Y %/% res * res) + (res/2) ]
-
-    stopifnot(nrow(dt[is.na(X), ])==0)
-
-    ####  One pixel every day ####
-    points_by_day        <- dt[ , .(Points  = sum(Points, na.rm = T),
-                                    Hours   = length(unique(hour))), by = .(X,Y,Source,day) ]
-    points_by_day$res    <- res
-    points_by_day        <- st_as_sf( points_by_day,  coords = c("X", "Y"), crs = EPSG, agr = "constant")
-    stop("wait")
-    st_write(points_by_day, fl_gis_data_test, layer = sprintf("Days   %5d m",res), append = FALSE, delete_layer= TRUE)
-
-}
-
 
 
 ####_ END _####
