@@ -19,7 +19,7 @@ library(jsonlite)
 library(myRtools)
 
 ## break every n data points
-breaks   <- 10000
+breaks   <- 5000
 
 ## input file path
 Bfile    <- "~/DATA_RAW/Other/Google_Takeout/Location History (Timeline)/Records.json"
@@ -108,10 +108,19 @@ for ( ii in 1:(length(spltlin) - 1) ) {
     cat(tail(temp),sep = "\n")
     cat("......\n")
 
-    ## write spitted files
-    writeLines( temp, paste0(tempdir,"GLH_part_", sprintf("%04d",ii), ".json"))
+    tmpjson_fl <- paste0(tempdir,"GLH_part_", sprintf("%04d",ii), ".json")
+    tmprds_fl  <- paste0(tempdir,"GLH_part_", sprintf("%04d",ii), ".Rds")
 
-    tempJ <- data.table(jsonlite::fromJSON(af))
+    ## write partial json file
+    writeLines(temp, tmpjson_fl)
+    ## read partial file in R
+    tempJ <- data.table(jsonlite::fromJSON(temp))
+    ## save partial fiel as Rds
+
+
+    ## remove partial json file
+
+
     stop()
 }
 rm(lines)
