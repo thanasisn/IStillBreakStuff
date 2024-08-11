@@ -56,23 +56,23 @@ DATA <- data.frame(DATA)
 # colnames(DATA[, ..activ])[max.col(DATA[, ..activ])]
 
 # only considering columns 1 and 2
-DD <-  DATA %>% mutate(max_ind = max.col(DATA[, activ]))
-DD[!is.na(DD$max_ind)]
+# DD <-  DATA %>% mutate(max_ind = max.col(DATA[, activ]))
+# DD[!is.na(DD$max_ind)]
 
 
-DD <- transform(DATA, max_ind_subset=max.col(DATA[,activ]))
+# DD <- transform(DATA, max_ind_subset=max.col(DATA[,activ]))
 
-DD[!is.na(DD$max_ind_subset)]
+# DD[!is.na(DD$max_ind_subset)]
 
 
-DATA[,activ]
+# DATA[,activ]
 
 
 DD <- transform(DATA, max_ind_base = apply(DATA[, activ],1,which.max)) %>% print
 DD[!is.na(DD$max_ind_base)]
 
-vecN <- unlist(apply(DATA[, activ], 1, function(x) activ[which.max(x)]  ))
-vecP <- unlist(apply(DATA[, activ], 1, function(x) x[activ[which.max(x)]]  ))
+vecN <- apply(DATA[, activ], 1, function(x) activ[which.max(x)]   )
+vecP <- apply(DATA[, activ], 1, function(x) x[activ[which.max(x)]])
 
 DATA[, activ][activ[which.max(x)]]
 
