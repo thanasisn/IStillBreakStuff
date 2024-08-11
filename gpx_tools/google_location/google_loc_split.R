@@ -5,6 +5,11 @@
 #### Split Google location history json to smaller manageable Rds files
 ## The output may need some manual adjustment
 
+# Convert the json into a smaller JSON only with the fields we want using jq cat LocationHistory.json |jq "[.locations[] | {latitudeE7, longitudeE7, timestampMs}]" > filtered_locations.json
+# Convert the json summary into CSV with jsonv cat filtered_locations.json |jsonv  latitudeE7,longitudeE7,timestampMs > filtered_locations.csv
+
+
+
 
 #### _ INIT _ ####
 
@@ -30,6 +35,14 @@ storedir <- "~/DATA_RAW/Other/GLH/Raw"
 ## temp output base
 tempdir  <- "/home/athan/ZHOST/glh_temp/"
 
+## csv export
+csv_fl <- "~/DATA/Other/GLH/GLH_Records.csv"
+
+
+fread(csv_fl)
+
+
+stop()
 #### _ MAIN _ ####
 
 unlink(tempdir, recursive=TRUE)
