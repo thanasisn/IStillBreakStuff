@@ -19,10 +19,12 @@ Sys.setenv(TZ = "UTC")
 tic = Sys.time()
 Script.Name = funr::sys.script()
 
-library(data.table)
-library(jsonlite)
-library(myRtools)
-library(dplyr)
+library(data.table, quietly = TRUE, warn.conflicts = FALSE)
+library(jsonlite,   quietly = TRUE, warn.conflicts = FALSE)
+library(myRtools,   quietly = TRUE, warn.conflicts = FALSE)
+library(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
+library(sf,         quietly = TRUE, warn.conflicts = FALSE)
+
 
 ## break every n data points
 breaks   <- 5000
@@ -38,8 +40,11 @@ tempdir  <- "/home/athan/ZHOST/glh_temp/"
 
 ## csv export
 csv_fl <- "~/DATA/Other/GLH/GLH_Records.csv"
+rds_fl <- "~/DATA/Other/GLH/GLH_Records.Rds"
 
 
+EPSG_WGS84 <- 4326  ## Usual gps datum
+EPSG_PMERC <- 3857  ## Pseudo-Mercator, Spherical Mercator, Google Maps, OpenStreetMap
 
 DATA <- fread(csv_fl)
 DATA <- janitor::remove_empty(DATA, "cols")
@@ -55,6 +60,7 @@ vecP <- apply(DATA[, activ], 1, function(x) x[activ[which.max(x)]])
 
 dd <- data.table(Main_activity             = as.character(vecN),
                  Main_activity_probability = as.numeric(vecP)   )
+rm(vecN, vecP)
 
 dd[Main_activity == "character(0)", Main_activity := NA]
 
@@ -64,22 +70,33 @@ DATA <- data.table(DATA)
 ## clean data coordinates
 DATA <- DATA[Latitude  != 0]
 DATA <- DATA[Longitude != 0]
+DATA <- DATA[abs(Latitude)  <  89.9999]
+DATA <- DATA[abs(Longitude) < 179.9999]
+DATA[, X_LON := Longitude]
+DATA[, Y_LAT := Latitude ]
 
-
-DATA[abs(Latitude) < 89.9999]
-
-
-
-tempJ <- tempJ[ !is.na(tempJ$Long), ]
-tempJ <- tempJ[ !is.na(tempJ$Lat),  ]
-tempJ <- tempJ[ abs(tempJ$Lat)  <  89.9999, ]
-tempJ <- tempJ[ abs(tempJ$Long) < 179.9999, ]
-## Prepare data
-## OR store and prepera elseware
+DATA <- st_as_sf(DATA,
+                 coords = c("Longitude", "Latitude"),
+                 crs = EPSG_WGS84)
 
 
 
-stop()
+## parse coordinates for process in meters
+temp <- data.table(
+  st_coordinates(
+    st_transform(DATA, crs = EPSG_PMERC)
+  )
+)
+DATA <- cbind(DATA, X = temp$X)
+DATA <- cbind(DATA, Y = temp$Y)
+
+write_RDS(DATA, rds_fl)
+
+stop("DONE")
+
+
+
+
 #### _ MAIN _ ####
 
 unlink(tempdir, recursive=TRUE)
@@ -222,6 +239,8 @@ for (af in filestodo) {
   tempJ <- tempJ[ !is.na(tempJ$Lat),  ]
   tempJ <- tempJ[ abs(tempJ$Lat)  <  89.9999, ]
   tempJ <- tempJ[ abs(tempJ$Long) < 179.9999, ]
+
+
   stop()
 
   for (ay in unique(year(tempJ$Date))) {
