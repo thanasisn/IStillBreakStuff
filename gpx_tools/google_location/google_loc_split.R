@@ -59,8 +59,21 @@ dd <- data.table(Main_activity             = as.character(vecN),
 dd[Main_activity == "character(0)", Main_activity := NA]
 
 DATA <- cbind(DATA, dd)
+DATA <- data.table(DATA)
+
+## clean data coordinates
+DATA <- DATA[Latitude  != 0]
+DATA <- DATA[Longitude != 0]
 
 
+DATA[abs(Latitude) < 89.9999]
+
+
+
+tempJ <- tempJ[ !is.na(tempJ$Long), ]
+tempJ <- tempJ[ !is.na(tempJ$Lat),  ]
+tempJ <- tempJ[ abs(tempJ$Lat)  <  89.9999, ]
+tempJ <- tempJ[ abs(tempJ$Long) < 179.9999, ]
 ## Prepare data
 ## OR store and prepera elseware
 
