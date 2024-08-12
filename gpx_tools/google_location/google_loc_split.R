@@ -40,43 +40,30 @@ tempdir  <- "/home/athan/ZHOST/glh_temp/"
 csv_fl <- "~/DATA/Other/GLH/GLH_Records.csv"
 
 
-DATA <- fread(csv_fl)
 
+DATA <- fread(csv_fl)
 DATA <- janitor::remove_empty(DATA, "cols")
 
 
+## Find main activity
 activ <- names(DATA)[toupper(names(DATA)) == names(DATA)]
 
-DATA[, ..activ]
-
-
 DATA <- data.frame(DATA)
-
-
-# colnames(DATA[, ..activ])[max.col(DATA[, ..activ])]
-
-# only considering columns 1 and 2
-# DD <-  DATA %>% mutate(max_ind = max.col(DATA[, activ]))
-# DD[!is.na(DD$max_ind)]
-
-
-# DD <- transform(DATA, max_ind_subset=max.col(DATA[,activ]))
-
-# DD[!is.na(DD$max_ind_subset)]
-
-
-# DATA[,activ]
-
-
-DD <- transform(DATA, max_ind_base = apply(DATA[, activ],1,which.max)) %>% print
-DD[!is.na(DD$max_ind_base)]
 
 vecN <- apply(DATA[, activ], 1, function(x) activ[which.max(x)]   )
 vecP <- apply(DATA[, activ], 1, function(x) x[activ[which.max(x)]])
 
-DATA[, activ][activ[which.max(x)]]
+dd <- data.table(Main_activity             = as.character(vecN),
+                 Main_activity_probability = as.numeric(vecP)   )
 
-unlist(apply(DATA[, activ], 1, max.col))
+dd[Main_activity == "character(0)", Main_activity := NA]
+
+DATA <- cbind(DATA, dd)
+
+
+## Prepare data
+## OR store and prepera elseware
+
 
 
 stop()
