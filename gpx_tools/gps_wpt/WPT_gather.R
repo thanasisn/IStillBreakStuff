@@ -40,6 +40,7 @@ options(warn = 1)
 DRINKING_WATER <- TRUE
 WATERFALLS     <- TRUE
 CAVES          <- TRUE
+PYRAMIDS       <- TRUE
 
 
 #### list GPX files ####
@@ -201,6 +202,39 @@ if (CAVES) {
   rm(dw)
 }
 
+
+##  Add pyramids from OSM  -----------------------------------------------------
+if (PYRAMIDS) {
+  dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_pyramids_Gr.gpx"
+  dw        <- read_sf(dw_fl, layer = "waypoints")
+  ## clean data
+  dw$desc   <- gsub("\n", " ", dw$desc)
+  dw$name   <- gsub("\n", " ", dw$name)
+  ## set a name for display in case of empty
+  # dw$name[is.na(dw$name)] <- "Cave"
+  dw$link <- NA
+
+  meta <- data.table(file     = path.expand(dw_fl),
+                     Region   = NA,
+                     Src_Type = "OSM_Pyramid",
+                     mtime    = file.mtime(dw_fl))
+  dw   <- cbind(dw, meta)
+
+  ## reproject to meters
+  dw  <- st_transform(dw, EPSG_MERCA)
+
+  # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T     # distmwt <- round(distmwt, digits = 3)
+  ## find close points
+  # dd <- which(distmwt < 5, arr.ind = T)
+
+  DATA <- rbind(DATA,
+                dw,
+                fill = T)
+  rm(dw)
+}
+
+
+
 DATA <- remove_empty(DATA, which = "cols")
 DATA <- DATA |> distinct()
 
@@ -251,7 +285,3 @@ pander::pander(table(DATA$Region))
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n", Sys.time(), Sys.info()["login"],
             Sys.info()["nodename"], basename(Script.Name), difftime(tac,tic,units = "mins")))
-# if (difftime(tac,tic,units = "sec") > 30) {
-#   system("mplayer /usr/share/sounds/freedesktop/stereo/dialog-warning.oga", ignore.stdout = T, ignore.stderr = T)
-#   system(paste("notify-send -u normal -t 30000 ", Script.Name, " 'R script ended'"))
-# }
