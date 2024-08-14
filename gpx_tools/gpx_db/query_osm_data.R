@@ -37,7 +37,7 @@ for (ar in regions) {
 
   ## Get camp sites from OSM #################################################
   outfile <- paste0("~/GISdata/Layers/Auto/osm/OSM_pyramids_",ar,".gpx")
-  cat(paste("Query for camp sites", ar, "\n"))
+  cat(paste("Query for pyramids", ar, "\n"))
 
   q1      <- add_osm_feature(call, key = "boundary", value =  "marker")
   q1      <- osmdata_sf(q1)
@@ -48,6 +48,18 @@ for (ar in regions) {
   q1$sym  <- "Green Block"
   q1$desc <- "Πυραμίδα"
   saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_boundary_marker.Rds")
+
+
+  q2      <- add_osm_feature(call, key = "man_made", value =  "survey_point")
+  q2      <- osmdata_sf(q2)
+  Sys.sleep(2) ## be polite to server
+  q2      <- q2$osm_points
+  q2$sym  <- "Short Tower"
+  q2$desc <- "Τριγωνομετρικό"
+  saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_survay_point.Rds")
+
+
+
 
   Q          <- unique(q1)
   Q$geometry <- sf::st_centroid(Q$geometry)
@@ -61,7 +73,7 @@ for (ar in regions) {
   Q$created_by           <- NULL
   Q$source               <- NULL
   Q$operator             <- NULL
-  Q$historic             <- NULL
+  # Q$historic             <- NULL
   Q$tourism              <- NULL
   Q$access               <- NULL
   Q$bottle               <- NULL
@@ -69,10 +81,11 @@ for (ar in regions) {
   Q$capacity             <- NULL
 
   Q <- unique(Q)
+  Q <- janitor::remove_empty(Q, "cols")
 
   ## replace na with spaces
   for (an in names(Q)) {
-    Q[as.vector(is.na(Q[,an])),an] <- ""
+    Q[as.vector(is.na(Q[, an])), an] <- ""
   }
 
   ## create name field from many
@@ -87,10 +100,11 @@ for (ar in regions) {
   Q$name <- gsub("^[ ]",  "", Q$name)
   Q$name <- gsub("[ ]$",  "", Q$name)
 
-  cnames <- unique(c("..."))
-  for (cn in cnames) {
-    Q$name <- sub(paste0("^",cn,"$"), "", Q$name, ignore.case = T)
-  }
+  ### Ignore sort names?
+  # cnames <- unique(c("..."))
+  # for (cn in cnames) {
+  #   Q$name <- sub(paste0("^",cn,"$"), "", Q$name, ignore.case = T)
+  # }
 
   ## test output
   ss <- data.frame( table(Q$name) )
@@ -124,21 +138,16 @@ for (ar in regions) {
   Q$cmt[Q$cmt   == ""] <- NA
   Q$cmt[Q$desc  == ""] <- NA
 
+
+  sel <- Q$name != "Πυραμίδα"
+  Q$name[sel] <- paste0("Π # ", Q$name[sel])
+
   ## test output
   ss <- table(Q$name)
 
   ## export data
-  EXP <- Q[,c("geometry","name","desc","sym","cmt")]
+  EXP <- Q[, c("geometry","name","desc","sym","cmt")]
   write_sf(EXP, outfile, driver = "GPX", append = F, overwrite = T)
-
-  stop()
-
-
-
-
-
-
-
 
 
 
