@@ -211,7 +211,7 @@ if (PYRAMIDS) {
   dw$desc   <- gsub("\n", " ", dw$desc)
   dw$name   <- gsub("\n", " ", dw$name)
   ## set a name for display in case of empty
-  # dw$name[is.na(dw$name)] <- "Cave"
+  dw$name[is.na(dw$name)] <- "Pyramid"
   dw$link <- NA
 
   meta <- data.table(file     = path.expand(dw_fl),

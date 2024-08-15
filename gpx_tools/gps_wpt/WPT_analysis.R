@@ -111,7 +111,7 @@ copywpt$mtime  <- NULL
 copywpt$Region <- NULL
 copywpt$type   <- NULL
 
-copywpt$name      <- copywpt$name_orig
+# copywpt$name      <- copywpt$name_orig
 copywpt$name_orig <- NULL
 
 write_sf(copywpt,
@@ -123,9 +123,10 @@ write_sf(copywpt,
 cat("Updated file: ", export_fl, "\n")
 rm(copywpt)
 
-
 ##  Clean points  --------------------------------------------------------------
 DATA_wpt$type <- NULL
+
+## TODO check spell
 
 ## __ Remove extra spaces  -----------------------------------------------------
 DATA_wpt$name <- gsub("^[ ]+",    "", DATA_wpt$name)
@@ -169,9 +170,9 @@ DATA_wpt <- DATA_wpt[grep("Trail Head",            DATA_wpt$name, invert = T, ig
 DATA_wpt <- DATA_wpt[grep("Turn .*",               DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("WPT[0-9]+",             DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("XDRXRD.*",              DATA_wpt$name, invert = T, ignore.case = T), ]
-DATA_wpt <- DATA_wpt[grep("[0-9]+!",               DATA_wpt$name, invert = T, ignore.case = T), ]
-DATA_wpt <- DATA_wpt[grep("[0-9]+",                DATA_wpt$name, invert = T, ignore.case = T), ]
-DATA_wpt <- DATA_wpt[grep("[0-9]+R",               DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("^[0-9]+!",              DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("^[0-9]+",               DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("^[0-9]+R",              DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^arxh$",                DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^arxi$",                DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^aσφμον$",              DATA_wpt$name, invert = T, ignore.case = T), ]
@@ -353,7 +354,7 @@ DATA_wpt$sym[ids] <- icon
 
 
 terms <- c("tomap")
-icon <- "Flag, Yellow"
+icon <- "Flag, Green"
 cat("Set symbol:", icon, "\n")
 ids <- unique(unlist(lapply(
   terms,
