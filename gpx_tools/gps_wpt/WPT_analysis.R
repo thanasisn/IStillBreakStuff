@@ -168,8 +168,8 @@ if (FALSE) {
 
 
   vec      <- grepl("[Α-Ω]", words, ignore.case = T )
-  el_words <- words[ vec]
-  en_words <- words[!vec]
+  el_words <- sort(words[ vec])
+  en_words <- sort(words[!vec])
 
   er_en <- data.table(
     words   = en_words,
@@ -217,11 +217,10 @@ if (FALSE) {
   to_check <- DATA_wpt[grepl("WPT", DATA_wpt$file, ignore.case = T), ]
 
   for (aw in 1:nrow(er_gr)) {
-    er_gr$words[aw]
     temp <- to_check[grepl(er_gr$words[aw], to_check$name), ]
     if (nrow(temp)>0){
       cat(er_gr$words[aw], ":", er_gr$suggest[aw], "\n")
-      print(temp$file)
+      print(unique(temp$file))
       cat("\n")
     }
   }
