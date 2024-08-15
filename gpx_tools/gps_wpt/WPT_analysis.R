@@ -31,6 +31,7 @@ suppressPackageStartupMessages({
   library(janitor,       quietly = TRUE, warn.conflicts = FALSE)
   library(RecordLinkage, quietly = TRUE, warn.conflicts = FALSE)
   library(stringdist,    quietly = TRUE, warn.conflicts = FALSE)
+  library(hunspell,      quietly = TRUE, warn.conflicts = FALSE)
 })
 
 source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
@@ -127,6 +128,13 @@ rm(copywpt)
 DATA_wpt$type <- NULL
 
 ## TODO check spell
+
+DATA_wpt |> hunspell_check(name)
+
+
+quanteda::tokens()
+stop()
+
 
 ## __ Remove extra spaces  -----------------------------------------------------
 DATA_wpt$name <- gsub("^[ ]+",    "", DATA_wpt$name)
