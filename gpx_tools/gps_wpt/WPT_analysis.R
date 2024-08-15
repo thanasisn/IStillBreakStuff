@@ -213,12 +213,22 @@ if (FALSE) {
 
   ## find error source
 
+  # to_check <- DATA_wpt[!grepl("OSM", DATA_wpt$Src_Type, ignore.case = T), ]
+  to_check <- DATA_wpt[grepl("WPT", DATA_wpt$file, ignore.case = T), ]
+
+  for (aw in 1:nrow(er_gr)) {
+    er_gr$words[aw]
+    temp <- to_check[grepl(er_gr$words[aw], to_check$name), ]
+    if (nrow(temp)>0){
+      cat(er_gr$words[aw], ":", er_gr$suggest[aw], "\n")
+      print(temp$file)
+      cat("\n")
+    }
+  }
+
 
 }
 
-
-
-stop()
 
 
 ## __ Remove extra spaces  -----------------------------------------------------
