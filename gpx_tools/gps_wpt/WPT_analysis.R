@@ -225,6 +225,18 @@ if (FALSE) {
     }
   }
 
+  for (aw in 1:nrow(er_en)) {
+    temp <- to_check[grepl(er_en$words[aw], to_check$name), ]
+    if (nrow(temp)>0){
+      cat(er_en$words[aw], ":", er_en$suggest[aw], "\n")
+      print(unique(temp$file))
+      cat("\n")
+    }
+  }
+
+
+
+
 
 }
 
