@@ -32,6 +32,7 @@ suppressPackageStartupMessages({
   library(RecordLinkage, quietly = TRUE, warn.conflicts = FALSE)
   library(stringdist,    quietly = TRUE, warn.conflicts = FALSE)
   library(hunspell,      quietly = TRUE, warn.conflicts = FALSE)
+  if (!require("qdap")) {install.packages("qdap")} else {library(qdap)}
 })
 
 source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
@@ -129,10 +130,61 @@ DATA_wpt$type <- NULL
 
 ## TODO check spell
 
-DATA_wpt |> hunspell_check(name)
+# DATA_wpt |> hunspell_check(name)
+#
+#
+# DATA_wpt |> quanteda::tokens(name,
+#                              remove_punct = T,
+#                              remove_numbers = T,
+#                              remove_symbols = T,
+#                              remove_separators = T)
+#
+# DATA_wpt$token <- quanteda::tokens(DATA_wpt$name,
+#                                    remove_punct = T,
+#                                    remove_numbers = T,
+#                                    remove_symbols = T,
+#                                    remove_separators = T)
+#
+# hunspell_check(DATA_wpt$token)
 
 
-quanteda::tokens()
+
+words <- unique(
+  unlist(
+    quanteda::tokens(DATA_wpt$name,
+                     remove_punct = T,
+                     remove_numbers = T,
+                     remove_symbols = T,
+                     remove_separators = T)
+  )
+)
+
+words <- words[nchar(words) > 2]
+words <- data.frame(words)
+
+er_en <- cbind(words$words,
+               hunspell_check(words = words$words, dict = dictionary("en_US"))
+)
+
+
+
+hunspell_check(words = words$words, dict = dictionary("el_GR"))
+
+hunspell_suggest(words = words$words)
+
+
+
+hunspell_check(words)
+
+
+
+
+
+
+library(qdap)
+
+
+
 stop()
 
 
