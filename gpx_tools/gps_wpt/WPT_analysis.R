@@ -130,58 +130,91 @@ DATA_wpt$type <- NULL
 
 ## TODO check spell
 
-# DATA_wpt |> hunspell_check(name)
-#
-#
-# DATA_wpt |> quanteda::tokens(name,
-#                              remove_punct = T,
-#                              remove_numbers = T,
-#                              remove_symbols = T,
-#                              remove_separators = T)
-#
-# DATA_wpt$token <- quanteda::tokens(DATA_wpt$name,
-#                                    remove_punct = T,
-#                                    remove_numbers = T,
-#                                    remove_symbols = T,
-#                                    remove_separators = T)
-#
-# hunspell_check(DATA_wpt$token)
+if (FALSE) {
+
+  # DATA_wpt |> hunspell_check(name)
+  #
+  #
+  # DATA_wpt |> quanteda::tokens(name,
+  #                              remove_punct = T,
+  #                              remove_numbers = T,
+  #                              remove_symbols = T,
+  #                              remove_separators = T)
+  #
+  # DATA_wpt$token <- quanteda::tokens(DATA_wpt$name,
+  #                                    remove_punct = T,
+  #                                    remove_numbers = T,
+  #                                    remove_symbols = T,
+  #                                    remove_separators = T)
+  #
+  # hunspell_check(DATA_wpt$token)
 
 
-
-words <- unique(
-  unlist(
-    quanteda::tokens(DATA_wpt$name,
-                     remove_punct = T,
-                     remove_numbers = T,
-                     remove_symbols = T,
-                     remove_separators = T)
+  words <- unique(
+    unlist(
+      quanteda::tokens(DATA_wpt$name,
+                       remove_punct = T,
+                       remove_numbers = T,
+                       remove_symbols = T,
+                       remove_separators = T)
+    )
   )
-)
-
-words <- words[nchar(words) > 2]
-words <- data.frame(words)
-
-er_en <- cbind(words$words,
-               hunspell_check(words = words$words, dict = dictionary("en_US"))
-)
 
 
-
-hunspell_check(words = words$words, dict = dictionary("el_GR"))
-
-hunspell_suggest(words = words$words)
-
-
-
-hunspell_check(words)
+  ## keep big words
+  words <- words[nchar(words) > 3]
+  ## ignore numbers
+  words <- words[!grepl("[0-9]+", words)]
 
 
+  vec      <- grepl("[Α-Ω]", words, ignore.case = T )
+  el_words <- words[ vec]
+  en_words <- words[!vec]
+
+  er_en <- data.table(
+    words   = en_words,
+    correct = hunspell_check(words = en_words,
+                             dict = dictionary("en_US"))
+  )
+  er_en <- er_en[ correct == F, ]
 
 
+  lld <- lapply(er_en$words, function(x)
+    paste(unlist(
+      hunspell_suggest(x, dict = dictionary("en_US"))
+    ), collapse = ", ")
+  )
+  er_en$suggest <- unlist(lld)
+  er_en <- er_en[suggest != "",]
+  er_en$correct <- NULL
 
 
-library(qdap)
+  er_gr <- data.table(
+    words   = el_words,
+    correct = hunspell_check(words = el_words, dict = dictionary("el_GR"))
+  )
+  er_gr <- er_gr[ correct == F, ]
+
+
+  lld <- lapply(er_gr$words, function(x)
+    paste(unlist(
+      hunspell_suggest(x, dict = dictionary("el_GR"))
+    ), collapse = ", ")
+  )
+  er_gr$suggest <- unlist(lld)
+  er_gr <- er_gr[suggest != "",]
+  er_gr$correct <- NULL
+
+  # for (aw in er_gr$words) {
+  #   cat(aw, ":", paste(unlist(hunspell_suggest(aw, dict = dictionary("el_GR"))), collapse = ", "), "\n")
+  # }
+  #
+
+
+  ## find error source
+
+
+}
 
 
 
