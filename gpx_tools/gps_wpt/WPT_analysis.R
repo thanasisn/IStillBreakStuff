@@ -12,13 +12,12 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/CODE/gpx_tools/gps_wpt/WPT_analysis.R"
 
-if (!interactive()) pdf(file = sub("\\.R$", ".pdf", Script.Name), width = 14)
 
-if (!interactive()) {
+# if (!interactive()) {
   dir.create("~/CODE/gpx_tools/gps_wpt/runtime/", showWarnings = F, recursive = T)
   # pdf( file = paste0("~/CODE/gpx_tools/gps_wpt/runtime/", basename(sub("\\.R$",".pdf", Script.Name))))
   sink(file = paste0("~/CODE/gpx_tools/gps_wpt/runtime/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
-}
+# }
 
 #+ echo=F, include=T
 suppressPackageStartupMessages({
@@ -236,8 +235,6 @@ if (FALSE) {
 
 
 
-
-
 }
 
 
@@ -287,6 +284,7 @@ DATA_wpt <- DATA_wpt[grep("XDRXRD.*",              DATA_wpt$name, invert = T, ig
 DATA_wpt <- DATA_wpt[grep("^[0-9]+!",              DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^[0-9]+",               DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^[0-9]+R",              DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("^afeteria$",            DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^arxh$",                DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^arxi$",                DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^aσφμον$",              DATA_wpt$name, invert = T, ignore.case = T), ]
@@ -317,6 +315,7 @@ DATA_wpt <- DATA_wpt[grep("^εδω$",                 DATA_wpt$name, invert = T,
 DATA_wpt <- DATA_wpt[grep("^εδώ$",                 DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^σκατ$",                DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^τριχεσ$",              DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("arxi monopat",          DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("asf-xom",               DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("at roundab",            DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("go left",               DATA_wpt$name, invert = T, ignore.case = T), ]
@@ -350,6 +349,7 @@ DATA_wpt <- DATA_wpt[grep("αριστερα",              DATA_wpt$name, invert
 DATA_wpt <- DATA_wpt[grep("αρχή μονοπάτι",         DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("ασφμον",                DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("διαδρομή",              DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("επιστροφή",             DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("κ[0-9]+",               DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("χωματoδρομος",          DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("χωματόδρομος",          DATA_wpt$name, invert = T, ignore.case = T), ]
