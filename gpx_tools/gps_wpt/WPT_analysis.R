@@ -295,6 +295,7 @@ DATA_wpt <- DATA_wpt[grep("^photo$",               DATA_wpt$name, invert = T, ig
 DATA_wpt <- DATA_wpt[grep("^scat [0-9]+",          DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^scat$",                DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^skat [0-9]+",          DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("^waypoint[ 0-9]+",      DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^skat$",                DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^start$",               DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("^strofi$",              DATA_wpt$name, invert = T, ignore.case = T), ]
@@ -551,8 +552,6 @@ for (al in 1:nrow(torem)) {
 DATA_wpt <- DATA_wpt[!st_is_empty(DATA_wpt$geometry), ]
 
 
-
-stop("dddddd")
 
 
 
