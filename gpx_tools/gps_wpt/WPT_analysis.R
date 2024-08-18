@@ -506,9 +506,6 @@ cat(nrow(dd), "point pairs under", close_flag, "m distance\n")
 
 
 
-stop("kkkkk")
-
-
 ## __ Check suspect points  ----------------------------------------------------
 suspects <- data.table(
   name_A = DATA_wpt$name     [dd[,1]],
@@ -530,30 +527,33 @@ suspects$Dist <- distm[cbind(dd[,2], dd[,1])]
 suspects      <- suspects[order(suspects$Dist, decreasing = T), ]
 
 
-## remove all this from data
-torem <- suspects[ name_A == name_B & Dist < 5 ]
+## remove all close with the same name
+torem    <- suspects[ name_A == name_B & Dist < 6 ]
+suspects <- suspects[!(name_A == name_B & Dist < 6) ]
 
 ## if A and B remove one
 for (al in 1:nrow(torem)) {
   ll <- torem[al, ]
 
   ## if both points exist remove B geometry
-  if ((DATA_wpt[ll$id_A,]$geometry == ll$geom_A) & (
-       DATA_wpt[ll$id_B,]$geometry == ll$geom_B)) {
+  if (
+    (!st_is_empty(DATA_wpt[ll$id_A,]$geometry)) &
+    (!st_is_empty(DATA_wpt[ll$id_B,]$geometry)) &
+    (DATA_wpt[ll$id_A,]$geometry == ll$geom_A) &
+      (DATA_wpt[ll$id_B,]$geometry == ll$geom_B)) {
 
-    DATA_wpt |> mutate()
-    DATA_wpt[ll$id_B, name]   <- NA
-    DATA_wpt[ll$id_B, "Region"] <- NA
+    DATA_wpt <- DATA_wpt |> mutate(geometry = replace(geometry, ll$id_B, NA))
   }
 
-  ## also remove from suspects?
-  suspects <- suspects[!suspects$geom_B == ll$geom_B & suspects$id_B == ll$id_B & suspects$id_A == ll$id_A]
-
 }
-## clean removed poinst
-is.na(DATA_wpt$geometry)
 
-stop()
+## clean removed point
+DATA_wpt <- DATA_wpt[!st_is_empty(DATA_wpt$geometry), ]
+
+
+
+stop("dddddd")
+
 
 
 ## FIXME change method
