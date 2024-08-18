@@ -148,7 +148,6 @@ if (TRUE) {
   #
   # hunspell_check(DATA_wpt$token)
 
-
   words <- unique(
     unlist(
       quanteda::tokens(DATA_wpt$name,
@@ -158,7 +157,6 @@ if (TRUE) {
                        remove_separators = T)
     )
   )
-
 
   ## keep big words
   words <- words[nchar(words) > 3]
@@ -177,7 +175,6 @@ if (TRUE) {
   )
   er_en <- er_en[ correct == F, ]
 
-
   lld <- lapply(er_en$words, function(x)
     paste(unlist(
       hunspell_suggest(x, dict = dictionary("en_US"))
@@ -193,7 +190,6 @@ if (TRUE) {
     correct = hunspell_check(words = el_words, dict = dictionary("el_GR"))
   )
   er_gr <- er_gr[ correct == F, ]
-
 
   lld <- lapply(er_gr$words, function(x)
     paste(unlist(
@@ -232,8 +228,6 @@ if (TRUE) {
       cat("\n")
     }
   }
-
-
 
 }
 
@@ -512,23 +506,55 @@ cat(nrow(dd), "point pairs under", close_flag, "m distance\n")
 
 
 
+stop("kkkkk")
+
+
 ## __ Check suspect points  ----------------------------------------------------
 suspects <- data.table(
   name_A = DATA_wpt$name     [dd[,1]],
-  geom_A = DATA_wpt$geometry [dd[,1]],
-  file_A = DATA_wpt$file     [dd[,1]],
-  time_A = DATA_wpt$time     [dd[,1]],
-  elev_A = DATA_wpt$ele      [dd[,1]],
-  orig_A = DATA_wpt$name_orig[dd[,1]],
   name_B = DATA_wpt$name     [dd[,2]],
-  geom_B = DATA_wpt$geometry [dd[,2]],
+  orig_A = DATA_wpt$name_orig[dd[,1]],
+  orig_B = DATA_wpt$name_orig[dd[,2]],
+  file_A = DATA_wpt$file     [dd[,1]],
   file_B = DATA_wpt$file     [dd[,2]],
-  time_B = DATA_wpt$time     [dd[,2]],
+  geom_A = DATA_wpt$geometry [dd[,1]],
+  geom_B = DATA_wpt$geometry [dd[,2]],
+  elev_A = DATA_wpt$ele      [dd[,1]],
   elev_B = DATA_wpt$ele      [dd[,2]],
-  orig_B = DATA_wpt$name_orig[dd[,2]]
+  # time_A = DATA_wpt$time     [dd[,1]],
+  id_A   = dd[,1],
+  # time_B = DATA_wpt$time     [dd[,2]],
+  id_B   = dd[,2]
 )
 suspects$Dist <- distm[cbind(dd[,2], dd[,1])]
 suspects      <- suspects[order(suspects$Dist, decreasing = T), ]
+
+
+## remove all this from data
+torem <- suspects[ name_A == name_B & Dist < 5 ]
+
+## if A and B remove one
+for (al in 1:nrow(torem)) {
+  ll <- torem[al, ]
+
+  ## if both points exist remove B geometry
+  if ((DATA_wpt[ll$id_A,]$geometry == ll$geom_A) & (
+       DATA_wpt[ll$id_B,]$geometry == ll$geom_B)) {
+
+    DATA_wpt |> mutate()
+    DATA_wpt[ll$id_B, name]   <- NA
+    DATA_wpt[ll$id_B, "Region"] <- NA
+  }
+
+  ## also remove from suspects?
+  suspects <- suspects[!suspects$geom_B == ll$geom_B & suspects$id_B == ll$id_B & suspects$id_A == ll$id_A]
+
+}
+## clean removed poinst
+is.na(DATA_wpt$geometry)
+
+stop()
+
 
 ## FIXME change method
 # suspects$S_Dist <- levenshteinDist(suspects$name_A, suspects$name_B)
