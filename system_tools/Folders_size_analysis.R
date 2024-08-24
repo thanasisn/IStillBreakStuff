@@ -63,9 +63,9 @@ datafls <- sort(datafls)
 SIZE_LIM <- 300 * 1024 ^ 2
 
 af <- datafls[1] # blue
+af <- datafls[3] # tyler
 af <- datafls[2] # sagan
 af <- datafls[4] # yperos
-af <- datafls[3] # tyler
 
 # for (af in datafls) {
 host <- sub("Log_folders_size_", "", sub(".Rds", "", basename(af)))
