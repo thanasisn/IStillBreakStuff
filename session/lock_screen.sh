@@ -21,7 +21,7 @@ convert             "$BASE_IMG"    \
 
 ## lock screen and black screen
 ( i3lock -t -c 000000 -i "$TARGET" ) &
-sleep 30
-( xset dpms force off )
+sleep 3
+( xset dpms force off ) &
 
 exit 0
