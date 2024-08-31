@@ -17,26 +17,12 @@
 
 
 #+ echo=F, include=T
-# # ~  Universal Header  ~ # # # # # # # # # # # # # # # # # # # # # # # # # # #
 rm(list = (ls()[ls() != ""]))
 Script.Name <- "DHI_GHI_01_Input_longterm.R"
 dir.create("./runtime/", showWarnings = FALSE)
 d <- filelock::lock(paste0("./runtime/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 Sys.setenv(TZ = "UTC")
-## standard output
-if (!interactive()) {
-    pdf( file = paste0("./runtime/",  basename(sub("\\.R$",".pdf", Script.Name))))
-    sink(file = paste0("./runtime/",  basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
-}
-## error notification function
-options(error = function() {
-    if (interactive()) {
-        system("mplayer /usr/share/sounds/freedesktop/stereo/dialog-warning.oga", ignore.stdout = T, ignore.stderr = T)
-        system(paste("notify-send -u normal -t 30000 ", Script.Name, " 'An error occurred!'"))
-    }
-})
 tic <- Sys.time()
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 
