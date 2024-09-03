@@ -228,9 +228,10 @@ for i in "${folders[@]}"; do
 	info " $i "
 	echo
 	[ ! -d "$i" ] && echo "Not a folder: $i" && continue
-	## go through sub folders
+	## go in the sub folders
 	cd "$i" || return
-	## in the git folder here
+	## make sure git is writable
+  chmod +w .git
 	pwd
 	(
 		## always break lock
