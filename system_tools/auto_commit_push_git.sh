@@ -106,7 +106,7 @@ for i in "${folders[@]}"; do
 	[ ! -d "$i" ] && echo "Not a folder: $i" && continue
 	## go through sub folders
 	cd "$i" || return
-	## in the git folder here
+  chmod +w .git
 	pwd
 	## commit and push
 	git commit -uno -a -m "Commit $(date +'%F %R')"
@@ -143,9 +143,10 @@ for i in "${folders[@]}"; do
 	info " $i "
 	echo
 	[ ! -d "$i" ] && echo "Not a folder: $i" && continue
-	## go through sub folders
+	## go in the sub folders
 	cd "$i" || return
-	## in the git folder here
+	## make sure git is writable
+  chmod +w .git
 	pwd
 	(
 		## add files we care about
