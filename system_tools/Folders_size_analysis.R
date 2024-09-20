@@ -63,9 +63,9 @@ datafls <- sort(datafls)
 SIZE_LIM <- 300 * 1024 ^ 2
 
 af <- datafls[1] # blue
-af <- datafls[3] # tyler
 af <- datafls[4] # yperos
 af <- datafls[2] # sagan
+af <- datafls[3] # tyler
 
 # for (af in datafls) {
 host <- sub("Log_folders_size_", "", sub(".Rds", "", basename(af)))
@@ -83,6 +83,16 @@ DATA       <- DATA[ size > 2, ]
 DATA$Bytes <- gdata::humanReadable(DATA$size)
 DATA$Date  <- as.Date(DATA$Date, origin = "1970-01-01")
 DATA[, Depth := str_count(file, "/")]
+
+
+## Ignore some folders
+DATA <- DATA[!grepl("ZHOST/unisonbackups",    file), ]
+DATA <- DATA[!grepl("barel/.BORGbackup_test", file), ]
+DATA <- DATA[!grepl("free/.BORGbackup",       file), ]
+
+
+
+DATA$file <- sub("/home/athan", "~", DATA$file)
 
 
 ## keep the oldest unchanged row only
@@ -115,7 +125,16 @@ DATA[, Diff_MB := as.integer((size - min(size)) / 1024 ^ 2), by = file]
 
 
 ## to monitor absolute change
-p <- ggplot(DATA,
+quantile(DATA[,Ratio])
+
+## test selection
+test <- DATA[Diff_MB > 20 | Ratio > 1.03, ]
+# unique(test$file)
+
+
+
+
+p <- ggplot(test,
             aes(x = Date, y = Diff_MB, colour = file)) +
   geom_line() +
   theme(legend.position = "none")
@@ -157,7 +176,7 @@ for (ad in sort(unique(DATA$Depth))) {
 
   temp <- DATA[DATA[Depth == ad, .I[which.max(Date)], by = file]$V1, ]
 
-  setorder(temp, -size)
+  setorder(temp, -Diff_MB)
   temp$size  <- NULL
   # temp$Date  <- NULL
   temp$Depth <- NULL
