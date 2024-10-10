@@ -3,7 +3,7 @@
 #### Scrub all btrfs filesystems
 
 
-LOGDIR="/home/athan/LOGs/SYSTEM_LOGS"
+LOGDIR="/home/athan/LOGs/SYSTEM_LOGS/STORAGE"
 
 mkdir -p "$LOGDIR"
 
