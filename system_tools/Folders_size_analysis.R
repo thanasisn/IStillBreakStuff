@@ -19,7 +19,7 @@
 #+ echo=F, include=T
 rm(list = (ls()[ls() != ""]))
 Script.Name <- "~/CODE/system_tools/Folders_size_analysis.R"
-dir.create("./runtime/", showWarnings = FALSE)
+# dir.create("./runtime/", showWarnings = FALSE)
 Sys.setenv(TZ = "UTC")
 ## standard output
 if (!interactive()) {
