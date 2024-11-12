@@ -127,7 +127,7 @@ folders=(
 	"$HOME/CODE/training_location_analysis"
 	"$HOME/CS_id/"
 	"$HOME/MANUSCRIPTS/01_2022_sdr_trends"
-	"$HOME/MANUSCRIPTS/02_enhancement"
+	"$HOME/MANUSCRIPTS/02_2024_enhancement"
 	"$HOME/MANUSCRIPTS/03_thesis"
 	"$HOME/MANUSCRIPTS/presentations"
 	"$HOME/MANUSCRIPTS/reports"
