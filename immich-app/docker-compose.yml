@@ -14,7 +14,8 @@ services:
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
     # extends:
     volumes:
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload/upload
+      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - ${LIBRARY_LOCATION}:/usr/src/app/upload/Library
       - ${THUMBS_LOCATION}:/usr/src/app/upload/thumbs
       - ${PROFILE_LOCATION}:/usr/src/app/upload/profile
       - ${VIDEO_LOCATION}:/usr/src/app/upload/encoded-video
