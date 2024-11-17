@@ -16,7 +16,7 @@ letters="$(   sed 's/[[:punct:] ]//g' "$FILE" | wc --chars           | cut -d' '
 maxlett="$(   sed 's/[[:punct:] ]//g' "$FILE" | wc --max-line-length | cut -d' ' -f1)" ## remove punctuation and spaces
 
 ## display totals and means
-echo "Target is 66 characters"
+echo "Target is 66 characters or 45 - 75"
 echo ""
 echo "$FILE"
 printf "%-18s %6s  %s\n"    " "                 "Total"        "Per line"
