@@ -36,7 +36,7 @@ DARKSKY_FL <- "/dev/shm/WHEATHER/Forecast_hourly_DarkSky.Rds"
 METEOBL_FL <- "/dev/shm/WHEATHER/Forecast_meteoblue.Rds"
 DAILY_FL   <- "/dev/shm/WHEATHER/Forecast_daily_DarkSky.Rds"
 OUTPUT_01  <- "/dev/shm/WHEATHER/Loc_Weather3.png"
-LAPDAV_FL  <- "/home/athan/LOGs/LAP_AUTH_davis.csv"
+LAPDAV_FL  <- "/home/athan/DATA_RAW/LAPWeath/LAP_roof/LAP_AUTH_davis.csv"
 
 
 open_meteo_fl <- "/dev/shm/WHEATHER/open_meteo_dump.Rds"
