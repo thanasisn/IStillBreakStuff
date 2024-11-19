@@ -15,10 +15,10 @@ services:
     # extends:
     volumes:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - ${LIBRARY_LOCATION}:/usr/src/app/upload/Library
-      - ${THUMBS_LOCATION}:/usr/src/app/upload/thumbs
-      - ${PROFILE_LOCATION}:/usr/src/app/upload/profile
-      - ${VIDEO_LOCATION}:/usr/src/app/upload/encoded-video
+      - ${LIBRARY_LOCATION}:/usr/src/app/Library
+      - ${THUMBS_LOCATION}:/usr/src/app/thumbs
+      - ${PROFILE_LOCATION}:/usr/src/app/profile
+      - ${VIDEO_LOCATION}:/usr/src/app/encoded-video
       - /home/athan/Pictures:/home/athan/Pictures:ro
       - /home/folder/CAMERATTA:/home/folder/CAMERATTA:ro
       - /etc/localtime:/etc/localtime:ro
