@@ -8,22 +8,24 @@
 
 name: immich
 
+
 services:
   immich-server:
     container_name: immich_server
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
     # extends:
+    #   file: hwaccel.transcoding.yml
+    #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
     volumes:
+      # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - ${LIBRARY_LOCATION}:/usr/src/app/Library
-      - ${THUMBS_LOCATION}:/usr/src/app/thumbs
-      - ${PROFILE_LOCATION}:/usr/src/app/profile
-      - ${VIDEO_LOCATION}:/usr/src/app/encoded-video
+      - ${THUMB_LOCATION}:/usr/src/app/upload/thumbs
+      - ${ENCODED_VIDEO_LOCATION}:/usr/src/app/upload/encoded-video
+      - ${PROFILE_LOCATION}:/usr/src/app/upload/profile
+      - ${BACKUP_LOCATION}:/usr/src/app/upload/backups 
       - /home/athan/Pictures:/home/athan/Pictures:ro
       - /home/folder/CAMERATTA:/home/folder/CAMERATTA:ro
       - /etc/localtime:/etc/localtime:ro
-    #   file: hwaccel.transcoding.yml
-    #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
     env_file:
       - .env
     ports:
