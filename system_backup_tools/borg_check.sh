@@ -11,8 +11,6 @@
 
 
 ## executable path
-# BORG="/home/athan/PROGRAMS/borgtest/borg-1.2.0a7"
-# BORG="/home/athan/PROGRAMS/borgtest/borg-1.2.4"
 ## Debian 12 has 1.2.4 as default
 BORG="borg"
 

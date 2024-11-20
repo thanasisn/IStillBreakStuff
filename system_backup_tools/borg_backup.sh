@@ -8,15 +8,12 @@
 
 
 ##  Can create borg backups with different profiles
-##  used with  borg 1.2.4 as a cron job
 ##  Creates backups and prunes the repo
 ##  Uses full paths for a regular user so root can also execute
 ##  Hopefully will issue warnings through custom notify-send
 
 
 ## executable path
-# BORG="/home/athan/PROGRAMS/borgtest/borg-1.2.0a7"
-# BORG="/home/athan/PROGRAMS/borgtest/borg-1.2.4"
 ## Debian 12 has 1.2.4 as default
 BORG="borg"
 
