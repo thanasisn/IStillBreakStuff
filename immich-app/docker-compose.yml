@@ -25,6 +25,7 @@ services:
       - ${BACKUP_LOCATION}:/usr/src/app/upload/backups 
       - /home/athan/Pictures:/home/athan/Pictures:ro
       - /home/folder/CAMERATTA:/home/folder/CAMERATTA:ro
+      - /home/folder/Alexandria/eeee:/home/folder/Alexandria/eeee:ro
       - /etc/localtime:/etc/localtime:ro
     env_file:
       - .env
