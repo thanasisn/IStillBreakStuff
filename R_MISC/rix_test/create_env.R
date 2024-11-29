@@ -1,6 +1,13 @@
 
+
 ## Build a nix environment for R using r
 
+cat("\n Use default.nix to add R packages\n")
+cat("\n Use renv to check for packages needing upgrade\n")
+
+stop("Use only to create default.nix, we wan't to keep .Rprofile")
+
+###  Install rix in the system and create a nix environment to build
 # install.packages("rix", repos = c(
 #   "https://ropensci.r-universe.dev",
 #   "https://cloud.r-project.org"
@@ -32,7 +39,7 @@ rix(
                    NULL),
   ide          = "rstudio",
   project_path = path_default_nix,
-  overwrite    = TRUE,
+  overwrite    = FALSE, ## don't use rix for adding packages
   print        = TRUE
 )
 
