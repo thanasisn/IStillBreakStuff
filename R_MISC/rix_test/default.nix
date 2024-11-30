@@ -23,15 +23,15 @@
 # Report any issues to https://github.com/ropensci/rix
 let
  pkgs = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/019f5c29c5afeb215587e17bf1ec31dc1913595b.tar.gz") {};
- 
+
   rpkgs = builtins.attrValues {
-    inherit (pkgs.rPackages) 
+    inherit (pkgs.rPackages)
       data_table
       dplyr
       ggplot2
       renv;
   };
- 
+
   git_archive_pkgs = [
     (pkgs.rPackages.buildRPackage {
       name = "colorout";
@@ -54,24 +54,24 @@ let
         sha256 = "sha256-oNrRa0OebsHiUkYl5yDZnpVG+Du5Zhx3fH69vbaRwtk=";
       };
       propagatedBuildInputs = builtins.attrValues {
-        inherit (pkgs.rPackages) 
+        inherit (pkgs.rPackages)
           DBI;
       };
     })
    ];
-   
+
   system_packages = builtins.attrValues {
-    inherit (pkgs) 
+    inherit (pkgs)
       adwaita-qt
       glibcLocales
       nix
       R;
   };
- 
+
   wrapped_pkgs = pkgs.rstudioWrapper.override {
     packages = [ git_archive_pkgs rpkgs  ];
   };
- 
+
 in
 
 pkgs.mkShell {
@@ -84,5 +84,9 @@ pkgs.mkShell {
    LC_MEASUREMENT = "en_US.UTF-8";
 
   buildInputs = [ git_archive_pkgs rpkgs  system_packages  wrapped_pkgs ];
-  
+
+  shellHook = ''
+    export QT_XCB_GL_INTEGRATION=none
+  '';
+
 }
