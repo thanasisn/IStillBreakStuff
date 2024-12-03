@@ -23,8 +23,19 @@
 # Report any issues to https://github.com/ropensci/rix
 
 let
+  ## Nix repo for R 4.3.3
   pkgs = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/019f5c29c5afeb215587e17bf1ec31dc1913595b.tar.gz") {};
 
+  ## System packages
+  system_packages = builtins.attrValues {
+    inherit (pkgs)
+      adwaita-qt
+      glibcLocales
+      nix
+      R;
+  };
+
+  ## R packages
   rpkgs = builtins.attrValues {
     inherit (pkgs.rPackages)
       data_table
@@ -34,13 +45,15 @@ let
       renv;
   };
 
+  ## R packages from github
   git_archive_pkgs = [
-    (pkgs.rPackages.buildRPackage {
+
+   (pkgs.rPackages.buildRPackage {
       name = "colorout";
       src = pkgs.fetchgit {
-        url = "https://github.com/jalvesaq/colorout/";
-        rev = "6eca95213c6cb2fae1c2c4eaccf43de4c93a65b5";
-        sha256 = "sha256-HBQRKqyYYAKJj2TFXBgX5Gc6EnkMG3ZaMCxuHVR9Cfc=";
+        url    = "https://github.com/jalvesaq/colorout/";
+        rev    = "2a5f21496162ea30684d2783e3a204f4756db4e8";
+        sha256 = "sha256-RglnS3QS85598qC87uciW/d64mgeavUDccdXt+GKwFM=";
       };
       propagatedBuildInputs = builtins.attrValues {
         inherit (pkgs.rPackages) ;
@@ -64,21 +77,15 @@ let
     })
    ];
 
-  system_packages = builtins.attrValues {
-    inherit (pkgs)
-      adwaita-qt
-      glibcLocales
-      nix
-      R;
-  };
-
+  ## Feed Rstudio with this environment packages
   wrapped_pkgs = pkgs.rstudioWrapper.override {
-    packages = [ git_archive_pkgs rpkgs  ];
+    packages = [ git_archive_pkgs rpkgs ];
   };
 
 in
 
 pkgs.mkShell {
+
   LOCALE_ARCHIVE = if pkgs.system == "x86_64-linux" then "${pkgs.glibcLocales}/lib/locale/locale-archive" else "";
   LANG           = "en_US.UTF-8";
   LC_ALL         = "en_US.UTF-8";
@@ -92,7 +99,9 @@ pkgs.mkShell {
   shellHook = ''
     ## for rstudio GUI
     export QT_XCB_GL_INTEGRATION=none
+    alias rstudio='setsid rstudio &'
     ## check for dependencies
     Rscript -e "renv::update(check=TRUE)"
   '';
+
 }
