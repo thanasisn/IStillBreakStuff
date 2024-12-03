@@ -30,6 +30,7 @@ let
       data_table
       dplyr
       ggplot2
+      rlang
       renv;
   };
 
@@ -89,7 +90,9 @@ pkgs.mkShell {
   buildInputs = [ git_archive_pkgs rpkgs  system_packages  wrapped_pkgs ];
 
   shellHook = ''
+    ## for rstudio GUI
     export QT_XCB_GL_INTEGRATION=none
+    ## check for dependencies
+    Rscript -e "renv::update(check=TRUE)"
   '';
-
 }
