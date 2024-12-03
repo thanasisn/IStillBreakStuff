@@ -21,8 +21,9 @@
 # It uses nixpkgs' revision 019f5c29c5afeb215587e17bf1ec31dc1913595b for reproducibility purposes
 # which will install R version 4.3.3.
 # Report any issues to https://github.com/ropensci/rix
+
 let
- pkgs = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/019f5c29c5afeb215587e17bf1ec31dc1913595b.tar.gz") {};
+  pkgs = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/019f5c29c5afeb215587e17bf1ec31dc1913595b.tar.gz") {};
 
   rpkgs = builtins.attrValues {
     inherit (pkgs.rPackages)
@@ -78,12 +79,12 @@ in
 
 pkgs.mkShell {
   LOCALE_ARCHIVE = if pkgs.system == "x86_64-linux" then "${pkgs.glibcLocales}/lib/locale/locale-archive" else "";
-  LANG = "en_US.UTF-8";
-   LC_ALL = "en_US.UTF-8";
-   LC_TIME = "en_US.UTF-8";
-   LC_MONETARY = "en_US.UTF-8";
-   LC_PAPER = "en_US.UTF-8";
-   LC_MEASUREMENT = "en_US.UTF-8";
+  LANG           = "en_US.UTF-8";
+  LC_ALL         = "en_US.UTF-8";
+  LC_TIME        = "en_US.UTF-8";
+  LC_MONETARY    = "en_US.UTF-8";
+  LC_PAPER       = "en_US.UTF-8";
+  LC_MEASUREMENT = "en_US.UTF-8";
 
   buildInputs = [ git_archive_pkgs rpkgs  system_packages  wrapped_pkgs ];
 
