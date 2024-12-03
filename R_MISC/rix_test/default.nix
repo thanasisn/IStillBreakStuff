@@ -45,9 +45,11 @@ let
       };
     })
 
+# 19864453f7d0ed095256d848b46e7b8630989bac
 
     (pkgs.rPackages.buildRPackage {
       name = "duckdb";
+      version = "1.1.2";
       src = pkgs.fetchgit {
         url = "https://github.com/duckdb/duckdb-r/";
         rev = "71c71a6b824bd0f2c0fca43c5dfa53645b17bfb7";
