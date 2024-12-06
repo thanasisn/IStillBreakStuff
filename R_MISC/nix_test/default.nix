@@ -14,10 +14,16 @@ let
   ## R packages
   rpkgs = builtins.attrValues {
     inherit (pkgs.rPackages)
+      ## for rendering
+      lintr
+      formatR
+      knitr
+      ## for data analysis
       data_table
       dplyr
       ggplot2
-      renv;
+      renv
+      ;
   };
 
   ## R packages from github
