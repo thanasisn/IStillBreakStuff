@@ -134,7 +134,6 @@ folders=(
 	"$HOME/PANDOC/My_Publications"
 	"$HOME/PANDOC/thanasisn.github.io"
 	"$HOME/RAD_QC"
-	"$HOME/TSI"
 )
 
 ## go through main folder
