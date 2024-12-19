@@ -20,6 +20,7 @@ let
       knitr
       ## for data analysis
       data_table
+      metrica
       dplyr
       ggplot2
       renv
