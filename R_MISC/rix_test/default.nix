@@ -60,7 +60,6 @@ let
       };
     })
 
-# 19864453f7d0ed095256d848b46e7b8630989bac
 
     (pkgs.rPackages.buildRPackage {
       name = "duckdb";
@@ -102,6 +101,7 @@ pkgs.mkShell {
     alias rstudio='setsid rstudio &'
     ## check for dependencies
     Rscript -e "renv::update(check=TRUE)"
+    echo "Just for reference"
   '';
 
 }
