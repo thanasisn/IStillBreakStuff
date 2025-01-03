@@ -22,6 +22,7 @@
 # which will install R version 4.3.3.
 # Report any issues to https://github.com/ropensci/rix
 
+
 let
   ## Nix repo for R 4.3.3
   pkgs = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/019f5c29c5afeb215587e17bf1ec31dc1913595b.tar.gz") {};
@@ -60,20 +61,19 @@ let
       };
     })
 
-
-    (pkgs.rPackages.buildRPackage {
-      name = "duckdb";
-      version = "1.1.2";
-      src = pkgs.fetchgit {
-        url = "https://github.com/duckdb/duckdb-r/";
-        rev = "71c71a6b824bd0f2c0fca43c5dfa53645b17bfb7";
-        sha256 = "sha256-oNrRa0OebsHiUkYl5yDZnpVG+Du5Zhx3fH69vbaRwtk=";
-      };
-      propagatedBuildInputs = builtins.attrValues {
-        inherit (pkgs.rPackages)
-          DBI;
-      };
-    })
+   #  (pkgs.rPackages.buildRPackage {
+   #    name = "duckdb";
+   #    version = "1.1.2";
+   #    src = pkgs.fetchgit {
+   #      url = "https://github.com/duckdb/duckdb-r/";
+   #      rev = "71c71a6b824bd0f2c0fca43c5dfa53645b17bfb7";
+   #      sha256 = "sha256-oNrRa0OebsHiUkYl5yDZnpVG+Du5Zhx3fH69vbaRwtk=";
+   #    };
+   #    propagatedBuildInputs = builtins.attrValues {
+   #      inherit (pkgs.rPackages)
+   #        DBI;
+   #    };
+   #  })
    ];
 
   ## Feed Rstudio with this environment packages
@@ -103,5 +103,5 @@ pkgs.mkShell {
     Rscript -e "renv::update(check=TRUE)"
     echo "Just for reference"
   '';
-
 }
+
