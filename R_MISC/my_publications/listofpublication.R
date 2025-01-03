@@ -21,6 +21,7 @@
 #'     keep_tex:         yes
 #'     keep_md:          yes
 #'     latex_engine:     xelatex
+#'     number_sections:  false
 #'   html_document:
 #'     keep_md:          yes
 #'
