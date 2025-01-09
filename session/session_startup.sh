@@ -88,7 +88,8 @@ kill_run zeitgeist-daemon
 # nohup $HOME/BASH/deamonize.sh "evolution -c calendar --name Evolution_i3" &
 
 killall -s 9 thunderbird
-GTK_THEME=Adwaita:dark nohup $HOME/BASH/deamonize.sh "$HOME/.nix-profile/bin/thunderbird" &
+pkill        thunderbird
+GTK_THEME=Adwaita:dark nohup "$daemonize" "$HOME/.nix-profile/bin/thunderbird" &
 
 # pkill evolution
 # nohup $HOME/BASH/deamonize.sh "evolution" &
