@@ -59,11 +59,11 @@ while true; do
         nohup $COMMAND &
         PID="$!"
         echo "$PID" > "$pidfile"
-        $NOTIFY_SEND -u low -t 30000  "Daemon Exec($nruns): $COMMAND "
+#        $NOTIFY_SEND -u low -t 30000  "Daemon Exec($nruns): $COMMAND "
     fi
     ## length out daemon
     if [[ $nruns -gt $KILL_COUNT ]]; then
-        $NOTIFY_SEND -u normal "Daemon Exited after $nruns tries, for $COMMAND"
+#        $NOTIFY_SEND -u normal "Daemon Exited after $nruns tries, for $COMMAND"
         exit 9
     fi
     sleep "$SLEEP"
