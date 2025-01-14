@@ -97,8 +97,6 @@ rm(WATER)
 
 ##  Electricity  ------------------------------------------------------------
 #'
-#' `r cat(paste("# ", Sys.time()), "\n")`
-#'
 #' ## Electricity
 #'
 #+ echo=F, include=T, fig.width=6, fig.height=6, results = "asis"
@@ -109,7 +107,6 @@ POWER <- read_ods(paste0(datadir, "/utilities_electricity.ods")) |>
 
 cat("\n test day seq:\n")
 cat(lag(POWER$current) - POWER$previous, "\n")
-
 
 POWER[, since := as.Date(since, "%d/%m/%Y")]
 POWER[, until := as.Date(until, "%d/%m/%Y")]
@@ -123,8 +120,6 @@ cat(diff(order(POWER$until)), "\n")
 POWER[c(NA, diff(order(POWER$until))) != 1]
 
 POWER[difference == 0, difference := NA]
-
-
 POWER[is.na(kwh) & !is.na(difference), kwh := difference ]
 
 
@@ -166,8 +161,79 @@ if (!isTRUE(getOption('knitr.in.progress'))) {
 if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
   ggplotly(p)
 }
+rm(POWER)
 
 
+##  Gas  ------------------------------------------------------------
+#'
+#' ## Gas
+#'
+#+ echo=F, include=T, fig.width=6, fig.height=6, results = "asis"
+
+
+GAS <- read_ods(paste0(datadir, "/utilities_gas.ods")) |>
+  filter(!is.na(since)) |>
+  data.table()
+
+cat("\n test day seq:\n")
+cat(lag(GAS$current) - GAS$previous, "\n")
+
+GAS[, since := as.Date(since, "%d/%m/%Y")]
+GAS[, until := as.Date(until, "%d/%m/%Y")]
+
+cat("\n test day order:\n")
+cat(diff(order(GAS$since)), "\n")
+
+cat("\n test day order:\n")
+cat(diff(order(GAS$until)), "\n")
+
+
+GAS[c(NA, diff(order(GAS$until))) != 1]
+
+GAS[difference == 0, difference := NA]
+GAS[is.na(Nm3) & !is.na(difference), Nm3 := difference ]
+
+
+p <- ggplot(data = GAS, aes(x = until)) +
+  geom_line(aes(y = invoice), colour = "red", linewidth = 0.8) +
+  xlab("") +
+  ylab("Λογαριασμός") +
+  theme_linedraw()
+
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+
+
+p <- ggplot(data = GAS, aes(x = until)) +
+  geom_line(aes(y = Nm3), colour = "blue", linewidth = 0.8) +
+  xlab("") +
+  ylab("Κατανάλωση") +
+  theme_linedraw()
+
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+
+p <- ggplot(data = GAS, aes(x = until)) +
+  geom_line(aes(y = invoice/Nm3), colour = "orange", linewidth = 0.8) +
+  xlab("") +
+  ylab("Τιμή μονάδας") +
+  theme_linedraw()
+
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+rm(GAS)
 
 
 #+ include=T, echo=F, results="asis"
