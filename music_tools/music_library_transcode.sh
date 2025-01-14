@@ -21,10 +21,18 @@ QQ=1
 BIT=220
 
 ## duration of non silence
-sl_start_duration="2"
+# start_duration Specify the amount of time that non-silence must be detected
+# before it stops trimming audio. By increasing the duration, bursts of noises
+# can be treated as silence and trimmed off. Default value is 0.
+sl_start_duration="0.1"
 
 ## silence volume
-sl_start_threshold="-25dB"
+# This indicates what sample value should be treated as silence. For digital
+# audio, a value of 0 may be fine but for audio recorded from analog, you may
+# wish to increase the value to account for background noise. Can be specified in
+# dB (in case "dB" is appended to the specified value) or amplitude ratio.
+# Default value is 0.
+sl_start_threshold="-50dB" # -50db ~ 0.0032 amplitude
 
 ## detection method "rms" or "peak"
 sl_detection="rms"
@@ -126,6 +134,11 @@ find "$IN" -type f -iname "*.wma"
                     start_threshold=$sl_start_threshold:\
                     detection=$sl_detection,\
                     aformat=dblp,areverse" "$tmpfl"
+
+#         ffmpeg -i input.mp3 
+#         -af "silenceremove=start_periods=1:start_duration=1:start_threshold=-60dB:detection=peak,
+#         aformat=dblp,areverse,silenceremove=start_periods=1:start_duration=1:start_threshold=-60dB:detection=peak,
+#         aformat=dblp,areverse" output.flac       
 
                 ## replace original file
                 if [ -e "$tmpfl" ]; then

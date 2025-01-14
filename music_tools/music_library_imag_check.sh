@@ -20,7 +20,7 @@ masterfil="/home/folder/Music/file.list"
 mastercle="/home/folder/Music/filecle.list"
 mastermis="/home/folder/Music/fileclemis.list"
 
-## Imaged library lacations
+## Imaged library locations
 imagedir="/media/barel/Music_img"
 imagefil="/media/barel/Music_img/file.list"
 imagecle="/media/barel/Music_img/filecle.list"
@@ -67,33 +67,33 @@ echo
 
 ## remove files in image no longer on original
 if [[ count -gt 0 ]]; then
-    # echo "Uncomment code to clean $count files"
-    cat "$mastermis" | while read line ; do
-        echo  "TO RM:  ${imagedir}${line}.mp3"
-        rm -v "${imagedir}${line}.mp3"
-        echo "Run music_library_transcode.sh"
-    done
+  # echo "Uncomment code to clean $count files"
+  cat "$mastermis" | while read line ; do
+    echo  "TO RM:  ${imagedir}${line}.mp3"
+    rm -v "${imagedir}${line}.mp3"
+    echo "Run music_library_transcode.sh"
+  done
 fi
 
 
 
 ## Check if files in image are older than master and remove from image
 cat "$masterfil" | while read original; do
-    duplicate="${imagedir}${original}"
-    duplicate="$(echo "$duplicate" | sed "s/\.flac$/\.mp3/" | sed "s/\.wma$/\.mp3/")"
+  duplicate="${imagedir}${original}"
+  duplicate="$(echo "$duplicate" | sed "s/\.flac$/\.mp3/" | sed "s/\.wma$/\.mp3/")"
 
-#     echo "OR: $original"
-#     echo "cp: $duplicate"
+#   echo "OR: $original"
+#   echo "cp: $duplicate"
 
-    if [[ -e "$duplicate" ]]; then
-#         echo "exist"
-        if [[ "$duplicate" -ot "$original" ]]; then
-            echo "Remove old duplicate $duplicate"
-            ## remove old dups in order to reencode with newer version
-            rm -v "$duplicate"
-            echo "Run music_library_transcode.sh"
-        fi
+  if [[ -e "$duplicate" ]]; then
+#     echo "exist"
+    if [[ "$duplicate" -ot "$original" ]]; then
+      echo "Remove old duplicate $duplicate"
+      ## remove old dups in order to re-encode with newer version
+      rm -v "$duplicate"
+      echo "Run music_library_transcode.sh"
     fi
+  fi
 done
 
 echo
