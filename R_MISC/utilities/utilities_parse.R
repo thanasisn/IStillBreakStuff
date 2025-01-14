@@ -92,7 +92,80 @@ if (!isTRUE(getOption('knitr.in.progress'))) {
 if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
   ggplotly(p)
 }
+rm(WATER)
 
+
+##  Electricity  ------------------------------------------------------------
+#'
+#' `r cat(paste("# ", Sys.time()), "\n")`
+#'
+#' ## Electricity
+#'
+#+ echo=F, include=T, fig.width=6, fig.height=6, results = "asis"
+
+POWER <- read_ods(paste0(datadir, "/utilities_electricity.ods")) |>
+  filter(!is.na(since)) |>
+  data.table()
+
+cat("\n test day seq:\n")
+cat(lag(POWER$current) - POWER$previous, "\n")
+
+
+POWER[, since := as.Date(since, "%d/%m/%Y")]
+POWER[, until := as.Date(until, "%d/%m/%Y")]
+
+cat("\n test day order:\n")
+cat(diff(order(POWER$since)), "\n")
+
+cat("\n test day order:\n")
+cat(diff(order(POWER$until)), "\n")
+
+POWER[c(NA, diff(order(POWER$until))) != 1]
+
+POWER[difference == 0, difference := NA]
+
+
+POWER[is.na(kwh) & !is.na(difference), kwh := difference ]
+
+
+p <- ggplot(data = POWER, aes(x = until)) +
+  geom_line(aes(y = invoice), colour = "red", linewidth = 0.8) +
+  xlab("") +
+  ylab("Λογαριασμός") +
+  theme_linedraw()
+
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+
+p <- ggplot(data = POWER, aes(x = until)) +
+  geom_line(aes(y = kwh), colour = "blue", linewidth = 0.8) +
+  xlab("") +
+  ylab("Κατανάλωση") +
+  theme_linedraw()
+
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+
+p <- ggplot(data = POWER, aes(x = until)) +
+  geom_line(aes(y = invoice/kwh), colour = "orange", linewidth = 0.8) +
+  xlab("") +
+  ylab("Τιμή μονάδας") +
+  theme_linedraw()
+
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
 
 
 
