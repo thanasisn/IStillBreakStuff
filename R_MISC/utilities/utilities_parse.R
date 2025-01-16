@@ -136,7 +136,9 @@ if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
   ggplotly(p)
 }
 
-p <- ggplot(data = POWER, aes(x = until)) +
+p <- POWER |>
+  filter(!is.na(kwh)) |>
+  ggplot(aes(x = until)) +
   geom_line(aes(y = kwh), colour = "blue", linewidth = 0.8) +
   xlab("") +
   ylab("Κατανάλωση") +
@@ -149,7 +151,9 @@ if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
   ggplotly(p)
 }
 
-p <- ggplot(data = POWER, aes(x = until)) +
+p <- POWER |>
+  filter(!is.na(kwh)) |>
+  ggplot(aes(x = until)) +
   geom_line(aes(y = invoice/kwh), colour = "orange", linewidth = 0.8) +
   xlab("") +
   ylab("Τιμή μονάδας") +
@@ -233,6 +237,7 @@ if (!isTRUE(getOption('knitr.in.progress'))) {
 if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
   ggplotly(p)
 }
+
 rm(GAS)
 
 
@@ -240,3 +245,4 @@ rm(GAS)
 tac <- Sys.time()
 cat(sprintf("**END** %s %s@%s %s %f mins\n\n", Sys.time(), Sys.info()["login"],
             Sys.info()["nodename"], basename(Script.Name), difftime(tac,tic,units = "mins")))
+
