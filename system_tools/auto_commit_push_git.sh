@@ -133,7 +133,6 @@ folders=(
 	"$HOME/MANUSCRIPTS/reports"
 	"$HOME/PANDOC/My_Publications"
 	"$HOME/PANDOC/thanasisn.github.io"
-	"$HOME/RAD_QC"
 )
 
 ## go through main folder
