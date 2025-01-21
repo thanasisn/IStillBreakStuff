@@ -125,7 +125,6 @@ folders=(
 	"$HOME/CODE/nixos"
 	"$HOME/CODE/fi_analysis"
 	"$HOME/CODE/training_location_analysis"
-	"$HOME/CS_id/"
 	"$HOME/MANUSCRIPTS/01_2022_sdr_trends"
 	"$HOME/MANUSCRIPTS/02_2024_enhancement"
 	"$HOME/MANUSCRIPTS/03_thesis"
