@@ -7,8 +7,8 @@
 # allow only one instance
 exec 9>"/dev/shm/$(basename $0).lock"
 if ! flock -n 9  ; then
-    echo "another instance is running";
-    exit 1
+  echo "another instance is running";
+  exit 1
 fi
 
 info() { echo "$(date +%F_%T) ${SECONDS}s :: $* ::" >&1; }
@@ -28,21 +28,21 @@ info "START :: $0 :: $* ::"
 
 ## list folders containing a makefile
 folders=(
-    "$HOME/BBand_LAP/JOURNAL"
-    "$HOME/CODE/R_MISC/utilities"
-    "$HOME/DATA_ARC/10_TODO/JOURNAL"
-    "$HOME/NOTES/01_PROJECTS"
-    "$HOME/NOTES/01_PROJECTS/Aerosols"
-    "$HOME/NOTES/02_AREA"
-    "$HOME/NOTES/03_RESOURCES"
-    "$HOME/NOTES/04_ARCHIVE"
-    "$HOME/NOTES/08_JOURNAL"
-    "$HOME/NOTES/09_JOURNAL_WORK"
-    "$HOME/NOTES/11_TRAINING"
-    "$HOME/NOTES/11_TRAINING/Running"
-    "$HOME/NOTES/12_WRITINGS"
-    "$HOME/NOTES/Clippings"
-    "$HOME/NOTES/zauto"
+  "$HOME/BBand_LAP/JOURNAL"
+  "$HOME/CODE/R_MISC/utilities"
+  "$HOME/DATA_ARC/10_TODO/JOURNAL"
+  "$HOME/NOTES/01_PROJECTS"
+  "$HOME/NOTES/01_PROJECTS/Aerosols"
+  "$HOME/NOTES/02_AREA"
+  "$HOME/NOTES/03_RESOURCES"
+  "$HOME/NOTES/04_ARCHIVE"
+  "$HOME/NOTES/08_JOURNAL"
+  "$HOME/NOTES/09_JOURNAL_WORK"
+  "$HOME/NOTES/11_TRAINING"
+  "$HOME/NOTES/11_TRAINING/Running"
+  "$HOME/NOTES/12_WRITINGS"
+  "$HOME/NOTES/Clippings"
+  "$HOME/NOTES/zauto"
 )
 
 for af in "${folders[@]}"; do
@@ -55,8 +55,8 @@ for af in "${folders[@]}"; do
     fi
     cd "$af" || continue
     (
-        ## run make with default
-        nice -n 19 ionice -c2 -n7 make -f *[Mm]akefile -C "$af"
+        ## run make with default rule
+        nice -n 19 ionice -c2 -n7 make -f ./*[Mm]akefile -C "$af"
     ) > >(tee .automake.log) 2> >(tee .automake.err >&2)
     echo "================================="
 done
