@@ -3,6 +3,8 @@
 
 My small projects are collected here.
 
+Obviously everything is a WIP.
+
 Some may be moved to other/new repositories.
 
 Each folder should have a README file.
@@ -62,4 +64,3 @@ Tools for processing my training data.
 ------------------------------------------------------------------------
 *Suggestions and improvements are always welcome.*
 
-*I use those regular, but they have their quirks, may broke and maybe superseded by other tools.*
