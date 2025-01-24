@@ -123,7 +123,6 @@ done
 folders=(
 	"$HOME/.dot_files"
 	"$HOME/BBand_LAP"
-	"$HOME/CM_21_GLB/"
 	"$HOME/CODE/nixos"
 	"$HOME/CODE/fi_analysis"
 	"$HOME/CODE/training_location_analysis"
