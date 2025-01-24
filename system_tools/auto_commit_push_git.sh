@@ -113,7 +113,7 @@ for i in "${folders[@]}"; do
 	## commit and push
 	git commit -uno -a -m "Commit $(date +'%F %R')"
 	git push -f
-	git push --tag
+	git push -f --tag
 	git maintenance run --auto
 done
 
@@ -190,7 +190,7 @@ for i in "${folders[@]}"; do
 		## commit and push
 		git commit -uno -a -m "Commit $(date +'%F %R')"
 		git push -f
-		git push --tag
+		git push -f --tag
 		git maintenance run --auto
 	) > >(tee .autogit.log) 2> >(tee .autogit.err >&2)
 done
