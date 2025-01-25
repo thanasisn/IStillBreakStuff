@@ -64,4 +64,3 @@ Tools for processing my training data.
 ------------------------------------------------------------------------
 *Suggestions and improvements are always welcome.*
 
-# git_analysis
