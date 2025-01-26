@@ -28,16 +28,6 @@ git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" commit -uno -a -m "Commit $
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" push -u origin master
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" maintenance run --auto
 
-# echo "---------------"
-# cd "$HOME/PANDOC/Deployment_notes"
-# cd "./_book"
-# ln -f ./Deployment_notes.html ./index.html
-# git add -f .
-# cd ".."
-# pwd
-# git commit -uno -a -m "Commit $(date +'%F %R')"
-# git push -f -u origin main
-# git maintenance run --auto
 
 echo "---------------"
 cd "$HOME/PANDOC/Libradtran_guide"
@@ -72,22 +62,6 @@ git commit -uno -a -m "Commit $(date +'%F %R')"
 git push -f -u origin main
 git maintenance run --auto
 
-echo "---------------"
-cd "$HOME/PANDOC/thanasisnsite"
-git add -f .
-cd "./public"
-git add -f .
-cd ".."
-cd "./static"
-git add -f .
-cd ".."
-cd "./themes"
-git add -f .
-cd ".."
-pwd
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
-git maintenance run --auto
 
 
 
