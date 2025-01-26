@@ -29,39 +29,27 @@ git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" push -u origin master
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" maintenance run --auto
 
 
-echo "---------------"
-cd "$HOME/PANDOC/Libradtran_guide"
-cd "./_book"
-ln -f ./Libratran_guide.html ./index.html
-git add -f .
-cd ".."
-pwd
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
-git maintenance run --auto
+# echo "---------------"
+# cd "$HOME/PANDOC/Libradtran_guide"
+# cd "./_book"
+# ln -f ./Libratran_guide.html ./index.html
+# git add -f .
+# cd ".."
+# pwd
+# git commit -uno -a -m "Commit $(date +'%F %R')"
+# git push -f -u origin main
+# git maintenance run --auto
 
-echo "---------------"
-cd "$HOME/PANDOC/CHP1_measurements_guide"
-cd "./_book"
-ln -f ./CHP1_measurements_guide.html ./index.html
-git add -f .
-cd ".."
-pwd
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
-git maintenance run --auto
-
-echo "---------------"
-cd "$HOME/PANDOC/Tracker_manual"
-cd "./_book"
-ln -f ./LAP_tracker_manual.html ./index.html
-git add -f .
-cd ".."
-pwd
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f -u origin main
-git maintenance run --auto
-
+# echo "---------------"
+# cd "$HOME/PANDOC/CHP1_measurements_guide"
+# cd "./_book"
+# ln -f ./CHP1_measurements_guide.html ./index.html
+# git add -f .
+# cd ".."
+# pwd
+# git commit -uno -a -m "Commit $(date +'%F %R')"
+# git push -f -u origin main
+# git maintenance run --auto
 
 
 
@@ -97,9 +85,9 @@ done
 folders=(
 	"$HOME/.dot_files"
 	"$HOME/BBand_LAP"
-	"$HOME/CODE/nixos"
 	"$HOME/CODE/fi_analysis"
 	"$HOME/CODE/git_analysis"
+	"$HOME/CODE/nixos"
 	"$HOME/CODE/notes_tools"
 	"$HOME/CODE/training_location_analysis"
 	"$HOME/MANUSCRIPTS/01_2022_sdr_trends"
@@ -109,6 +97,9 @@ folders=(
 	"$HOME/MANUSCRIPTS/reports"
 	"$HOME/PANDOC/My_Publications"
 	"$HOME/PANDOC/thanasisn.github.io"
+  "$HOME/PANDOC/CHP1_measurements_guide"
+  "$HOME/PANDOC/Libradtran_guide"
+  "$HOME/PANDOC/Tracker_manual"
 )
 
 ## go through main folder
