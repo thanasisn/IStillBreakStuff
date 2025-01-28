@@ -7,14 +7,18 @@
 ## This list CAN NOT COPE WITH SPACES !!
 list=(
 '/home/athan/BASH'
-'/home/athan/PROGRAMS'
-'/home/athan/CODE'
-'/home/athan/LOGs'
+'/home/athan/.ssh'
+#'/home/athan/CODE'
+#'/home/athan/LOGs'
 '/home/athan/.unison'
+'/home/athan/.dotfiles'
+'/home/athan/.dot_files'
+'/home/athan/.dot_files_private'
 )
 
 
 REMOTE_HOST="192.168.1.105"
+REMOTE_HOST="crane.lobster-atlas.ts.net"
 REMOTE_USER="$USER"
 REMOTE="${REMOTE_USER}@${REMOTE_HOST}"
 OPTIONS=" --info=progress2 --info=name0 -arvh --stats --delete "
