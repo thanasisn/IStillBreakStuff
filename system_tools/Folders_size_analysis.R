@@ -74,7 +74,12 @@ DATA <- DATA[ size >= SIZE_LIM, ]
 ## only for existing
 DATA <- DATA[dir.exists(file), ]
 
+## nost recent
+DATA <- DATA[ Date > Sys.Date() - 4*31 ]
+
+
 DATA$Date <- as.Date(DATA$Date, origin = "1970-01-01")
+
 
 
 #'
