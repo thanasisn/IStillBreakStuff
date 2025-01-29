@@ -23,8 +23,7 @@ Script.Name <- "~/CODE/system_tools/Folders_size_analysis.R"
 Sys.setenv(TZ = "UTC")
 ## standard output
 if (!interactive()) {
-    pdf( file = paste0("/home/athan/LOGs/SYSTEM_LOGS/",  basename(sub("\\.R$",".pdf", Script.Name))))
-    sink(file = paste0("/home/athan/LOGs/SYSTEM_LOGS/",  basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
+    pdf(file = paste0("/home/athan/LOGs/SYSTEM_LOGS/", basename(sub("\\.R$",".pdf", Script.Name))))
 }
 ## error notification function
 tic <- Sys.time()
@@ -72,6 +71,11 @@ host <- sub("Log_folders_size_", "", sub(".Rds", "", basename(af)))
 DATA <- data.table(readRDS(af))
 DATA <- DATA[ size >= SIZE_LIM, ]
 
+## only for existing
+DATA <- DATA[dir.exists(file), ]
+
+DATA$Date <- as.Date(DATA$Date, origin = "1970-01-01")
+
 
 #'
 #' # `r host`
@@ -89,8 +93,9 @@ DATA[, Depth := str_count(file, "/")]
 DATA <- DATA[!grepl("ZHOST/unisonbackups",    file), ]
 DATA <- DATA[!grepl("barel/.BORGbackup_test", file), ]
 DATA <- DATA[!grepl("free/.BORGbackup",       file), ]
+DATA <- DATA[!grepl("share/Trash",            file), ]
 
-
+setorder(DATA, Date)
 
 DATA$file <- sub("/home/athan", "~", DATA$file)
 
