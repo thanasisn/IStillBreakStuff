@@ -89,7 +89,8 @@ kill_run zeitgeist-daemon
 
 killall -s 9 thunderbird
 pkill        thunderbird
-GTK_THEME=Adwaita:dark nohup "$daemonize" "$HOME/.nix-profile/bin/thunderbird" &
+# GTK_THEME=Adwaita:dark nohup "$daemonize" "$HOME/.nix-profile/bin/thunderbird" &
+GTK_THEME=Adwaita:dark setsid "$HOME/.nix-profile/bin/thunderbird" &
 
 # pkill evolution
 # nohup $HOME/BASH/deamonize.sh "evolution" &
