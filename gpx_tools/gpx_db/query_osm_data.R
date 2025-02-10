@@ -2,7 +2,6 @@
 
 #### Get data points from OSM using Overpass API
 
-
 ####_ Set environment _####
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
@@ -11,7 +10,6 @@ Script.Name = funr::sys.script()
 if (!interactive()) pdf(file = sub("\\.R$",".pdf", Script.Name))
 sink(file=sub("\\.R$",".out",Script.Name,), split = TRUE)
 Script.Base = sub("\\.R$","",Script.Name)
-
 
 
 library(osmdata)
@@ -57,7 +55,6 @@ for (ar in regions) {
   q2$sym  <- "Short Tower"
   q2$desc <- "Τριγωνομετρικό"
   saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_survay_point.Rds")
-
 
 
 

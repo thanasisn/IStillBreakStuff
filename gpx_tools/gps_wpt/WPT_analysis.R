@@ -88,8 +88,8 @@ if (EXPORT |
     file.mtime(export_fl) < file.mtime(fl_waypoints)) {
   cat("Going on with analysis and export\n")
 } else {
-  cat("No new data for analysis\n")
-  stop(" --- Exit here --- ")
+    cat("No new data for analysis\n")
+    stop(" --- Exit here --- ")
 }
 
 
@@ -717,8 +717,6 @@ for (st in unique(DATA_wpt$Src_Type)) {
            driver = "GPX",
            append = F,
            overwrite = T)
-
-
 
 }
 
