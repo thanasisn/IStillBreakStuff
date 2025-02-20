@@ -91,28 +91,168 @@ dcast(DTRIP, Date ~ variable , value.var = c("value", "label", "note"))
 
 dcast(DTRIP, Date ~ variable + note , value.var = c("value", "label", "note"))
 
+#'
+#' # Raw trip data
+#'
+#+ echo=F, include=T
 
-#+ echo=F, include=T, results="asis"
-for (av in sort(unique(DTRIP$variable))) {
-  pp <- DTRIP[variable == av]
+# for (av in sort(unique(DTRIP$variable))) {
+#   pp <- DTRIP[variable == av]
+#
+#   p <- ggplot(pp, aes(x = Date, y = value)) +
+#     geom_line() +
+#     theme_linedraw() +
+#     labs(subtitle = av)
+#
+#   if (!isTRUE(getOption('knitr.in.progress'))) {
+#     suppressWarnings(print(p))
+#   }
+#
+#   if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+#     ggplotly(p)
+#   }
+#
+# }
 
-  p <- ggplot(pp, aes(x = Date, y = value)) +
-    geom_line() +
-    theme_linedraw() +
-    labs(subtitle = av)
+av <- "Avg_kmph"
+pp <- DTRIP[variable == av]
+p <- ggplot(pp, aes(x = Date, y = value)) +
+  geom_line() +
+  theme_linedraw() +
+  labs(subtitle = av)
 
-  if (!isTRUE(getOption('knitr.in.progress'))) {
-    suppressWarnings(print(p))
-  }
-
-  if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
-    ggplotly(p)
-  }
-
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
 }
 
 
-table(DATA$variable)
+av <- "Consumption_Accum"
+pp <- DTRIP[variable == av]
+p <- ggplot(pp, aes(x = Date, y = value)) +
+  geom_line() +
+  theme_linedraw() +
+  labs(subtitle = av)
+
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+av <- "Consumption_Rate"
+pp <- DTRIP[variable == av]
+p <- ggplot(pp, aes(x = Date, y = value)) +
+  geom_line() +
+  theme_linedraw() +
+  labs(subtitle = av)
+
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+av <- "Fuel_Level"
+pp <- DTRIP[variable == av]
+p <- ggplot(pp, aes(x = Date, y = value)) +
+  geom_line() +
+  theme_linedraw() +
+  labs(subtitle = av)
+
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+av <- "km"
+pp <- DTRIP[variable == av]
+p <- ggplot(pp, aes(x = Date, y = value)) +
+  geom_line() +
+  theme_linedraw() +
+  labs(subtitle = av)
+
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+av <- "Range"
+pp <- DTRIP[variable == av]
+p <- ggplot(pp, aes(x = Date, y = value)) +
+  geom_line() +
+  theme_linedraw() +
+  labs(subtitle = av)
+
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+av <- "trip_km"
+pp <- DTRIP[variable == av]
+p <- ggplot(pp, aes(x = Date, y = value)) +
+  geom_line() +
+  theme_linedraw() +
+  labs(subtitle = av)
+
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+
+
+
+
+#'
+#' # Trip analysis
+#'
+#+ echo=F, include=T
+
+ANT <- dcast(DTRIP, Date ~ variable )
+ANT[, KM_kpl   := c(NA, 100 * diff(Consumption_Accum)/diff(km))]
+ANT[, TRIP_kpl := c(NA, 100 * diff(Consumption_Accum)/diff(trip_km))]
+
+
+p <- ANT |>
+  rename(kpl = Consumption_Rate) |>
+  select(Date, contains("kpl")) |>
+  melt(id.vars = "Date") |>
+  filter(!is.na(value) & value > 0) |>
+  ggplot(aes(x = Date, y = value, colour = variable)) +
+  geom_point()
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+
+p <- ANT |>
+  rename(kpl = Consumption_Rate) |>
+  select(Date, contains("kpl")) |>
+  melt(id.vars = "Date") |>
+  filter(!is.na(value) & value < 0) |>
+  ggplot(aes(x = Date, y = value, colour = variable)) +
+  geom_point()
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+
+
+
+
+
 
 dbDisconnect(con)
 
