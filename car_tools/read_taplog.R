@@ -216,17 +216,19 @@ if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
 #+ echo=F, include=T
 
 ANT <- dcast(DTRIP, Date ~ variable )
-ANT[, KM_kpl   := c(NA, 100 * diff(Consumption_Accum)/diff(km))]
-ANT[, TRIP_kpl := c(NA, 100 * diff(Consumption_Accum)/diff(trip_km))]
+ANT[, KM_lp100   := c(NA, 100 * diff(Consumption_Accum)/diff(km))]
+ANT[, TRIP_lp100 := c(NA, 100 * diff(Consumption_Accum)/diff(trip_km))]
 
 
 p <- ANT |>
-  rename(kpl = Consumption_Rate) |>
-  select(Date, contains("kpl")) |>
+  rename(lp100 = Consumption_Rate) |>
+  select(Date, contains("lp100")) |>
   melt(id.vars = "Date") |>
   filter(!is.na(value) & value > 0) |>
   ggplot(aes(x = Date, y = value, colour = variable)) +
-  geom_point()
+  geom_point() +
+  theme_linedraw() +
+  labs(subtitle = "Consumption", y = "l/100km")
 if (!isTRUE(getOption('knitr.in.progress'))) {
   suppressWarnings(print(p))
 }
@@ -235,12 +237,15 @@ if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
 }
 
 p <- ANT |>
-  rename(kpl = Consumption_Rate) |>
-  select(Date, contains("kpl")) |>
+  rename(lp100 = Consumption_Rate) |>
+  select(Date, contains("lp100")) |>
   melt(id.vars = "Date") |>
   filter(!is.na(value) & value < 0) |>
   ggplot(aes(x = Date, y = value, colour = variable)) +
-  geom_point()
+  geom_point() +
+  theme_linedraw() +
+  labs(subtitle = "Consumption errors",
+       y = "l/100km")
 if (!isTRUE(getOption('knitr.in.progress'))) {
   suppressWarnings(print(p))
 }
@@ -256,8 +261,50 @@ if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
 #+ echo=F, include=T
 
 GAS <- dcast(DGAS, Date ~ variable) |>
-  filter(!is.na(Litre))
-GAS[, c(NA, 100 * diff(Litre)/diff(km))]
+  filter(!is.na(Litre) & !is.na(Mileage))
+GAS[, lp100 := 100 * Litre/c(NA, diff(Mileage))]
+
+p <- ggplot(GAS, aes(x = Date, y = lp100)) +
+  geom_point() +
+  theme_linedraw() +
+  labs(subtitle = "Consumption from gas",
+       y = "l/100km")
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+
+
+GAS <- dcast(DGAS, Date ~ variable)
+
+p <- ggplot(GAS, aes(x = Date)) +
+  geom_point(aes(y = Cost,  color = "Cost")) +
+  geom_point(aes(y = Litre, color = "Litre")) +
+  theme_linedraw() +
+  labs(subtitle = "gas",
+       y = element_blank())
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+
+p <- ggplot(GAS, aes(x = Date, y = Cost/Litre)) +
+  geom_point() +
+  theme_linedraw() +
+  labs(subtitle = "gas",
+       y = "euro/litre")
+if (!isTRUE(getOption('knitr.in.progress'))) {
+  suppressWarnings(print(p))
+}
+if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+  ggplotly(p)
+}
+
+
 
 dbDisconnect(con)
 
