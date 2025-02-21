@@ -541,7 +541,7 @@ for (CAR in mycars) {
             )
         }
         fuelgather <- rm.cols.dups.DT(fuelgather)
-        write.csv(x = fuelgather, file = paste0("~/LOGs/car_logs/Fuel_test_",CAR,".csv"),row.names = F)
+        # write.csv(x = fuelgather, file = paste0("~/LOGs/car_logs/Fuel_test_",CAR,".csv"),row.names = F)
     }
 
 
