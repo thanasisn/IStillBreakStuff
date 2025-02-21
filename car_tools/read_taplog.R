@@ -210,7 +210,6 @@ if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
 
 
 
-
 #'
 #' # Trip analysis
 #'
@@ -251,8 +250,14 @@ if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
 
 
 
+#'
+#' # Gas analysis
+#'
+#+ echo=F, include=T
 
-
+GAS <- dcast(DGAS, Date ~ variable) |>
+  filter(!is.na(Litre))
+GAS[, c(NA, 100 * diff(Litre)/diff(km))]
 
 dbDisconnect(con)
 

@@ -210,7 +210,7 @@ for (CAR in mycars) {
             Fuel_Level_change_p100km := 100 * Fuel_Level_diff / Fuel_Level_trip]
 
     setorder(taplog, Date )
-    write.csv(x = taplog, file = paste0("~/LOGs/car_logs/Taplog_",CAR,".csv"),row.names = F)
+    # write.csv(x = taplog, file = paste0("~/LOGs/car_logs/Taplog_",CAR,".csv"),row.names = F)
 
 
 
@@ -238,7 +238,7 @@ for (CAR in mycars) {
     gas[ , dist_traveled := c(NA, abs(diff(Odometer)))]
     gas[ , lp100km       := 100 * Litre / dist_traveled ]
     gas[ , Avg_lp100km   := 100 * sum(gas$Litre[ 1:(nrow(gas)-1) ]) / diff(range(gas$Odometer)) ]
-    write.csv(x = gas, file = paste0("~/LOGs/car_logs/Gas_stats_", CAR,".csv"),row.names = F)
+    # write.csv(x = gas, file = paste0("~/LOGs/car_logs/Gas_stats_", CAR,".csv"),row.names = F)
 
 
     ####  Prepare trip data carpros  ####
@@ -337,7 +337,7 @@ for (CAR in mycars) {
         rm(trip1, trip2)
         trip <- data.table(trip)
         trip <- trip[ !is.na(Date)]
-        write.csv(x = trip, file = paste0("~/LOGs/car_logs/Trip_stats_",CAR,".csv"),row.names = F)
+        # write.csv(x = trip, file = paste0("~/LOGs/car_logs/Trip_stats_",CAR,".csv"),row.names = F)
     }
 
 
@@ -387,7 +387,7 @@ for (CAR in mycars) {
     servicemanual$Time_left <- sub("^[0-9]+s \\(" ,"" ,as.duration(difftime( servicemanual$Expire.Date, Sys.Date() , units = "days")))
     servicemanual$Time_left <- sub("\\)" ,"" ,servicemanual$Time_left)
     servicemanual           <- servicemanual[ order(difftime( servicemanual$Expire.Date, Sys.Date() , units = "days")),]
-    write.csv(x = servicemanual, file = paste0("~/LOGs/car_logs/Maintainance_",CAR,".csv"),row.names = F)
+    # write.csv(x = servicemanual, file = paste0("~/LOGs/car_logs/Maintainance_",CAR,".csv"),row.names = F)
     rm(servicemanual)
 
     ## TODO Issue warnings
@@ -583,7 +583,7 @@ for (CAR in mycars) {
     }
 
     temp <- rm.cols.dups.DT(temp)
-    write.csv(x = temp, file = paste0("~/LOGs/car_logs/Data_",CAR,".csv"),row.names = F)
+    # write.csv(x = temp, file = paste0("~/LOGs/car_logs/Data_",CAR,".csv"),row.names = F)
 }
 
 
