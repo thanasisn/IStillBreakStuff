@@ -52,7 +52,8 @@ synclient  RBCornerButton=1
 echo
 
 echo "set keyboard language options"
-setxkbmap -option grp:switch,grp:alt_shift_toggle,grp_led:scroll us,el
+#  setxkbmap -option grp:switch,grp:alt_shift_toggle,grp_led:scroll us,el
+setxkbmap -option grp:switch,grp:alt_shift_toggle,grp_led:scroll us,gr
 echo
 
 echo "swap caps and escape keys"
