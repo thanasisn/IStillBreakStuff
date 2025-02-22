@@ -119,7 +119,8 @@ pp <- DTRIP[variable == av]
 p <- ggplot(pp, aes(x = Date, y = value)) +
   geom_line() +
   theme_linedraw() +
-  labs(subtitle = av)
+  labs(subtitle = av,
+       y        = av)
 
 if (!isTRUE(getOption('knitr.in.progress'))) {
   suppressWarnings(print(p))
@@ -134,7 +135,8 @@ pp <- DTRIP[variable == av]
 p <- ggplot(pp, aes(x = Date, y = value)) +
   geom_line() +
   theme_linedraw() +
-  labs(subtitle = av)
+  labs(subtitle = av,
+       y        = av)
 
 if (!isTRUE(getOption('knitr.in.progress'))) {
   suppressWarnings(print(p))
@@ -147,7 +149,8 @@ pp <- DTRIP[variable == av]
 p <- ggplot(pp, aes(x = Date, y = value)) +
   geom_line() +
   theme_linedraw() +
-  labs(subtitle = av)
+  labs(subtitle = av,
+       y        = av)
 
 if (!isTRUE(getOption('knitr.in.progress'))) {
   suppressWarnings(print(p))
@@ -160,7 +163,8 @@ pp <- DTRIP[variable == av]
 p <- ggplot(pp, aes(x = Date, y = value)) +
   geom_line() +
   theme_linedraw() +
-  labs(subtitle = av)
+  labs(subtitle = av,
+       y        = av)
 
 if (!isTRUE(getOption('knitr.in.progress'))) {
   suppressWarnings(print(p))
@@ -173,7 +177,8 @@ pp <- DTRIP[variable == av]
 p <- ggplot(pp, aes(x = Date, y = value)) +
   geom_line() +
   theme_linedraw() +
-  labs(subtitle = av)
+  labs(subtitle = av,
+       y        = av)
 
 if (!isTRUE(getOption('knitr.in.progress'))) {
   suppressWarnings(print(p))
@@ -186,7 +191,8 @@ pp <- DTRIP[variable == av]
 p <- ggplot(pp, aes(x = Date, y = value)) +
   geom_line() +
   theme_linedraw() +
-  labs(subtitle = av)
+  labs(subtitle = av,
+       y        = av)
 
 if (!isTRUE(getOption('knitr.in.progress'))) {
   suppressWarnings(print(p))
@@ -199,7 +205,8 @@ pp <- DTRIP[variable == av]
 p <- ggplot(pp, aes(x = Date, y = value)) +
   geom_line() +
   theme_linedraw() +
-  labs(subtitle = av)
+  labs(subtitle = av,
+       y        = av)
 
 if (!isTRUE(getOption('knitr.in.progress'))) {
   suppressWarnings(print(p))
