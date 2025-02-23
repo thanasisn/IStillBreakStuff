@@ -30,14 +30,15 @@
 #' ---
 
 #+ echo=F, messages=F
-knitr::opts_chunk$set(comment  = ""     )
-knitr::opts_chunk$set(echo     = FALSE  )
-knitr::opts_chunk$set(messages = FALSE  )
+knitr::opts_chunk$set(comment  = ""   )
+knitr::opts_chunk$set(echo     = FALSE)
+knitr::opts_chunk$set(messages = FALSE)
+knitr::opts_chunk$set(warning  = FALSE)
 
-library(bib2df)
-library(stevemisc)
-library(stringi)
-library(janitor)
+library(bib2df,    quietly = TRUE, warn.conflicts = FALSE)
+library(stevemisc, quietly = TRUE, warn.conflicts = FALSE)
+library(stringi,   quietly = TRUE, warn.conflicts = FALSE)
+library(janitor,   quietly = TRUE, warn.conflicts = FALSE)
 
 bib_fl     <- "~/LIBRARY/A_Atmosphere/A_Atmosphere.bib"
 my_pattern <- "Natsis|Νάτσης"
@@ -77,7 +78,7 @@ bib_df <- bib_df[
 
 
 
-#+ results="asis"
+#+ results="asis", messages=F
 for (at in unique(bib_df$CATEGORY)) {
   cc <- 0
   ## Change language
