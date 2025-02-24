@@ -325,11 +325,30 @@ testf <- list.files("~/LOGs/BMeasurments/",
 testf <- "/home/athan/LOGs/BMeasurments//TAP_2b.csv"
 for (af in testf) {
   tmp <- fread(af)
-  tmp <- tmp[grepl("Duster", cat1), ]
+  tmp <- tmp[grepl("Duster", cat1), ] |>
+    select(-starts_with("gps"),
+           -latitude, -longitude, -accuracy, -altitude) |>
+    rename(Date = timestamp)
+
+  test <- rbind(
+    tmp  |> mutate(
+      Day    = as.Date(Date),
+      Source = "csv"),
+    DATA |> mutate(Day = as.Date(Date),
+                   Source = "DB"),
+    fill = T
+  )
+
+  test <- test |> filter(
+    Day >= test[Source == "csv", range(Day)][1] &
+    Day <= test[Source == "csv", range(Day)][2]
+  )
+  setorder(test, "Date")
 
 }
 
-
+ggplot(test, aes(x= Date, y = Source)) +
+  geom_point()
 
 tac = Sys.time();
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
