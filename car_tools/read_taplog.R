@@ -328,7 +328,9 @@ for (af in testf) {
   tmp <- tmp[grepl("Duster", cat1), ] |>
     select(-starts_with("gps"),
            -latitude, -longitude, -accuracy, -altitude) |>
-    rename(Date = timestamp)
+    rename(Date     = timestamp) |>
+    rename(value     = number) |>
+    rename(variable = cat1)
 
   test <- rbind(
     tmp  |> mutate(
