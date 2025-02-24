@@ -49,8 +49,8 @@ con <- dbConnect(drv = RSQLite::SQLite(), dbname = dbfile)
 dbListTables(con)
 
 points   <- tbl(con, "data_points_table")
-features <- tbl(con, "features_table")
-groups   <- tbl(con, "groups_table")
+features <- tbl(con, "features_table"   )
+groups   <- tbl(con, "groups_table"     )
 
 DATA <- left_join(
   left_join(points,
@@ -314,6 +314,20 @@ if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
 
 
 dbDisconnect(con)
+
+
+
+## read old?
+testf <- list.files("~/LOGs/BMeasurments/",
+                    "*.csv",
+                    full.names = T)
+
+testf <- "/home/athan/LOGs/BMeasurments//TAP_2b.csv"
+for (af in testf) {
+  tmp <- fread(af)
+  tmp <- tmp[grepl("Duster", cat1), ]
+
+}
 
 
 

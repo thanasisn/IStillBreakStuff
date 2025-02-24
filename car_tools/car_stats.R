@@ -6,18 +6,13 @@
 ####_ Set environment _####
 rm(list = (ls()[ls() != ""]))
 tic <- Sys.time()
-Script.Name <- tryCatch({ funr::sys.script() },
-                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n")
-                            return("Undefined R script name!!") })
+Script.Name <- "~/CODE/car_tools/car_stats.R"
 if(!interactive())pdf(file="~/LOGs/car_logs/Car_stats_plots.pdf")
 if(!interactive())sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
 Script.Base = sub("\\.R$","",Script.Name)
 
 
-
 library(data.table)
-
-
 source("~/FUNCTIONS/R/data.R")
 
 ## always use local time here
@@ -26,10 +21,7 @@ Sys.setenv(TZ = "Europe/Athens")
 ## variables
 repo   <- "~/LOGs/carpros/"
 mycars <- c("Duster", "Carina")
-TANK   <- c(  70    ,   60    )
-
-# mycars <- c("Carina", "Duster")
-# TANK   <- c(  60    ,   70    )
+TANK   <- c(  50    ,   60    )
 
 
 
@@ -56,7 +48,7 @@ m.s.S <- Vectorize(
 
 for (CAR in mycars) {
     cat(CAR, "\n")
-
+stop()
     ## get file list
     files <- list.files(path       = repo,
                         pattern    = CAR,
