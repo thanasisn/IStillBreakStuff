@@ -346,10 +346,9 @@ for (af in testf) {
     Day <= test[Source == "csv", range(Day)][2]
   )
   setorder(test, "Date")
-
 }
 
-ggplot(test, aes(x= Date, y = Source)) +
+ggplot(test, aes(x = Date, y = Source)) +
   geom_point()
 
 tac = Sys.time();
