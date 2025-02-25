@@ -326,8 +326,7 @@ testf <- "/home/athan/LOGs/BMeasurments//TAP_2b.csv"
 for (af in testf) {
   tmp <- fread(af)
   tmp <- tmp[grepl("Duster", cat1), ] |>
-    select(-starts_with("gps"),
-           -latitude, -longitude, -accuracy, -altitude) |>
+    select(-starts_with("gps")) |>
     rename(Date     = timestamp) |>
     rename(value     = number) |>
     rename(variable = cat1)
@@ -337,19 +336,25 @@ for (af in testf) {
       Day    = as.Date(Date),
       Source = "csv"),
     DATA |> mutate(Day = as.Date(Date),
-                   Source = "DB"),
+                   Source = "DB") |>
+      select(-color_index, -group),
     fill = T
-  )
+  ) |> select(-Milliseconds, -V1, -"_id" )
 
   test <- test |> filter(
     Day >= test[Source == "csv", range(Day)][1] &
     Day <= test[Source == "csv", range(Day)][2]
   )
   setorder(test, "Date")
+  print(tail(test, 50))
 }
+
+
 
 ggplot(test, aes(x = Date, y = Source)) +
   geom_point()
+
+
 
 tac = Sys.time();
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
