@@ -311,7 +311,7 @@ if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
   ggplotly(p)
 }
 
-
+ANT[year(Date)==2022,]
 
 dbDisconnect(con)
 
