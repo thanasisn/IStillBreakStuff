@@ -339,7 +339,7 @@ for (af in testf) {
                    Source = "DB") |>
       select(-color_index, -group),
     fill = T
-  ) |> select(-Milliseconds, -V1, -"_id" )
+  ) |> select(-Milliseconds )
 
   test <- test |> filter(
     Day >= test[Source == "csv", range(Day)][1] &
@@ -351,9 +351,9 @@ for (af in testf) {
 
 
 
-ggplot(test, aes(x = Date, y = Source)) +
+p <- ggplot(test, aes(x = Date, y = Source)) +
   geom_point()
-
+print(p)
 
 
 tac = Sys.time();
