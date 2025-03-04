@@ -95,6 +95,7 @@ folders=(
 	"$HOME/MANUSCRIPTS/03_thesis"
 	"$HOME/MANUSCRIPTS/presentations"
 	"$HOME/MANUSCRIPTS/reports"
+	"$HOME/OREO"
 	"$HOME/PANDOC/My_Publications"
 	"$HOME/PANDOC/thanasisn.github.io"
   "$HOME/PANDOC/CHP1_measurements_guide"
