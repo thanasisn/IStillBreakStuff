@@ -15,7 +15,6 @@
 #' date: "`r format(Sys.time(), '%F')`"
 #' ---
 
-
 #+ echo=F, include=T
 rm(list = (ls()[ls() != ""]))
 Script.Name <- "~/CODE/system_tools/Folders_size_analysis.R"
@@ -27,7 +26,6 @@ if (!interactive()) {
 }
 ## error notification function
 tic <- Sys.time()
-
 
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment    = ""       )
@@ -63,8 +61,8 @@ SIZE_LIM <- 300 * 1024 ^ 2
 
 af <- datafls[1] # blue
 af <- datafls[4] # yperos
-af <- datafls[2] # sagan
 af <- datafls[3] # tyler
+af <- datafls[2] # sagan
 
 # for (af in datafls) {
 host <- sub("Log_folders_size_", "", sub(".Rds", "", basename(af)))
@@ -77,9 +75,7 @@ DATA <- DATA[dir.exists(file), ]
 ## nost recent
 DATA <- DATA[ Date > Sys.Date() - 4*31 ]
 
-
 DATA$Date <- as.Date(DATA$Date, origin = "1970-01-01")
-
 
 
 #'
