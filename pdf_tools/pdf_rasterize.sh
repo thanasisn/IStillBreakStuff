@@ -4,7 +4,6 @@
 #### Get a pdf file and create a rasterized version of it
 ## output one file with some metadata and one without
 
-
 ## get options
 while getopts d:p:q: option
 do
@@ -23,7 +22,6 @@ if [ $OPTIND -eq 1 ]; then
     echo ""
     exit
 fi
-
 
 ## check input resolution sanity
 if [[ ${DENSITY} -gt "29" && ${DENSITY} -lt "601" ]]; then
@@ -48,13 +46,11 @@ else
     echo "exit.."; exit 1
 fi
 
-
 ## temp folder
 mkdir -p "/dev/shm/temppdf"
 
-
-echo "${PATHpdf%.*}_D${DENSITY}Q${quality}.pdf"
-echo "${PATHpdf%.*}_D${DENSITY}Q${quality}BM.pdf"
+echo "Without metadata: ${PATHpdf%.*}_D${DENSITY}Q${quality}.pdf"
+echo "With metadata:    ${PATHpdf%.*}_D${DENSITY}Q${quality}BM.pdf"
 
 ## create images in temp folder
 gs -sDEVICE=jpeg                       \
@@ -63,7 +59,6 @@ gs -sDEVICE=jpeg                       \
    -r"${DENSITY}x${DENSITY}"           \
    -sPAPERSIZE=a4                      \
    "${PATHpdf}"
-
 
 ## create new pdf without metadata
 img2pdf -o "${PATHpdf%.*}_D${DENSITY}Q${quality}.pdf" $(ls "/dev/shm/temppdf/"*.jpg)
@@ -74,7 +69,6 @@ pdftk "${PATHpdf}" dump_data_utf8 output "/dev/shm/temppdf/Ddump"
 pdftk "${PATHpdf%.*}_D${DENSITY}Q${quality}.pdf" \
       update_info_utf8 "/dev/shm/temppdf/Ddump"  \
       output "${PATHpdf%.*}_D${DENSITY}Q${quality}BM.pdf"
-
 
 ## check output
 if [[ -f "${PATHpdf%.*}_D${DENSITY}Q${quality}BM.pdf" ]]; then
@@ -92,6 +86,5 @@ fi
 
 ## cleanup temp files
 rm -r "/dev/shm/temppdf"
-
 
 exit 0
