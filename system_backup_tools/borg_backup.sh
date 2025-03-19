@@ -151,7 +151,7 @@ else
             ## break with the first success
             break
         else
-            echo "NO TRAFIC : $iip "
+            echo "NO TRAFFIC : $iip "
         fi
     done
     FOUND="${FOUND:-${HOST_IPS[-1]}}"
@@ -162,7 +162,7 @@ else
     ## ssh location
     REPO_ROOT="${HOST_USER}@${HOST_REPO}"
 
-    ## fullpath of the repository
+    ## full path of the repository
     BORG_REPO="${REPO_ROOT}:${STORAGE}"
 fi
 
