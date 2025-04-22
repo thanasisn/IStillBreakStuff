@@ -44,6 +44,8 @@ pids=()
 (
     "$HOME/BASH/mail_auto/gmailr_get_accounts_alerts.R"
     "$HOME/BASH/mail_auto/parse_accounts_alerts.R"
+    # new parser
+    "$HOME/BASH/mail_auto/scrap_noa/run_noa_mail.R
 ) & pids+=($!)
 
 
