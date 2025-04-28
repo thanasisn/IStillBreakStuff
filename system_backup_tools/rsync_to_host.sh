@@ -16,6 +16,7 @@ list=(
 '/home/athan/.dot_files_private'
 '/home/athan/DATA'
 '/home/athan/DATA_ARC'
+'/home/athan/LIBRARY'
 '/home/athan/DATA_RAW'
 )
 
