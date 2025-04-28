@@ -8,20 +8,24 @@
 list=(
 '/home/athan/BASH'
 '/home/athan/.ssh'
-#'/home/athan/CODE'
-#'/home/athan/LOGs'
+'/home/athan/CODE'
+'/home/athan/LOGs'
 '/home/athan/.unison'
 '/home/athan/.dotfiles'
 '/home/athan/.dot_files'
 '/home/athan/.dot_files_private'
+'/home/athan/DATA'
+'/home/athan/DATA_ARC'
+'/home/athan/DATA_RAW'
 )
 
 
 REMOTE_HOST="192.168.1.105"
-REMOTE_HOST="crane.lobster-atlas.ts.net"
+REMOTE_HOST="mumra.ts"
 REMOTE_USER="$USER"
 REMOTE="${REMOTE_USER}@${REMOTE_HOST}"
 OPTIONS=" --info=progress2 --info=name0 -arvh --stats --delete "
+OPTIONS=" --info=progress2 --info=name0 -arvh --stats "
 
 echo
 echo "***********************************************"
