@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 rm(list = (ls()[ls() != ""]))
-.libPaths(c(.libPaths(), "~/.R/x86_64-pc-linux-gnu-library/4.2.3/"))
+# .libPaths(c(.libPaths(), "~/.R/x86_64-pc-linux-gnu-library/4.2.3/"))
 Sys.setenv(TZ = "UTC")
 
 #### Gather current weather from OpenWeatherMAP for the current location
@@ -15,9 +15,9 @@ library(plyr)
 readRenviron("~/.Renviron")
 
 dir.create("/dev/shm/WHEATHER/", recursive = TRUE, showWarnings = FALSE)
-CURRENT_FL = "/dev/shm/WHEATHER/Current_OpenWeather.Rds"
-LOCATIO_FL = "/dev/shm/CONKY/last_location.dat"
-KEEP_MAX   = 1000
+CURRENT_FL <- "/dev/shm/WHEATHER/Current_OpenWeather.Rds"
+LOCATIO_FL <- "/dev/shm/CONKY/last_location.dat"
+KEEP_MAX   <- 1000
 
 ## Resolve location to ask weather for
 stopifnot(file.exists(LOCATIO_FL))

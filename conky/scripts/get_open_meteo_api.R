@@ -6,7 +6,7 @@
 ####  Set environment  ####
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
-.libPaths(c(.libPaths(), "~/.R/x86_64-pc-linux-gnu-library/4.2.3/"))
+# .libPaths(c(.libPaths(), "~/.R/x86_64-pc-linux-gnu-library/4.2.3/"))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/CODE/conky/scripts/get_open_meteo_api.R"
@@ -20,6 +20,7 @@ LOCATIO_FL <- "/dev/shm/CONKY/last_location.dat"
 exportfile <- "/dev/shm/WHEATHER/open_meteo_dump.Rds"
 oldness    <- 000 ## we want to be less than an hour
 
+dir.create("/dev/shm/WHEATHER", showWarnings = F)
 
 ## Resolve location to use
 if (!file.exists(LOCATIO_FL) ) {
