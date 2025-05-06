@@ -6,15 +6,12 @@
 ## ignore errors
 set +e
 
-
 ## Get telegram credentials  ---------------------------------------------------
-
 if [ -f ~/.ssh/telegram/unikey_$(hostname) ]; then
     . ~/.ssh/telegram/unikey_$(hostname)
   else
     . ~/.ssh/telegram/unikey_hosts
 fi
-
 
 ## Try to use markdown first  --------------------------------------------------
 
