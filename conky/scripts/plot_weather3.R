@@ -5,12 +5,14 @@
 
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-.libPaths(c(.libPaths(), "~/.R/x86_64-pc-linux-gnu-library/4.2.3/"))
+# .libPaths(c(.libPaths(), "~/.R/x86_64-pc-linux-gnu-library/4.2.3/"))
 Script.Name <- "~/CODE/conky/scripts/plot_weather3.R"
 
 library(scales)
-library(myRtools)
+# library(myRtools)
 library(data.table)
+
+source("~/CODE/R_myRtools/myRtools/R/physics_conv.R")
 
 # try({
 #     library(extrafont)
