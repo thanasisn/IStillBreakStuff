@@ -96,6 +96,7 @@ folders=(
 	"$HOME/MANUSCRIPTS/presentations"
 	"$HOME/MANUSCRIPTS/reports"
 	"$HOME/OREO"
+	"/home/athan/EUMETSAT/"
 	"$HOME/PANDOC/My_Publications"
 	"$HOME/PANDOC/thanasisn.github.io"
   "$HOME/PANDOC/CHP1_measurements_guide"
@@ -111,7 +112,7 @@ for i in "${folders[@]}"; do
 	[ ! -d "$i" ] && echo "Not a folder: $i" && continue
 	## go in the sub folders
 	cd "$i" || return
-	## make sure git is writable
+	## make sure git is writeable
   chmod +w .git
 	pwd
 	(
