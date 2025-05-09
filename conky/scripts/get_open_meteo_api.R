@@ -4,13 +4,12 @@
 #### Get weather data from open-meteo.com
 
 ####  Set environment  ####
-closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 # .libPaths(c(.libPaths(), "~/.R/x86_64-pc-linux-gnu-library/4.2.3/"))
 Sys.setenv(TZ = "UTC")
+source("~/CODE/conky/scripts/location.R")
 tic <- Sys.time()
 Script.Name <- "~/CODE/conky/scripts/get_open_meteo_api.R"
-source("~/CODE/conky/scripts/location.R")
 
 library(data.table)
 library(curl)

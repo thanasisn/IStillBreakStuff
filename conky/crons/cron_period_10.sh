@@ -40,7 +40,7 @@ pids=()
 # "${SCRIPTS}Cnk_ip_watch.sh"     &
 
 ## check external ips and ports of our hosts
-"$HOME/CODE/conky/scripts/ext_ip_watch.sh"     & pids+=($!)
+# "$HOME/CODE/conky/scripts/ext_ip_watch.sh"     & pids+=($!)
 
 
 ## Clean some of syncthing artifacts
