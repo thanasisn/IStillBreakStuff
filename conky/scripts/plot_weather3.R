@@ -500,8 +500,8 @@ testa <- lapd[ lapd$dateTime > Sys.Date() - 10 * 3600 * 24, ]
 Sys.setlocale(locale = "el_GR.utf8")
 
 if (!interactive()) {
-png(OUTPUT_01, bg = "transparent", family = "Liberation Sans",
-    width = 540, height = 255, units = "px", pointsize = 15, type = "cairo")
+png( OUTPUT_01, bg = "transparent", family = "Liberation Sans",
+     width = 540, height = 255, units = "px", pointsize = 15, type = "cairo")
 }
 
 {
