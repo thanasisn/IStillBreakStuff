@@ -96,7 +96,7 @@ folders=(
 	"$HOME/MANUSCRIPTS/presentations"
 	"$HOME/MANUSCRIPTS/reports"
 	"$HOME/OREO"
-	"/home/athan/EUMETSAT/"
+	"$HOME/EUMETSAT/"
 	"$HOME/PANDOC/My_Publications"
 	"$HOME/PANDOC/thanasisn.github.io"
   "$HOME/PANDOC/CHP1_measurements_guide"
