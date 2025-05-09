@@ -47,10 +47,16 @@ fncols <- function(data, cname) {
 try({
     res <- "Nothing"
     ## have to drop vnc devices from results
-    res <- system('sudo arp -a ',
-                  intern        = TRUE,
-                  ignore.stderr = TRUE,
-                  timeout       = 10)
+    ## TODO use 'ip neigh"
+    res <- system("ip neigh",
+           intern        = TRUE,
+           ignore.stderr = TRUE,
+           timeout       = 30)
+
+    # res <- system('sudo arp -a ',
+    #               intern        = TRUE,
+    #               ignore.stderr = TRUE,
+    #               timeout       = 30)
 
     ## we got something useful to process
     if ( !is.null(res) && length(res) > 0 ) {
@@ -59,7 +65,7 @@ try({
             loc_H <- LOCs[ apply(LOCs[1],1, function(x) { any(grepl(x, res)) } ),  ]
             cat(paste("Known location Access Point\n"))
         }
-        rm(res)
+        # rm(res)
     }
     cat(paste("Wifi AP says:", c(AT_HOME, loc_H)), sep = "\n")
 })
