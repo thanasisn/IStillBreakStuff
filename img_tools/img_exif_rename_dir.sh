@@ -8,7 +8,7 @@ FOLDER="$1"
 
 exiftool -v -P \
 	-r '-FileName<DateTimeOriginal'        \
-	-d %%d/%Y%m%d/%Y%m%d_%H%M%S%%-02c.%%e  \
+	-d %%d/%Y-%m-%d/%Y%m%d_%H%M%S%%-02c.%%e  \
 	"$FOLDER"
 
 # exiftool -v -P -r '-FileName<CreateDate' -d %Y%m%d_%H%M%S%%-02c.%%e "$FOLDER"
