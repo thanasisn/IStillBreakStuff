@@ -3,15 +3,12 @@
 #############################################################
 ##  Natsis Athanasios (c) 2018 <natsisthanasis@gmail.com>  ##
 ##  created:  2018-11-01                                   ##
-##  updated:  2024-02-12                                   ##
 #############################################################
-
 
 ##  Can create borg backups with different profiles
 ##  Creates backups and prunes the repo
 ##  Uses full paths for a regular user so root can also execute
 ##  Hopefully will issue warnings through custom notify-send
-
 
 ## executable path
 ## Debian 12 has 1.2.4 as default
@@ -20,7 +17,6 @@ BORG="borg"
 ## check requirements
 command -v nc    >/dev/null 2>&1 || { echo >&2 "nc NOT INSTALLED. Aborting."; exit 1; }
 command -v $BORG >/dev/null 2>&1 || { echo >&2 "borg NOT INSTALLED. Aborting."; exit 1; }
-
 
 ##-------------------------##
 ##   logging definitions   ##
@@ -56,7 +52,6 @@ LOCK_FILE="/dev/shm/borg_backup_${PROFILE}.lock"
 # NOTIFY_SEND="notify-send"
 NOTIFY_SEND="/home/athan/BASH/TOOLS/pub_messages.py"
 LOCATION_DET="/home/athan/CODE/conky/scripts/location.R"
-
 
 if [[ -f "$CONF_FILE" ]] ; then
     echo
@@ -234,13 +229,9 @@ info2 "Break lock of $BORG_REPO"
 ${BORG} break-lock
 echo
 
-
-
 ## export some info before backup
 ${BORG} --remote-path "${BORG}" info
 echo
-
-
 
 info2 "Will start backup"
 info  "start backup"
@@ -282,12 +273,14 @@ ${BORG} prune                                  \
         --list                                 \
         --stats                                \
         --remote-path "${BORG}"                \
-        --prefix '{hostname}-'                 \
         --show-rc                              \
+        -n \
+        -a '*-*-*:*:*'                         \
         -p                                     \
         ${KEEP}                                > "$PRU_FILE" 2>&1
 prune_exit=$?
 
+        # --prefix '{hostname}-'                 \
 TAC=$(date +'%s'); dura="$( echo "scale=6; ($TAC-$TIC)/60" | bc)"
 echo "Prune done in $dura minutes"             >> "$PRU_FILE"
 
