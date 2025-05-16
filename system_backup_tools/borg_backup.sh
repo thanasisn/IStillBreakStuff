@@ -274,7 +274,6 @@ ${BORG} prune                                  \
         --stats                                \
         --remote-path "${BORG}"                \
         --show-rc                              \
-        -n \
         -a '*-*-*:*:*'                         \
         -p                                     \
         ${KEEP}                                > "$PRU_FILE" 2>&1
