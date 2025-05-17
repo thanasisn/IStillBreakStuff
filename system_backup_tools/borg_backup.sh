@@ -269,7 +269,6 @@ printf "%s  S:%s T:%fmin " "$( date +%F_%T )" "$backup_exit" "$dura"
 echo
 
 
-
 info2 "Prune repository"
 info  "start pruning"
 TIC=$(date +'%s')
