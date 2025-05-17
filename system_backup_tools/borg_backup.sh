@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #############################################################
 ##  Natsis Athanasios (c) 2018 <natsisthanasis@gmail.com>  ##
@@ -192,6 +192,13 @@ export BORG_RELOCATED_REPO_ACCESS_IS_OK=yes
 : "${LOG_FILE:?}"
 : "${ERR_FILE:?}"
 
+## Default compression
+COMPRESSION="${COMPRESSION:-auto,lzma,4}"
+
+echo
+echo "Compression set $COMPRESSION"
+echo
+
 ## remove existing log files to clear ownership
 rm -f "${LOG_FILE}" "${ERR_FILE}" "${FIL_FILE}"
 
@@ -241,14 +248,14 @@ ${BORG} create                                 \
         --stats                                \
         --verbose                              \
         --filter AMEUx                         \
-        --remote-ratelimit "${RATE_LIM}"       \
-        --remote-path      "${BORG}"           \
+        --remote-ratelimit    "${RATE_LIM}"    \
+        --remote-path         "${BORG}"        \
         --checkpoint-interval "${CHKPNT_INT}"  \
         --list                                 \
         --progress                             \
         --show-rc                              \
         --nobsdflags                           \
-        --compression         'auto,lzma,4'    \
+        --compression        $COMPRESSION    \
         --exclude-if-present '.excludeBacula'  \
         --exclude-from       "${EXCLUDE_FILE}" \
                                                \
