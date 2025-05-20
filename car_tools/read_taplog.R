@@ -22,7 +22,7 @@ Script.Name <- "~/CODE/car_tools/read_taplog.R"
 knitr::opts_chunk$set(out.width  = "100%"   )
 
 filenames <- list.files(path       = "~/MISC/a34_export/TapLog",
-                        pattern    = "TrackAndGraphBackup.*db",
+                        pattern    = "TrackAndGraphBackup.*db$",
                         full.names = T)
 
 library(data.table)
@@ -52,15 +52,16 @@ points   <- tbl(con, "data_points_table")
 features <- tbl(con, "features_table"   )
 groups   <- tbl(con, "groups_table"     )
 
+
 DATA <- left_join(
   left_join(points,
             features,
-            by = join_by(feature_id == id)) |>
+            by = c("feature_id" = "id")) |>
     select(-feature_id,
            -display_index) |>
     rename(variable = "name"),
   groups,
-  by = join_by(group_id == id)
+  by = c("group_id" = "id")
 ) |>
   select(-group_id,
          -display_index) |>
@@ -328,7 +329,7 @@ for (af in testf) {
   tmp <- tmp[grepl("Duster", cat1), ] |>
     select(-starts_with("gps")) |>
     rename(Date     = timestamp) |>
-    rename(value     = number) |>
+    rename(value    = number) |>
     rename(variable = cat1)
 
   test <- rbind(
@@ -348,7 +349,6 @@ for (af in testf) {
   setorder(test, "Date")
   print(tail(test, 55))
 }
-
 
 
 p <- ggplot(test, aes(x = Date, y = Source)) +
