@@ -43,6 +43,11 @@
   "image": {
     "colorspace": "p3",
     "extractEmbedded": false,
+    "fullsize": {
+      "enabled": false,
+      "format": "jpeg",
+      "quality": 80
+    },
     "preview": {
       "format": "jpeg",
       "quality": 80,
@@ -59,13 +64,13 @@
       "concurrency": 5
     },
     "faceDetection": {
-      "concurrency": 2
+      "concurrency": 4
     },
     "library": {
-      "concurrency": 5
+      "concurrency": 6
     },
     "metadataExtraction": {
-      "concurrency": 5
+      "concurrency": 10
     },
     "migration": {
       "concurrency": 5
@@ -77,13 +82,13 @@
       "concurrency": 5
     },
     "sidecar": {
-      "concurrency": 5
+      "concurrency": 6
     },
     "smartSearch": {
-      "concurrency": 2
+      "concurrency": 4
     },
     "thumbnailGeneration": {
-      "concurrency": 3
+      "concurrency": 6
     },
     "videoConversion": {
       "concurrency": 1
@@ -91,24 +96,24 @@
   },
   "library": {
     "scan": {
-      "cronExpression": "0 0 * * *",
+      "cronExpression": "0 */6 * * *",
       "enabled": true
     },
     "watch": {
-      "enabled": false
+      "enabled": true
     }
   },
   "logging": {
     "enabled": true,
-    "level": "log"
+    "level": "debug"
   },
   "machineLearning": {
     "clip": {
       "enabled": true,
-      "modelName": "ViT-B-32__openai"
+      "modelName": "ViT-SO400M-16-SigLIP2-384__webli"
     },
     "duplicateDetection": {
-      "enabled": true,
+      "enabled": false,
       "maxDistance": 0.01
     },
     "enabled": true,
@@ -117,9 +122,11 @@
       "maxDistance": 0.5,
       "minFaces": 3,
       "minScore": 0.7,
-      "modelName": "buffalo_l"
+      "modelName": "antelopev2"
     },
-    "url": "http://immich-machine-learning:3003"
+    "urls": [
+      "http://immich-machine-learning:3003"
+    ]
   },
   "map": {
     "darkStyle": "https://tiles.immich.cloud/v1/style/dark.json",
@@ -163,7 +170,9 @@
     "scope": "openid email profile",
     "signingAlgorithm": "RS256",
     "storageLabelClaim": "preferred_username",
-    "storageQuotaClaim": "immich_quota"
+    "storageQuotaClaim": "immich_quota",
+    "timeout": 30000,
+    "tokenEndpointAuthMethod": "client_secret_post"
   },
   "passwordLogin": {
     "enabled": true
@@ -173,19 +182,27 @@
   },
   "server": {
     "externalDomain": "",
-    "loginPageMessage": ""
+    "loginPageMessage": "",
+    "publicUsers": true
   },
   "storageTemplate": {
     "enabled": false,
     "hashVerificationEnabled": true,
     "template": "{{y}}/{{y}}-{{MM}}-{{dd}}/{{filename}}"
   },
+  "templates": {
+    "email": {
+      "albumInviteTemplate": "",
+      "albumUpdateTemplate": "",
+      "welcomeTemplate": ""
+    }
+  },
   "theme": {
     "customCss": ""
   },
   "trash": {
     "days": 30,
-    "enabled": true
+    "enabled": false
   },
   "user": {
     "deleteDelay": 7
