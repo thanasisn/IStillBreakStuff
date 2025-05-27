@@ -20,8 +20,8 @@ source("~/CODE/R_myRtools/myRtools/R/write_.R")
 # library(data.table)
 
 ## root of all xml files
-data_folder = "~/DATA_ARC/08_Chats/SMS_CALLS/"
-data_folder = "/home/athan/MISC/a34_export/SMS_calls"
+data_folder <- "~/DATA_ARC/08_Chats/SMS_CALLS/"
+data_folder <- "/home/athan/MISC/a34_export/SMS_calls"
 
 ##  Gather all xml call logs  --------------------------------------------------
 old_files <- list.files(path = data_folder,
