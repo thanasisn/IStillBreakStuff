@@ -15,7 +15,7 @@
 #+ echo=F, include=F
 ####_ Set environment _####
 rm(list = (ls()[ls() != ""]))
-tic <- Sys.time()
+tic <- Sys.time()]]]
 Script.Name <- "~/CODE/car_tools/read_taplog.R"
 
 ## __ Document options ---------------------------------------------------------
