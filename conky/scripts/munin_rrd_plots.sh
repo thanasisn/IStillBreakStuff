@@ -59,13 +59,13 @@ rrdtool graph "${outputdir}load_graph.png"                              \
     --disable-rrdtool-tag                                               \
     DEF:bluel1="/var/lib/munin/blue/blue-load-load-g.rrd":42:MAX        \
     CDEF:bluel1n=bluel1,2,/      LINE3:bluel1n${col_blue}:"blue"        \
-    DEF:yperos1="/var/lib/munin/yperos/yperos-load-load-g.rrd":42:MAX   \
-    CDEF:yperosl1n=yperos1,32,/  LINE3:yperosl1n${col_yperos}:"yperos"  \
     DEF:sagan1="/var/lib/munin/sagan/sagan-load-load-g.rrd":42:MAX      \
     CDEF:saganl1n=sagan1,12,/    LINE3:saganl1n${col_sagan}:"sagan"     \
     DEF:tylerl1="/var/lib/munin/tyler/tyler-load-load-g.rrd":42:MAX     \
     CDEF:tylerl1n=tylerl1,4,/    LINE3:tylerl1n${col_tyler}:"tyler"     \
 
+#    DEF:yperos1="/var/lib/munin/yperos/yperos-load-load-g.rrd":42:MAX   \
+#    CDEF:yperosl1n=yperos1,32,/  LINE3:yperosl1n${col_yperos}:"yperos"  \
 
 rrdtool graph "${outputdir}total_processes_graph.png"                           \
     -v "Processes"                                                              \
@@ -87,14 +87,14 @@ rrdtool graph "${outputdir}total_processes_graph.png"                           
     --disable-rrdtool-tag                                                       \
     DEF:bluel1="/var/lib/munin/blue/blue-processes-processes-g.rrd":42:MAX      \
     CDEF:bluel1n=bluel1     LINE2:bluel1n${col_blue}:"blue"                     \
-    DEF:yperos1="/var/lib/munin/yperos/yperos-processes-processes-g.rrd":42:MAX \
-    CDEF:yperosl1n=yperos1  LINE2:yperosl1n${col_yperos}:"yperos"               \
     DEF:sagan1="/var/lib/munin/sagan/sagan-processes-processes-g.rrd":42:MAX    \
     CDEF:saganl1n=sagan1    LINE2:saganl1n${col_sagan}:"sagan"                  \
     DEF:tylerl4="/var/lib/munin/tyler/tyler-processes-processes-g.rrd":42:MAX   \
     CDEF:tylerl1n=tylerl4   LINE2:tylerl1n${col_tyler}:"tyler"                  \
   
 
+#     DEF:yperos1="/var/lib/munin/yperos/yperos-processes-processes-g.rrd":42:MAX \
+#     CDEF:yperosl1n=yperos1  LINE2:yperosl1n${col_yperos}:"yperos"               \
 
 rrdtool graph "${outputdir}running_processes_graph.png"                        \
     -v "Running Processes"                                                     \
@@ -118,13 +118,13 @@ rrdtool graph "${outputdir}running_processes_graph.png"                        \
     --disable-rrdtool-tag                                                      \
     DEF:bluel1="/var/lib/munin/blue/blue-processes-runnable-g.rrd":42:MAX      \
     CDEF:bluel1n=bluel1     LINE2:bluel1n${col_blue}:"blue"                    \
-    DEF:yperos1="/var/lib/munin/yperos/yperos-processes-runnable-g.rrd":42:MAX \
-    CDEF:yperosl1n=yperos1  LINE2:yperosl1n${col_yperos}:"yperos"              \
     DEF:sagan1="/var/lib/munin/sagan/sagan-processes-runnable-g.rrd":42:MAX    \
     CDEF:saganl1n=sagan1    LINE2:saganl1n${col_sagan}:"sagan"                 \
     DEF:tylerl5="/var/lib/munin/tyler/tyler-processes-runnable-g.rrd":42:MAX   \
     CDEF:tylerl1n=tylerl5   LINE2:tylerl1n${col_tyler}:"tyler"                 \
 
+#     DEF:yperos1="/var/lib/munin/yperos/yperos-processes-runnable-g.rrd":42:MAX \
+#     CDEF:yperosl1n=yperos1  LINE2:yperosl1n${col_yperos}:"yperos"              \
 
 rrdtool graph "${outputdir}usage_graph.png"                                  \
     -v "Usage"                                                               \
@@ -146,14 +146,14 @@ rrdtool graph "${outputdir}usage_graph.png"                                  \
     --disable-rrdtool-tag                                                    \
     DEF:bluel1="/var/lib/munin/blue/blue-cpu-idle-d.rrd":42:MAX              \
     CDEF:bluel1n=100,bluel1,2,/,-      LINE3:bluel1n${col_blue}:"blue"       \
-    DEF:yperos1="/var/lib/munin/yperos/yperos-cpu-idle-d.rrd":42:MAX         \
-    CDEF:yperosl1n=100,yperos1,32,/,-  LINE3:yperosl1n${col_yperos}:"yperos" \
     DEF:sagan1="/var/lib/munin/sagan/sagan-cpu-idle-d.rrd":42:MAX            \
     CDEF:saganl1n=100,sagan1,12,/,-   LINE3:saganl1n${col_sagan}:"sagan"     \
     DEF:tylerl1="/var/lib/munin/tyler/tyler-cpu-idle-d.rrd":42:MAX           \
     CDEF:tylerl1n=100,tylerl1,4,/,-    LINE3:tylerl1n${col_tyler}:"tyler"    \
 
 
+    # DEF:yperos1="/var/lib/munin/yperos/yperos-cpu-idle-d.rrd":42:MAX         \
+    # CDEF:yperosl1n=100,yperos1,32,/,-  LINE3:yperosl1n${col_yperos}:"yperos" \
 #     DEF:bluel1="/var/lib/munin/blue/blue-load-load-g.rrd":42:MAX        \
 #     CDEF:bluel1n=bluel1,2,/      LINE3:bluel1n${col_blue}:"blue"        \
 #     DEF:yperos1="/var/lib/munin/yperos/yperos-load-load-g.rrd":42:MAX   \
