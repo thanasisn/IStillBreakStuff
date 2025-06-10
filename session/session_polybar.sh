@@ -1,4 +1,4 @@
-#!/usr/bin/env bash -x
+#!/usr/bin/env bash
 set +e
 ## created on 2016-06-05
 
@@ -22,9 +22,5 @@ xrandr --listactivemonitors | sed 's/^.* //' | sed 1d | while read screen; do
     export MONITOR=$screen
     polybar -c $HOME/.config/polybar/config -r example &
 done
-
-
-
-
 
 exit 0
