@@ -23,7 +23,7 @@ source("~/CODE/R_myRtools/myRtools/R/physics_conv.R")
 ## plot options
 MIN_SCALE_RAIN = 3
 MIN_RAIN       = 0.1            ## mm
-TIME_BACK      = 35 * 3600      ## show previous forecasts
+TIME_BACK      = 50 * 3600      ## show previous forecasts
 TIME_FRONT     = 6 * 24 * 3600  ## show future forecasts
 CLOUD_PLOT     = .5
 CEX            = .75
@@ -75,7 +75,6 @@ curr <- readRDS(OPENWEA_FL)
 lapd <- read.csv(LAPDAV_FL)
 
 fore[is.na(fore)] <- 0
-
 
 
 WAPI_hourly$dt <- as.POSIXct(strptime(WAPI_hourly$time, format = "%FT%R", tz = WAPI_metadata$timezone))
@@ -466,9 +465,6 @@ has_temp <- sum(!is.na(Temp$Temp)) > 1
 has_rain <- any(c(Rain$Rain.3h, Rain$Rain.1h) > MIN_RAIN, na.rm = TRUE)
 has_wind <- any(!is.na(c(Wind$wind_speed, Wind$windSpeed)), na.rm = TRUE)
 
-# has_rain = F
-
-
 
 WAPI_daily       <- WAPI_daily[ WAPI_daily$From <= dt_end, ]
 
@@ -478,7 +474,7 @@ lapd$time <- as.POSIXct(lapd$dateTime, origin = "1970-01-01")
 lapd$dt   <- as.POSIXlt(lapd$time,     tz = "Europe/Athens")
 
 ## remove same data cols
-lapd <- lapd[,vapply(lapd, function(x) length(unique(x)) > 1, logical(1L))]
+lapd <- lapd[, vapply(lapd, function(x) length(unique(x)) > 1, logical(1L))]
 
 lapd$outTemp   <- fahrenheit_to_celsius(lapd$outTemp)
 lapd$inTemp    <- fahrenheit_to_celsius(lapd$inTemp)
@@ -529,7 +525,6 @@ png(OUTPUT_01, bg = "transparent", family = "Liberation Sans",
     par(bg = "transparent")
     # par(bg = "black")
 
-
     ## adjust clouds to rain
     upcloud <- rrange[2]
     dncloud <- rrange[2] - (rrange[2] - rrange[1]) * CLOUD_PLOT
@@ -575,7 +570,6 @@ png(OUTPUT_01, bg = "transparent", family = "Liberation Sans",
     #          y0 = WAPI_daily$apparent_temperature_max_best_match, col = "green", lwd = 2, lty = 2 )
     # segments(x0 = WAPI_daily$From, x1 = WAPI_daily$Until,
     #          y0 = WAPI_daily$apparent_temperature_min_best_match, col = "cyan", lwd = 2, lty = 2 )
-
 
 
 
