@@ -52,7 +52,7 @@ kill_run  volumeicon
 
 if [[ $WM_NAME = "bspwm" ]]; then
     ## keybinds for bspwm
-    skill_run xhkd -c "$HOME/.config/sxhkd/sxhkdrc_bspwm"
+    skill_run sxhkd -c "$HOME/.config/sxhkd/sxhkdrc_bspwm"
 else
     ## any other wm
     kill_run sxhkd
