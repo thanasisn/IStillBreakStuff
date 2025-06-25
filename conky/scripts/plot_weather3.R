@@ -296,7 +296,6 @@ for (av in wecare) {
 
 
 
-
 if (!interactive()) { dev.off() }
 
 
@@ -800,3 +799,4 @@ if (Sys.info()["nodename"] == "tyler") {
   file.copy(OUTPUT_01, outdir, overwrite = TRUE )
 }
 
+cat("nnnnnn")
