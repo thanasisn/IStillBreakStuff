@@ -21,12 +21,12 @@ source("~/CODE/R_myRtools/myRtools/R/physics_conv.R")
 # })
 
 ## plot options
-MIN_SCALE_RAIN = 3
-MIN_RAIN       = 0.1            ## mm
-TIME_BACK      = 50 * 3600      ## show previous forecasts
-TIME_FRONT     = 6 * 24 * 3600  ## show future forecasts
-CLOUD_PLOT     = .5
-CEX            = .75
+MIN_SCALE_RAIN <- 3
+MIN_RAIN       <- 0.1            ## mm
+TIME_BACK      <- 50 * 3600      ## show previous forecasts
+TIME_FRONT     <- 6 * 24 * 3600  ## show future forecasts
+CLOUD_PLOT     <- .5
+CEX            <- .75
 
 
 ## plot weather and forecast
@@ -492,297 +492,304 @@ testa <- lapd[ lapd$dateTime > Sys.Date() - 10 * 3600 * 24, ]
 
 
 #### Start plotting ####
- # x11()
+# x11()
 Sys.setlocale(locale = "el_GR.utf8")
 
 if (!interactive()) {
-png(OUTPUT_01, bg = "transparent", family = "Liberation Sans",
-    width = 540, height = 255, units = "px", pointsize = 15, type = "cairo")
+  png(OUTPUT_01, bg = "transparent", family = "Liberation Sans",
+      width = 540, height = 255, units = "px", pointsize = 15, type = "cairo")
 }
 
 {
-    how_graphs = sum(has_temp, has_rain, has_wind)
-    if ( how_graphs == 3 ) {
-        layout(matrix(c(1,1,1,2,2,3), 6, 1, byrow = TRUE))
-        # layout.show(2)
-    }
-    if ( how_graphs == 2 ) {
-        layout(matrix(c(1,1,2), 3, 1, byrow = TRUE))
-        # layout.show(2)
-    }
+  how_graphs = sum(has_temp, has_rain, has_wind)
+  if ( how_graphs == 3 ) {
+    layout(matrix(c(1,1,1,2,2,3), 6, 1, byrow = TRUE))
+    # layout.show(2)
+  }
+  if ( how_graphs == 2 ) {
+    layout(matrix(c(1,1,2), 3, 1, byrow = TRUE))
+    # layout.show(2)
+  }
 
-    par("cex"=CEX)
+  par("cex"=CEX)
 
-    ## set ranges to plot
-    next_day <- Sys.time() + 24*3600
-    drange <- range( dt_start,        Temp$dt,                         na.rm = T )
-    trange <- range( Temp$Temp,       Temp$Temp_feel, Temp$feels_like, na.rm = T )
-    rrange <- range( Rain$Rain.1h,    Rain$Rain.3h, 0, MIN_SCALE_RAIN, na.rm = T )
-    wrange <- range( Wind$wind_speed, Wind$windspeed_10m_best_match  , na.rm = T )
-    name   <- as.character(tail(curr$name[!is.na(curr$name)],1))
+  ## set ranges to plot
+  next_day <- Sys.time() + 24*3600
+  drange <- range( dt_start,        Temp$dt,                         na.rm = T )
+  trange <- range( Temp$Temp,       Temp$Temp_feel, Temp$feels_like, na.rm = T )
+  rrange <- range( Rain$Rain.1h,    Rain$Rain.3h, 0, MIN_SCALE_RAIN, na.rm = T )
+  wrange <- range( Wind$wind_speed, Wind$windspeed_10m_best_match  , na.rm = T )
+  name   <- as.character(tail(curr$name[!is.na(curr$name)],1))
 
-    ## set colors
-    par(bg = "transparent")
-    # par(bg = "black")
+  ## set colors
+  par(bg = "transparent")
+  # par(bg = "black")
 
-    ## adjust clouds to rain
-    upcloud <- rrange[2]
-    dncloud <- rrange[2] - (rrange[2] - rrange[1]) * CLOUD_PLOT
-    ## height of cloud to plot in rain units
-    Cloud$cloud_cover <- (upcloud - dncloud) * Cloud$clouds_all
-    Cloud$cloudCover  <- (upcloud - dncloud) * Cloud$cloudcover_best_match
+  ## adjust clouds to rain
+  upcloud <- rrange[2]
+  dncloud <- rrange[2] - (rrange[2] - rrange[1]) * CLOUD_PLOT
+  ## height of cloud to plot in rain units
+  Cloud$cloud_cover <- (upcloud - dncloud) * Cloud$clouds_all
+  Cloud$cloudCover  <- (upcloud - dncloud) * Cloud$cloudcover_best_match
 
 
-    ####  Temperature plot  ####################################################
-    par(mar = c( 0.7, 1.1, 1, 0.9 ))
-    plot(1, type = "n", axes = F,
+  ####  Temperature plot  ####################################################
+  par(mar = c( 0.7, 1.1, 1, 0.9 ))
+  plot(1, type = "n", axes = F,
+       xlab = "", ylab = "",
+       # yaxs = "i",
+       xlim = as.POSIXct(drange),
+       ylim = trange )
+
+  ## add decorations on graph
+  abline( v = seq( drange[1], drange[2], by = "day"),
+          lwd = 2 , lty = 2, col = col_grid )
+  abline( v = seq( drange[1], drange[2], by = "day") + 12*3600,
+          lty = 3, col = col_grid )
+  abline( h = pretty(drange, min.n = 1), lty = 2, col = col_grid )
+  abline( h = 0, lwd = 2, lty = 2, col = col_grid )
+  abline( v = Sys.time(), lwd = 2, lty = 2, col = col_font )
+
+  ## plot sun background
+  rect(WAPI_daily$sunrise, trange[1] - 10,
+       WAPI_daily$sunset,  trange[2] + 10,
+       col = col_sun, border = NA, lwd = 1 )
+
+  ## plot lap davis
+  lines(lapd$dt, lapd$appTemp,   col = "red", lty = 1 )
+  lines(lapd$dt, lapd$outTemp,   col = "red", lty = 2 )
+  lines(lapd$dt, lapd$heatindex, col = "red", lty = 3 )
+
+
+  ## plot daily extremes
+  # segments(x0 = WAPI_daily$From, x1 = WAPI_daily$Until,
+  #          y0 = WAPI_daily$temperature_2m_max_best_match,     col = "green", lwd = 2 )
+  # segments(x0 = WAPI_daily$From, x1 = WAPI_daily$Until,
+  #          y0 = WAPI_daily$temperature_2m_min_best_match,     col = "cyan", lwd = 2 )
+  # segments(x0 = WAPI_daily$From, x1 = WAPI_daily$Until,
+  #          y0 = WAPI_daily$apparent_temperature_max_best_match, col = "green", lwd = 2, lty = 2 )
+  # segments(x0 = WAPI_daily$From, x1 = WAPI_daily$Until,
+  #          y0 = WAPI_daily$apparent_temperature_min_best_match, col = "cyan", lwd = 2, lty = 2 )
+
+
+
+  ## plot temperature lines
+  lines(Temp$dt[Temp$source == "OpenWeatherMAP"], Temp$Temp[      Temp$source == "OpenWeatherMAP"], lwd = 3, col = col_open)
+  lines(Temp$dt[Temp$source == "OpenWeatherMAP"], Temp$feels_like[Temp$source == "OpenWeatherMAP"], lwd = 3, col = col_open, lty = 3)
+  lines(Temp$dt[Temp$source == "OpenMeteo"],      Temp$Temp[      Temp$source == "OpenMeteo"],      lwd = 3, col = col_dark)
+  lines(Temp$dt[Temp$source == "OpenMeteo"],      Temp$Temp_feel[ Temp$source == "OpenMeteo"],      lwd = 3, col = col_dark, lty = 3)
+  lines(curr$dt, curr$temp, lwd = 3, lty = 1, col = col_curen)
+
+
+  ## temperature axis
+  axis(side = 2, line = -1,
+       at = curr$temp[length(curr$temp)],
+       labels = F, tcl = .5,
+       col = col_curen, lwd=2, col.axis = col_curen  )
+
+  text(drange[1], curr$temp[length(curr$temp)],
+       round(curr$temp[length(curr$temp)], digits = 1), pos = 4, col = col_curen  )
+
+  ## x axis below
+  axis.POSIXct( side = 1, at = seq( drange[1], drange[2], by = "day"), format = "%a", labels = F ,
+                lwd.ticks = 3, col = col_other, col.axis = col_other, font = 2 )
+  axis.POSIXct( side = 1, at = seq( drange[1], drange[2], by = "3 hour"), labels = F ,
+                lwd.ticks = 3, tcl = -0.2 , col = col_other, col.axis = col_other)
+  ##  y axis
+  axis( side = 2, line = -1,
+        at = c(pretty(trange, min.n = 1, n = 5),
+               round(min(trange),0),
+               round(max(trange),0)),
+        las = 2,
+        col = col_other, lwd = 2, col.axis = col_other, font = 2 )
+  axis( side = 2, line = -1,
+        at = seq(round(min(trange),0), round(max(trange),0), by = 1 ),
+        labels = F,
+        tcl = -0.2,
+        col = col_other, lwd = 2, col.axis = col_other )
+
+  axis( side = 4, line = -1.5,
+        at = c(pretty(trange, min.n = 1, n = 5),
+               round(min(trange),0),
+               round(max(trange),0)),
+        las = 2,
+        col = col_other, lwd = 2, col.axis = col_other, font = 2 )
+  axis( side = 4, line = -1.5,
+        at = seq(round(min(trange),0), round(max(trange),0), by = 1 ),
+        labels = F,
+        tcl = -0.2,
+        col = col_other, lwd = 2, col.axis = col_other )
+
+  title(main = paste(name, format( Sys.time(),"%H:%M",tz = "Europe/Athens" )), font = 2, cex.main = .9, col.main = col_font)
+
+
+  ## next 24h
+  today <- Temp[ Temp$dt < next_day & Temp$dt > Sys.time(), ]
+  text(today$dt[which.max(today$Temp)], max(today$Temp, na.rm = T), labels = round(max(today$Temp, na.rm = T),1), col = col_other, pos = 4, font = 2 )
+  text(today$dt[which.min(today$Temp)], min(today$Temp, na.rm = T), labels = round(min(today$Temp, na.rm = T),1), col = col_other, pos = 1, font = 2 )
+
+
+  ####  Precip plot  #########################################################
+  if (has_rain) {
+
+    plot(0, type = "n", axes = F,
          xlab = "", ylab = "",
-         # yaxs = "i",
+         yaxs = "i",
          xlim = as.POSIXct(drange),
-         ylim = trange )
+         ylim = rrange )
 
-    ## add decorations on graph
-    abline( v = seq( drange[1], drange[2], by = "day"),
-            lwd = 2 , lty = 2, col = col_grid )
-    abline( v = seq( drange[1], drange[2], by = "day") + 12*3600,
-            lty = 3, col = col_grid )
-    abline( h = pretty(drange, min.n = 1), lty = 2, col = col_grid )
-    abline( h = 0, lwd = 2, lty = 2, col = col_grid )
-    abline( v = Sys.time(), lwd = 2, lty = 2, col = col_font )
-
-    ## plot sun background
+    ## plot sun
     rect(WAPI_daily$sunrise, trange[1] - 10,
          WAPI_daily$sunset,  trange[2] + 10,
          col = col_sun, border = NA, lwd = 1 )
 
-    ## plot lap davis
-    lines(lapd$dt, lapd$appTemp,   col = "red", lty = 1 )
-    lines(lapd$dt, lapd$outTemp,   col = "red", lty = 2 )
-    lines(lapd$dt, lapd$heatindex, col = "red", lty = 3 )
+    ## add decoration
+    abline( v = seq( drange[1], drange[2], by = "day"), lwd = 2 , lty = 2, col = col_grid )
+    abline( v = seq( drange[1], drange[2], by = "day") + 12*3600, lty = 3, col = col_grid )
+    abline( h = pretty(drange, min.n = 1), lty = 2, col = col_grid )
+    abline( v = Sys.time(), lwd = 2, lty = 2, col = col_font )
+
+    ## Precipitation probability
+    pp    <- data.table(Precip_Proba = fore$Precip_Proba)
+    pp$dt <- as.POSIXct(fore$dt)
+    pp <- pp[, 100*max(Precip_Proba), by = as.Date(dt)]
+    pp$dt <- as.POSIXct(strptime(paste( pp$as.Date, "00:00" ), "%F %H:%M", tz = "Europe/Athens"))
+
+    text(x = pp$dt,
+         y = rrange[2],
+         labels = paste0(pp$V1,"%"),
+         adj = c(0,1.1),
+         cex = 1.3, font = 2, col = "magenta")
+
+    if (!is.null(Rain$Rain.1h)){
+      Rain$Rain.1h[Rain$Rain.1h == 0] <- NA
+    }
+
+    Rain$Rain.3h[Rain$Rain.3h == 0] <- NA
+
+    rect(Cloud$dt[Cloud$source == "OpenMeteo"],            upcloud,
+         Cloud$dt[Cloud$source == "OpenMeteo"] - 1 * 3600, upcloud - Cloud$cloudCover[Cloud$source == "OpenMeteo"],
+         col = col_cloud, border = NA)
+
+    rect(Cloud$dt[Cloud$source == "OpenWeatherMAP"],            upcloud,
+         Cloud$dt[Cloud$source == "OpenWeatherMAP"] - 3 * 3600, upcloud - Cloud$cloud_cover[Cloud$source == "OpenWeatherMAP"],
+         col = col_cloud, border = NA)
 
 
-    ## plot daily extremes
-    # segments(x0 = WAPI_daily$From, x1 = WAPI_daily$Until,
-    #          y0 = WAPI_daily$temperature_2m_max_best_match,     col = "green", lwd = 2 )
-    # segments(x0 = WAPI_daily$From, x1 = WAPI_daily$Until,
-    #          y0 = WAPI_daily$temperature_2m_min_best_match,     col = "cyan", lwd = 2 )
-    # segments(x0 = WAPI_daily$From, x1 = WAPI_daily$Until,
-    #          y0 = WAPI_daily$apparent_temperature_max_best_match, col = "green", lwd = 2, lty = 2 )
-    # segments(x0 = WAPI_daily$From, x1 = WAPI_daily$Until,
-    #          y0 = WAPI_daily$apparent_temperature_min_best_match, col = "cyan", lwd = 2, lty = 2 )
+    ## plot rain
+    try({
+      rect(Rain$dt, rrange[1], Rain$dt - 1*3600, Rain$Rain.1h,
+           col = col_rain2, border = col_rain2, lwd = 1 )
+    })
 
+    try({
+      rect(Rain$dt, rrange[1], Rain$dt - 3*3600, Rain$Rain.3h,
+           col = NA, border = col_rain1, lwd = 3 )
+    })
 
-
-    ## plot temperature lines
-    lines(Temp$dt[Temp$source == "OpenWeatherMAP"], Temp$Temp[      Temp$source == "OpenWeatherMAP"], lwd = 3, col = col_open)
-    lines(Temp$dt[Temp$source == "OpenWeatherMAP"], Temp$feels_like[Temp$source == "OpenWeatherMAP"], lwd = 3, col = col_open, lty = 3)
-    lines(Temp$dt[Temp$source == "OpenMeteo"],      Temp$Temp[      Temp$source == "OpenMeteo"],      lwd = 3, col = col_dark)
-    lines(Temp$dt[Temp$source == "OpenMeteo"],      Temp$Temp_feel[ Temp$source == "OpenMeteo"],      lwd = 3, col = col_dark, lty = 3)
-    lines(curr$dt, curr$temp, lwd = 3, lty = 1, col = col_curen)
-
-
-    ## temperature axis
-    axis(side = 2, line = -1,
-         at = curr$temp[length(curr$temp)],
-         labels = F, tcl = .5,
-         col = col_curen, lwd=2, col.axis = col_curen  )
-
-    text(drange[1], curr$temp[length(curr$temp)],
-         round(curr$temp[length(curr$temp)], digits = 1), pos = 4, col = col_curen  )
+    ## add axis x above
+    axis.POSIXct( side = 3, at = seq( drange[1], drange[2], by = "day")+ 12 * 3600,
+                  labels = format(seq( drange[1], drange[2], by = "day"), "%a"),
+                  lwd = 0, col = col_other, col.axis = col_other, font = 2, line = -.9 )
 
     ## x axis below
-    axis.POSIXct( side = 1, at = seq( drange[1], drange[2], by = "day"), format = "%a", labels = F ,
+    axis.POSIXct( side = 1, at = seq( drange[1], drange[2], by = "day"), format = "%a",  labels = F ,
                   lwd.ticks = 3, col = col_other, col.axis = col_other, font = 2 )
     axis.POSIXct( side = 1, at = seq( drange[1], drange[2], by = "3 hour"), labels = F ,
                   lwd.ticks = 3, tcl = -0.2 , col = col_other, col.axis = col_other)
-    ##  y axis
+
+    ## y axis
     axis( side = 2, line = -1,
-          at = c(pretty(trange, min.n = 1, n = 5),
-                 round(min(trange),0),
-                 round(max(trange),0)),
+          at = c(pretty(rrange, min.n = 1, n = 4),
+                 round(min(rrange),0),
+                 round(max(rrange),0)),
           las = 2,
           col = col_other, lwd = 2, col.axis = col_other, font = 2 )
     axis( side = 2, line = -1,
-          at = seq(round(min(trange),0), round(max(trange),0), by = 1 ),
+          at = seq(round(min(rrange),0), round(max(rrange),0), by = 1 ),
           labels = F,
           tcl = -0.2,
           col = col_other, lwd = 2, col.axis = col_other )
 
+
     axis( side = 4, line = -1.5,
-          at = c(pretty(trange, min.n = 1, n = 5),
-                 round(min(trange),0),
-                 round(max(trange),0)),
+          at = c(pretty(rrange, min.n = 1, n = 4),
+                 round(min(rrange),0),
+                 round(max(rrange),0)),
           las = 2,
           col = col_other, lwd = 2, col.axis = col_other, font = 2 )
     axis( side = 4, line = -1.5,
-          at = seq(round(min(trange),0), round(max(trange),0), by = 1 ),
+          at = seq(round(min(rrange),0), round(max(rrange),0), by = 1 ),
           labels = F,
           tcl = -0.2,
           col = col_other, lwd = 2, col.axis = col_other )
-
-    title(main = paste(name, format( Sys.time(),"%H:%M",tz = "Europe/Athens" )), font = 2, cex.main = .9, col.main = col_font)
-
 
     ## next 24h
-    today <- Temp[ Temp$dt < next_day & Temp$dt > Sys.time(), ]
-    text(today$dt[which.max(today$Temp)], max(today$Temp, na.rm = T), labels = round(max(today$Temp, na.rm = T),1), col = col_other, pos = 4, font = 2 )
-    text(today$dt[which.min(today$Temp)], min(today$Temp, na.rm = T), labels = round(min(today$Temp, na.rm = T),1), col = col_other, pos = 1, font = 2 )
+    today <- Rain[ Rain$dt < next_day & Rain$dt > Sys.time(), ]
+    text(today$dt[which.max(today$Rain.3h)], max(today$Rain.3h, na.rm = T), labels = round(max(today$Rain.3h, na.rm = T),1), col = col_other, pos = 3, font = 2 )
+    text(today$dt[which.max(today$Rain.1h)], max(today$Rain.1h, na.rm = T), labels = round(max(today$Rain.1h, na.rm = T),1), col = col_other, pos = 3, font = 2 )
+
+  }
 
 
-    ####  Precip plot  #########################################################
-    if (has_rain) {
+  ####  Wind plot  ###########################################################################################
+  if (has_wind) {
 
-        plot(0, type = "n", axes = F,
-             xlab = "", ylab = "",
-             yaxs = "i",
-             xlim = as.POSIXct(drange),
-             ylim = rrange )
-
-        ## plot sun
-        rect(WAPI_daily$sunrise, trange[1] - 10,
-             WAPI_daily$sunset,  trange[2] + 10,
-             col = col_sun, border = NA, lwd = 1 )
-
-        ## add decoration
-        abline( v = seq( drange[1], drange[2], by = "day"), lwd = 2 , lty = 2, col = col_grid )
-        abline( v = seq( drange[1], drange[2], by = "day") + 12*3600, lty = 3, col = col_grid )
-        abline( h = pretty(drange, min.n = 1), lty = 2, col = col_grid )
-        abline( v = Sys.time(), lwd = 2, lty = 2, col = col_font )
-
-        ## Precipitation probability
-        pp    <- data.table(Precip_Proba = fore$Precip_Proba)
-        pp$dt <- as.POSIXct(fore$dt)
-        pp <- pp[, 100*max(Precip_Proba), by = as.Date(dt)]
-        pp$dt <- as.POSIXct(strptime(paste( pp$as.Date, "00:00" ), "%F %H:%M", tz = "Europe/Athens"))
-
-        text(x = pp$dt,
-             y = rrange[2],
-             labels = paste0(pp$V1,"%"),
-             adj = c(0,1.1),
-             cex = 1.3, font = 2, col = "magenta")
-
-        Rain$Rain.1h[Rain$Rain.1h == 0] <- NA
-        Rain$Rain.3h[Rain$Rain.3h == 0] <- NA
-
-        rect(Cloud$dt[Cloud$source == "OpenMeteo"],            upcloud,
-             Cloud$dt[Cloud$source == "OpenMeteo"] - 1 * 3600, upcloud - Cloud$cloudCover[Cloud$source == "OpenMeteo"],
-             col = col_cloud, border = NA)
-
-        rect(Cloud$dt[Cloud$source == "OpenWeatherMAP"],            upcloud,
-             Cloud$dt[Cloud$source == "OpenWeatherMAP"] - 3 * 3600, upcloud - Cloud$cloud_cover[Cloud$source == "OpenWeatherMAP"],
-             col = col_cloud, border = NA)
-
-
-        ## plot rain
-        rect(Rain$dt, rrange[1], Rain$dt - 1*3600, Rain$Rain.1h,
-             col = col_rain2, border = col_rain2, lwd = 1 )
-
-        rect(Rain$dt, rrange[1], Rain$dt - 3*3600, Rain$Rain.3h,
-             col = NA, border = col_rain1, lwd = 3 )
-
-        ## add axis x above
-        axis.POSIXct( side = 3, at = seq( drange[1], drange[2], by = "day")+ 12 * 3600,
-                      labels = format(seq( drange[1], drange[2], by = "day"), "%a"),
-                      lwd = 0, col = col_other, col.axis = col_other, font = 2, line = -.9 )
-
-        ## x axis below
-        axis.POSIXct( side = 1, at = seq( drange[1], drange[2], by = "day"), format = "%a",  labels = F ,
-                      lwd.ticks = 3, col = col_other, col.axis = col_other, font = 2 )
-        axis.POSIXct( side = 1, at = seq( drange[1], drange[2], by = "3 hour"), labels = F ,
-                      lwd.ticks = 3, tcl = -0.2 , col = col_other, col.axis = col_other)
-
-        ## y axis
-        axis( side = 2, line = -1,
-              at = c(pretty(rrange, min.n = 1, n = 4),
-                     round(min(rrange),0),
-                     round(max(rrange),0)),
-              las = 2,
-              col = col_other, lwd = 2, col.axis = col_other, font = 2 )
-        axis( side = 2, line = -1,
-              at = seq(round(min(rrange),0), round(max(rrange),0), by = 1 ),
-              labels = F,
-              tcl = -0.2,
-              col = col_other, lwd = 2, col.axis = col_other )
-
-
-        axis( side = 4, line = -1.5,
-              at = c(pretty(rrange, min.n = 1, n = 4),
-                     round(min(rrange),0),
-                     round(max(rrange),0)),
-              las = 2,
-              col = col_other, lwd = 2, col.axis = col_other, font = 2 )
-        axis( side = 4, line = -1.5,
-              at = seq(round(min(rrange),0), round(max(rrange),0), by = 1 ),
-              labels = F,
-              tcl = -0.2,
-              col = col_other, lwd = 2, col.axis = col_other )
-
-        ## next 24h
-        today <- Rain[ Rain$dt < next_day & Rain$dt > Sys.time(), ]
-        text(today$dt[which.max(today$Rain.3h)], max(today$Rain.3h, na.rm = T), labels = round(max(today$Rain.3h, na.rm = T),1), col = col_other, pos = 3, font = 2 )
-        text(today$dt[which.max(today$Rain.1h)], max(today$Rain.1h, na.rm = T), labels = round(max(today$Rain.1h, na.rm = T),1), col = col_other, pos = 3, font = 2 )
-
+    if (how_graphs == 3) {
+      par(mar = c( 0.9, 1.1, 0, 0.9 ))
     }
 
+    plot(0, type = "n", axes = F,
+         xlab = "", ylab = "",
+         yaxs = "i",
+         xlim = as.POSIXct(drange),
+         ylim = wrange )
 
-    ####  Wind plot  ###########################################################################################
-    if (has_wind) {
+    ## add decoration
+    abline( v = seq( drange[1], drange[2], by = "day"), lwd = 2 , lty = 2, col = col_grid )
+    abline( v = seq( drange[1], drange[2], by = "day") + 12*3600, lty = 3, col = col_grid )
+    abline( h = pretty(drange, min.n = 1), lty = 2, col = col_grid )
+    abline( v = Sys.time(), lwd = 2, lty = 2, col = col_font )
 
-        if (how_graphs == 3) {
-            par(mar = c( 0.9, 1.1, 0, 0.9 ))
-        }
-
-        plot(0, type = "n", axes = F,
-             xlab = "", ylab = "",
-             yaxs = "i",
-             xlim = as.POSIXct(drange),
-             ylim = wrange )
-
-        ## add decoration
-        abline( v = seq( drange[1], drange[2], by = "day"), lwd = 2 , lty = 2, col = col_grid )
-        abline( v = seq( drange[1], drange[2], by = "day") + 12*3600, lty = 3, col = col_grid )
-        abline( h = pretty(drange, min.n = 1), lty = 2, col = col_grid )
-        abline( v = Sys.time(), lwd = 2, lty = 2, col = col_font )
-
-        lines(Wind$dt[Wind$source == "OpenWeatherMAP"], Wind$wind_speed[Wind$source == "OpenWeatherMAP"],
-              lwd = 2, col = col_open)
-        lines(Wind$dt[Wind$source == "OpenMeteo"], Wind$windspeed_10m_best_match[Wind$source == "OpenMeteo"],
-              lwd = 2, col = col_dark)
+    lines(Wind$dt[Wind$source == "OpenWeatherMAP"], Wind$wind_speed[Wind$source == "OpenWeatherMAP"],
+          lwd = 2, col = col_open)
+    lines(Wind$dt[Wind$source == "OpenMeteo"], Wind$windspeed_10m_best_match[Wind$source == "OpenMeteo"],
+          lwd = 2, col = col_dark)
 
 
-        ## x above
-        if (how_graphs==2){
-            axis.POSIXct( side = 3, at = seq( drange[1], drange[2], by = "day")+ 12 * 3600,
-                          labels = format(seq( drange[1], drange[2], by = "day"), "%a"),
-                          lwd = 0, col = col_other, col.axis = col_other, font = 2, line = -.9 )
-        }
-        ## x below
-        axis.POSIXct( side = 1, at = seq( drange[1], drange[2], by = "day"), format = "%a",  labels = F ,
-                      lwd.ticks = 3, col = col_other, col.axis = col_other, font = 2 , line = 0.15 )
-        axis.POSIXct( side = 1, at = seq( drange[1], drange[2], by = "3 hour"), labels = F ,
-                      lwd.ticks = 3, tcl = -0.2 , col = col_other, col.axis = col_other, line = 0.15)
-
-        ## y axis
-        axis( side = 2, line = -1,
-              at = c(pretty(wrange, min.n = 2, n = 3)),
-              las = 2,
-              col = col_other, lwd = 2, col.axis = col_other, font = 2 )
-        axis( side = 2, line = -1,
-              at = seq(round(min(wrange),0), round(max(wrange),0), by = 1 ),
-              labels = F,
-              tcl = -0.2,
-              col = col_other, lwd = 2, col.axis = col_other )
-
-        axis( side = 4, line = -1.5,
-              at = c(pretty(wrange, min.n = 2, n = 2 )),
-              las = 2,
-              col = col_other, lwd = 2, col.axis = col_other, font = 2 )
-        axis( side = 4, line = -1.5,
-              at = seq(round(min(wrange),0), round(max(wrange),0), by = 1 ),
-              labels = F,
-              tcl = -0.2,
-              col = col_other, lwd = 2, col.axis = col_other )
+    ## x above
+    if (how_graphs==2){
+      axis.POSIXct( side = 3, at = seq( drange[1], drange[2], by = "day")+ 12 * 3600,
+                    labels = format(seq( drange[1], drange[2], by = "day"), "%a"),
+                    lwd = 0, col = col_other, col.axis = col_other, font = 2, line = -.9 )
     }
+    ## x below
+    axis.POSIXct( side = 1, at = seq( drange[1], drange[2], by = "day"), format = "%a",  labels = F ,
+                  lwd.ticks = 3, col = col_other, col.axis = col_other, font = 2 , line = 0.15 )
+    axis.POSIXct( side = 1, at = seq( drange[1], drange[2], by = "3 hour"), labels = F ,
+                  lwd.ticks = 3, tcl = -0.2 , col = col_other, col.axis = col_other, line = 0.15)
+
+    ## y axis
+    axis( side = 2, line = -1,
+          at = c(pretty(wrange, min.n = 2, n = 3)),
+          las = 2,
+          col = col_other, lwd = 2, col.axis = col_other, font = 2 )
+    axis( side = 2, line = -1,
+          at = seq(round(min(wrange),0), round(max(wrange),0), by = 1 ),
+          labels = F,
+          tcl = -0.2,
+          col = col_other, lwd = 2, col.axis = col_other )
+
+    axis( side = 4, line = -1.5,
+          at = c(pretty(wrange, min.n = 2, n = 2 )),
+          las = 2,
+          col = col_other, lwd = 2, col.axis = col_other, font = 2 )
+    axis( side = 4, line = -1.5,
+          at = seq(round(min(wrange),0), round(max(wrange),0), by = 1 ),
+          labels = F,
+          tcl = -0.2,
+          col = col_other, lwd = 2, col.axis = col_other )
+  }
 }
 
 if (!interactive()) {dev.off()}
@@ -790,6 +797,6 @@ Sys.setlocale(locale = "en_US.utf8")
 
 ## copy conky image to log
 if (Sys.info()["nodename"] == "tyler") {
-    file.copy(OUTPUT_01, outdir, overwrite = TRUE )
+  file.copy(OUTPUT_01, outdir, overwrite = TRUE )
 }
 

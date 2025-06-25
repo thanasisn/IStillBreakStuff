@@ -2,6 +2,8 @@
 
 #### Choose the bigger connected screen for displaying conky
 
+killall conky && sleep 2 || true
+sleep 2
 
 ## VARS
 #confile="$HOME/BASH/CONKY/conky.conf.d/conky_crane_1680x1050_new.conf"
@@ -9,7 +11,6 @@ confile="$HOME/CODE/conky/conf.d/conky_1366x768.conf"
 conpause="0"
 confont="Liberation Mono"
 conalig="top_left"  # we have done all configs with that in mind
-
 
 ## list monitors
 screens="$(xrandr | grep " connected")"
@@ -45,8 +46,6 @@ echo "X size    : $Xres"
 echo "Y size    : $Yres"
 echo "Config    : $confile"
 
-killall -s 9 conky
-
 ## the only instance we like to see time in home locale
 export LC_ALL="el_GR.UTF-8"
 
@@ -57,12 +56,12 @@ conky -p "$conpause"  \
       -y "$Yoff"      \
       -D \
       -d \
-      -c "$confile"   ;
-    notify-send "Conky Ended"  &
+      -c "$confile"
+#    notify-send "Conky Ended"  &
 export LC_ALL=en_US.UTF-8
 
 
-## running second conky makes the display unstable, although it is suported
+## running second conky makes the display unstable, although it is supported
 
 #    if [[  $(xrandr | grep " connected .*1366x768") ]] ; then
 #        echo "LVDS1 connected 1366x768"
