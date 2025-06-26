@@ -56,7 +56,7 @@ conky -p "$conpause"  \
       -y "$Yoff"      \
       -D \
       -d \
-      -c "$confile"
+      -c "$confile"   &
 #    notify-send "Conky Ended"  &
 export LC_ALL=en_US.UTF-8
 
