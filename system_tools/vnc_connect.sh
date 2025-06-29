@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
-set -euo pipefail # Exit on error, treat unset variables as error, fail on pipe errors
 
 #### Creates a ssh tunnel and open a new vnc connection to known hosts
 ## works for entries configured in .ssh/config
 ## have to setup vnc server first on the remote to set passwd
-
-
-
-
 
 host="$1"
 
