@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
+set -euo pipefail # Exit on error, treat unset variables as error, fail on pipe errors
 
 #### Creates a ssh tunnel and open a new vnc connection to known hosts
 ## works for entries configured in .ssh/config
 ## have to setup vnc server first on the remote to set passwd
 
+
+
+
+
 host="$1"
 
 command -v xdpyinfo >/dev/null 2>&1 || { echo >&2 "xdpyinfo is not installed.  Aborting."; exit 1; }
+
+# xrandr | grep "*" | awk '{ print $1 }'
 
 ## get resolution to use
 resolution="$(xdpyinfo | awk '/dimensions/{print $2}' | head -n 1)"
@@ -15,7 +22,6 @@ height="$(echo $resolution | cut -d'x' -f2)"
 
 echo "Screen Resolution"
 echo $width $height
-
 
 xgap="20"
 ygap="50"
@@ -26,8 +32,8 @@ depth="16"
 
 if [ -z "$host" ]
 then
-      echo "Give a host/ip"
-      exit 1
+  echo "Give a host/ip"
+  exit 1
 fi
 
 echo "Ask remote host resolution"
@@ -39,8 +45,8 @@ ssh "$host" "pkill  Xtightvnc; pkill Xtigervnc; vncserver  -geometry ${width}x${
 ## find available port on local host 
 _check="placeholder"
 while [[ ! -z "${_check}" ]]; do
-    ((LPORT++))
-    _check=$(ss -tulpn | grep ":${LPORT}")
+  ((LPORT++))
+  _check=$(ss -tulpn | grep ":${LPORT}")
 done
 
 echo "Connecting:  localhost:$LPORT -> $host:5901 "
