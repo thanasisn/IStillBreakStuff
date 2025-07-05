@@ -6,14 +6,16 @@
 
 host="$1"
 
-command -v xdpyinfo >/dev/null 2>&1 || { echo >&2 "xdpyinfo is not installed.  Aborting."; exit 1; }
+# command -v xdpyinfo >/dev/null 2>&1 || { echo >&2 "xdpyinfo is not installed.  Aborting."; exit 1; }
 
 # xrandr | grep "*" | awk '{ print $1 }'
 
 ## get resolution to use
-resolution="$(xdpyinfo | awk '/dimensions/{print $2}' | head -n 1)"
-width="$(echo $resolution | cut -d'x' -f1)"
+# resolution="$(xdpyinfo | awk '/dimensions/{print $2}' | head -n 1)"
+resolution="$(xrandr | grep '*' | awk '{print $1}')"
+width="$( echo $resolution | cut -d'x' -f1)"
 height="$(echo $resolution | cut -d'x' -f2)"
+
 
 echo "Screen Resolution"
 echo $width $height
