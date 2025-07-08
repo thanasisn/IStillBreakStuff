@@ -148,9 +148,7 @@ for (ar in regions) {
 
 
 
-
-
-  ## Get camp sites from OSM #################################################
+  ##  Get camp sites from OSM  #################################################
   outfile <- paste0("~/GISdata/Layers/Auto/osm/OSM_Camp_sites_",ar,".gpx")
   cat(paste("Query for camp sites",ar,"\n"))
 
