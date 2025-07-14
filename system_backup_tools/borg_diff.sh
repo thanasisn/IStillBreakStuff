@@ -154,7 +154,7 @@ function bytesToHR()
 }
 
 
-## magic redirection for the whole script
+## output redirection for the whole script
 # exec  > >(tee -i "${DIF_FILE}")
 exec 2> >(tee -i "${DIF_FILE}" >&2)
 
