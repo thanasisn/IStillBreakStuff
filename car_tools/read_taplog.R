@@ -22,7 +22,7 @@ Script.Name <- "~/CODE/car_tools/read_taplog.R"
 knitr::opts_chunk$set(out.width  = "100%"   )
 
 filenames <- list.files(path       = "~/MISC/a34_export/TapLog",
-                        pattern    = "TrackAndGraphBackup.*db$",
+                        pattern    = "TrackAndGraphBackup.*.db",
                         full.names = T)
 
 library(data.table)
