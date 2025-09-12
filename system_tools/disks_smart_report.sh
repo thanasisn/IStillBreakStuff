@@ -67,7 +67,6 @@ for ad in /dev/nvme[0-9]; do
     echo "$outfile"
 done
 
-exit
 ## Loop all HDD
 for ad in /dev/sd[a-z] /dev/sd[a-z][a-z]; do
     if [[ ! -e $ad ]]; then continue ; fi

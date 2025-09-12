@@ -356,5 +356,35 @@ p <- ggplot(test, aes(x = Date, y = Source)) +
 print(p)
 
 
+
+## get last service
+LASTSERV <- DATA |> filter(variable == "Service") |> filter(max(Date) == Date)
+LASTTRIP <- DTRIP |> filter(variable == "km") |> filter(max(value) == value)
+LASTSERV$label <- as.numeric(LASTSERV$label)
+
+warn_tyres <- 5000
+warn_servi <- 9000
+
+
+if (LASTTRIP$value > LASTSERV$label + warn_tyres) {
+  summary <- paste0("Brake pads warning over ", LASTTRIP$value - (LASTSERV$label + warn_tyres), "km")
+  body    <- paste("Replace brakepads")
+
+  res     <- system(paste0("dunstify -b -u normal -t 0 ",
+                           " ' ", summary, "' ' ", body,  "'"),
+                    intern = F, wait = F)
+}
+
+if (LASTTRIP$value > LASTSERV$label + warn_servi) {
+  summary <- paste0("Service warning in ", LASTSERV$label + warn_servi + 10000 - LASTTRIP$value , "km")
+  body    <- paste("Replace brakepads")
+  res     <- system(paste0("dunstify -b -u normal -t 0 ",
+                           " '", summary, "' "),
+                    intern = F, wait = F)
+}
+
+
+
+
 tac = Sys.time();
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
