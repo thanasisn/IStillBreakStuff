@@ -3,9 +3,14 @@
 ##  Initialisation
 profile="$1"; shift
 args="$*"
-lock="/dev/shm/$(basename "$0")_$profile.lock"
+## Sanitize profile name for use in filename
+sanitized_profile=$(echo "$profile" | sed 's/[^a-zA-Z0-9._-]/_/g')
+lock="/dev/shm/$(basename "$0")_${sanitized_profile}.lock"
 ldir="/home/athan/LOGs/SYSTEM_LOGS/"
 killafter="8h"
+##  Create lock file directory if needed
+lock_dir=$(dirname "$lock")
+mkdir -p "$lock_dir"
 
 echo
 echo "Profile:   $profile"

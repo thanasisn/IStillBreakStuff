@@ -3,7 +3,7 @@
 ##  Initialisation
 profile="$1"; shift
 args="$*"
-# Sanitize profile name for use in filename
+## Sanitize profile name for use in filename
 sanitized_profile=$(echo "$profile" | sed 's/[^a-zA-Z0-9._-]/_/g')
 lock="/dev/shm/$(basename "$0")_${sanitized_profile}.lock"
 ldir="/home/athan/LOGs/SYSTEM_LOGS/"
