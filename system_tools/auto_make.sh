@@ -31,8 +31,6 @@ folders=(
   "$HOME/BBand_LAP/JOURNAL"
   "$HOME/CODE/R_MISC/utilities"
   "$HOME/DATA_ARC/10_TODO/JOURNAL"
-  "$HOME/NOTES/01_PROJECTS"
-  "$HOME/NOTES/01_PROJECTS/Aerosols"
   "$HOME/NOTES/02_AREA"
   "$HOME/NOTES/03_RESOURCES"
   "$HOME/NOTES/04_ARCHIVE"
@@ -43,6 +41,7 @@ folders=(
   "$HOME/NOTES/12_WRITINGS"
   "$HOME/NOTES/Clippings"
   "$HOME/NOTES/zauto"
+  "$HOME/NOTES"
 )
 
 for af in "${folders[@]}"; do
