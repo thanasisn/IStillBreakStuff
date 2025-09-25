@@ -20,7 +20,6 @@ exec 2> >(tee -i "${ERR_FILE}" >&2)
 trap 'echo $( date +%F_%T ) ${SECONDS}s :: $0 interrupted ::  >&2;' INT TERM
 info "START :: $0 :: $* ::"
 
-
 # if [[ "$(hostname)" = "tyler" ]]; then
 #     echo "$(basename "$0") is suspended in tyler!!"
 #     exit
@@ -31,6 +30,7 @@ folders=(
   "$HOME/BBand_LAP/JOURNAL"
   "$HOME/CODE/R_MISC/utilities"
   "$HOME/DATA_ARC/10_TODO/JOURNAL"
+  "$HOME/NOTES"
   "$HOME/NOTES/02_AREA"
   "$HOME/NOTES/03_RESOURCES"
   "$HOME/NOTES/04_ARCHIVE"
@@ -40,8 +40,8 @@ folders=(
   "$HOME/NOTES/11_TRAINING/Running"
   "$HOME/NOTES/12_WRITINGS"
   "$HOME/NOTES/Clippings"
+  "$HOME/NOTES/P07_DUST"
   "$HOME/NOTES/zauto"
-  "$HOME/NOTES"
 )
 
 for af in "${folders[@]}"; do
