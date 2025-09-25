@@ -12,7 +12,7 @@ if [[ $xsessions -gt 0 ]]; then
     echo "Display exists $xsessions"
 else
     echo "No X server at \$DISPLAY [$DISPLAY] $xsessions" >&2
-    exit 0
+    # exit 0
 fi
 ##  Watchdog for script  ############################################
 mainpid=$$

@@ -123,7 +123,8 @@ WAPI_daily$Until <- as.POSIXct(strptime( paste(WAPI_daily$time, "23:59"), "%F %R
 
 pdffile <- paste0(outdir,"/Open_Meteo_Variables_",tail(curr$name,1),"_",WAPI_metadata$City, ".pdf")
 
-if (!interactive() && (!file.exists(pdffile) || WAPI_metadata$Data_time > file.mtime(pdffile) + 3600)) {
+newdata <- WAPI_metadata$Data_time > (file.mtime(pdffile) + 3600)
+if (!interactive() && (!file.exists(pdffile) || newdata)) {
     cat("Create new ", pdffile,"\n")
     pdf(pdffile, width = 9, height = 5)
 }
@@ -304,7 +305,7 @@ if (!interactive()) { dev.off() }
 
 pdffile <- paste0(outdir,"/Open_Weather_Variables_",tail(fore$name,1),"_",WAPI_metadata$City, ".pdf")
 
-if (!interactive() && (!file.exists(pdffile) || fore$Data_time > file.mtime(pdffile) + 3600)) {
+if (!interactive() && (!file.exists(pdffile) || any(fore$Data_time > file.mtime(pdffile) + 3600))) {
     cat("Create new ", pdffile,"\n")
     pdf(pdffile, width = 9, height = 4)
 }
@@ -571,7 +572,6 @@ if (!interactive()) {
   #          y0 = WAPI_daily$apparent_temperature_min_best_match, col = "cyan", lwd = 2, lty = 2 )
 
 
-
   ## plot temperature lines
   lines(Temp$dt[Temp$source == "OpenWeatherMAP"], Temp$Temp[      Temp$source == "OpenWeatherMAP"], lwd = 3, col = col_open)
   lines(Temp$dt[Temp$source == "OpenWeatherMAP"], Temp$feels_like[Temp$source == "OpenWeatherMAP"], lwd = 3, col = col_open, lty = 3)
@@ -757,7 +757,7 @@ if (!interactive()) {
 
 
     ## x above
-    if (how_graphs==2){
+    if (how_graphs == 2){
       axis.POSIXct( side = 3, at = seq( drange[1], drange[2], by = "day")+ 12 * 3600,
                     labels = format(seq( drange[1], drange[2], by = "day"), "%a"),
                     lwd = 0, col = col_other, col.axis = col_other, font = 2, line = -.9 )
