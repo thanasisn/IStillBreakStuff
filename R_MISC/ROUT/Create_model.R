@@ -50,7 +50,7 @@ tic <- Sys.time()
 knitr::opts_chunk$set(comment    = ""       )
 knitr::opts_chunk$set(dev        = c("pdf", "png")) ## expected option
 # knitr::opts_chunk$set(dev        = "png"    )       ## for too much data
-knitr::opts_chunk$set(out.width  = "60%"   )
+knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
 knitr::opts_chunk$set(fig.cap    = " - empty caption - " )
 knitr::opts_chunk$set(cache      =  FALSE   )  ## !! breaks calculations
@@ -87,23 +87,36 @@ DT[, `ΔΧ %`    := NULL]
 DT[, συνμωτ    := NULL]
 DT[, `K-0CP-0` := 0]
 
+
 ## set gender
 DT <- DT |>  mutate(Gender = if_else(grepl("M",Κατ.), "Male", "Female"))
 
-
 #' \FloatBarrier
 #'
-#' # Create some groups
+#' A data driven prediction based on finishing times from ROUT 2024
 #'
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
-
-
 
 
 ## symmetric splits
 bbrakes <- 5
 
-hist(DT$`K-181Χαϊντού`, breaks = bbrakes)
+#' \FloatBarrier
+#'
+#' # Inspect
+#'
+#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+
+plot(cut(DT$`K-181Χαϊντού`, breaks = bbrakes),
+     xlab = "Minutes")
+
+
+#' \FloatBarrier
+#'
+#' ## Assume there are `r bbrakes` class of athletes slit in equal bins of finishing times
+#'
+#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+
 
 DT <- DT |> mutate(
   bin   = cut(`K-181Χαϊντού`, breaks = bbrakes),
@@ -133,12 +146,12 @@ for (id in unique(DT$binid)) {
   TT[, Pace  := Dt/Dx]
   TT[, Speed := Dx/Dt]
 
-  TT[, Min := min(tmp$`K-181Χαϊντού`)]
-  TT[, Max := max(tmp$`K-181Χαϊντού`)]
-  TT[, id  := id]
+  TT[, Min   := min(tmp$`K-181Χαϊντού`)]
+  TT[, Max   := max(tmp$`K-181Χαϊντού`)]
+  TT[, Class := as.character(id)]
 
-  plot(TT[, Speed, Ttime])
-  title(id)
+  # plot(TT[, Speed, Ttime])
+  # title(id)
 
   models <- rbind(models, TT)
 }
@@ -148,8 +161,8 @@ models[, TtimeH := Ttime / 60 ]
 ggplot(models,
        aes(x = TtimeH,
            y = Speed,
-           colour = as.character(id),
-           group = as.character(id))) +
+           colour = Class,
+           group  = Class)) +
   geom_point() +
   geom_line()
 
@@ -157,9 +170,16 @@ ggplot(models,
 ggplot(models,
        aes(x = km,
            y = Speed,
-           colour = as.character(id),
-           group = as.character(id))) +
+           colour = Class,
+           group  = Class)) +
   geom_point() + geom_line()
+
+
+
+
+
+
+
 
 
 
