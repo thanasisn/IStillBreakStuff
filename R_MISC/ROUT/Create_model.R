@@ -1,6 +1,6 @@
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:  "Model ROUT"
+#' title:  "ROUT model"
 #' date:   "`r strftime(Sys.time(), '%F', tz= 'Europe/Athens')`"
 #' author: ""
 #'
@@ -99,7 +99,7 @@ DT <- DT |>  mutate(Gender = if_else(grepl("M",Κατ.), "Male", "Female"))
 
 #' \FloatBarrier
 #'
-#' **A data driven prediction, based on the finishing times of 2024 ROUT.**
+#' # **A data driven prediction, based on the finishing times of 2024 ROUT.**
 #'
 #' **Source code: [`github.com/thanasisn/IStillBreakStuff/blob/main/R_MISC/ROUT/Create_model.R`](https://github.com/thanasisn/IStillBreakStuff/blob/main/R_MISC/ROUT/Create_model.R)**
 #'
