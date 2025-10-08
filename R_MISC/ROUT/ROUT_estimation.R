@@ -1,0 +1,147 @@
+# /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+#' ---
+#' title:  "ROUT estimation"
+#' date:   "`r strftime(Sys.time(), '%F %R %Z', tz= 'Europe/Athens')`"
+#' author: ""
+#'
+#' output:
+#'   bookdown::pdf_document2:
+#'     number_sections:  no
+#'     fig_caption:      no
+#'     keep_tex:         yes
+#'     keep_md:          yes
+#'     latex_engine:     xelatex
+#'     toc:              yes
+#'     toc_depth:        4
+#'     fig_width:        8
+#'     fig_height:       5
+#'   html_document:
+#'     toc:             true
+#'     number_sections: false
+#'     fig_width:       6
+#'     fig_height:      4
+#'     keep_md:         no
+#'
+#' header-includes:
+#'   - \usepackage{fontspec}
+#'   - \usepackage{xunicode}
+#'   - \usepackage{xltxtra}
+#'   - \usepackage{placeins}
+#'   - \geometry{
+#'      a4paper,
+#'      left     = 25mm,
+#'      right    = 25mm,
+#'      top      = 30mm,
+#'      bottom   = 30mm,
+#'      headsep  = 3\baselineskip,
+#'      footskip = 4\baselineskip
+#'    }
+#'   - \setmainfont[Scale=1.1]{Linux Libertine O}
+#' ---
+
+#+ echo=F, include=F
+rm(list = (ls()[ls() != ""]))
+Script.Name <- "~/CODE/R_MISC/ROUT/ROUT_estimation.R"
+Sys.setenv(TZ = "UTC")
+tic <- Sys.time()
+
+## __ Document options ---------------------------------------------------------
+#+ echo=FALSE, include=TRUE
+knitr::opts_chunk$set(comment    = ""       )
+knitr::opts_chunk$set(dev        = c("pdf", "png")) ## expected option
+# knitr::opts_chunk$set(dev        = "png"    )       ## for too much data
+knitr::opts_chunk$set(out.width  = "60%"   )
+knitr::opts_chunk$set(fig.align  = "center" )
+knitr::opts_chunk$set(fig.cap    = " - empty caption - " )
+knitr::opts_chunk$set(cache      =  FALSE   )  ## !! breaks calculations
+knitr::opts_chunk$set(fig.pos    = 'h!'    )
+
+
+## __  Set environment ---------------------------------------------------------
+library(readODS)
+library(data.table)
+library(reticulate, warn.conflicts = FALSE, quietly = TRUE)
+
+reticulate::py_config()
+# use_python("~/.pyenv/versions/3.13.2/bin/python3")
+py_require("astropy")
+
+## Load my previous times
+DT <- data.table(read_ods("~/GISdata/GPX/Plans/ROUT/ROUT_2024/Results.ods"))
+
+## piramida sun calculation for this point
+lat <- 41.523612
+lon <- 24.454846
+alt <- 900
+
+## Race start time
+START     <- as.POSIXct("2025-10-17 00:00 EEST")
+START_UTC <- as.POSIXct(START, tz = "UTC")
+
+## Set target time
+target <- 43 * 60
+
+## prepare data
+DT$Συνολο_minutes <- as.numeric(DT$Συνολο) * 60
+
+## compute change from previous
+change <- 1 - tail(DT$Συνολο_minutes, 1) / target
+
+
+DT$new <- DT$Συνολο_minutes * (1 + change)
+
+minutes_to_hhmm <- function(minutes) {
+  hours <- floor(minutes / 60)
+  mins <- round(minutes %% 60)
+  sprintf("%02d:%02d", hours, mins)
+}
+
+# Apply to your data
+DT$Συνολο_hhmm <- minutes_to_hhmm(as.numeric(DT$Συνολο_minutes))
+DT$New_hhmm    <- minutes_to_hhmm(as.numeric(DT$new))
+
+DT$Date_EET <- START
+DT$Date_UTC <- START_UTC
+
+
+DT$Date_EET <- DT$Date_EET + DT$Συνολο_minutes * 60
+DT$Date_UTC <- DT$Date_UTC + DT$Συνολο_minutes * 60
+
+DT <- DT[!is.na(Συνολο)]
+
+
+##  Compute Astropy data  ------------------------------------------------------
+source_python("~/BBand_LAP/parameters/sun/sun_vector_astropy_p3.py")
+## Call pythons Astropy for sun distance calculation
+sunR_astropy <- function(date) {
+  cbind(t(sun_vector(date, lat = lat, lon = lon, height = alt)), date)
+}
+
+##  Calculate sun vector
+sss <- data.frame(t(sapply(DT$Date_UTC, sunR_astropy )))
+
+##  reshape data
+ADD <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
+                  AsPy_Elevation = unlist(sss$X2),
+                  AsPy_Dist      = unlist(sss$X3),
+                  Date           = as.POSIXct(unlist(sss$X4),
+                                              origin = "1970-01-01"))
+
+DT$SunElevation <- round(ADD$AsPy_Elevation, 2)
+
+
+TT <- DT[, .(KM, `Σημείο Ελέγχου`, New_hhmm, Date_EET, SunElevation)]
+
+#+ echo=FALSE, include=TRUE
+cat(c("Γωνία του ήλιου πάνω από τον ορίζοντα για υποθετικούς χρόνους\n"))
+print( TT )
+cat(c("Συντεταγμές πυραμίδας:", lat, lon, "\n"))
+cat(c("Μέσο υψόμετρο:", alt, "\n"))
+
+#' \FloatBarrier
+#'
+#' # Create some groups
+#'
+#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+
+pander::pander(TT)

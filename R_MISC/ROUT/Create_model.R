@@ -41,7 +41,7 @@
 
 #+ echo=F, include=F
 rm(list = (ls()[ls() != ""]))
-Script.Name <- "~/PROJECTS/General/ROUT/Create_model.R"
+Script.Name <- "~/CODE/R_MISC/ROUT/Create_model.R"
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 
@@ -56,7 +56,6 @@ knitr::opts_chunk$set(fig.cap    = " - empty caption - " )
 knitr::opts_chunk$set(cache      =  FALSE   )  ## !! breaks calculations
 knitr::opts_chunk$set(fig.pos    = 'h!'    )
 
-# remotes::install_github("larmarange/JLutils", force = T)
 
 ## __  Set environment ---------------------------------------------------------
 suppressMessages({
