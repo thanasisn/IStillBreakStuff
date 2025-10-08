@@ -90,8 +90,8 @@ exec 2> >(tee -i "$ERR_FILE")
 breakin=$(( 14840 * 1048576 ))
 
 ## set the bandwidth limit
-BWLIM=${1:-60}
-BWLIM_K=${1:-60}
+BWLIM=${1:-120}
+BWLIM_K=${1:-120}
 
 ## list of configured accounts to iterate
 ## an empty element for array for 1
