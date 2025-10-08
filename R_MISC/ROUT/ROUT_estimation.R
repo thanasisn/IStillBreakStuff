@@ -68,6 +68,10 @@ py_require("astropy")
 
 ## Load my previous times
 DT <- data.table(read_ods("~/GISdata/GPX/Plans/ROUT/ROUT_2024/Results.ods"))
+CP <- data.table(read_ods("~/CODE/R_MISC/ROUT/CP_cords.ods"))
+
+
+DT <- merge(DT, CP, by.x = "Σημείο Ελέγχου", by.y = "cp_name")
 
 ## piramida sun calculation for this point
 lat <- 41.523612
@@ -117,6 +121,13 @@ sunR_astropy <- function(date) {
   cbind(t(sun_vector(date, lat = lat, lon = lon, height = alt)), date)
 }
 
+## sun at each location
+for (ii in 1:nrow(DT)) {
+  sun_vector(DT[ii, Date_UTC], lat = DT[ii, lat], lon = DT[ii, lon], height = DT[ii, alt])[[2]]
+
+}
+
+stop()
 ##  Calculate sun vector
 sss <- data.frame(t(sapply(DT$Date_UTC, sunR_astropy )))
 
