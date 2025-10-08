@@ -1,7 +1,7 @@
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:  "Model ROUT"
-#' date:   "`r strftime(Sys.time(), '%F %R %Z', tz= 'Europe/Athens')`"
+#' date:   "`r strftime(Sys.time(), '%F', tz= 'Europe/Athens')`"
 #' author: ""
 #'
 #' output:
@@ -65,6 +65,9 @@ suppressMessages({
   library(pander,     quietly = TRUE, warn.conflicts = FALSE)
   require(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
   require(readODS,    quietly = TRUE, warn.conflicts = FALSE)
+  require(grid,       quietly = TRUE, warn.conflicts = FALSE)
+  require(gridExtra,  quietly = TRUE, warn.conflicts = FALSE)
+  require(gtable,     quietly = TRUE, warn.conflicts = FALSE)
 })
 
 
@@ -87,6 +90,7 @@ DT[, `K-0CP-0` := 0]
 minutes_to_hhmm <- function(minutes) {
   hours <- floor(minutes / 60)
   mins  <- round(minutes %% 60)
+
   sprintf("%02d:%02d", hours, mins)
 }
 
@@ -95,10 +99,11 @@ DT <- DT |>  mutate(Gender = if_else(grepl("M",Κατ.), "Male", "Female"))
 
 #' \FloatBarrier
 #'
-#' A data driven prediction based on finishing times from ROUT 2024
+#' **A data driven prediction, based on the finishing times of 2024 ROUT.**
 #'
+#' **Source code: [`github.com/thanasisn/IStillBreakStuff/blob/main/R_MISC/ROUT/Create_model.R`](https://github.com/thanasisn/IStillBreakStuff/blob/main/R_MISC/ROUT/Create_model.R)**
 #'
-#' **Source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
+#' This is just an estimation, not a actual prediction tool.
 #'
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 
@@ -136,8 +141,7 @@ DT$upper <- as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", DT$bin) )
 #'
 #' ## Model each group
 #'
-#' Get the median time for each part and create a pace/speed for each group
-#'
+#' Get a representative value for each part and variable, and create a pace/speed for each group
 #'
 #+ echo=T, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 
@@ -147,10 +151,10 @@ for (id in unique(DT$binid)) {
   tmp <- DT[binid == id]
   tmp <- remove_empty(tmp, "cols")
 
-  ## prepare data
+  ## get representative data as the mean of each group
   TT <- tmp |>
     select(contains("K-")) |>
-    summarise_all(median, na.rm = T) |> t()
+    summarise_all(mean, na.rm = T) |> t()
 
   TT <- data.table(TT, keep.rownames = T)
   TT <- rename(.data = TT, Ttime = V1)
@@ -166,9 +170,6 @@ for (id in unique(DT$binid)) {
   TT[, Dt    := c(0, diff(Ttime))]
   TT[, Pace  := Dt/Dx]
   TT[, Speed := Dx/Dt]
-
-  TT[, Min   := min(tmp$`K-181Χαϊντού`)]
-  TT[, Max   := max(tmp$`K-181Χαϊντού`)]
   TT[, Class := as.character(id)]
 
   models <- rbind(models, TT)
@@ -194,7 +195,6 @@ ggplot(models,
   geom_line() +
   theme_bw()
 
-
 ggplot(models,
        aes(x = km,
            y = Speed,
@@ -205,7 +205,6 @@ ggplot(models,
   theme_bw()
 
 
-
 #' \newpage
 #' \FloatBarrier
 #'
@@ -214,7 +213,7 @@ ggplot(models,
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 ## create multiple models
 
-hours <- (min(models$Min) %/% 60):(max(models$Max) %/% 60)
+hours <- (min(models$lower) %/% 60):(max(models$upper) %/% 60)
 
 for (HH in hours) {
   MM  <- HH * 60
@@ -240,13 +239,11 @@ for (HH in hours) {
   pp <- tmp[, .(rn, km, Tnew_hhmm, tmp$Tpartial)]
   names(pp) <- c("CP", "km", "Total time", "Partial time")
 
+  ## for pdf
   cat(pander(pp))
 
+  ## create an imaga
 
-
-  library(grid)
-  library(gridExtra)
-  library(gtable)
 
   ttl <- paste("Target hours", HH, "model class", tmp[, unique(Class)])
 
@@ -278,7 +275,7 @@ for (HH in hours) {
 
 
 
-#+ include=T, echo=F, results="asis"
+#+ include=F, echo=F, results="asis"
 tac <- Sys.time()
 cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n", Sys.time(), Sys.info()["login"],
             Sys.info()["nodename"], basename(Script.Name), difftime(tac,tic,units = "mins")))
