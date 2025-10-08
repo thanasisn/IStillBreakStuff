@@ -62,11 +62,8 @@ suppressMessages({
   library(data.table, quietly = TRUE, warn.conflicts = FALSE)
   library(janitor,    quietly = TRUE, warn.conflicts = FALSE)
   library(ggplot2,    quietly = TRUE, warn.conflicts = FALSE)
-  library(lubridate,  quietly = TRUE, warn.conflicts = FALSE)
   library(pander,     quietly = TRUE, warn.conflicts = FALSE)
-  library(readxl,     quietly = TRUE, warn.conflicts = FALSE)
   require(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
-  require(tidyr,      quietly = TRUE, warn.conflicts = FALSE)
   require(readODS,    quietly = TRUE, warn.conflicts = FALSE)
 })
 
@@ -87,6 +84,11 @@ DT[, `ΔΧ %`    := NULL]
 DT[, συνμωτ    := NULL]
 DT[, `K-0CP-0` := 0]
 
+minutes_to_hhmm <- function(minutes) {
+  hours <- floor(minutes / 60)
+  mins  <- round(minutes %% 60)
+  sprintf("%02d:%02d", hours, mins)
+}
 
 ## set gender
 DT <- DT |>  mutate(Gender = if_else(grepl("M",Κατ.), "Male", "Female"))
@@ -103,42 +105,57 @@ bbrakes <- 5
 
 #' \FloatBarrier
 #'
-#' # Inspect
+#' ## Assume there are `r bbrakes` class of athletes, slit in equal bins of finishing times
 #'
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 
-plot(cut(DT$`K-181Χαϊντού`, breaks = bbrakes),
-     xlab = "Minutes")
-
-
-#' \FloatBarrier
-#'
-#' ## Assume there are `r bbrakes` class of athletes slit in equal bins of finishing times
-#'
-#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+hist(DT$`K-181Χαϊντού`,
+     breaks = seq(min(DT$`K-181Χαϊντού`), max(DT$`K-181Χαϊντού`), l = bbrakes + 1),
+     main = "Histogram",
+     xlab = "minutes",
+     ylab = "Athletes",
+     yaxs = "i",
+     xaxs = "i")
 
 
 DT <- DT |> mutate(
   bin   = cut(`K-181Χαϊντού`, breaks = bbrakes),
-  binid = as.numeric(cut(`K-181Χαϊντού`, breaks = bbrakes)),
+  binid = as.numeric(cut(`K-181Χαϊντού`, breaks = bbrakes)
+  ),
 )
 
+DT$lower <- as.numeric( sub("\\((.+),.*", "\\1", DT$bin) )
+DT$upper <- as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", DT$bin) )
+
+
+#' \FloatBarrier
+#'
+#' ## Model each group
+#'
+#' Get the median time for each part and create a pace/speed for each group
+#'
+#'
+#+ echo=T, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 ## create multiple models
+
 models <- data.table()
 for (id in unique(DT$binid)) {
   tmp <- DT[binid == id]
-  tmp <- janitor::remove_empty(tmp, "cols")
+  tmp <- remove_empty(tmp, "cols")
 
   ## prepare data
   TT <- tmp |>
     select(contains("K-")) |>
-    summarise_all(mean, na.rm = T) |> t()
+    summarise_all(median, na.rm = T) |> t()
 
   TT <- data.table(TT, keep.rownames = T)
   TT <- rename(.data = TT, Ttime = V1)
 
   TT$km <- as.numeric(stringr::str_match(TT$rn, "K-(\\d+).*")[,2])
   setorder(TT, km)
+
+  TT$lower <- unique(tmp$lower)
+  TT$upper <- unique(tmp$upper)
 
   ## create model
   TT[, Dx    := c(0, diff(km))]
@@ -150,11 +167,16 @@ for (id in unique(DT$binid)) {
   TT[, Max   := max(tmp$`K-181Χαϊντού`)]
   TT[, Class := as.character(id)]
 
-  # plot(TT[, Speed, Ttime])
-  # title(id)
-
   models <- rbind(models, TT)
 }
+
+#' \FloatBarrier
+#'
+#' ## Use each group to get relative times within group range
+#'
+#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+## create multiple models
+
 
 models[, TtimeH := Ttime / 60 ]
 
@@ -164,7 +186,8 @@ ggplot(models,
            colour = Class,
            group  = Class)) +
   geom_point() +
-  geom_line()
+  geom_line() +
+  theme_bw()
 
 
 ggplot(models,
@@ -172,13 +195,42 @@ ggplot(models,
            y = Speed,
            colour = Class,
            group  = Class)) +
-  geom_point() + geom_line()
+  geom_point() +
+  geom_line() +
+  theme_bw()
 
 
 
+#' \FloatBarrier
+#'
+#' ## Create table for each hour within it's class
+#'
+#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+## create multiple models
 
+hours <- (min(models$Min) %/% 60):(max(models$Max) %/% 60)
 
+for (HH in hours) {
+  MM  <- HH * 60
+  tmp <- models[ MM < upper & MM > lower]
+  if (nrow(tmp) == 0) next
 
+  cat("### Hours", HH ,tmp[, unique(Class)], "\n")
+
+  setorder(tmp, Ttime)
+
+  last(tmp$Ttime)
+
+  ## compute change from previous
+  change <- 1 - last(tmp$Ttime) / MM
+
+  ## compute scaled times
+  tmp$Tnew <- tmp$Ttime * (1 + change)
+
+  tmp$Tnew_hhmm <- minutes_to_hhmm(tmp$Tnew)
+
+  pander(tmp[, .(rn, km, Tnew_hhmm)])
+}
 
 
 

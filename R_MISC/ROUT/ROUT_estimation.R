@@ -87,12 +87,12 @@ DT$Συνολο_minutes <- as.numeric(DT$Συνολο) * 60
 ## compute change from previous
 change <- 1 - tail(DT$Συνολο_minutes, 1) / target
 
-
+## compute scaled times
 DT$new <- DT$Συνολο_minutes * (1 + change)
 
 minutes_to_hhmm <- function(minutes) {
   hours <- floor(minutes / 60)
-  mins <- round(minutes %% 60)
+  mins  <- round(minutes %% 60)
   sprintf("%02d:%02d", hours, mins)
 }
 
