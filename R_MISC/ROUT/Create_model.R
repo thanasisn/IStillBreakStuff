@@ -8,8 +8,8 @@
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
-#'     keep_tex:         yes
-#'     keep_md:          yes
+#'     keep_tex:         no
+#'     keep_md:          no
 #'     latex_engine:     xelatex
 #'     toc:              yes
 #'     toc_depth:        4
@@ -97,6 +97,9 @@ DT <- DT |>  mutate(Gender = if_else(grepl("M",Κατ.), "Male", "Female"))
 #'
 #' A data driven prediction based on finishing times from ROUT 2024
 #'
+#'
+#' **Source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
+#'
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 
 
@@ -104,15 +107,16 @@ DT <- DT |>  mutate(Gender = if_else(grepl("M",Κατ.), "Male", "Female"))
 bbrakes <- 5
 
 #' \FloatBarrier
+#' \newpage
 #'
-#' ## Assume there are `r bbrakes` class of athletes, slit in equal bins of finishing times
+#' ## Assume there are `r bbrakes` class of athletes, splitted in equal bins of finishing times
 #'
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 
 hist(DT$`K-181Χαϊντού`,
      breaks = seq(min(DT$`K-181Χαϊντού`), max(DT$`K-181Χαϊντού`), l = bbrakes + 1),
      main = "Histogram",
-     xlab = "minutes",
+     xlab = "Minutes",
      ylab = "Athletes",
      yaxs = "i",
      xaxs = "i")
@@ -136,8 +140,8 @@ DT$upper <- as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", DT$bin) )
 #'
 #'
 #+ echo=T, include=T, fig.width=6, fig.height=6, results="asis", warning=F
-## create multiple models
 
+## create model for each class
 models <- data.table()
 for (id in unique(DT$binid)) {
   tmp <- DT[binid == id]
@@ -171,6 +175,7 @@ for (id in unique(DT$binid)) {
 }
 
 #' \FloatBarrier
+#' \newpage
 #'
 #' ## Use each group to get relative times within group range
 #'
@@ -201,6 +206,7 @@ ggplot(models,
 
 
 
+#' \newpage
 #' \FloatBarrier
 #'
 #' ## Create table for each hour within it's class
@@ -215,7 +221,7 @@ for (HH in hours) {
   tmp <- models[ MM < upper & MM > lower]
   if (nrow(tmp) == 0) next
 
-  cat("### Hours", HH ,tmp[, unique(Class)], "\n")
+  cat("### Hours", HH, "model class", tmp[, unique(Class)], "\n")
 
   setorder(tmp, Ttime)
 
@@ -228,8 +234,43 @@ for (HH in hours) {
   tmp$Tnew <- tmp$Ttime * (1 + change)
 
   tmp$Tnew_hhmm <- minutes_to_hhmm(tmp$Tnew)
+  tmp$Tpartial  <- minutes_to_hhmm(c(0,diff(tmp$Tnew)))
+  tmp           <- tmp[-1,]
 
-  pander(tmp[, .(rn, km, Tnew_hhmm)])
+  pp <- tmp[, .(rn, km, Tnew_hhmm, tmp$Tpartial)]
+  names(pp) <- c("CP", "km", "Total time", "Partial time")
+
+  cat(pander(pp))
+
+
+
+  library(grid)
+  library(gridExtra)
+  library(gtable)
+
+  ttl <- paste("Target hours", HH, "model class", tmp[, unique(Class)])
+
+  png(paste0("C_", tmp[, unique(Class)], "_H_", HH, ".png"), height = 25 * nrow(pp), width = 95 * ncol(pp))
+
+
+  t1      <- tableGrob(pp)
+  title   <- textGrob(ttl, gp = gpar(fontsize = 20))
+  padding <- unit(5,"mm")
+
+  table <- gtable_add_rows(
+    t1,
+    heights = grobHeight(title) + padding,
+    pos = 0)
+  table <- gtable_add_grob(
+    table,
+    title,
+    1, 1, 1, ncol(table))
+
+  grid.newpage()
+  grid.draw(table)
+
+  dev.off()
+
 }
 
 
