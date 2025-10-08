@@ -145,3 +145,5 @@ cat(c("Μέσο υψόμετρο:", alt, "\n"))
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 
 pander::pander(TT)
+
+

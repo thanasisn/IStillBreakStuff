@@ -72,6 +72,10 @@ suppressMessages({
 
 
 dtk_fl <- "~/Documents/Running/ROUT results/ROUT_2024.ods"
+cp_fl  <- "~/CODE/R_MISC/ROUT/CP_cords.ods"
+
+## get locations
+CP <- data.table(read_ods(cp_fl))
 
 ## get finished
 DT <- data.table(read_ods(dtk_fl))
@@ -269,8 +273,6 @@ for (HH in hours) {
   dev.off()
 
 }
-
-
 
 
 
