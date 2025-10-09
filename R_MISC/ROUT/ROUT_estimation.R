@@ -8,8 +8,8 @@
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
-#'     keep_tex:         yes
-#'     keep_md:          yes
+#'     keep_tex:         no
+#'     keep_md:          no
 #'     latex_engine:     xelatex
 #'     toc:              yes
 #'     toc_depth:        4
@@ -48,7 +48,8 @@ tic <- Sys.time()
 ## __ Document options ---------------------------------------------------------
 #+ echo=FALSE, include=TRUE
 knitr::opts_chunk$set(comment    = ""       )
-knitr::opts_chunk$set(dev        = c("pdf", "png")) ## expected option
+# knitr::opts_chunk$set(dev        = c("pdf", "png")) ## expected option
+knitr::opts_chunk$set(dev        = c("pdf"))
 # knitr::opts_chunk$set(dev        = "png"    )       ## for too much data
 knitr::opts_chunk$set(out.width  = "60%"   )
 knitr::opts_chunk$set(fig.align  = "center" )

@@ -1,6 +1,6 @@
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:  "ROUT model"
+#' title:  "ROUT model for all"
 #' date:   "`r strftime(Sys.time(), '%F', tz= 'Europe/Athens')`"
 #' author: ""
 #'
@@ -70,6 +70,9 @@ suppressMessages({
   require(gtable,     quietly = TRUE, warn.conflicts = FALSE)
 })
 
+## Race start time
+START     <- as.POSIXct("2025-10-17 00:00 EEST")
+START_UTC <- as.POSIXct(START, tz = "UTC")
 
 dtk_fl <- "~/Documents/Running/ROUT results/ROUT_2024.ods"
 cp_fl  <- "~/CODE/R_MISC/ROUT/CP_cords.ods"
@@ -118,7 +121,9 @@ bbrakes <- 5
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Assume there are `r bbrakes` class of athletes, splitted in equal bins of finishing times
+#' ## Assume there are `r bbrakes` class of athletes.
+#'
+#' We split finishing times in equal bins, and ignore differences in age or gender.
 #'
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 
@@ -179,6 +184,11 @@ for (id in unique(DT$binid)) {
   models <- rbind(models, TT)
 }
 
+CP[, km := NULL]
+
+## use actual coordinates of check points for sun calculation
+models <- merge(models, CP, by.x = "rn", by.y = "rn" )
+
 #' \FloatBarrier
 #' \newpage
 #'
@@ -186,7 +196,6 @@ for (id in unique(DT$binid)) {
 #'
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 ## create multiple models
-
 
 models[, TtimeH := Ttime / 60 ]
 
@@ -243,12 +252,22 @@ for (HH in hours) {
   pp <- tmp[, .(rn, km, Tnew_hhmm, tmp$Tpartial)]
   names(pp) <- c("CP", "km", "Total time", "Partial time")
 
+
+  ## Calculate sun vector
+
+
+
+
+
+
+  stop( )
+
   ## for pdf
   cat(pander(pp))
 
-  ## create an imaga
 
 
+  ## create a table as an image
   ttl <- paste("Target hours", HH, "model class", tmp[, unique(Class)])
 
   png(paste0("C_", tmp[, unique(Class)], "_H_", HH, ".png"), height = 25 * nrow(pp), width = 95 * ncol(pp))
