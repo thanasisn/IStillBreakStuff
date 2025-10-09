@@ -121,13 +121,14 @@ sunR_astropy <- function(date) {
   cbind(t(sun_vector(date, lat = lat, lon = lon, height = alt)), date)
 }
 
-## sun at each location
-for (ii in 1:nrow(DT)) {
-  sun_vector(DT[ii, Date_UTC], lat = DT[ii, lat], lon = DT[ii, lon], height = DT[ii, alt])[[2]]
 
-}
 
-stop()
+
+DT[, SunElevation := mapply(function(dt, lt, ln, ht) {
+  round(sun_vector(dt, lat = lt, lon = ln, height = ht)[[2]], 2)
+}, Date_UTC, lat, lon, alt)]
+
+
 ##  Calculate sun vector
 sss <- data.frame(t(sapply(DT$Date_UTC, sunR_astropy )))
 
@@ -137,11 +138,10 @@ ADD <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
                   AsPy_Dist      = unlist(sss$X3),
                   Date           = as.POSIXct(unlist(sss$X4),
                                               origin = "1970-01-01"))
+DT$SunElevation_Pir <- round(ADD$AsPy_Elevation, 2)
 
-DT$SunElevation <- round(ADD$AsPy_Elevation, 2)
 
-
-TT <- DT[, .(KM, `Σημείο Ελέγχου`, New_hhmm, Date_EET, SunElevation)]
+TT <- DT[, .(KM, `Σημείο Ελέγχου`, New_hhmm, Date_EET, SunElevation, alt)]
 
 #+ echo=FALSE, include=TRUE
 cat(c("Γωνία του ήλιου πάνω από τον ορίζοντα για υποθετικούς χρόνους\n"))
