@@ -109,8 +109,8 @@ DT$Date_EET <- START
 DT$Date_UTC <- START_UTC
 
 
-DT$Date_EET <- DT$Date_EET + DT$Συνολο_minutes * 60
-DT$Date_UTC <- DT$Date_UTC + DT$Συνολο_minutes * 60
+DT$Date_EET <- DT$Date_EET + DT$new * 60
+DT$Date_UTC <- DT$Date_UTC + DT$new * 60
 
 DT <- DT[!is.na(Συνολο)]
 
@@ -154,6 +154,6 @@ print( TT )
 #'
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 
-pander::pander(TT)
+pander::pander(TT, split.table = Inf)
 
 
