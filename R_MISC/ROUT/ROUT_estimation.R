@@ -139,15 +139,14 @@ ADD <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
                   Date           = as.POSIXct(unlist(sss$X4),
                                               origin = "1970-01-01"))
 DT$SunElevation_Pir <- round(ADD$AsPy_Elevation, 2)
-
+setorder(DT, KM)
 
 TT <- DT[, .(KM, `Σημείο Ελέγχου`, New_hhmm, Date_EET, SunElevation, alt)]
+setorder(TT, KM)
 
 #+ echo=FALSE, include=TRUE
-cat(c("Γωνία του ήλιου πάνω από τον ορίζοντα για υποθετικούς χρόνους\n"))
+cat(c("Γωνία του ήλιου πάνω από τον ορίζοντα για υποθετικούς χρόνους στα check point\n"))
 print( TT )
-cat(c("Συντεταγμές πυραμίδας:", lat, lon, "\n"))
-cat(c("Μέσο υψόμετρο:", alt, "\n"))
 
 #' \FloatBarrier
 #'
