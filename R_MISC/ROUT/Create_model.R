@@ -29,10 +29,10 @@
 #'   - \usepackage{placeins}
 #'   - \geometry{
 #'      a4paper,
-#'      left     = 25mm,
-#'      right    = 25mm,
-#'      top      = 30mm,
-#'      bottom   = 30mm,
+#'      left     = 20mm,
+#'      right    = 20mm,
+#'      top      = 25mm,
+#'      bottom   = 25mm,
 #'      headsep  = 3\baselineskip,
 #'      footskip = 4\baselineskip
 #'    }
@@ -65,13 +65,14 @@ suppressMessages({
   library(pander,     quietly = TRUE, warn.conflicts = FALSE)
   require(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
   require(readODS,    quietly = TRUE, warn.conflicts = FALSE)
+  require(reticulate, quietly = TRUE, warn.conflicts = FALSE)
   require(grid,       quietly = TRUE, warn.conflicts = FALSE)
   require(gridExtra,  quietly = TRUE, warn.conflicts = FALSE)
   require(gtable,     quietly = TRUE, warn.conflicts = FALSE)
 })
 
 ## Race start time
-START     <- as.POSIXct("2025-10-17 00:00 EEST")
+START     <- as.POSIXct("2025-10-17 00:00", tz = "EEST")
 START_UTC <- as.POSIXct(START, tz = "UTC")
 
 dtk_fl <- "~/Documents/Running/ROUT results/ROUT_2024.ods"
@@ -101,6 +102,14 @@ minutes_to_hhmm <- function(minutes) {
   sprintf("%02d:%02d", hours, mins)
 }
 
+##  Compute Astropy data  ------------------------------------------------------
+py_require("astropy")
+source_python("~/BBand_LAP/parameters/sun/sun_vector_astropy_p3.py")
+## Call pythons Astropy for sun distance calculation
+sunR_astropy <- function(date) {
+  cbind(t(sun_vector(date, lat = lat, lon = lon, height = alt)), date)
+}
+
 ## set gender
 DT <- DT |>  mutate(Gender = if_else(grepl("M",Κατ.), "Male", "Female"))
 
@@ -125,6 +134,8 @@ bbrakes <- 5
 #'
 #' We split finishing times in equal bins, and ignore differences in age or gender.
 #'
+#' Sun angles are computed at the actual location of each check point.
+#'
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 
 hist(DT$`K-181Χαϊντού`,
@@ -134,7 +145,6 @@ hist(DT$`K-181Χαϊντού`,
      ylab = "Athletes",
      yaxs = "i",
      xaxs = "i")
-
 
 DT <- DT |> mutate(
   bin   = cut(`K-181Χαϊντού`, breaks = bbrakes),
@@ -233,7 +243,8 @@ for (HH in hours) {
   tmp <- models[ MM < upper & MM > lower]
   if (nrow(tmp) == 0) next
 
-  cat("### Hours", HH, "model class", tmp[, unique(Class)], "\n")
+  cat("\\newpage", "\n\n")
+  cat("### Hours", HH, "model class", tmp[, unique(Class)], "\n\n")
 
   setorder(tmp, Ttime)
 
@@ -249,31 +260,29 @@ for (HH in hours) {
   tmp$Tpartial  <- minutes_to_hhmm(c(0,diff(tmp$Tnew)))
   tmp           <- tmp[-1,]
 
-  pp <- tmp[, .(rn, km, Tnew_hhmm, tmp$Tpartial)]
-  names(pp) <- c("CP", "km", "Total time", "Partial time")
-
+  tmp$Date     <- START     + tmp$Tnew * 60
+  tmp$Date_UTC <- START_UTC + tmp$Tnew * 60
 
   ## Calculate sun vector
+  tmp[, SunElevation := mapply(function(dt, lt, ln, ht) {
+    round(sun_vector(dt, lat = lt, lon = ln, height = ht)[[2]], 2)
+  }, Date_UTC, lat, lon, alt)]
 
+  ## for export
+  pp <- tmp[, .(rn, km, Tnew_hhmm, Tpartial, Date, SunElevation)]
+  names(pp) <- c("CP", "km", "Total time", "Partial time", "Date", "Sun elevation angle")
 
-
-
-
-
-  stop( )
+  rownames(pp) <- NULL
 
   ## for pdf
-  cat(pander(pp))
-
-
+  cat(pander(pp, split.table = Inf))
 
   ## create a table as an image
-  ttl <- paste("Target hours", HH, "model class", tmp[, unique(Class)])
+  ttl <- paste("ROUT finishing target:", HH, "hours, model class:", tmp[, unique(Class)])
 
   png(paste0("C_", tmp[, unique(Class)], "_H_", HH, ".png"), height = 25 * nrow(pp), width = 95 * ncol(pp))
 
-
-  t1      <- tableGrob(pp)
+  t1      <- tableGrob(pp, rows = NULL)
   title   <- textGrob(ttl, gp = gpar(fontsize = 20))
   padding <- unit(5,"mm")
 
@@ -290,10 +299,7 @@ for (HH in hours) {
   grid.draw(table)
 
   dev.off()
-
 }
-
-
 
 
 #+ include=F, echo=F, results="asis"

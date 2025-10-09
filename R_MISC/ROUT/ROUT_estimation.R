@@ -124,7 +124,6 @@ sunR_astropy <- function(date) {
 
 
 
-
 DT[, SunElevation := mapply(function(dt, lt, ln, ht) {
   round(sun_vector(dt, lat = lt, lon = ln, height = ht)[[2]], 2)
 }, Date_UTC, lat, lon, alt)]
