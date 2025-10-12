@@ -99,6 +99,7 @@ DT$new <- DT$Συνολο_minutes * (1 + change)
 minutes_to_hhmm <- function(minutes) {
   hours <- floor(minutes / 60)
   mins  <- round(minutes %% 60)
+  hours[mins == 60] <- hours[mins == 60]+1
   sprintf("%02d:%02d", hours, mins)
 }
 
