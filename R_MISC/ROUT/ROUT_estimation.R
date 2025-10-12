@@ -66,7 +66,6 @@ library(reticulate, warn.conflicts = FALSE, quietly = TRUE)
 reticulate::py_config()
 # use_python("~/.pyenv/versions/3.13.2/bin/python3")
 py_require("astropy")
-py_require("ephem")
 
 ## Load my previous times
 DT <- data.table(read_ods("~/GISdata/GPX/Plans/ROUT/ROUT_2024/Results.ods"))
@@ -118,56 +117,31 @@ DT <- DT[!is.na(Συνολο)]
 
 ##  Compute Astropy data  ------------------------------------------------------
 source_python("~/BBand_LAP/parameters/sun/sun_vector_astropy_p3.py")
-source_python("~/BBand_LAP/parameters/sun/moon_vector_ephem.py")
-
 ## Call pythons Astropy for sun distance calculation
-
-moon_elevation <- function(date, lat = lat, lon = lon, height = alt) {
-  res <- moon_sky_parameters(date, lat = lat, lon = lon, height = alt)
-  return(res$moon$elevation)
-}
-
-moon_phase <- function(date, lat = lat, lon = lon, height = alt) {
-  res <- moon_sky_parameters(date, lat = lat, lon = lon, height = alt)
-  return(res$moon$phase)
+sunR_astropy <- function(date) {
+  cbind(t(sun_vector(date, lat = lat, lon = lon, height = alt)), date)
 }
 
 
 
-DT[, Sun_Elevation := mapply(function(dt, lt, ln, ht) {
+DT[, SunElevation := mapply(function(dt, lt, ln, ht) {
   round(sun_vector(dt, lat = lt, lon = ln, height = ht)[[2]], 2)
 }, Date_UTC, lat, lon, alt)]
 
-DT[, Moon_Elevation := mapply(function(dt, lt, ln, al) {
-  round(moon_elevation(dt, lat = lt, lon = ln, height = al), 2)
-}, Date_UTC, lat, lon, alt)]
 
-DT[, Moon_Phase_percent := mapply(function(dt, lt, ln, al) {
-  100 * round(moon_phase(dt, lat = lt, lon = ln, height = al), 3)
-}, Date_UTC, lat, lon, alt)]
+##  Calculate sun vector
+sss <- data.frame(t(sapply(DT$Date_UTC, sunR_astropy )))
 
-
-# res <- moon_sky_parameters(as.POSIXct(Sys.time(), tz = "UTC"), lat = lat, lon = lon, height = alt)
-
-# res$moon$phase
-# stop()
-
-
-
-# ##  Calculate sun vector
-# sss <- data.frame(t(sapply(DT$Date_UTC, sunR_astropy )))
-#
-# ##  reshape data
-# ADD <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
-#                   AsPy_Elevation = unlist(sss$X2),
-#                   AsPy_Dist      = unlist(sss$X3),
-#                   Date           = as.POSIXct(unlist(sss$X4),
-#                                               origin = "1970-01-01"))
-# DT$SunElevation_Pir <- round(ADD$AsPy_Elevation, 2)
-
+##  reshape data
+ADD <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
+                  AsPy_Elevation = unlist(sss$X2),
+                  AsPy_Dist      = unlist(sss$X3),
+                  Date           = as.POSIXct(unlist(sss$X4),
+                                              origin = "1970-01-01"))
+DT$SunElevation_Pir <- round(ADD$AsPy_Elevation, 2)
 setorder(DT, KM)
 
-TT <- DT[, .(KM, `Σημείο Ελέγχου`, New_hhmm, Date_EET, Sun_Elevation, Moon_Elevation, Moon_Phase_percent, alt)]
+TT <- DT[, .(KM, `Σημείο Ελέγχου`, New_hhmm, Date_EET, SunElevation, alt)]
 setorder(TT, KM)
 
 #+ echo=FALSE, include=TRUE

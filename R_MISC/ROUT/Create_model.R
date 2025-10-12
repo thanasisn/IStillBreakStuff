@@ -105,11 +105,10 @@ minutes_to_hhmm <- function(minutes) {
 ##  Compute Astropy data  ------------------------------------------------------
 py_require("astropy")
 source_python("~/BBand_LAP/parameters/sun/sun_vector_astropy_p3.py")
-
-# ## Call pythons Astropy for sun distance calculation
-# sunR_astropy <- function(date) {
-#   cbind(t(sun_vector(date, lat = lat, lon = lon, height = alt)), date)
-# }
+## Call pythons Astropy for sun distance calculation
+sunR_astropy <- function(date) {
+  cbind(t(sun_vector(date, lat = lat, lon = lon, height = alt)), date)
+}
 
 ## set gender
 DT <- DT |>  mutate(Gender = if_else(grepl("M",Κατ.), "Male", "Female"))
