@@ -66,6 +66,7 @@ library(reticulate, warn.conflicts = FALSE, quietly = TRUE)
 reticulate::py_config()
 # use_python("~/.pyenv/versions/3.13.2/bin/python3")
 py_require("astropy")
+py_require("ephem")
 
 ## Load my previous times
 DT <- data.table(read_ods("~/GISdata/GPX/Plans/ROUT/ROUT_2024/Results.ods"))
@@ -122,6 +123,11 @@ sunR_astropy <- function(date) {
   cbind(t(sun_vector(date, lat = lat, lon = lon, height = alt)), date)
 }
 
+source_python("~/BBand_LAP/parameters/sun/moon_vector_skyfield.py")
+
+moon_sky_parameters(DT$Date_UTC[1], lat = lat, lon = lon, height = alt)
+
+stop()
 
 
 DT[, SunElevation := mapply(function(dt, lt, ln, ht) {
