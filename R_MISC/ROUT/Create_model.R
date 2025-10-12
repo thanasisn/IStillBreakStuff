@@ -105,10 +105,23 @@ minutes_to_hhmm <- function(minutes) {
 ##  Compute Astropy data  ------------------------------------------------------
 py_require("astropy")
 source_python("~/BBand_LAP/parameters/sun/sun_vector_astropy_p3.py")
-## Call pythons Astropy for sun distance calculation
-sunR_astropy <- function(date) {
-  cbind(t(sun_vector(date, lat = lat, lon = lon, height = alt)), date)
+source_python("~/BBand_LAP/parameters/sun/moon_vector_ephem.py")
+
+moon_elevation <- function(date, lat = lat, lon = lon, height = alt) {
+  res <- moon_sky_parameters(date, lat = lat, lon = lon, height = height)
+  return(res$moon$elevation)
 }
+
+moon_phase <- function(date, lat = lat, lon = lon, height = alt) {
+  res <- moon_sky_parameters(date, lat = lat, lon = lon, height = height)
+  return(res$moon$phase)
+}
+
+
+# ## Call pythons Astropy for sun distance calculation
+# sunR_astropy <- function(date) {
+#   cbind(t(sun_vector(date, lat = lat, lon = lon, height = alt)), date)
+# }
 
 ## set gender
 DT <- DT |>  mutate(Gender = if_else(grepl("M",Κατ.), "Male", "Female"))
@@ -264,13 +277,21 @@ for (HH in hours) {
   tmp$Date_UTC <- START_UTC + tmp$Tnew * 60
 
   ## Calculate sun vector
-  tmp[, SunElevation := mapply(function(dt, lt, ln, ht) {
+  tmp[, Sun_Elevation := mapply(function(dt, lt, ln, ht) {
     round(sun_vector(dt, lat = lt, lon = ln, height = ht)[[2]], 2)
   }, Date_UTC, lat, lon, alt)]
 
+  tmp[, Moon_Elevation := mapply(function(dt, lt, ln, ht) {
+    round(moon_elevation(dt, lat = lt, lon = ln, height = ht), 2)
+  }, Date_UTC, lat, lon, alt)]
+
+  tmp[, Moon_Phase_percent := mapply(function(dt, lt, ln, al) {
+    100 * round(moon_phase(dt, lat = lt, lon = ln, height = al), 3)
+  }, Date_UTC, lat, lon, alt)]
+
   ## for export
-  pp <- tmp[, .(rn, km, Tnew_hhmm, Tpartial, Date, SunElevation)]
-  names(pp) <- c("CP", "km", "Total time", "Partial time", "Date", "Sun elevation angle")
+  pp <- tmp[, .(  rn,   km,     Tnew_hhmm,       Tpartial,   Date,         Sun_Elevation,         Moon_Elevation, Moon_Phase_percent)]
+  names(pp) <- c("CP", "km", "Total time", "Partial time", "Date", "Sun elevation angle", "Moon elevation angle", "Moon Phase %")
 
   rownames(pp) <- NULL
 
