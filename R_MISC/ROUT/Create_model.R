@@ -98,7 +98,8 @@ DT[, `K-0CP-0` := 0]
 minutes_to_hhmm <- function(minutes) {
   hours <- floor(minutes / 60)
   mins  <- round(minutes %% 60)
-
+  hours[mins == 60] <- hours[mins == 60] + 1
+  mins[ mins == 60]  <- 0
   sprintf("%02d:%02d", hours, mins)
 }
 
@@ -198,10 +199,10 @@ for (id in unique(DT$binid)) {
   TT$upper <- unique(tmp$upper)
 
   ## create model
-  TT[, Dx    := c(0, diff(km))]
-  TT[, Dt    := c(0, diff(Ttime))]
-  TT[, Pace  := Dt/Dx]
-  TT[, Speed := Dx/Dt]
+  TT[, Dx    :=  diff(c(0, km))]
+  TT[, Dt    :=  diff(c(0, Ttime))]
+  TT[, Pace  := round(Dt / Dx     , 2)]
+  TT[, Speed := round(Dx / (Dt/60), 2)]
   TT[, Class := as.character(id)]
 
   models <- rbind(models, TT)
@@ -270,7 +271,7 @@ for (HH in hours) {
   tmp$Tnew <- tmp$Ttime * (1 + change)
 
   tmp$Tnew_hhmm <- minutes_to_hhmm(tmp$Tnew)
-  tmp$Tpartial  <- minutes_to_hhmm(c(0,diff(tmp$Tnew)))
+  tmp$Tpartial  <- minutes_to_hhmm(c(0, diff(tmp$Tnew) ))
   tmp           <- tmp[-1,]
 
   tmp$Date     <- START     + tmp$Tnew * 60
@@ -290,8 +291,8 @@ for (HH in hours) {
   }, Date_UTC, lat, lon, alt)]
 
   ## for export
-  pp <- tmp[, .(  rn,   km,     Tnew_hhmm,       Tpartial,   Date,         Sun_Elevation,         Moon_Elevation, Moon_Phase_percent)]
-  names(pp) <- c("CP", "km", "Total time", "Partial time", "Date", "Sun elevation angle", "Moon elevation angle", "Moon Phase %")
+  pp <- tmp[, .(  rn,   km,     Tnew_hhmm,       Tpartial,   Pace,   Speed,   Date,         Sun_Elevation,         Moon_Elevation, Moon_Phase_percent)]
+  names(pp) <- c("CP", "km", "Total time", "Partial time", "Pace", "Speed", "Date", "Sun elevation angle", "Moon elevation angle", "Moon Phase %")
 
   rownames(pp) <- NULL
 
@@ -301,7 +302,7 @@ for (HH in hours) {
   ## create a table as an image
   ttl <- paste("ROUT finishing target:", HH, "hours, model class:", tmp[, unique(Class)])
 
-  png(paste0("C_", tmp[, unique(Class)], "_H_", HH, ".png"), height = 25 * nrow(pp), width = 95 * ncol(pp))
+  png(paste0("C_", tmp[, unique(Class)], "_H_", HH, ".png"), height = 25 * nrow(pp), width = 90 * ncol(pp))
 
   t1      <- tableGrob(pp, rows = NULL)
   title   <- textGrob(ttl, gp = gpar(fontsize = 20))

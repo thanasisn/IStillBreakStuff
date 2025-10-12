@@ -62,6 +62,9 @@ knitr::opts_chunk$set(fig.pos    = 'h!'    )
 library(readODS)
 library(data.table)
 library(reticulate, warn.conflicts = FALSE, quietly = TRUE)
+require(grid,       quietly = TRUE, warn.conflicts = FALSE)
+require(gridExtra,  quietly = TRUE, warn.conflicts = FALSE)
+require(gtable,     quietly = TRUE, warn.conflicts = FALSE)
 
 reticulate::py_config()
 # use_python("~/.pyenv/versions/3.13.2/bin/python3")
@@ -87,6 +90,8 @@ START_UTC <- as.POSIXct(START, tz = "UTC")
 ## Set target time
 target <- 43 * 60
 
+181.3 / 43
+
 ## prepare data
 DT$Συνολο_minutes <- as.numeric(DT$Συνολο) * 60
 
@@ -99,7 +104,8 @@ DT$new <- DT$Συνολο_minutes * (1 + change)
 minutes_to_hhmm <- function(minutes) {
   hours <- floor(minutes / 60)
   mins  <- round(minutes %% 60)
-  hours[mins == 60] <- hours[mins == 60]+1
+  hours[mins == 60] <- hours[mins == 60] + 1
+  mins[ mins == 60]  <- 0
   sprintf("%02d:%02d", hours, mins)
 }
 
@@ -115,7 +121,13 @@ DT$Date_EET <- DT$Date_EET + DT$new * 60
 DT$Date_UTC <- DT$Date_UTC + DT$new * 60
 
 DT <- DT[!is.na(Συνολο)]
+setorder(DT, KM)
 
+DT$Dx <- diff(c(0, DT$KM))
+DT$Dt <- diff(c(0, DT$new))
+
+DT[, Pace  := round(Dt/Dx, 2)]
+DT[, Speed := round(Dx/(Dt/60), 2)]
 
 ##  Compute Astropy data  ------------------------------------------------------
 source_python("~/BBand_LAP/parameters/sun/sun_vector_astropy_p3.py")
@@ -166,7 +178,7 @@ DT[, Moon_Phase_percent := mapply(function(dt, lt, ln, al) {
 
 setorder(DT, KM)
 
-TT <- DT[, .(KM, `Σημείο Ελέγχου`, New_hhmm, Date_EET, Sun_Elevation, Moon_Elevation, Moon_Phase_percent, alt)]
+TT <- DT[, .(KM, `Σημείο Ελέγχου`, New_hhmm, Speed, Pace, Date_EET, Sun_Elevation, Moon_Elevation, Moon_Phase_percent, alt)]
 setorder(TT, KM)
 
 #+ echo=FALSE, include=TRUE
@@ -182,3 +194,28 @@ print( TT )
 pander::pander(TT, split.table = Inf)
 
 
+
+
+
+## create a table as an image
+ttl <- paste("ROUT finishing target:", target/60, "hours")
+
+png(paste0("P_H_", target/60, ".png"), height = 25 * nrow(TT), width = 90 * ncol(TT))
+
+t1      <- tableGrob(TT, rows = NULL)
+title   <- textGrob(ttl, gp = gpar(fontsize = 20))
+padding <- unit(5,"mm")
+
+table <- gtable_add_rows(
+  t1,
+  heights = grobHeight(title) + padding,
+  pos = 0)
+table <- gtable_add_grob(
+  table,
+  title,
+  1, 1, 1, ncol(table))
+
+grid.newpage()
+grid.draw(table)
+
+dev.off()
