@@ -118,36 +118,56 @@ DT <- DT[!is.na(Συνολο)]
 
 ##  Compute Astropy data  ------------------------------------------------------
 source_python("~/BBand_LAP/parameters/sun/sun_vector_astropy_p3.py")
+source_python("~/BBand_LAP/parameters/sun/moon_vector_ephem.py")
+
 ## Call pythons Astropy for sun distance calculation
-sunR_astropy <- function(date) {
-  cbind(t(sun_vector(date, lat = lat, lon = lon, height = alt)), date)
+
+moon_elevation <- function(date, lat = lat, lon = lon, height = alt) {
+  res <- moon_sky_parameters(date, lat = lat, lon = lon, height = alt)
+  return(res$moon$elevation)
 }
 
-source_python("~/BBand_LAP/parameters/sun/moon_vector_skyfield.py")
+moon_phase <- function(date, lat = lat, lon = lon, height = alt) {
+  res <- moon_sky_parameters(date, lat = lat, lon = lon, height = alt)
+  return(res$moon$phase)
+}
 
-moon_sky_parameters(DT$Date_UTC[1], lat = lat, lon = lon, height = alt)
-
-stop()
 
 
-DT[, SunElevation := mapply(function(dt, lt, ln, ht) {
+DT[, Sun_Elevation := mapply(function(dt, lt, ln, ht) {
   round(sun_vector(dt, lat = lt, lon = ln, height = ht)[[2]], 2)
 }, Date_UTC, lat, lon, alt)]
 
+DT[, Moon_Elevation := mapply(function(dt, lt, ln, al) {
+  round(moon_elevation(dt, lat = lt, lon = ln, height = al), 2)
+}, Date_UTC, lat, lon, alt)]
 
-##  Calculate sun vector
-sss <- data.frame(t(sapply(DT$Date_UTC, sunR_astropy )))
+DT[, Moon_Phase_percent := mapply(function(dt, lt, ln, al) {
+  100 * round(moon_phase(dt, lat = lt, lon = ln, height = al), 3)
+}, Date_UTC, lat, lon, alt)]
 
-##  reshape data
-ADD <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
-                  AsPy_Elevation = unlist(sss$X2),
-                  AsPy_Dist      = unlist(sss$X3),
-                  Date           = as.POSIXct(unlist(sss$X4),
-                                              origin = "1970-01-01"))
-DT$SunElevation_Pir <- round(ADD$AsPy_Elevation, 2)
+
+# res <- moon_sky_parameters(as.POSIXct(Sys.time(), tz = "UTC"), lat = lat, lon = lon, height = alt)
+
+# res$moon$phase
+# stop()
+
+
+
+# ##  Calculate sun vector
+# sss <- data.frame(t(sapply(DT$Date_UTC, sunR_astropy )))
+#
+# ##  reshape data
+# ADD <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
+#                   AsPy_Elevation = unlist(sss$X2),
+#                   AsPy_Dist      = unlist(sss$X3),
+#                   Date           = as.POSIXct(unlist(sss$X4),
+#                                               origin = "1970-01-01"))
+# DT$SunElevation_Pir <- round(ADD$AsPy_Elevation, 2)
+
 setorder(DT, KM)
 
-TT <- DT[, .(KM, `Σημείο Ελέγχου`, New_hhmm, Date_EET, SunElevation, alt)]
+TT <- DT[, .(KM, `Σημείο Ελέγχου`, New_hhmm, Date_EET, Sun_Elevation, Moon_Elevation, Moon_Phase_percent, alt)]
 setorder(TT, KM)
 
 #+ echo=FALSE, include=TRUE
