@@ -110,6 +110,7 @@ minutes_to_hhmm <- function(minutes) {
 
 ##  Compute Astropy data  ------------------------------------------------------
 py_require("astropy")
+py_require("ephem")
 source_python("~/BBand_LAP/parameters/sun/sun_vector_astropy_p3.py")
 source_python("~/BBand_LAP/parameters/sun/moon_vector_ephem.py")
 
@@ -255,7 +256,6 @@ ggplot(models,
 #' ## Create table for each hour within it's class
 #'
 #+ echo=F, include=PLANS, fig.width=6, fig.height=6, results="asis", warning=F
-## create multiple models
 
 if (PLANS) {
 
@@ -421,9 +421,66 @@ pander(summary(gather[, 100 * (Tnew - ActTime) / ActTime]))
 hist(gather[, 100 * (Tnew - ActTime) / ActTime], breaks = 20,
      main = "Distribution of % difference for all CP")
 
-## TODO by CP
 
-## TODO by Class
+#'
+#' ### Departures by CP
+#'
+#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
+for (cp in unique(gather$rn)) {
+  tmp <- gather[rn == cp]
+  if (nrow(tmp) <= 4) next()
+
+  cat("\\newpage", "\n\n")
+  cat("#### ", cp, "\n\n")
+
+  pander(summary(tmp[, 100 * (Tnew - ActTime) / ActTime]))
+
+  hist(tmp[, 100 * (Tnew - ActTime) / ActTime], breaks = 20,
+     main = paste("Distribution of % difference for", cp))
+}
+
+
+#'
+#' ### Departures by class
+#'
+#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
+for (cl in unique(gather$Class)) {
+  tmp <- gather[Class == cl]
+  if (nrow(tmp) <= 4) next()
+
+  cat("\\newpage", "\n\n")
+  cat("#### ", cl, "\n\n")
+
+  pander(summary(tmp[, 100 * (Tnew - ActTime) / ActTime]))
+
+  hist(tmp[, 100 * (Tnew - ActTime) / ActTime], breaks = 20,
+     main = paste("Distribution of % difference for class", cl))
+}
+
+#'
+#' ### Departures by athlete
+#'
+#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
+for (al in unique(gather$Name)) {
+  tmp <- gather[Name == al]
+  if (nrow(tmp) <= 4) next()
+
+  cat("\\newpage", "\n\n")
+  cat("#### ", al, "\n\n")
+
+  pander(summary(tmp[, 100 * (Tnew - ActTime) / ActTime]))
+
+  cat("\n\n")
+
+  # hist(tmp[, 100 * (Tnew - ActTime) / ActTime], breaks = 20,
+  #    main = paste("Distribution of % difference for", al))
+
+  cat("\n\n")
+
+  plot(tmp[, Tnew - ActTime],
+       xlab = "CP", main = al)
+  cat("\n\n")
+}
 
 
 #+ include=F, echo=F, results="asis"
