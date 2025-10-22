@@ -1,6 +1,6 @@
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:  "ROUT estimation"
+#' title:  "ROUT estimation of my times"
 #' date:   "`r strftime(Sys.time(), '%F %R %Z', tz= 'Europe/Athens')`"
 #' author: ""
 #'
@@ -89,8 +89,6 @@ START_UTC <- as.POSIXct(START, tz = "UTC")
 
 ## Set target time
 target <- 43 * 60
-
-181.3 / 43
 
 ## prepare data
 DT$Συνολο_minutes <- as.numeric(DT$Συνολο) * 60
@@ -192,7 +190,6 @@ print( TT )
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 
 pander::pander(TT, split.table = Inf)
-
 
 
 

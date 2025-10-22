@@ -75,7 +75,12 @@ suppressMessages({
 START     <- as.POSIXct("2025-10-17 00:00", tz = "EEST")
 START_UTC <- as.POSIXct(START, tz = "UTC")
 
-dtk_fl <- "~/Documents/Running/ROUT results/ROUT_2024.ods"
+base_year <- 2024
+
+PLANS  <- FALSE
+
+dtk_fl <- paste0("~/Documents/Running/ROUT results/ROUT_", base_year, ".ods")
+mdl_fl <- paste0("~/Documents/Running/ROUT results/ROUT_models_", base_year, ".Rds")
 cp_fl  <- "~/CODE/R_MISC/ROUT/CP_cords.ods"
 
 ## get locations
@@ -241,87 +246,168 @@ ggplot(models,
   geom_line() +
   theme_bw()
 
+## Store models
+
 
 #' \newpage
 #' \FloatBarrier
 #'
 #' ## Create table for each hour within it's class
 #'
-#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=F, include=PLANS, fig.width=6, fig.height=6, results="asis", warning=F
 ## create multiple models
 
-hours <- (min(models$lower) %/% 60):(max(models$upper) %/% 60)
+if (PLANS) {
 
-for (HH in hours) {
-  MM  <- HH * 60
-  tmp <- models[ MM < upper & MM > lower]
-  if (nrow(tmp) == 0) next
+  hours <- (min(models$lower) %/% 60):(max(models$upper) %/% 60)
 
-  cat("\\newpage", "\n\n")
-  cat("### Hours", HH, "model class", tmp[, unique(Class)], "\n\n")
+  for (HH in hours) {
+    MM  <- HH * 60
+    tmp <- models[ MM < upper & MM > lower]
+    if (nrow(tmp) == 0) next
 
-  setorder(tmp, Ttime)
+    cat("\\newpage", "\n\n")
+    cat("### Hours", HH, "model class", tmp[, unique(Class)], "\n\n")
 
-  last(tmp$Ttime)
+    setorder(tmp, Ttime)
 
-  ## compute change from previous
-  change <- 1 - last(tmp$Ttime) / MM
+    last(tmp$Ttime)
 
-  ## compute scaled times
-  tmp$Tnew <- tmp$Ttime * (1 + change)
+    ## compute change from previous
+    change <- 1 - last(tmp$Ttime) / MM
 
-  tmp$Tnew_hhmm <- minutes_to_hhmm(tmp$Tnew)
-  tmp$Tpartial  <- minutes_to_hhmm(c(0, diff(tmp$Tnew) ))
-  tmp           <- tmp[-1,]
+    ## compute scaled times
+    tmp$Tnew <- tmp$Ttime * (1 + change)
 
-  tmp$Date     <- START     + tmp$Tnew * 60
-  tmp$Date_UTC <- START_UTC + tmp$Tnew * 60
+    tmp$Tnew_hhmm <- minutes_to_hhmm(tmp$Tnew)
+    tmp$Tpartial  <- minutes_to_hhmm(c(0, diff(tmp$Tnew) ))
+    tmp           <- tmp[-1,]
 
-  ## Calculate sun vector
-  tmp[, Sun_Elevation := mapply(function(dt, lt, ln, ht) {
-    round(sun_vector(dt, lat = lt, lon = ln, height = ht)[[2]], 2)
-  }, Date_UTC, lat, lon, alt)]
+    tmp$Date     <- START     + tmp$Tnew * 60
+    tmp$Date_UTC <- START_UTC + tmp$Tnew * 60
 
-  tmp[, Moon_Elevation := mapply(function(dt, lt, ln, ht) {
-    round(moon_elevation(dt, lat = lt, lon = ln, height = ht), 2)
-  }, Date_UTC, lat, lon, alt)]
+    ## Calculate sun vector
+    tmp[, Sun_Elevation := mapply(function(dt, lt, ln, ht) {
+      round(sun_vector(dt, lat = lt, lon = ln, height = ht)[[2]], 2)
+    }, Date_UTC, lat, lon, alt)]
 
-  tmp[, Moon_Phase_percent := mapply(function(dt, lt, ln, al) {
-    100 * round(moon_phase(dt, lat = lt, lon = ln, height = al), 3)
-  }, Date_UTC, lat, lon, alt)]
+    tmp[, Moon_Elevation := mapply(function(dt, lt, ln, ht) {
+      round(moon_elevation(dt, lat = lt, lon = ln, height = ht), 2)
+    }, Date_UTC, lat, lon, alt)]
 
-  ## for export
-  pp <- tmp[, .(  rn,   km,     Tnew_hhmm,       Tpartial,   Pace,   Speed,   Date,         Sun_Elevation,         Moon_Elevation, Moon_Phase_percent)]
-  names(pp) <- c("CP", "km", "Total time", "Partial time", "Pace", "Speed", "Date", "Sun elevation angle", "Moon elevation angle", "Moon Phase %")
+    tmp[, Moon_Phase_percent := mapply(function(dt, lt, ln, al) {
+      100 * round(moon_phase(dt, lat = lt, lon = ln, height = al), 3)
+    }, Date_UTC, lat, lon, alt)]
 
-  rownames(pp) <- NULL
+    ## for export
+    pp <- tmp[, .(  rn,   km,     Tnew_hhmm,       Tpartial,   Pace,   Speed,   Date,         Sun_Elevation,         Moon_Elevation, Moon_Phase_percent)]
+    names(pp) <- c("CP", "km", "Total time", "Partial time", "Pace", "Speed", "Date", "Sun elevation angle", "Moon elevation angle", "Moon Phase %")
 
-  ## for pdf
-  cat(pander(pp, split.table = Inf))
+    rownames(pp) <- NULL
 
-  ## create a table as an image
-  ttl <- paste("ROUT finishing target:", HH, "hours, model class:", tmp[, unique(Class)])
+    ## for pdf
+    cat(pander(pp, split.table = Inf))
 
-  png(paste0("C_", tmp[, unique(Class)], "_H_", HH, ".png"), height = 25 * nrow(pp), width = 90 * ncol(pp))
+    ## create a table as an image
+    ttl <- paste("ROUT finishing target:", HH, "hours, model class:", tmp[, unique(Class)])
 
-  t1      <- tableGrob(pp, rows = NULL)
-  title   <- textGrob(ttl, gp = gpar(fontsize = 20))
-  padding <- unit(5,"mm")
+    png(paste0("C_", tmp[, unique(Class)], "_H_", HH, ".png"), height = 25 * nrow(pp), width = 90 * ncol(pp))
 
-  table <- gtable_add_rows(
-    t1,
-    heights = grobHeight(title) + padding,
-    pos = 0)
-  table <- gtable_add_grob(
-    table,
-    title,
-    1, 1, 1, ncol(table))
+    t1      <- tableGrob(pp, rows = NULL)
+    title   <- textGrob(ttl, gp = gpar(fontsize = 20))
+    padding <- unit(5,"mm")
 
-  grid.newpage()
-  grid.draw(table)
+    table <- gtable_add_rows(
+      t1,
+      heights = grobHeight(title) + padding,
+      pos = 0)
+    table <- gtable_add_grob(
+      table,
+      title,
+      1, 1, 1, ncol(table))
 
-  dev.off()
+    grid.newpage()
+    grid.draw(table)
+
+    dev.off()
+  }
 }
+
+res_fl <- paste0("~/Documents/Running/ROUT results/ROUT_", base_year+1, ".ods")
+if (file.exists(res_fl)) {
+  VALIDATE <- TRUE
+  RS <- data.table(read_ods(res_fl))
+  RS <- RS[!is.na(`K-181Χαϊντού`)]
+} else {
+  VALIDATE <- FALSE
+}
+
+
+#' \newpage
+#' \FloatBarrier
+#'
+#' ## Evaluate results
+#'
+#' For all finishers estimate pass based on finishing times, and ...
+#'
+#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
+## create multiple models
+
+if (VALIDATE) {
+
+  gather <- data.table()
+  for (al in 1:nrow(RS)) {
+    ll  <- RS[al]
+    MM  <- ll$`K-181Χαϊντού`
+    HH  <- MM / 60
+    tmp <- models[ MM < upper & MM > lower]
+    if (nrow(tmp) == 0) next
+
+    # cat("\\newpage", "\n\n")
+    # cat("### Hours", HH, "model class", tmp[, unique(Class)], "\n\n")
+
+    setorder(tmp, Ttime)
+
+    ## compute change from previous
+    change <- 1 - last(tmp$Ttime) / MM
+
+    ## compute scaled times
+    tmp$Tnew <- tmp$Ttime * (1 + change)
+
+    tmp$Tnew_hhmm <- minutes_to_hhmm(tmp$Tnew)
+    tmp$Tpartial  <- minutes_to_hhmm(c(0, diff(tmp$Tnew) ))
+    tmp           <- tmp[-1,]
+
+    # tmp$Date     <- START     + tmp$Tnew * 60
+    # tmp$Date_UTC <- START_UTC + tmp$Tnew * 60
+
+    pp <- ll |>
+      select(contains("K-")) |>
+      t()
+
+    tt <- data.table(
+      rn      = rownames(pp),
+      ActTime = pp[,1])
+
+    tmps <- merge(tmp, tt)
+    setorder(tmps, km)
+
+    gather <- rbind(
+      gather,
+      tmps[, .(rn, Tnew, ActTime, Name = ll$Αθλητής, Class)]
+    )
+  }
+}
+
+## remove total time as it is constructed equal
+
+gather <- gather[rn != "K-181Χαϊντού"]
+
+summary(gather[, 100 * (Tnew - ActTime) / ActTime])
+
+hist(gather[, 100 * (Tnew - ActTime) / ActTime], breaks = 20)
+
+
 
 
 #+ include=F, echo=F, results="asis"
