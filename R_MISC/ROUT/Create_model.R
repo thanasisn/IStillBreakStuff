@@ -348,10 +348,10 @@ if (file.exists(res_fl)) {
 #'
 #' ## Evaluate results
 #'
-#' For all finishers estimate pass based on finishing times, and ...
+#' For all finishers estimate pass times from each CP, using the appropriate
+#' model based on individual finishing time.
 #'
 #+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
-## create multiple models
 
 if (VALIDATE) {
 
@@ -399,15 +399,31 @@ if (VALIDATE) {
   }
 }
 
-## remove total time as it is constructed equal
+#'
+#' We excluded finishing time from the statistical evaluation, as the modelled
+#' finishing time is equal.
+#'
+#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
 
 gather <- gather[rn != "K-181Χαϊντού"]
 
-summary(gather[, 100 * (Tnew - ActTime) / ActTime])
+#'
+#' ### Summary of % difference for all CP
+#'
+#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
+pander(summary(gather[, 100 * (Tnew - ActTime) / ActTime]))
 
-hist(gather[, 100 * (Tnew - ActTime) / ActTime], breaks = 20)
 
+#'
+#' ### Distribution of % difference for all CP
+#'
+#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
+hist(gather[, 100 * (Tnew - ActTime) / ActTime], breaks = 20,
+     main = "Distribution of % difference for all CP")
 
+## TODO by CP
+
+## TODO by Class
 
 
 #+ include=F, echo=F, results="asis"
