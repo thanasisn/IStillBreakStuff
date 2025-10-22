@@ -1,3 +1,4 @@
+
 library(XML)
 library(httr)
 library(chron)
@@ -6,6 +7,7 @@ library(readODS)
 
 years <- 2015:2025
 year  <- 2024
+year  <- 2025
 
 theurl <- paste0("http://www.rout.gr/index.php?name=Rout&file=results&year=", year)
 #theurl <- "http://www.rout.gr/index.php?name=Rout&file=results_printer&year=2011&order=final_a&race=rout"
@@ -43,7 +45,6 @@ names(all.data2) <- c(names3, names4)
 all.data2[all.data2 == ""] <- NA
 
 all.data2 <- janitor::remove_empty(all.data2, "cols")
-
 
 hh.mm_to_minutes <- function(x) {
   as.numeric(x) * 60
@@ -88,7 +89,7 @@ hh.mm.ss_to_minutes <- function(time_string) {
   }, USE.NAMES = FALSE)
 }
 
-## conver itermediate times
+## convert intermediate times
 all.data2 <- all.data2 |>
   mutate_at(vars(contains("CP-")), hh.mm_to_minutes)
 
@@ -97,8 +98,5 @@ all.data2 <- all.data2 |>
 
 print(all.data2)
 
-
 ## export data
 write_ods(all.data2, paste0("~/Documents/Running/ROUT results/ROUT_", year, ".ods"))
-
-#save(all.data2,file="results.Rdata")
