@@ -39,7 +39,7 @@
 #'   - \setmainfont[Scale=1.1]{Linux Libertine O}
 #' ---
 
-#+ echo=F, include=F
+#+ echo=F, include=F, warning=F, message=F
 rm(list = (ls()[ls() != ""]))
 Script.Name <- "~/CODE/R_MISC/ROUT/Create_model.R"
 Sys.setenv(TZ = "UTC")
@@ -146,7 +146,7 @@ bbrakes <- 5
 
 #' \FloatBarrier
 #'
-#' ## Create model with the results of `r base_year`
+#' # Create models with the results of `r base_year`
 #'
 #' Assume there are `r bbrakes` class of athletes.
 #'
@@ -203,8 +203,8 @@ for (id in unique(DT$binid)) {
   TT$upper <- unique(tmp$upper)
 
   ## create model
-  TT[, Dx    :=  diff(c(0, km))]
-  TT[, Dt    :=  diff(c(0, Ttime))]
+  TT[, Dx    := diff(c(0, km))]
+  TT[, Dt    := diff(c(0, Ttime))]
   TT[, Pace  := round(Dt / Dx     , 2)]
   TT[, Speed := round(Dx / (Dt/60), 2)]
   TT[, Class := as.character(id)]
@@ -479,8 +479,8 @@ for (al in unique(gather$Name)) {
 
   cat(" \n \n")
 
-  hist(tmp[, 100 * (Tnew - ActTime) / ActTime], breaks = 20,
-     main = paste("Distribution of % difference for", al))
+  # hist(tmp[, 100 * (Tnew - ActTime) / ActTime], breaks = 20,
+  #    main = paste("Distribution of % difference for", al))
 
   cat(" \n \n")
 
