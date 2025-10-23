@@ -1,6 +1,6 @@
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:  "ROUT model for all"
+#' title:  "A data driven prediction, based on the finishing times of 2024 ROUT"
 #' date:   "`r strftime(Sys.time(), '%F', tz= 'Europe/Athens')`"
 #' author: ""
 #'
@@ -13,8 +13,8 @@
 #'     latex_engine:     xelatex
 #'     toc:              yes
 #'     toc_depth:        4
-#'     fig_width:        8
-#'     fig_height:       5
+#'     fig_width:        6
+#'     fig_height:       4
 #'   html_document:
 #'     toc:             true
 #'     number_sections: false
@@ -124,7 +124,6 @@ moon_phase <- function(date, lat = lat, lon = lon, height = alt) {
   return(res$moon$phase)
 }
 
-
 # ## Call pythons Astropy for sun distance calculation
 # sunR_astropy <- function(date) {
 #   cbind(t(sun_vector(date, lat = lat, lon = lon, height = alt)), date)
@@ -135,28 +134,27 @@ DT <- DT |>  mutate(Gender = if_else(grepl("M",Κατ.), "Male", "Female"))
 
 #' \FloatBarrier
 #'
-#' # **A data driven prediction, based on the finishing times of 2024 ROUT.**
-#'
 #' **Source code: [`github.com/thanasisn/IStillBreakStuff/blob/main/R_MISC/ROUT/Create_model.R`](https://github.com/thanasisn/IStillBreakStuff/blob/main/R_MISC/ROUT/Create_model.R)**
 #'
-#' This is just an estimation, not a actual prediction tool.
+#' This is just an statistical estimation, not a actual prediction tool.
 #'
-#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=F, include=T, results="asis", warning=F
 
 
 ## symmetric splits
 bbrakes <- 5
 
 #' \FloatBarrier
-#' \newpage
 #'
-#' ## Assume there are `r bbrakes` class of athletes.
+#' ## Create model with the results of `r base_year`
+#'
+#' Assume there are `r bbrakes` class of athletes.
 #'
 #' We split finishing times in equal bins, and ignore differences in age or gender.
 #'
 #' Sun angles are computed at the actual location of each check point.
 #'
-#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=F, include=T, results="asis", warning=F
 
 hist(DT$`K-181Χαϊντού`,
      breaks = seq(min(DT$`K-181Χαϊντού`), max(DT$`K-181Χαϊντού`), l = bbrakes + 1),
@@ -178,11 +176,11 @@ DT$upper <- as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", DT$bin) )
 
 #' \FloatBarrier
 #'
-#' ## Model each group
+#' # Model each class
 #'
 #' Get a representative value for each part and variable, and create a pace/speed for each group
 #'
-#+ echo=T, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=T, include=T, results="asis", warning=F
 
 ## create model for each class
 models <- data.table()
@@ -220,11 +218,10 @@ CP[, km := NULL]
 models <- merge(models, CP, by.x = "rn", by.y = "rn" )
 
 #' \FloatBarrier
-#' \newpage
 #'
-#' ## Use each group to get relative times within group range
+#' # Use each class to get relative times within each class finishing times
 #'
-#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=F, include=T, results="asis", warning=F
 ## create multiple models
 
 models[, TtimeH := Ttime / 60 ]
@@ -250,12 +247,13 @@ ggplot(models,
 ## Store models
 
 
-#' \newpage
 #' \FloatBarrier
 #'
-#' ## Create table for each hour within it's class
+#' # Create table for each hour within it's class
 #'
-#+ echo=F, include=PLANS, fig.width=6, fig.height=6, results="asis", warning=F
+#' Predict passes for a range of finishing time. This was posted online.
+#'
+#+ echo=F, include=PLANS, results="asis", warning=F
 
 if (PLANS) {
 
@@ -343,13 +341,12 @@ if (file.exists(res_fl)) {
 }
 
 
-#' \newpage
 #' \FloatBarrier
 #'
-#' ## Evaluate results
+#' # Evaluate models against `r base_year + 1` results.
 #'
 #' For all finishers estimate pass times from each CP, using the appropriate
-#' model based on individual finishing time.
+#' class model. Prediction are based on individual finishing time.
 #'
 #+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
 
@@ -394,7 +391,7 @@ if (VALIDATE) {
 
     gather <- rbind(
       gather,
-      tmps[, .(rn, Tnew, ActTime, Name = ll$Αθλητής, Class)]
+      tmps[, .(rn, km, Tnew, ActTime, Name = ll$Αθλητής, Class)]
     )
   }
 }
@@ -403,32 +400,34 @@ if (VALIDATE) {
 #' We excluded finishing time from the statistical evaluation, as the modelled
 #' finishing time is equal.
 #'
-#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=F, include=VALIDATE, results="asis", warning=F
 
 gather <- gather[rn != "K-181Χαϊντού"]
 
 #'
-#' ### Summary of % difference for all CP
+#' ## Summary of % difference for all CP
 #'
-#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=F, include=VALIDATE, results="asis", warning=F
 pander(summary(gather[, 100 * (Tnew - ActTime) / ActTime]))
 
 
 #'
-#' ### Distribution of % difference for all CP
+#' ## Distribution of % difference for all CP and classes
 #'
-#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=F, include=VALIDATE, results="asis", warning=F
 hist(gather[, 100 * (Tnew - ActTime) / ActTime], breaks = 20,
      main = "Distribution of % difference for all CP")
 
 
 #'
-#' ### Departures by CP
+#' ## Departures by CP
 #'
-#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
+#' Per cent difference from the modelled time for all classes, by each check point.
+#'
+#+ echo=F, include=VALIDATE, results="asis", warning=F
 for (cp in unique(gather$rn)) {
   tmp <- gather[rn == cp]
-  if (nrow(tmp) <= 4) next()
+  if (nrow(tmp[!is.na(ActTime) & !is.na(Tnew)]) <= 4) next()
 
   cat("\\newpage", "\n\n")
   cat("#### ", cp, "\n\n")
@@ -441,12 +440,14 @@ for (cp in unique(gather$rn)) {
 
 
 #'
-#' ### Departures by class
+#' ## Departures by class
 #'
-#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
+#' Per cent difference from the modelled time for all check point, fro each class.
+#'
+#+ echo=F, include=VALIDATE, results="asis", warning=F
 for (cl in unique(gather$Class)) {
   tmp <- gather[Class == cl]
-  if (nrow(tmp) <= 4) next()
+  if (nrow(tmp[!is.na(ActTime) & !is.na(Tnew)]) <= 4) next()
 
   cat("\\newpage", "\n\n")
   cat("#### ", cl, "\n\n")
@@ -458,28 +459,38 @@ for (cl in unique(gather$Class)) {
 }
 
 #'
-#' ### Departures by athlete
+#' ## Departures by athlete
 #'
-#+ echo=F, include=VALIDATE, fig.width=6, fig.height=6, results="asis", warning=F
+#' Actual pass time minus predicted passes.
+#'
+#' Positive values mean that actual time is longer than expected, and the athlete slower than expected.
+#'
+#+ echo=F, include=VALIDATE, results="asis", warning=F
 for (al in unique(gather$Name)) {
   tmp <- gather[Name == al]
   if (nrow(tmp) <= 4) next()
 
   cat("\\newpage", "\n\n")
-  cat("#### ", al, "\n\n")
+
+  cat(" \n \n")
+  cat("#### ", al, "\n \n")
 
   pander(summary(tmp[, 100 * (Tnew - ActTime) / ActTime]))
 
-  cat("\n\n")
+  cat(" \n \n")
 
-  # hist(tmp[, 100 * (Tnew - ActTime) / ActTime], breaks = 20,
-  #    main = paste("Distribution of % difference for", al))
+  hist(tmp[, 100 * (Tnew - ActTime) / ActTime], breaks = 20,
+     main = paste("Distribution of % difference for", al))
 
-  cat("\n\n")
+  cat(" \n \n")
 
-  plot(tmp[, Tnew - ActTime],
-       xlab = "CP", main = al)
-  cat("\n\n")
+  plot(tmp[, ActTime - Tnew, km ],
+       xlab = "",
+       ylab = "Diff minutes",
+       xaxt = "n",
+       main = al)
+  axis(1, at = tmp$km, labels = tmp$rn, las = 2)
+  cat(" \n \n")
 }
 
 
