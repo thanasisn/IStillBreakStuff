@@ -55,7 +55,14 @@ knitr::opts_chunk$set(fig.align  = "center" )
 knitr::opts_chunk$set(fig.cap    = " - empty caption - " )
 knitr::opts_chunk$set(cache      =  FALSE   )  ## !! breaks calculations
 knitr::opts_chunk$set(fig.pos    = 'h!'    )
-
+knitr::opts_chunk$set(tidy = TRUE,
+                      tidy.opts = list(
+                        indent       = 4,
+                        blank        = FALSE,
+                        comment      = FALSE,
+                        args.newline = TRUE,
+                        arrow        = TRUE)
+)
 
 ## __  Set environment ---------------------------------------------------------
 suppressMessages({
