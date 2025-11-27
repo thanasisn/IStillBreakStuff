@@ -8,6 +8,7 @@ tic <- Sys.time()
 
 ## __  Set environment ---------------------------------------------------------
 require(data.table, quietly = TRUE, warn.conflicts = FALSE)
+require(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
 require(httr,       quietly = TRUE, warn.conflicts = FALSE)
 
 source("/home/athan/Formal/KEYS/nanopool")
@@ -148,6 +149,26 @@ try({
   }
   STATUS <- unique(STATUS)
   saveRDS(STATUS, filest)
+  STATUS <- data.table(
+    LastShare = as.POSIXct(unlist(STATUS$lastShare), origin = "1970-01-01"),
+    Rating    = unlist(STATUS$rating),
+    ID        = unlist(STATUS$id),
+    UID       = unlist(STATUS$uid),
+    Date      = unlist(STATUS$Date),
+    Hashrate  = unlist(STATUS$hashrate)
+  )
+  exp <- STATUS |>
+    group_by(UID) |>
+    filter(Date == max(Date)) |>
+    data.frame() |>
+    select(ID, Hashrate, Rating, LastShare)
+  # exp           <- data.frame(WORK[Date == max(Date), .(ID, Hashrate, Rating, LastShare)])
+  exp$LastShare <- as.POSIXct(exp$LastShare, tz = "Europe/Athens")
+  exp           <- data.frame(exp)
+  exp[]         <- lapply(exp, as.character)
+  exp           <- rbind(colnames(exp), exp)
+  gdata::write.fwf(x = exp, colnames = FALSE,
+                   file = "/dev/shm/nanopool.status")
 })
 
 try({
