@@ -110,7 +110,6 @@ try({
   saveRDS(STATUS, filest)
 })
 
-
 try({
   filest <- paste0(storagePre, "Hashratechart.Rds")
   read_data(                   "hashratechart")
@@ -123,7 +122,6 @@ try({
   STATUS <- unique(STATUS)
   saveRDS(STATUS, filest)
 })
-
 
 try({
   filest <- paste0(storagePre, "History.Rds")
@@ -138,10 +136,10 @@ try({
   saveRDS(STATUS, filest)
 })
 
-
 try({
   filest <- paste0(storagePre, "Workers.Rds")
   read_data(                   "workers")
+  workers_DT$Date <- Sys.time()
   if (file.exists(filest)) {
     STATUS <- readRDS(filest)
     STATUS <- rbind(STATUS,     workers_DT)
@@ -151,7 +149,6 @@ try({
   STATUS <- unique(STATUS)
   saveRDS(STATUS, filest)
 })
-
 
 try({
   filest <- paste0(storagePre, "Shareratehistory.Rds")
