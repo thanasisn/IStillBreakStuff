@@ -4,6 +4,7 @@
 
 #### Auto commit and push all git repos
 
+
 exec 9>"/dev/shm/$(basename $0).lock"
 if ! flock -n 9; then
 	echo "another instance of $0 is running"
