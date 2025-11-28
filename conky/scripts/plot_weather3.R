@@ -137,12 +137,14 @@ varab    <- grep(paste0(models,collapse = "|") ,names(WAPI_hourly), value = T)
 uvarab   <- unique(sub("_$", "", sub(pattern = paste0(models,collapse = "|"), "", varab)))
 str_date <- strftime( WAPI_metadata$Data_time, tz = "Europe/Athens", format = "%F %R" )
 
+uvarab <- grep("_radiation_instant", uvarab, value = T, invert = T)
+uvarab <- grep("terrestrial_radiation", uvarab, value = T, invert = T)
 
 #### as lines ####
 for (av in uvarab) {
 
     wecare <- names(WAPI_hourly)[names(WAPI_hourly) %in% paste0(av, "_", models)]
-    wecare <- sort(wecare,decreasing = T)
+    wecare <- sort(wecare, decreasing = T)
     ylim   <- range(unlist( WAPI_hourly[wecare]), na.rm = T )
     xlim   <- range(WAPI_hourly$dt)
 
