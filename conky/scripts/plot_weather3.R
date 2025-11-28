@@ -273,27 +273,25 @@ for (av in uvarab) {
 
 
 
-#### plot each variable ####
-wecare  <- sort(grep("time|source|dt", names(WAPI_hourly), invert = T, value = T ))
-for (av in wecare) {
-
-    par(mar = c(3,3,2,1))
-
-    ylim <- range(WAPI_hourly[[av]], na.rm = T)
-
-    plot(WAPI_hourly$dt, WAPI_hourly[[av]], xlab = "", ylab = "", "l", lwd = 3)
-
-    abline(v = Sys.time(), col = "green", lty = 3, lwd = 3)
-
-    title(paste(WAPI_metadata$City, str_date, av), cex.main = 0.8,  )
-
-    drange <- range( dt_start,  WAPI_hourly$dt,                         na.rm = T )
-    abline( v = seq( drange[1], drange[2], by = "day"), lwd = 2 , lty = 2, col = "grey" )
-    abline( v = seq( drange[1], drange[2], by = "day") + 12 * 3600, lty = 3, col = "grey" )
-    abline( h = pretty(WAPI_hourly[[av]], min.n = 1), lty = 2, col = "grey" )
-}
-
-
+# #### plot each variable ####
+# wecare  <- sort(grep("time|source|dt", names(WAPI_hourly), invert = T, value = T ))
+# for (av in wecare) {
+#
+#     par(mar = c(3,3,2,1))
+#
+#     ylim <- range(WAPI_hourly[[av]], na.rm = T)
+#
+#     plot(WAPI_hourly$dt, WAPI_hourly[[av]], xlab = "", ylab = "", "l", lwd = 3)
+#
+#     abline(v = Sys.time(), col = "green", lty = 3, lwd = 3)
+#
+#     title(paste(WAPI_metadata$City, str_date, av), cex.main = 0.8,  )
+#
+#     drange <- range( dt_start,  WAPI_hourly$dt,                         na.rm = T )
+#     abline( v = seq( drange[1], drange[2], by = "day"), lwd = 2 , lty = 2, col = "grey" )
+#     abline( v = seq( drange[1], drange[2], by = "day") + 12 * 3600, lty = 3, col = "grey" )
+#     abline( h = pretty(WAPI_hourly[[av]], min.n = 1), lty = 2, col = "grey" )
+# }
 
 
 
@@ -794,9 +792,5 @@ if (!interactive()) {
 if (!interactive()) {dev.off()}
 Sys.setlocale(locale = "en_US.utf8")
 
-## copy conky image to log
-if (Sys.info()["nodename"] == "tyler") {
-  file.copy(OUTPUT_01, outdir, overwrite = TRUE )
-}
 
 cat("nnnnnn")
