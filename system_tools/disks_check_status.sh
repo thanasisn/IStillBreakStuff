@@ -15,7 +15,7 @@ set +e
 
 ## Variables
 auser="athan"
-LOGDIR="/home/$auser/LOGs/SYSTEM_LOGS/STORAGE"
+LOGDIR="/home/athan/LOGs/SYSTEM_LOGS/STORAGE"
 mkdir -p "$LOGDIR"
 
 
@@ -163,7 +163,7 @@ echo "DONE checking ZFS"
 echo ""
 
 ## send to telegram
-~/CODE/system_tools/telegram_status.sh "$(hostname) filesystem" "$(cat "$statusfile")"
+/home/athan/CODE/system_tools/telegram_status.sh "$(hostname) filesystem" "$(cat "$statusfile")"
 
 ## maybe fix binary chars in log files
 LC_ALL=C sed -i 's/[^\x0-\xB1]//g' "$statusfile"
