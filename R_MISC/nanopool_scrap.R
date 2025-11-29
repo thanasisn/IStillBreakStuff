@@ -184,6 +184,20 @@ try({
   saveRDS(STATUS, filest)
 })
 
+
+
+read_data(                   "avghashrateworkers")
+
+read_tag(                   "avghashrateworkers")
+
+read_tag(                   "avghashrateworkers")
+
+read_tag(                   "reportedhashrates")
+
+
+
+
+
 #+ include=T, echo=F, results="asis"
 tac <- Sys.time()
 cat(sprintf("**END** %s %s@%s %s %f mins\n\n", Sys.time(), Sys.info()["login"],
