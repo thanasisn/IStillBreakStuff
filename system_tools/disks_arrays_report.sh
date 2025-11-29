@@ -15,7 +15,7 @@ set +e
 
 ## Variables
 auser="athan"
-LOGDIR="/home/$auser/LOGs/SYSTEM_LOGS/STORAGE"
+LOGDIR="/home/athan/LOGs/SYSTEM_LOGS/STORAGE"
 mkdir -p "$LOGDIR"
 
 
