@@ -10,6 +10,7 @@ tic <- Sys.time()
 require(data.table, quietly = TRUE, warn.conflicts = FALSE)
 require(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
 require(httr,       quietly = TRUE, warn.conflicts = FALSE)
+library(tidyr,      quietly = TRUE, warn.conflicts = FALSE)
 
 source("/home/athan/Formal/KEYS/nanopool")
 storagePre <- "~/DATA/Other/Nanopool_"
@@ -186,13 +187,37 @@ try({
 
 
 
-read_data(                   "avghashrateworkers")
+try({
+  filest <- paste0(storagePre, "Avghashrateworkers.Rds")
+  tag <- "avghashrateworkers"
+  res <- read_tag(tag)
 
-read_tag(                   "avghashrateworkers")
+  hcol <- names(res[["data"]])
+  avghashrateworkers_DT <- list2DF(res[["data"]]) |>
+    mutate(
+      across(all_of(hcol),
+             ~ lapply(., function(x) setNames(data.frame(t(c(x[[1]], x[[2]]))), c("Host", "Hashrate"))))) |>
+    pivot_longer(
+      cols      = hcol,
+      names_to  = "time_interval",
+      values_to = "data"
+    ) |>
+    unnest(data) |>
+    mutate(
+      Hashrate = as.numeric(Hashrate),
+      Date     = Sys.time()
+    )
 
-read_tag(                   "avghashrateworkers")
+  if (file.exists(filest)) {
+    STATUS <- readRDS(filest)
+    STATUS <- rbind(STATUS,     avghashrateworkers_DT)
+  } else {
+    STATUS <-                   avghashrateworkers_DT
+  }
+  STATUS <- unique(STATUS)
+  saveRDS(STATUS, filest)
+})
 
-read_tag(                   "reportedhashrates")
 
 
 
