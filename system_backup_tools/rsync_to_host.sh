@@ -6,38 +6,19 @@
 
 ## This list CAN NOT COPE WITH SPACES !!
 list=(
-'/home/athan/.ENC'
 '/home/athan/.dot_files'
 '/home/athan/.dot_files_private'
 '/home/athan/.dotfiles'
 '/home/athan/.ssh'
 '/home/athan/.unison'
-'/home/athan/Aerosols'
 '/home/athan/BASH'
 '/home/athan/CODE'
-'/home/athan/DATA'
-'/home/athan/DATA_ARC'
-'/home/athan/DATA_RAW'
-'/home/athan/Documents'
-'/home/athan/Ecotime_machine'
-'/home/athan/GISdata'
-'/home/athan/Improved_Aerosols_O3'
-'/home/athan/LIBRARY'
-'/home/athan/LOGs'
-'/home/athan/LibRadTranG'
-'/home/athan/LifeAsti'
-'/home/athan/MANUSCRIPTS'
-'/home/athan/MISC'
-'/home/athan/PROGRAMS'
-'/home/athan/PROJECTS'
-'/home/athan/Pictures'
-'/home/athan/TEACHING'
-'/home/athan/TRAIN'
 )
 
 
-REMOTE_HOST="192.168.1.105"
-REMOTE_HOST="mumra.ts"
+REMOTE_HOST="100.107.214.33"
+# REMOTE_HOST="mumra.ts"
+# REMOTE_HOST="192.168.1.105"
 REMOTE_USER="$USER"
 REMOTE="${REMOTE_USER}@${REMOTE_HOST}"
 OPTIONS=" --info=progress2 --info=name0 -arvh --stats --delete "
