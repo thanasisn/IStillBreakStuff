@@ -23,18 +23,25 @@ NOTIFY_SEND="/home/athan/CODE/system_tools/pub_notifications.py"
 # statusfile="${LOGDIR}/Disks_report_$(hostname).status"
 logfile="${LOGDIR}/Disks_report_$(hostname)_$(date +'%F').check"
 echo "" > "$logfile"
-# touch "$statusfile"
-
 
 cleanup() {
-    ## make all files accessible after running as root
-    chown "$auser" "$LOGDIR"
-    chmod a+rw     "$LOGDIR"*
-    chown "$auser" "$LOGDIR"*
-    chmod a+rw     "$logfile"
-    chown "$auser" "$logfile"
-    # chmod a+rw     "$statusfile"
-    # chown "$auser" "$statusfile"
+  ## clean binary chars and remove empty lines
+  if [[ -f "$logfile" ]]; then
+    # Create temporary file
+    local tempfile="$(mktemp)"
+    # Clean binary chars add suppress multiple empty lines
+    tr -cd '[:print:]\n\t' < "$logfile" | sed '/^$/N;/^\n$/D'  > "$tempfile"
+    # Only replace if tempfile has content (safer)
+    if [[ -s "$tempfile" ]]; then
+      mv "$tempfile" "$logfile"
+    fi
+  fi
+  ## make all files accessible after running as root
+  chown "$auser" "$LOGDIR"
+  chmod a+rw     "$LOGDIR"*
+  chown "$auser" "$LOGDIR"*
+  chmod a+rw     "$logfile"
+  chown "$auser" "$logfile"
 }
 
 trap cleanup 0 1 2 3 6
