@@ -54,7 +54,33 @@ echo ""
 echo "Log file: $logfile"
 echo ""
 echo "================================================================"
+echo ""
 
+## check missing commands
+ALLCMD=(
+  btrfs
+  df
+  fdisk
+  findmnt
+  hdparm
+  lsblk
+  lshw
+  mdadm
+  mount
+  sfdisk
+  zfs
+  zpool
+)
+
+for cmd in ${ALLCMD[*]}; do
+  if ! command -v "$cmd" &> /dev/null
+  then
+    echo " MISSING COMMAND:  $cmd"
+  fi
+done
+
+echo ""
+echo "----------------------------------------------------------------"
 
 
 ## check storage arrays first

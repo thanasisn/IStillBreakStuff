@@ -46,6 +46,22 @@ exec 2> >(tee -i "${logfile}" >&2)
 echo ""
 echo "Log file: $logfile"
 echo "====================================="
+
+## check missing commands
+ALLCMD=(
+  mdadm
+  btrfs
+  zpool
+  notify-send
+)
+
+for cmd in ${ALLCMD[*]}; do
+  if ! command -v "$cmd" &> /dev/null
+  then
+    echo " MISSING COMMAND:  $cmd"
+  fi
+done
+
 echo ""
 echo "-------------------------------------"
 echo "$(date +%F_%R) RAID report on $(hostname)"
