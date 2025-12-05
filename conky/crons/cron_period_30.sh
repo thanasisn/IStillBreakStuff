@@ -27,31 +27,34 @@ set +e
 pids=()
 
 
-# (
-#     "$HOME/CODE/conky/scripts/meteoblue_get.sh" 
-#     "$HOME/CODE/conky/scripts/getForecast_DarkSkyNet.R" 
-# ) & pids+=($!)
-
-
 (
     "$HOME/CODE/conky/scripts/getCurrent_OpenWeather.R"
     "$HOME/CODE/conky/scripts/getForecast_OpenWeather.R"
 ) & pids+=($!)
 
-"$HOME/CODE/conky/scripts/get_open_meteo_api.R"  & pids+=($!)
+"$HOME/CODE/conky/scripts/get_open_meteo_api.R" & pids+=($!)
 
-
-(
-#     "$HOME/BASH/mail_auto/gmailr_get_accounts_alerts.R"
-#    "$HOME/BASH/mail_auto/parse_accounts_alerts.R"
-    # new parser
-    "$HOME/BASH/mail_auto/scrap_noa/run_noa_mail.R
-) & pids+=($!)
-
+"$HOME/BASH/mail_auto/scrap_noa/run_noa_mail.R" & pids+=($!)
 
 ## Clean
 wait "${pids[@]}"; pids=()
-set -e
+
+
+(
+  Rscript -e "rmarkdown::render('~/CODE/conky/scripts/plot_weather_LAP_Davis.R',
+                  output_format = 'html_document',
+                  output_dir    = '~/Formal/REPORTS')"
+) & pids+=($!)
+
+(
+  Rscript -e "rmarkdown::render('~/CODE/conky/scripts/plot_weather4.R',
+                  output_format = 'html_document',
+                  output_dir    = '~/Formal/REPORTS')"
+) & pids+=($!)
+
+## Clean
+wait "${pids[@]}"; pids=()
+
 echo "took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"
 exit 0
