@@ -144,11 +144,10 @@ try({
   workers_DT$Date <- Sys.time()
   if (file.exists(filest)) {
     STATUS <- readRDS(filest)
-    STATUS <- rbind(STATUS,     workers_DT)
+    STATUS <- rbind(STATUS,     workers_DT, fill = T)
   } else {
     STATUS <-                   workers_DT
   }
-  STATUS <- unique(STATUS)
   saveRDS(STATUS, filest)
   STATUS <- data.table(
     LastShare = as.POSIXct(unlist(STATUS$lastShare), origin = "1970-01-01"),
@@ -158,18 +157,23 @@ try({
     Date      = unlist(STATUS$Date),
     Hashrate  = unlist(STATUS$hashrate)
   )
-  exp <- STATUS |>
+  STATUS <- unique(STATUS)
+
+  exp <- STATUS   |>
     group_by(UID) |>
-    filter(Date == max(Date)) |>
+    filter(Date == max(Date, na.rm = T)) |>
     data.frame() |>
     select(ID, Hashrate, Rating, LastShare)
+
   # exp           <- data.frame(WORK[Date == max(Date), .(ID, Hashrate, Rating, LastShare)])
   exp$LastShare <- as.POSIXct(exp$LastShare, tz = "Europe/Athens")
   exp           <- data.frame(exp)
   exp[]         <- lapply(exp, as.character)
+  ## export flat table
   exp           <- rbind(colnames(exp), exp)
-  gdata::write.fwf(x = exp, colnames = FALSE,
-                   file = "/dev/shm/nanopool.status")
+  gdata::write.fwf(x        = exp,
+                   colnames = FALSE,
+                   file     = "/dev/shm/nanopool.status")
 })
 
 try({
@@ -220,7 +224,7 @@ try({
 
 
 
-source("~/CODE/R_MISC/nanopool_plot.R")
+# source("~/CODE/R_MISC/nanopool_plot.R")
 
 
 #+ include=T, echo=F, results="asis"
