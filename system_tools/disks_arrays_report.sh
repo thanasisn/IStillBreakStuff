@@ -184,6 +184,11 @@ echo ""
 echo " ** hdparm ** "
 echo ""
 sudo hdparm -I /dev/sd*
+echo "----------------------------------------------------------------"
+echo ""
+echo " ** dysk ** "
+echo ""
+/home/athan/.nix-profile/bin/dysk --color no --ascii
 
 ls -1 "/dev/sd"? | while read device; do
     echo ""
