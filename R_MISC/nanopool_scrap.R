@@ -58,16 +58,23 @@ storagePre <- "~/DATA/Other/Nanopool_"
 #   print(content(res, type="application/json"))
 # }
 
+
+
+httr::set_config(httr::config(ssl_verifypeer = 0L, ssl_verifyhost = 0L))
+
 ## read json from site
 read_tag <- function(tag) {
-  content(
-    GET(
-      paste0("https://api.nanopool.org/v1/xmr/",
+  url <- paste0("https://api.nanopool.org/v1/xmr/",
              tag,
              "/",
-             ADDRESS),
-      accept_json()),
+             ADDRESS)
+  cat(url, "\n")
+  content(
+    GET(url,
+      accept_json(),
+      timeout(10)),
     type = "application/json")
+  Sys.sleep(5)
 }
 
 ## read json and make a table or variable
@@ -98,7 +105,7 @@ try({
   filest <- paste0(storagePre, "Status.Rds")
   read_data("balance")
   read_data("hashrate")
-  if (!exists("balance_Value"))  {balance_Value <- NA}
+  if (!exists("balance_Value"))  {balance_Value  <- NA}
   if (!exists("hashrate_Value")) {hashrate_Value <- NA}
   current <- data.frame(Date     = Sys.time(),
                         Balande  = balance_Value,
