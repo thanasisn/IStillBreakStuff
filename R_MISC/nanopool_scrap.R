@@ -12,8 +12,10 @@ require(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
 require(httr,       quietly = TRUE, warn.conflicts = FALSE)
 library(tidyr,      quietly = TRUE, warn.conflicts = FALSE)
 
+
+delay <- 20
 source("/home/athan/Formal/KEYS/nanopool")
-storagePre <- "~/DATA/Other/Nanopool_"
+storagePre <- paste0("~/DATA/Other/Nanopool_", Sys.info()["nodename"], "_")
 
 
 # Miner - Account Balance
@@ -59,8 +61,7 @@ storagePre <- "~/DATA/Other/Nanopool_"
 # }
 
 
-
-httr::set_config(httr::config(ssl_verifypeer = 0L, ssl_verifyhost = 0L))
+# httr::set_config(httr::config(ssl_verifypeer = 0L, ssl_verifyhost = 0L))
 
 ## read json from site
 read_tag <- function(tag) {
@@ -69,12 +70,12 @@ read_tag <- function(tag) {
              "/",
              ADDRESS)
   cat(url, "\n")
+  Sys.sleep(delay)
   content(
     GET(url,
       accept_json(),
       timeout(10)),
     type = "application/json")
-  Sys.sleep(5)
 }
 
 ## read json and make a table or variable
