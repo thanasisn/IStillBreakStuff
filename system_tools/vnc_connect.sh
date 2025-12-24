@@ -11,10 +11,13 @@ host="$1"
 # xrandr | grep "*" | awk '{ print $1 }'
 
 ## get resolution to use
-# resolution="$(xdpyinfo | awk '/dimensions/{print $2}' | head -n 1)"
 resolution="$(xrandr | grep '*' | awk '{print $1}')"
 width="$( echo $resolution | cut -d'x' -f1)"
 height="$(echo $resolution | cut -d'x' -f2)"
+
+largest=$(xrandr | grep "*" | awk '{print $1}' | awk -F'x' '{print $1" "$2}' | sort -n -k1,1 -k2,2 | tail -1)
+width=$( echo $largest | awk '{print $1}')
+height=$(echo $largest | awk '{print $2}')
 
 
 echo "Screen Resolution"
