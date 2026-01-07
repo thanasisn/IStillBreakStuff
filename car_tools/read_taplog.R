@@ -32,9 +32,13 @@ library(janitor)
 library(ggplot2)
 library(plotly)
 library(htmltools)
+library(DT,         quietly = TRUE, warn.conflicts = FALSE)
+library(htmltools,  quietly = TRUE, warn.conflicts = FALSE)
+
 
 #+ include=FALSE, echo=FALSE
 ## init use of ggplot and html tables in loops
+tagList(datatable(cars))
 tagList(ggplotly(ggplot()))
 
 ## find file to read
@@ -287,35 +291,67 @@ if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
 
 GAS <- dcast(DGAS, Date ~ variable)
 
-p <- ggplot(GAS, aes(x = Date)) +
-  geom_point(aes(y = Cost,  color = "Cost")) +
-  geom_point(aes(y = Litre, color = "Litre")) +
-  theme_linedraw() +
-  labs(subtitle = "gas",
-       y = element_blank())
-if (!isTRUE(getOption('knitr.in.progress'))) {
-  suppressWarnings(print(p))
-}
-if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
-  ggplotly(p)
-}
+try({
+  p <- ggplot(GAS, aes(x = Date)) +
+    geom_point(aes(y = Cost,  color = "Cost")) +
+    geom_point(aes(y = Litre, color = "Litre")) +
+    theme_linedraw() +
+    labs(subtitle = "gas",
+         y = element_blank())
+  if (!isTRUE(getOption('knitr.in.progress'))) {
+    suppressWarnings(print(p))
+  }
+  if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+    ggplotly(p)
+  }
+})
 
-p <- ggplot(GAS, aes(x = Date, y = Cost/Litre)) +
-  geom_point() +
-  theme_linedraw() +
-  labs(subtitle = "gas",
-       y = "euro/litre")
-if (!isTRUE(getOption('knitr.in.progress'))) {
-  suppressWarnings(print(p))
-}
-if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
-  ggplotly(p)
-}
+
+try({
+  p <- ggplot(GAS, aes(x = Date, y = Cost/Litre)) +
+    geom_point() +
+    theme_linedraw() +
+    labs(subtitle = "gas",
+         y = "euro/litre")
+  if (!isTRUE(getOption('knitr.in.progress'))) {
+    suppressWarnings(print(p))
+  }
+  if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
+    ggplotly(p)
+  }
+})
 
 ANT[year(Date)==2022,]
 
 dbDisconnect(con)
 
+
+setorder(DTRIP, Date)
+
+A <- DTRIP[variable == "km",                .(Diff_KM      = c(NA, diff(value)), Date) ]
+B <- DTRIP[variable == "trip_km",           .(Diff_trip_Km = c(NA, diff(value)), Date) ]
+C <- DTRIP[variable == "Consumption_Accum", .(Diff_Cons_L  = c(NA, diff(value)), Date) ]
+
+Diif <- merge(merge(A, B), C)
+
+Diif[, Start  := lag(Date)]
+Diif[, Finish := Date]
+Diif[, Date  := NULL]
+
+
+#'
+#' ## Changes from on board {-}
+#'
+#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis"
+print(
+  htmltools::tagList(
+    datatable(Diif,
+              rownames = FALSE,
+              options  = list(pageLength = 30),
+              style    = "bootstrap",
+              class    = "table-bordered table-condensed")
+  )
+)
 
 
 ## read old?
