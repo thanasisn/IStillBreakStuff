@@ -23,7 +23,6 @@ info "START :: $0 :: $* ::"
 ## list folders containing a makefile
 folders=(
   "$HOME/BBand_LAP/JOURNAL"
-  "$HOME/CODE/R_MISC/utilities"
   "$HOME/DATA_ARC/10_TODO/JOURNAL"
   "$HOME/NOTES"
   "$HOME/NOTES/02_AREA"
