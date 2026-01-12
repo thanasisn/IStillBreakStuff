@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
-## created on 2018-06-05
 
-#### Run conky scripts every 10 minutes with crontab
+#### Run conky scripts every 10 minutes
 
 ##  External kill switch  ###########################################
 killfile="/dev/shm/KILL_SWITCH/$(basename "$0")"
 [[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 99
+
 ##  Dot no run headless  ############################################
-xsessions="$(w | grep -o " :[0-9]\+ " | sort -u | wc -l)"
-if [[ $xsessions -gt 0 ]]; then
-    echo "Display exists $xsessions"
-else
-    echo "No X server at \$DISPLAY [$DISPLAY] $xsessions" >&2
-#    exit 0
-fi
+# xsessions="$(w | grep -o " :[0-9]\+ " | sort -u | wc -l)"
+# if [[ $xsessions -gt 0 ]]; then
+#     echo "Display exists $xsessions"
+# else
+#     echo "No X server at \$DISPLAY [$DISPLAY] $xsessions" >&2
+# #    exit 0
+# fi
+
 ##  Watchdog for script  ############################################
 mainpid=$$
 (sleep $((60*9)); kill -9 $mainpid) &
@@ -26,11 +27,7 @@ mkdir -p "/dev/shm/CONKY"
 set +e
 pids=()
 
-## get calendar
-# "${SCRIPTS}Cnk_gcal_reader.sh"  &
-
 ## plot weather
-# "$HOME/CODE/conky/scripts/plot_weather2.R" & pids+=($!)
 "$HOME/CODE/conky/scripts/plot_weather3.R"     & pids+=($!)
 
 ## output backup status
