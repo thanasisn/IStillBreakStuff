@@ -20,11 +20,6 @@ exec 2> >(tee -i "${ERR_FILE}" >&2)
 trap 'echo $( date +%F_%T ) ${SECONDS}s :: $0 interrupted ::  >&2;' INT TERM
 info "START :: $0 :: $* ::"
 
-# if [[ "$(hostname)" = "tyler" ]]; then
-#     echo "$(basename "$0") is suspended in tyler!!"
-#     exit
-# fi
-
 ## list folders containing a makefile
 folders=(
   "$HOME/BBand_LAP/JOURNAL"
@@ -45,20 +40,20 @@ folders=(
 )
 
 for af in "${folders[@]}"; do
-    info "$af"
-    if [ -d "$af" ]; then
-        info "Doing: $af"
-    else
-        info "$af don't exist SKIP!!"
-        continue
-    fi
-    cd "$af" || continue
-    (
-        ## run make with default rule
-        nice -n 19 ionice -c2 -n7 make -f ./*[Mm]akefile -C "$af"
-    ) > >(tee .automake.log) 2> >(tee .automake.err >&2)
-    echo "================================="
-done
+  info "$af"
+  if [ -d "$af" ]; then
+    info "Doing: $af"
+  else
+    info "$af don't exist SKIP!!"
+    continue
+  fi
 
+  cd "$af" || continue
+  (
+    ## run make with default rule
+    nice -n 19 ionice -c2 -n7 make -f ./*[Mm]akefile -C "$af"
+  ) > >(tee .automake.log) 2> >(tee .automake.err >&2)
+  echo "================================="
+done
 
 exit 0
