@@ -39,8 +39,8 @@ pids=()
 ## check external ips and ports of our hosts
 # "$HOME/CODE/conky/scripts/ext_ip_watch.sh"     & pids+=($!)
 
-
 ## Clean some of syncthing artifacts
+echo "Clean some artifacts"
 find "$HOME/LOGs/SYSTEM_LOGS" -name "*.sync-conflict-*" -delete
 find "$HOME/LOGs/waypoints"   -name "*.sync-conflict-*" -delete
 find "$HOME/LOGs/winb"        -name "*.sync-conflict-*" -delete
@@ -50,6 +50,7 @@ find "$HOME/NOTES/.obsidian"  -name "*.sync-conflict-*" -delete
 ## Clean
 wait "${pids[@]}"; pids=()
 set -e
-echo "took $SECONDS seconds for $0 to complete"
+echo 
+echo "Took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"
 exit 0
