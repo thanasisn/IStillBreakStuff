@@ -35,6 +35,7 @@ pids=()
 
 ##  CLEAN  ---------------------------------------------------------------------
 wait "${pids[@]}"; pids=()
-echo "took $SECONDS seconds for $0 to complete"
+echo
+echo "Took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"
 exit 0
