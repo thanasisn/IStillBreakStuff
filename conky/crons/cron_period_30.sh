@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-## created on 2018-06-05
 
-#### Run conky scripts every 30 minutes with crontab
+#### Run conky scripts every 30 minutes
 
 ##  External kill switch  ###########################################
 killfile="/dev/shm/KILL_SWITCH/$(basename "$0")"
@@ -54,7 +53,8 @@ wait "${pids[@]}"; pids=()
 
 ## Clean
 wait "${pids[@]}"; pids=()
-
-echo "took $SECONDS seconds for $0 to complete"
+set -e
+echo 
+echo "Took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"
 exit 0
