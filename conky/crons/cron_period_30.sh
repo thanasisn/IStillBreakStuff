@@ -5,26 +5,27 @@
 ##  External kill switch  ###########################################
 killfile="/dev/shm/KILL_SWITCH/$(basename "$0")"
 [[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 99
-# ##  Dot no run headless  ############################################
+
+##  Dot no run headless  ############################################
 # xsessions="$(w | grep -o " :[0-9]\+ " | sort -u | wc -l)"
 # if [[ $xsessions -gt 0 ]]; then
 #     echo "Display exists $xsessions"
 # else
 #     echo "No X server at \$DISPLAY [$DISPLAY] $xsessions" >&2
-#     exit 0
+# #     exit 0
 # fi
+
 ##  Watchdog for script  ############################################
 mainpid=$$
 (sleep $((60*20)); kill $mainpid) &
 watchdogpid=$!
 
-##  MAIN  ############################################################
-
-## Init
+##  INIT  ----------------------------------------------------------------------
 mkdir -p "/dev/shm/CONKY"
 set +e
 pids=()
 
+##  RUN  -----------------------------------------------------------------------
 
 (
     "$HOME/CODE/conky/scripts/getCurrent_OpenWeather.R"
@@ -51,10 +52,9 @@ wait "${pids[@]}"; pids=()
                   output_dir    = '~/Formal/REPORTS')"
 ) & pids+=($!)
 
-## Clean
+##  CLEAN  ---------------------------------------------------------------------
 wait "${pids[@]}"; pids=()
-set -e
-echo 
+echo
 echo "Took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"
 exit 0
