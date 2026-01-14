@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-## created on 2018-06-05
 
-#### Run conky scripts with every 90 minutes with crontab
+#### Run conky scripts with every 90 minutes
 
 ##  External kill switch  ###########################################
 killfile="/dev/shm/KILL_SWITCH/$(basename "$0")"
 [[ -f "$killfile" ]] && echo && echo "KILL SWITCH: $killfile !!!" && exit 99
+
 ##  Dot no run headless  ############################################
 xsessions="$(w | grep -o " :[0-9]\+ " | sort -u | wc -l)"
 if [[ $xsessions -gt 0 ]]; then
@@ -19,13 +19,12 @@ mainpid=$$
 (sleep $((60*30)); kill $mainpid) &
 watchdogpid=$!
 
-##  MAIN  ############################################################
-
-## Init
+##  INIT  ----------------------------------------------------------------------
 mkdir -p "/dev/shm/CONKY"
 set +e
 pids=()
 
+##  RUN  -----------------------------------------------------------------------
 
 "$HOME/BASH/TOOLS/brave_history_clean.sh"   & pids+=($!)
 # "$HOME/BASH/CRON/gather_winb_email.R"       & pids+=($!)
@@ -43,9 +42,9 @@ pids=()
 
 
 
-## Clean
+##  CLEAN  ---------------------------------------------------------------------
 wait "${pids[@]}"; pids=()
-set -e
+echo
 echo "Took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"
 exit 0
