@@ -22,28 +22,28 @@ watchdogpid=$!
 ##  INIT  ----------------------------------------------------------------------
 mkdir -p "/dev/shm/CONKY"
 set +e
-pids=()
+# pids=()
 
 ##  RUN  -----------------------------------------------------------------------
 
-"$HOME/BASH/TOOLS/brave_history_clean.sh"   & pids+=($!)
+"$HOME/BASH/TOOLS/brave_history_clean.sh"  # & pids+=($!)
 # "$HOME/BASH/CRON/gather_winb_email.R"       & pids+=($!)
 # "$HOME/CODE/conky/scripts/transact_plot.R"  & pids+=($!)
 
 
-(
+# (
 "$HOME/CODE/training_analysis/GC_data_proccess/GC_update_all.R"
 # "$HOME/CODE/training_analysis/GC_shoes_usage_duration.R"
 # "$HOME/CODE/training_analysis/GC_shoes_usage_timeseries.R"
 # "$HOME/CODE/training_analysis/GC_target_load.R"
 # "$HOME/CODE/training_analysis/GC_target_estimation.R"
-) & pids+=($!)
+# ) & pids+=($!)
 
 
 
 
 ##  CLEAN  ---------------------------------------------------------------------
-wait "${pids[@]}"; pids=()
+# wait "${pids[@]}"; pids=()
 echo
 echo "Took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"
