@@ -23,14 +23,14 @@ watchdogpid=$!
 ##  INIT  ----------------------------------------------------------------------
 mkdir -p "/dev/shm/CONKY"
 set +e
-pids=()
+# pids=()
 
 ##  RUN  -----------------------------------------------------------------------
 
-"$HOME/CODE/conky/scripts/plot_weather3.R"     & pids+=($!)
+"$HOME/CODE/conky/scripts/plot_weather3.R"     # & pids+=($!)
 
 ## output backup status
-"$HOME/CODE/conky/scripts/status_logs_parse.R" & pids+=($!)
+"$HOME/CODE/conky/scripts/status_logs_parse.R" #  & pids+=($!)
 
 ## check ip of our hosts
 # "${SCRIPTS}Cnk_ip_watch.sh"     &
@@ -38,8 +38,8 @@ pids=()
 ## check external ips and ports of our hosts
 # "$HOME/CODE/conky/scripts/ext_ip_watch.sh"     & pids+=($!)
 
-## Clean some of syncthing artifacts
-echo "Clean some artifacts"
+## Clean some of syncthing artefacts
+echo "Clean some artefacts"
 find "$HOME/LOGs/SYSTEM_LOGS" -name "*.sync-conflict-*" -delete
 find "$HOME/LOGs/waypoints"   -name "*.sync-conflict-*" -delete
 find "$HOME/LOGs/winb"        -name "*.sync-conflict-*" -delete
@@ -47,7 +47,7 @@ find "$HOME/PANDOC"           -name "*.sync-conflict-*" -delete
 find "$HOME/NOTES/.obsidian"  -name "*.sync-conflict-*" -delete
 
 ##  CLEAN  ---------------------------------------------------------------------
-wait "${pids[@]}"; pids=()
+# wait "${pids[@]}"; pids=()
 echo
 echo "Took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"

@@ -23,7 +23,7 @@ watchdogpid=$!
 ##  INIT  ----------------------------------------------------------------------
 mkdir -p "/dev/shm/CONKY"
 set +e
-pids=()
+# pids=()
 
 ##  RUN  -----------------------------------------------------------------------
 
@@ -31,10 +31,10 @@ pids=()
 # "$HOME/CODE/conky/scripts/tinc_diagram.sh"    & pids+=($!)
 
 ## Plot radiation from broadband
-"$HOME/CODE/conky/scripts/broadband_plot.R"   & pids+=($!)
+"$HOME/CODE/conky/scripts/broadband_plot.R"  # & pids+=($!)
 
 ##  CLEAN  ---------------------------------------------------------------------
-wait "${pids[@]}"; pids=()
+# wait "${pids[@]}"; pids=()
 echo
 echo "Took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"

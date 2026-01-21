@@ -23,14 +23,14 @@ watchdogpid=$!
 ##  INIT  ----------------------------------------------------------------------
 mkdir -p "/dev/shm/CONKY"
 set +e
-pids=()
+#pids=()
 
 ##  RUN  -----------------------------------------------------------------------
 
-(
+#(
     "$HOME/CODE/conky/scripts/getCurrent_OpenWeather.R"
     "$HOME/CODE/conky/scripts/getForecast_OpenWeather.R"
-) & pids+=($!)
+#) & pids+=($!)
 
 "$HOME/CODE/conky/scripts/get_open_meteo_api.R" & pids+=($!)
 
@@ -40,20 +40,20 @@ pids=()
 wait "${pids[@]}"; pids=()
 
 
-(
+#(
   Rscript -e "rmarkdown::render('~/CODE/conky/scripts/plot_weather_LAP_Davis.R',
                   output_format = 'html_document',
                   output_dir    = '~/Formal/REPORTS')"
-) & pids+=($!)
+#) & pids+=($!)
 
-(
+#(
   Rscript -e "rmarkdown::render('~/CODE/conky/scripts/plot_weather4.R',
                   output_format = 'html_document',
                   output_dir    = '~/Formal/REPORTS')"
-) & pids+=($!)
+#) & pids+=($!)
 
 ##  CLEAN  ---------------------------------------------------------------------
-wait "${pids[@]}"; pids=()
+#wait "${pids[@]}"; pids=()
 echo
 echo "Took $SECONDS seconds for $0 to complete"
 kill "$watchdogpid"
