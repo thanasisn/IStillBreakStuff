@@ -16,6 +16,7 @@ trash $(ls | grep "^[0-9]*\.zip$" | tr '\n' ' ')
 trash ./*.fit
 trash ./*.gpx
 ## call GoldenCheetah
-setsid devour /home/athan/PROGRAMS/GoldenCheetah_v3.7-sp1_x64Qt6.AppImage &
+# setsid devour /home/athan/PROGRAMS/GoldenCheetah_v3.7-sp1_x64Qt6.AppImage &
+setsid devour /home/athan/PROGRAMS/GoldenCheetah_v3.7-sp1_x64Qt6_1.AppImage &
 
 exit 0 
