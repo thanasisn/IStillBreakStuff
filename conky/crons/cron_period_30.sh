@@ -16,9 +16,9 @@ killfile="/dev/shm/KILL_SWITCH/$(basename "$0")"
 # fi
 
 ##  Watchdog for script  ############################################
-mainpid=$$
-(sleep $((60*20)); kill $mainpid) &
-watchdogpid=$!
+# mainpid=$$
+# (sleep $((60*20)); kill $mainpid) &
+# watchdogpid=$!
 
 ##  INIT  ----------------------------------------------------------------------
 mkdir -p "/dev/shm/CONKY"
@@ -56,5 +56,5 @@ wait "${pids[@]}"; pids=()
 #wait "${pids[@]}"; pids=()
 echo
 echo "Took $SECONDS seconds for $0 to complete"
-kill "$watchdogpid"
+# kill "$watchdogpid"
 exit 0
