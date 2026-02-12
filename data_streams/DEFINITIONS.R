@@ -50,8 +50,9 @@ expfilecsv   <- "~/DATA/Other/Accounts/Mailed_accounts_csv.Rds"
 
 
 ## gpx folder
-gpx_dir       <- "~/MISC/a34_export/gpxlog/"
-last_gpx_mins <- 30
+gpx_dir         <- "~/MISC/a34_export/gpxlog/"
+last_gpx_mins   <- 30
+last_gpx_points <- 3
 
 # Direct path to pyenv Python
 pyenv_python <- "~/.pyenv/shims/python"
