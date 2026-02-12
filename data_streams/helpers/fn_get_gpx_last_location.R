@@ -43,21 +43,21 @@ get_gpx_last_location <- function(gpx_file, last_minutes, min_points = 5) {
     distinct() %>%
     arrange(time)
 
-
   # Calculate mean location
   mean_location <- last_points %>%
     summarise(
-      mean_lat        = mean(lat, na.rm = TRUE),
-      mean_lon        = mean(lon, na.rm = TRUE),
+      mean_lat        = mean(  lat, na.rm = TRUE),
+      mean_lon        = mean(  lon, na.rm = TRUE),
       median_lat      = median(lat, na.rm = TRUE),
       median_lon      = median(lon, na.rm = TRUE),
-      start_time      = min(time, na.rm = TRUE),
-      end_time        = max(time, na.rm = TRUE),
-      mean_time       = mean(time, na.rm = TRUE),
-      mean_altitude   = mean(elevation, na.rm = TRUE),
+      start_time      = min(   time, na.rm = TRUE),
+      end_time        = max(   time, na.rm = TRUE),
+      mean_time       = mean(  time, na.rm = TRUE),
+      median_time     = median(time, na.rm = TRUE),
+      mean_altitude   = mean(  elevation, na.rm = TRUE),
       median_altitude = median(elevation, na.rm = TRUE),
-      min_altitude    = min(elevation, na.rm = TRUE),
-      max_altitude    = max(elevation, na.rm = TRUE),
+      min_altitude    = min(   elevation, na.rm = TRUE),
+      max_altitude    = max(   elevation, na.rm = TRUE),
       n_points        = n()
     )
 
