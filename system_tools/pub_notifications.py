@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on 2018-10-27
@@ -32,14 +32,17 @@ from socket import *
 ## set to IP address of target computers
 SEND_TO = ["127.0.0.1",
            "localhost",
-           "10.12.12.1",    # crane
-           "10.12.12.2",    # blue
-           "10.12.12.3",    # lap46
-           "10.12.12.4",    # kostas
-           "10.12.12.5",    # sagan
-           "10.12.12.6",    # tyler
-           "10.12.12.7",    # victor
-           "10.12.12.101"   # yperos
+           "10.12.12.1",     # crane
+           "10.12.12.101",   # yperos
+           "10.12.12.2",     # blue
+           "10.12.12.3",     # lap46
+           "10.12.12.4",     # kostas
+           "10.12.12.5",     # sagan
+           "10.12.12.7",     # victor
+           "100.107.214.33", # crane
+           "100.108.41.27",  # mumra
+           "100.81.44.4",    # blue
+           "100.119.4.3"     # tyler
            ]
 
 
