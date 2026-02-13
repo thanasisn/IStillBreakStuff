@@ -114,10 +114,6 @@ hourly <- hourly |>
 daily <- daily |>
   filter(DateLoc >= Sys.time() -  1 * 24 * 3600)
 
-## create a proper date for use with respect to timezone
-daily <- daily |>
-   mutate(DateLocO = as.Date(DateLoc + offset_to_seconds(DateLoc, Timezone), tz = timezone))
-
 #'
 #' # `r address` `r paste(round(gpx_old), "mins")`
 #'
@@ -216,6 +212,10 @@ offset_to_seconds <- function(ref_date, offset_str) {
 
   return(total_seconds)
 }
+
+## create a proper date for use with respect to timezone
+daily <- daily |>
+  mutate(DateLocO = as.Date(DateLoc + offset_to_seconds(DateLoc, Timezone), tz = timezone))
 
 
 ##  Plot data  -----------------------------------------------------------------
