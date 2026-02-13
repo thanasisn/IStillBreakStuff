@@ -114,6 +114,9 @@ hourly <- hourly |>
 daily <- daily |>
   filter(DateLoc >= Sys.time() -  1 * 24 * 3600)
 
+## create a proper date for use with respect to timezone
+daily <- daily |>
+   mutate(DateLocO = as.Date(DateLoc + offset_to_seconds(DateLoc, Timezone), tz = timezone))
 
 #'
 #' # `r address` `r paste(round(gpx_old), "mins")`
@@ -195,7 +198,24 @@ arrange_variables <- function(vars) {
   c(temp_vars, precip_vars, wind_vars, rest_vars)
 }
 
+## get the time diff from the UTC based on a timezone
+offset_to_seconds <- function(ref_date, offset_str) {
 
+  offset_str <- format(with_tz(ref_date, timezone), "%z")
+
+  # Extract sign, hours, and minutes
+  sign    <- substr(offset_str, 1, 1)
+  hours   <- as.numeric(substr(offset_str, 2, 3))
+  minutes <- as.numeric(substr(offset_str, 4, 5))
+
+  # Calculate total seconds
+  total_seconds <- hours * 3600 + minutes * 60
+
+  # Apply sign
+  total_seconds <- ifelse(sign == "-", -total_seconds, total_seconds)
+
+  return(total_seconds)
+}
 
 
 ##  Plot data  -----------------------------------------------------------------
@@ -326,12 +346,13 @@ for (avar in variables) {
 #'
 #+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
 
+
 pp <- daily |>
-  select(-Latitude, -Longitude, -Timezone) |>
+  select(-Latitude, -Longitude, -Timezone, -DateLoc) |>
   mutate(Value = round(Value, 2)) |>
   pivot_wider(
-    id_cols = c(Model, DateLoc),
-    names_from = Variable,
+    id_cols     = c(Model, DateLocO),
+    names_from  = Variable,
     values_from = Value
   )
 
@@ -347,6 +368,8 @@ print(
               class    = "table-bordered table-condensed")
   )
 )
+
+
 
 #+ include=T, echo=F, results="asis"
 tac <- Sys.time()
