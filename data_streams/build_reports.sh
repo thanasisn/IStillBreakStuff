@@ -25,16 +25,20 @@ echo "###################################"
 set +e
 pids=()
 
-(
-  info "##  W01_location_forecast.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/data_streams/weather/W01_location_forecast.R',
-                  output_format = 'html_document',
-                  output_dir    = '~/Formal/REPORTS')"
-  info "##  End W01_location_forecast.R STATUS:$?  ##"
-) & pids+=($!)
 
 
-wait "${pids[@]}"; pids=()
+info "##  W01_location_forecast.R  ##"
+Rscript -e "rmarkdown::render('~/CODE/data_streams/weather/W01_location_forecast.R',
+                output_format = 'html_document',
+                output_dir    = '~/Formal/REPORTS')"
+info "##  End W01_location_forecast.R STATUS:$?  ##"
+
+
+info "##  W02_LAP_Davis.R  ##"
+Rscript -e "rmarkdown::render('~/CODE/data_streams/weather/W02_LAP_Davis.R',
+                output_format = 'html_document',
+                output_dir    = '~/Formal/REPORTS')"
+info "##  End W02_LAP_Davis.R STATUS:$?  ##"
 
 
 

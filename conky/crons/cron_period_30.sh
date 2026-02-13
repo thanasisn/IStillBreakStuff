@@ -40,17 +40,6 @@ set +e
 wait "${pids[@]}"; pids=()
 
 
-#(
-  Rscript -e "rmarkdown::render('~/CODE/conky/scripts/plot_weather_LAP_Davis.R',
-                  output_format = 'html_document',
-                  output_dir    = '~/Formal/REPORTS')"
-#) & pids+=($!)
-
-#(
-  Rscript -e "rmarkdown::render('~/CODE/conky/scripts/plot_weather4.R',
-                  output_format = 'html_document',
-                  output_dir    = '~/Formal/REPORTS')"
-#) & pids+=($!)
 
 ##  CLEAN  ---------------------------------------------------------------------
 #wait "${pids[@]}"; pids=()
