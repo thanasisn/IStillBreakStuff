@@ -1,39 +1,52 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:  "`r format(Sys.time(), '%F %T')`"
+#' title:  "Car taplog `r strftime(Sys.time(), '%F %R %Z', tz= 'Europe/Athens')`"
 #' author: ""
 #' output:
 #'   html_document:
-#'     toc: true
-#'     fig_width:  6
-#'     fig_height: 4
-#'     keep_md:    no
+#'     toc:             true
+#'     number_sections: false
+#'     fig_width:       6
+#'     fig_height:      4
+#'     keep_md:         no
 #' date: ""
 #' ---
 
 #+ echo=F, include=F
 ####_ Set environment _####
-rm(list = (ls()[ls() != ""]))
 tic <- Sys.time()
-Script.Name <- "~/CODE/car_tools/read_taplog.R"
-
-## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(out.width  = "100%"   )
+Script.Name <- "~/CODE/data_streams/car/C01_taplog_plot.R"
+export.file <- "~/Formal/REPORTS/C01_taplog_plot.html"
 
 filenames <- list.files(path       = "~/MISC/a34_export/TapLog",
                         pattern    = "TrackAndGraphBackup.*.db",
                         full.names = T)
 
-library(data.table)
-library(dplyr)
-library(RSQLite)
-library(janitor)
-library(ggplot2)
-library(plotly)
-library(htmltools)
-library(DT,         quietly = TRUE, warn.conflicts = FALSE)
-library(htmltools,  quietly = TRUE, warn.conflicts = FALSE)
+
+if (interactive() ||
+    !file.exists(export.file) ||
+    file.mtime(export.file)    <= (Sys.time() - 4 * 3600) ||
+    max(file.mtime(filenames)) >= file.mtime(export.file)  ) {
+  print("Have to run")
+} else {
+  stop("Don't have to run yet!")
+}
+
+
+## __ Document options ---------------------------------------------------------
+knitr::opts_chunk$set(out.width  = "100%"   )
+
+
+require(data.table, quietly = TRUE, warn.conflicts = FALSE)
+require(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
+require(RSQLite,    quietly = TRUE, warn.conflicts = FALSE)
+require(janitor,    quietly = TRUE, warn.conflicts = FALSE)
+require(ggplot2,    quietly = TRUE, warn.conflicts = FALSE)
+require(plotly,     quietly = TRUE, warn.conflicts = FALSE)
+require(htmltools,  quietly = TRUE, warn.conflicts = FALSE)
+require(DT,         quietly = TRUE, warn.conflicts = FALSE)
+require(htmltools,  quietly = TRUE, warn.conflicts = FALSE)
 
 
 #+ include=FALSE, echo=FALSE
