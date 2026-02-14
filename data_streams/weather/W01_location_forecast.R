@@ -16,6 +16,13 @@
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/CODE/data_streams/weather/W01_location_forecast.R"
+export.file <- "~/Formal/REPORTS/W01_location_forecast.html"
+
+if (interactive() | !file.exists(export.file) | file.mtime(export.file) >= (Sys.time() - 0.5 * 3600)) {
+  print("Have to run")
+} else {
+  stop("Don't have to run yet!")
+}
 
 ##  Set environment  -----------------------------------------------------------
 require(data.table, quietly = TRUE, warn.conflicts = FALSE)
@@ -33,6 +40,7 @@ require(tidyr,      quietly = TRUE, warn.conflicts = FALSE)
 source("~/CODE/data_streams/DEFINITIONS.R")
 source("~/CODE/data_streams/helpers/fn_get_gpx_last_location.R")
 source("~/CODE/data_streams/helpers/fn_reverse_geocode_osm.R")
+
 
 if (file.exists(pyenv_python)) {
   use_python(pyenv_python, required = TRUE)
