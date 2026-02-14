@@ -1,4 +1,5 @@
-# /* Copyright (C) 2026 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* #!/usr/bin/env Rscript */
+# /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:  "My weather `r strftime(Sys.time(), '%F %R %Z', tz= 'Europe/Athens')`"
 #' author: ""
@@ -18,7 +19,9 @@ tic <- Sys.time()
 Script.Name <- "~/CODE/data_streams/weather/W01_location_forecast.R"
 export.file <- "~/Formal/REPORTS/W01_location_forecast.html"
 
-if (interactive() | !file.exists(export.file) | file.mtime(export.file) >= (Sys.time() - 0.5 * 3600)) {
+if (interactive() ||
+    !file.exists(export.file) ||
+    file.mtime(export.file) <= (Sys.time() - 0.5 * 3600)) {
   print("Have to run")
 } else {
   stop("Don't have to run yet!")

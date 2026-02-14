@@ -27,18 +27,29 @@ pids=()
 
 
 
+
+
+
 info "##  W01_location_forecast.R  ##"
 Rscript -e "rmarkdown::render('~/CODE/data_streams/weather/W01_location_forecast.R',
                 output_format = 'html_document',
                 output_dir    = '~/Formal/REPORTS')"
-info "##  End W01_location_forecast.R STATUS:$?  ##"
+info "##  End W01_location_forecast.R  STATUS:$?  ##"
 
 
 info "##  W02_LAP_Davis.R  ##"
 Rscript -e "rmarkdown::render('~/CODE/data_streams/weather/W02_LAP_Davis.R',
                 output_format = 'html_document',
                 output_dir    = '~/Formal/REPORTS')"
-info "##  End W02_LAP_Davis.R STATUS:$?  ##"
+info "##  End W02_LAP_Davis.R  STATUS:$?  ##"
+
+
+info "##  C01_taplog_plot.R  ##"
+Rscript -e "rmarkdown::render('~/CODE/data_streams/car/C01_taplog_plot.R',
+                output_format = 'html_document',
+                output_dir    = '~/Formal/REPORTS')"
+info "##  End C01_taplog_plot.R  STATUS:$?  ##"
+
 
 
 
@@ -199,14 +210,6 @@ wait "${pids[@]}"; pids=()
   info "##  End  M8_CarScannerParse.R  STATUS:$?  ##"
 ) & ## don't wait
 
-(
-  sleep 0.6
-  info "##  read_taplog.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/car_tools/read_taplog.R',
-                  output_format = 'html_document',
-                  output_dir    = '~/Formal/REPORTS')"
-  info "##  End  read_taplog.R  STATUS:$?  ##"
-) & ## don't wait
 
 wait "${pids[@]}"; pids=()
 
