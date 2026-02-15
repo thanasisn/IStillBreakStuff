@@ -178,25 +178,26 @@ wait "${pids[@]}"; pids=()
   info "##  End  F02_bonds.R  STATUS:$?  ##"
 ) & pids+=($!)
 
-exit
-
 (
   sleep 0.3
   info "##  F03_comod.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/fi_analysis/F03_comod.R',
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F03_comod.R',
                   output_format = 'html_document',
                   output_dir    = '~/Formal/REPORTS')"
   info "##  End  F03_comod.R  STATUS:$?  ##"
 ) & pids+=($!)
 
+
 (
   sleep 0.4
   info "##  F04_zero.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/fi_analysis/F04_zero.R',
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F04_zero.R',
                   output_format = 'html_document',
                   output_dir    = '~/Formal/REPORTS')"
   info "##  End  F04_zero.R  STATUS:$?  ##"
 ) & pids+=($!)
+
+exit
 
 (
   sleep 0.5
