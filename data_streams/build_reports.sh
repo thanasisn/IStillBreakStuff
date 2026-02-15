@@ -55,8 +55,23 @@ pids=()
 ) & pids+=($!)
 
 
+
 (
   sleep 3
+  script="$HOME/CODE/data_streams/fi_analysis/M01_get_noa_mail.R"
+  info "##  $(basename $script)  ##"
+  "$script"
+  info "##  End $(basename $script) STATUS:$?  ##"
+
+  script="$HOME/CODE/data_streams/fi_analysis/M02_parse_data.R"
+  info "##  $(basename $script)  ##"
+  "$script"
+  info "##  End $(basename $script) STATUS:$?  ##"
+) & pids+=($!)
+
+
+(
+  sleep 4
   script="$HOME/CODE/data_streams/fi_analysis/S01_peiraios_syn.R"
   info "##  $(basename $script)  ##"
   "$script"
@@ -64,7 +79,7 @@ pids=()
 ) & pids+=($!)
 
 (
-  sleep 4
+  sleep 5
   script="$HOME/CODE/data_streams/fi_analysis/S02_trel_gol.R"
   info "##  $(basename $script)  ##"
   "$script"
@@ -72,7 +87,7 @@ pids=()
 ) & pids+=($!)
 
 (
-  sleep 5
+  sleep 6
   script="$HOME/CODE/data_streams/fi_analysis/S03_pdma.R"
   info "##  $(basename $script)  ##"
   "$script"
@@ -80,7 +95,7 @@ pids=()
 ) & pids+=($!)
 
 (
-  sleep 6
+  sleep 7
   script="$HOME/CODE/data_streams/fi_analysis/S04_tsig.R"
   info "##  $(basename $script)  ##"
   "$script"
@@ -88,13 +103,13 @@ pids=()
 ) & pids+=($!)
 
 (
-  sleep 7
+  sleep 8
   script="$HOME/CODE/data_streams/fi_analysis/S05_get_winbank_zip_noa.py"
   info "##  $(basename $script)  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 
-  script="/home/athan/CODE/fi_analysis/S06_parse_winbank_csv.R"
+  script="$HOME/CODE/data_streams/fi_analysis/S06_parse_winbank_csv.R"
   info "##  $(basename $script)  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
@@ -103,75 +118,13 @@ pids=()
 
 wait "${pids[@]}"; pids=()
 
-exit
 
-
-##  Scrap and parse data  ------------------------------------------------------
-(
-  script="$HOME/CODE/fi_analysis/M1_get_noa_mail.R"
-  info "##  $(basename $script)  ##"
-  "$script"
-  info "##  End $(basename $script) STATUS:$?  ##"
-
-  script="$HOME/CODE/fi_analysis/M2_parse_data.R"
-  info "##  $(basename $script)  ##"
-  "$script"
-  info "##  End $(basename $script) STATUS:$?  ##"
-) & pids+=($!)
-
-# (
-#   sleep 0.1
-#   script="$HOME/CODE/fi_analysis/S01_peiraios_syn.R"
-#   info "##  $(basename $script)  ##"
-#   "$script"
-#   info "##  End $(basename $script) STATUS:$?  ##"
-# ) & pids+=($!)
-# 
-# (
-#   sleep 0.2
-#   script="$HOME/CODE/fi_analysis/S02_trel_gol.R"
-#   info "##  $(basename $script)  ##"
-#   "$script"
-#   info "##  End $(basename $script) STATUS:$?  ##"
-# ) & pids+=($!)
-# 
-# (
-#   sleep 0.3
-#   script="$HOME/CODE/fi_analysis/S03_pdma.R"
-#   info "##  $(basename $script)  ##"
-#   "$script"
-#   info "##  End $(basename $script) STATUS:$?  ##"
-# ) & pids+=($!)
-# 
-# (
-#   sleep 0.4
-#   script="$HOME/CODE/fi_analysis/S04_tsig.R"
-#   info "##  $(basename $script)  ##"
-#   "$script"
-#   info "##  End $(basename $script) STATUS:$?  ##"
-# ) & pids+=($!)
-
-# (
-#   sleep 0.5
-#   script="$HOME/CODE/fi_analysis/S05_get_winbank_zip_noa.py"
-#   info "##  $(basename $script)  ##"
-#   "$script"
-#   info "##  End $(basename $script) STATUS:$?  ##"
-# 
-#   script="/home/athan/CODE/fi_analysis/S06_parse_winbank_csv.R"
-#   info "##  $(basename $script)  ##"
-#   "$script"
-#   info "##  End $(basename $script) STATUS:$?  ##"
-# 
-# ) & pids+=($!)
-
-wait "${pids[@]}"; pids=()
 
 
 
 ##  Parse data  ----------------------------------------------------------------
 (
-  script="$HOME/CODE/fi_analysis/M4_alerts.R"
+  script="$HOME/CODE/data_streams/fi_analysis/M04_alerts.R"
   info "##  $(basename $script)  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
@@ -179,7 +132,7 @@ wait "${pids[@]}"; pids=()
 
 (
   sleep 0.1
-  script="$HOME/CODE/fi_analysis/M5_exports.R"
+  script="$HOME/CODE/data_streams/fi_analysis/M05_exports.R"
   info "##  $(basename $script)  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
@@ -187,7 +140,7 @@ wait "${pids[@]}"; pids=()
 
 (
   sleep 0.2
-  script="$HOME/CODE/fi_analysis/M6_conky_plot.R"
+  script="$HOME/CODE/data_streams/fi_analysis/M06_conky_plot.R"
   info "##  $(basename $script)  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
@@ -197,10 +150,11 @@ wait "${pids[@]}"; pids=()
 
 
 
+
 ##  Data display scripts  ------------------------------------------------------
 (
   info "##  M3_plots.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/fi_analysis/M3_plots.R',
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/M03_plots.R',
                   output_format = 'html_document',
                   output_dir    = '~/Formal/REPORTS')"
   info "##  End  M3_plots.R STATUS:$?  ##"
@@ -209,7 +163,7 @@ wait "${pids[@]}"; pids=()
 (
   sleep 0.1
   info "##  F01_placements.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/fi_analysis/F01_placements.R',
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F01_placements.R',
                   output_format = 'html_document',
                   output_dir    = '~/Formal/REPORTS')"
   info "##  End  F01_placements.R  STATUS:$?  ##"
@@ -218,11 +172,13 @@ wait "${pids[@]}"; pids=()
 (
   sleep 0.2
   info "##  F02_bonds.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/fi_analysis/F02_bonds.R',
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F02_bonds.R',
                   output_format = 'html_document',
                   output_dir    = '~/Formal/REPORTS')"
   info "##  End  F02_bonds.R  STATUS:$?  ##"
 ) & pids+=($!)
+
+exit
 
 (
   sleep 0.3
