@@ -116,6 +116,15 @@ pids=()
 
 ) & pids+=($!)
 
+(
+  sleep 9
+  info "##  M7_utilities.R  ##"
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/house/H01_utilities.R',
+                  output_format = 'html_document',
+                  output_dir    = '~/Formal/REPORTS')"
+  info "##  End  M7_utilities.R  STATUS:$?  ##"
+) & pids+=($!)
+
 wait "${pids[@]}"; pids=()
 
 
@@ -197,30 +206,22 @@ wait "${pids[@]}"; pids=()
   info "##  End  F04_zero.R  STATUS:$?  ##"
 ) & pids+=($!)
 
-exit
 
-(
-  sleep 0.5
-  info "##  M7_utilities.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/fi_analysis/M7_utilities.R',
-                  output_format = 'html_document',
-                  output_dir    = '~/Formal/REPORTS')"
-  info "##  End  M7_utilities.R  STATUS:$?  ##"
-) & pids+=($!)
 
 (
   sleep 0.6
-  info "##  M8_CarScannerParse.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/fi_analysis/M8_CarScannerParse.R',
+  info "##  C02_CarScannerParse.R  ##"
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/car/C02_CarScannerParse.R',
                   output_format = 'html_document',
                   output_dir    = '~/Formal/REPORTS')"
-  info "##  End  M8_CarScannerParse.R  STATUS:$?  ##"
+  info "##  End  C02_CarScannerParse.R  STATUS:$?  ##"
 ) & ## don't wait
 
 
 wait "${pids[@]}"; pids=()
 
 
+exit
 
 ##  Summary  -------------------------------------------------------------------
 (
