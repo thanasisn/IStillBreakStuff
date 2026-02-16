@@ -109,7 +109,12 @@ pids=()
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 
-  script="$HOME/CODE/data_streams/fi_analysis/S06_parse_winbank_csv.R"
+  script="$HOME/CODE/data_streams/fi_analysis/S06_get_winbank_zip_auth.py"
+  info "##  $(basename $script)  ##"
+  "$script"
+  info "##  End $(basename $script) STATUS:$?  ##"
+
+  script="$HOME/CODE/data_streams/fi_analysis/S07_parse_winbank_csv.R"
   info "##  $(basename $script)  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
