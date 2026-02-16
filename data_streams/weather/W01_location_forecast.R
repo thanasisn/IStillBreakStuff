@@ -24,7 +24,7 @@ if (interactive() ||
     file.mtime(export.file) <= (Sys.time() - 0.5 * 3600)) {
   print("Have to run")
 } else {
-  stop("Don't have to run yet!")
+  stop(paste0("\n\n", basename(Script.Name), "\nDon't have to run yet!\n\n"))
 }
 
 ##  Set environment  -----------------------------------------------------------

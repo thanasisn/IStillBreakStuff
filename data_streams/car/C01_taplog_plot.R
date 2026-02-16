@@ -30,7 +30,7 @@ if (interactive() ||
     max(file.mtime(filenames)) >= file.mtime(export.file)  ) {
   print("Have to run")
 } else {
-  stop("Don't have to run yet!")
+  stop(paste0("\n\n", basename(Script.Name), "\nDon't have to run yet!\n\n"))
 }
 
 
