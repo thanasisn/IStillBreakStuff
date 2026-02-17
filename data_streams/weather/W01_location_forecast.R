@@ -1,4 +1,3 @@
-# /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:  "My weather `r strftime(Sys.time(), '%F %R %Z', tz= 'Europe/Athens')`"
