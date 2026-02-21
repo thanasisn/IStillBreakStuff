@@ -35,12 +35,9 @@ require(ggplot2,    quietly = TRUE, warn.conflicts = FALSE)
 require(plotly,     quietly = TRUE, warn.conflicts = FALSE)
 require(DT,         quietly = TRUE, warn.conflicts = FALSE)
 require(htmltools,  quietly = TRUE, warn.conflicts = FALSE)
-library(slider)
+require(slider,     quietly = TRUE, warn.conflicts = FALSE)
 
 source("~/CODE/data_streams/GC_status/GC00_DEFINITIONS.R")
-
-source("~/CODE/FUNCTIONS/R/data.R")
-
 
 ## choose loess criterion for span
 LOESS_CRITERIO <-  c("aicc", "gcv")[1]
