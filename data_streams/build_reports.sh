@@ -134,8 +134,6 @@ wait "${pids[@]}"; pids=()
 
 
 
-
-
 ##  Parse data  ----------------------------------------------------------------
 (
   script="$HOME/CODE/data_streams/fi_analysis/M04_alerts.R"
@@ -222,6 +220,12 @@ wait "${pids[@]}"; pids=()
   info "##  End  C02_CarScannerParse.R  STATUS:$?  ##"
 ) & ## don't wait
 
+(
+  sleep 10
+  info "##  GC_status_run.R  ##"
+  "$HOME/CODE/data_streams/GC_status/GC_status_run.R"
+  info "##  End  GC_status_run.R  STATUS:$?  ##"
+) & ## don't wait
 
 wait "${pids[@]}"; pids=()
 

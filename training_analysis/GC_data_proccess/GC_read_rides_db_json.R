@@ -447,246 +447,246 @@ if (DEBUG ||
   # test[test < 10]
 
   ## __ Plot all variables ---------------------------------------------------
-  if (!interactive()) {
-    pdf(file = pdfout1, width = 8, height = 4)
-  }
-
-  par(mar = c(4,4,1,1))
-
-  plot(a$EPOC, a$Trimp_Points,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6,
-       xlab = "EPOC", ylab = "TRIMP")
-
-  plot(a$EPOC, a$Trimp_Zonal_Points,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6,
-       xlab = "EPOC", ylab = "TRIMP Zonal")
-
-  plot(a$Trimp_Points, a$Trimp_Zonal_Points,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6,
-       xlab = "TRIMP", ylab = "TRIMP Zonal")
-
-  plot(a$Total_Kcalories, a$Trimp_Points,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6)
-  plot(a$Total_Kcalories, a$Trimp_Zonal_Points,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6)
-  plot(a$Total_Kcalories, a$EPOC,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6)
-
-  plot(a$Workout_Time,   a$Trimp_Points / a$EPOC,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6)
-
-  # plot(a$Total_Distance, a$Trimp_Points / a$EPOC,
+  # if (!interactive()) {
+  #   pdf(file = pdfout1, width = 8, height = 4)
+  # }
+  #
+  # par(mar = c(4,4,1,1))
+  #
+  # plot(a$EPOC, a$Trimp_Points,
+  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,
+  #      xlab = "EPOC", ylab = "TRIMP")
+  #
+  # plot(a$EPOC, a$Trimp_Zonal_Points,
+  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,
+  #      xlab = "EPOC", ylab = "TRIMP Zonal")
+  #
+  # plot(a$Trimp_Points, a$Trimp_Zonal_Points,
+  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,
+  #      xlab = "TRIMP", ylab = "TRIMP Zonal")
+  #
+  # plot(a$Total_Kcalories, a$Trimp_Points,
   #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
-
-
-
-  ### how column exist?
-  grep("istanc",names(a),ignore.case = T,value = T)
-  # plot(a$Total_Distance, a$Distance,
+  # plot(a$Total_Kcalories, a$Trimp_Zonal_Points,
   #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
-
-  # plot(a$Workout_Time, a$Time_Recording,
-  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-  # plot(a$Workout_Time, a$Time_Carrying,
-  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-  # plot(a$Workout_Time, a$Time_Riding,
-  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-  # plot(a$Workout_Time, a$Time_Moving,
-  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-
-
-  for (avar in wecare) {
-    ## ignore no data
-    if (all(as.numeric(a[[avar]]) %in% c(0, NA))) {
-      cat(paste("Skip plot 0 or NA:", avar),"\n")
-      next()
-    }
-
-    if (sum(!is.na(a[[avar]])) < DATA_PLOT_LIMIT) {
-      cat(paste("Skip plot few points:", avar),"\n")
-      next()
-    }
-
-
-    par(mar = c(2,2,1,1))
-
-    rm   <- frollmean(a[[avar]], n = 30, hasNA = T, na.rm = T, algo = "exact" )
-    ylim <- range(rm,a[[avar]], na.rm = T)
-
-    ## regression my month
-    ## fails when all is na in a group
-    # lms <- a[,
-    #          .(model1 = list( lm(get(avar)~Date, .SD, na.action = na.omit) )),
-    #            by = .(year(Date), month(Date)) ]
-    #
-    # lms <- a[,
-    #          .(model1 = if (!all(is.na(.SD[[avar]]))) {list(lm(get(avar)~Date, .SD, na.action = na.omit))} else {NULL}),
-    #          by = .(year(Date), month(Date)) ]
-
-    plot(a$Date, a[[avar]],
-         col  = a$Col,
-         pch  = a$Pch,
-         cex  = 0.6,
-         xlab = "", ylab = "")
-
-    lines(a$Date, rm, col = "green")
-
-    ## create lm with loops
-    pp <- a[, .(Date, get(avar), month = month(Date), year = year(Date))]
-    for (ay in unique(pp$year)) {
-      tmp <- pp[year == ay, ]
-      if ( sum(!is.na(tmp$V2)) > 1) {
-        mlm    <- lm(V2 ~ Date, tmp, na.action = na.omit)
-        Dstart <- as.POSIXct(strptime(paste(ay, "1", "1"), "%Y %m %d"))
-        Dend   <- as.POSIXct(add_with_rollback(Dstart, months(1)))
-        res    <- predict(mlm, data.table(Date = c(Dstart,Dend)))
-        segments(x0 = Dstart, x1 = Dend, y0 = res[1], y1 = res[2], col = "grey")
-      }
-    }
-
-    ## LOESS curve
-    vec <- !is.na(a[[avar]])
-    if (sum(vec) > 20) {
-      FTSE.lo3 <- loess.as(a$Date[vec], a[[avar]][vec],
-                           degree = 1,
-                           criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
-      FTSE.lo.predict3 <- predict(FTSE.lo3, a$Date)
-      lines(a$Date, FTSE.lo.predict3, col = "cyan", lwd = 1)
-    }
-
-
-
-    abline(v = as.numeric(unique(round(a$Date, "month"))),
-           lty = 3, col = "lightgray")
-    abline(h = pretty(a[[avar]]),
-           lty = 3, col = "lightgray")
-
-    title(avar)
-  }
-
-  dev.off()
+  # plot(a$Total_Kcalories, a$EPOC,
+  #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
+  #
+  # plot(a$Workout_Time,   a$Trimp_Points / a$EPOC,
+  #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
+  #
+  # # plot(a$Total_Distance, a$Trimp_Points / a$EPOC,
+  # #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
+  #
+  #
+  #
+  # ### how column exist?
+  # grep("istanc",names(a),ignore.case = T,value = T)
+  # # plot(a$Total_Distance, a$Distance,
+  # #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
+  #
+  # # plot(a$Workout_Time, a$Time_Recording,
+  # #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+  # # plot(a$Workout_Time, a$Time_Carrying,
+  # #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+  # # plot(a$Workout_Time, a$Time_Riding,
+  # #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+  # # plot(a$Workout_Time, a$Time_Moving,
+  # #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+  #
+  #
+  # for (avar in wecare) {
+  #   ## ignore no data
+  #   if (all(as.numeric(a[[avar]]) %in% c(0, NA))) {
+  #     cat(paste("Skip plot 0 or NA:", avar),"\n")
+  #     next()
+  #   }
+  #
+  #   if (sum(!is.na(a[[avar]])) < DATA_PLOT_LIMIT) {
+  #     cat(paste("Skip plot few points:", avar),"\n")
+  #     next()
+  #   }
+  #
+  #
+  #   par(mar = c(2,2,1,1))
+  #
+  #   rm   <- frollmean(a[[avar]], n = 30, hasNA = T, na.rm = T, algo = "exact" )
+  #   ylim <- range(rm,a[[avar]], na.rm = T)
+  #
+  #   ## regression my month
+  #   ## fails when all is na in a group
+  #   # lms <- a[,
+  #   #          .(model1 = list( lm(get(avar)~Date, .SD, na.action = na.omit) )),
+  #   #            by = .(year(Date), month(Date)) ]
+  #   #
+  #   # lms <- a[,
+  #   #          .(model1 = if (!all(is.na(.SD[[avar]]))) {list(lm(get(avar)~Date, .SD, na.action = na.omit))} else {NULL}),
+  #   #          by = .(year(Date), month(Date)) ]
+  #
+  #   plot(a$Date, a[[avar]],
+  #        col  = a$Col,
+  #        pch  = a$Pch,
+  #        cex  = 0.6,
+  #        xlab = "", ylab = "")
+  #
+  #   lines(a$Date, rm, col = "green")
+  #
+  #   ## create lm with loops
+  #   pp <- a[, .(Date, get(avar), month = month(Date), year = year(Date))]
+  #   for (ay in unique(pp$year)) {
+  #     tmp <- pp[year == ay, ]
+  #     if ( sum(!is.na(tmp$V2)) > 1) {
+  #       mlm    <- lm(V2 ~ Date, tmp, na.action = na.omit)
+  #       Dstart <- as.POSIXct(strptime(paste(ay, "1", "1"), "%Y %m %d"))
+  #       Dend   <- as.POSIXct(add_with_rollback(Dstart, months(1)))
+  #       res    <- predict(mlm, data.table(Date = c(Dstart,Dend)))
+  #       segments(x0 = Dstart, x1 = Dend, y0 = res[1], y1 = res[2], col = "grey")
+  #     }
+  #   }
+  #
+  #   ## LOESS curve
+  #   vec <- !is.na(a[[avar]])
+  #   if (sum(vec) > 20) {
+  #     FTSE.lo3 <- loess.as(a$Date[vec], a[[avar]][vec],
+  #                          degree = 1,
+  #                          criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
+  #     FTSE.lo.predict3 <- predict(FTSE.lo3, a$Date)
+  #     lines(a$Date, FTSE.lo.predict3, col = "cyan", lwd = 1)
+  #   }
+  #
+  #
+  #
+  #   abline(v = as.numeric(unique(round(a$Date, "month"))),
+  #          lty = 3, col = "lightgray")
+  #   abline(h = pretty(a[[avar]]),
+  #          lty = 3, col = "lightgray")
+  #
+  #   title(avar)
+  # }
+  #
+  # dev.off()
 
 
   ## __  PLOT LAST -----------------------------------------------------------
   a <- a[ as.Date(Date) > (Sys.Date() - LASTDAYS) ]
-  if (!interactive()) {
-    pdf(file = pdfout2, width = 8, height = 4)
-  }
-
-  par(mar = c(4,4,1,1))
-
-  plot(a$EPOC, a$Trimp_Points,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6,
-       xlab = "EPOC", ylab = "TRIMP")
-
-  plot(a$EPOC, a$Trimp_Zonal_Points,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6,
-       xlab = "EPOC", ylab = "TRIMP Zonal")
-
-  plot(a$Trimp_Points, a$Trimp_Zonal_Points,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6,
-       xlab = "TRIMP", ylab = "TRIMP Zonal")
-
-  plot(a$Total_Kcalories, a$Trimp_Points,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6)
-  plot(a$Total_Kcalories, a$Trimp_Zonal_Points,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6)
-  plot(a$Total_Kcalories, a$EPOC,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6)
-
-  plot(a$Workout_Time,   a$Trimp_Points / a$EPOC,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6)
-
-  plot(a$Total_Distance, a$Trimp_Points / a$EPOC,
-       col  = a$Col, pch  = a$Pch, cex  = 0.6)
-
-
-
-  ### how column exist?
-  grep("istanc",names(a),ignore.case = T,value = T)
-  # plot(a$Total_Distance, a$Distance,
+  # if (!interactive()) {
+  #   pdf(file = pdfout2, width = 8, height = 4)
+  # }
+  #
+  # par(mar = c(4,4,1,1))
+  #
+  # plot(a$EPOC, a$Trimp_Points,
+  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,
+  #      xlab = "EPOC", ylab = "TRIMP")
+  #
+  # plot(a$EPOC, a$Trimp_Zonal_Points,
+  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,
+  #      xlab = "EPOC", ylab = "TRIMP Zonal")
+  #
+  # plot(a$Trimp_Points, a$Trimp_Zonal_Points,
+  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,
+  #      xlab = "TRIMP", ylab = "TRIMP Zonal")
+  #
+  # plot(a$Total_Kcalories, a$Trimp_Points,
   #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
-
-  # plot(a$Workout_Time, a$Time_Recording,
-  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-  # plot(a$Workout_Time, a$Time_Carrying,
-  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-  # plot(a$Workout_Time, a$Time_Riding,
-  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-  # plot(a$Workout_Time, a$Time_Moving,
-  #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
-
-
-  for (avar in wecare) {
-    ## ignore no data
-    if (all(as.numeric(a[[avar]]) %in% c(0, NA))) {
-      cat(paste("Skip plot 0 or NA:", avar),"\n")
-      next()
-    }
-
-    if (sum(!is.na(a[[avar]])) < DATA_PLOT_LIMIT) {
-      cat(paste("Skip plot few points:", avar),"\n")
-      next()
-    }
-
-
-    par(mar = c(2, 2, 1, 1))
-
-    rm   <- frollmean(a[[avar]], n = 30, hasNA = T, na.rm = T, algo = "exact" )
-    ylim <- range(rm,a[[avar]], na.rm = T)
-
-    ## regression my month
-    ## fails when all is na in a group
-    # lms <- a[,
-    #          .(model1 = list( lm(get(avar)~Date, .SD, na.action = na.omit) )),
-    #            by = .(year(Date), month(Date)) ]
-    #
-    # lms <- a[,
-    #          .(model1 = if (!all(is.na(.SD[[avar]]))) {list(lm(get(avar)~Date, .SD, na.action = na.omit))} else {NULL}),
-    #          by = .(year(Date), month(Date)) ]
-
-    plot(a$Date, a[[avar]],
-         col  = a$Col,
-         pch  = a$Pch,
-         cex  = 0.6,
-         xlab = "", ylab = "")
-
-    lines(a$Date, rm, col = "green")
-
-    ## create lm with loops
-    pp <- a[, .(Date, get(avar), month = month(Date), year = year(Date))]
-    for (ay in unique(pp$year)) {
-      for (am in unique(pp$month)) {
-        tmp <- pp[year == ay & month == am, ]
-        if ( sum(!is.na(tmp$V2)) > 1) {
-          mlm    <- lm(V2 ~ Date, tmp, na.action = na.omit)
-          Dstart <- as.POSIXct(strptime(paste(ay, am, "1"), "%Y %m %d"))
-          Dend   <- as.POSIXct(add_with_rollback(Dstart, months(1)))
-          res    <- predict(mlm, data.table(Date = c(Dstart,Dend)) )
-          segments(x0 = Dstart, x1 = Dend, y0 = res[1], y1 = res[2], col = "grey")
-        }
-      }
-    }
-
-    abline(v = as.numeric(unique(round(a$Date, "month"))),
-           lty = 3, col = "lightgray")
-    abline(h = pretty(a[[avar]]),
-           lty = 3, col = "lightgray")
-
-    ## LOESS curve
-    vec <- !is.na(a[[avar]])
-    if (sum(vec) > 20) {
-      FTSE.lo3 <- loess.as(a$Date[vec], a[[avar]][vec],
-                           degree = 1,
-                           criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
-      FTSE.lo.predict3 <- predict(FTSE.lo3, a$Date)
-      lines(a$Date, FTSE.lo.predict3, col = "cyan", lwd = 1)
-    }
-
-    title(avar)
-  }
-
-  dev.off()
+  # plot(a$Total_Kcalories, a$Trimp_Zonal_Points,
+  #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
+  # plot(a$Total_Kcalories, a$EPOC,
+  #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
+  #
+  # plot(a$Workout_Time,   a$Trimp_Points / a$EPOC,
+  #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
+  #
+  # plot(a$Total_Distance, a$Trimp_Points / a$EPOC,
+  #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
+  #
+  #
+  #
+  # ### how column exist?
+  # grep("istanc",names(a),ignore.case = T,value = T)
+  # # plot(a$Total_Distance, a$Distance,
+  # #      col  = a$Col, pch  = a$Pch, cex  = 0.6)
+  #
+  # # plot(a$Workout_Time, a$Time_Recording,
+  # #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+  # # plot(a$Workout_Time, a$Time_Carrying,
+  # #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+  # # plot(a$Workout_Time, a$Time_Riding,
+  # #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+  # # plot(a$Workout_Time, a$Time_Moving,
+  # #      col  = a$Col, pch  = a$Pch, cex  = 0.6,)
+  #
+  #
+  # for (avar in wecare) {
+  #   ## ignore no data
+  #   if (all(as.numeric(a[[avar]]) %in% c(0, NA))) {
+  #     cat(paste("Skip plot 0 or NA:", avar),"\n")
+  #     next()
+  #   }
+  #
+  #   if (sum(!is.na(a[[avar]])) < DATA_PLOT_LIMIT) {
+  #     cat(paste("Skip plot few points:", avar),"\n")
+  #     next()
+  #   }
+  #
+  #
+  #   par(mar = c(2, 2, 1, 1))
+  #
+  #   rm   <- frollmean(a[[avar]], n = 30, hasNA = T, na.rm = T, algo = "exact" )
+  #   ylim <- range(rm,a[[avar]], na.rm = T)
+  #
+  #   ## regression my month
+  #   ## fails when all is na in a group
+  #   # lms <- a[,
+  #   #          .(model1 = list( lm(get(avar)~Date, .SD, na.action = na.omit) )),
+  #   #            by = .(year(Date), month(Date)) ]
+  #   #
+  #   # lms <- a[,
+  #   #          .(model1 = if (!all(is.na(.SD[[avar]]))) {list(lm(get(avar)~Date, .SD, na.action = na.omit))} else {NULL}),
+  #   #          by = .(year(Date), month(Date)) ]
+  #
+  #   plot(a$Date, a[[avar]],
+  #        col  = a$Col,
+  #        pch  = a$Pch,
+  #        cex  = 0.6,
+  #        xlab = "", ylab = "")
+  #
+  #   lines(a$Date, rm, col = "green")
+  #
+  #   ## create lm with loops
+  #   pp <- a[, .(Date, get(avar), month = month(Date), year = year(Date))]
+  #   for (ay in unique(pp$year)) {
+  #     for (am in unique(pp$month)) {
+  #       tmp <- pp[year == ay & month == am, ]
+  #       if ( sum(!is.na(tmp$V2)) > 1) {
+  #         mlm    <- lm(V2 ~ Date, tmp, na.action = na.omit)
+  #         Dstart <- as.POSIXct(strptime(paste(ay, am, "1"), "%Y %m %d"))
+  #         Dend   <- as.POSIXct(add_with_rollback(Dstart, months(1)))
+  #         res    <- predict(mlm, data.table(Date = c(Dstart,Dend)) )
+  #         segments(x0 = Dstart, x1 = Dend, y0 = res[1], y1 = res[2], col = "grey")
+  #       }
+  #     }
+  #   }
+  #
+  #   abline(v = as.numeric(unique(round(a$Date, "month"))),
+  #          lty = 3, col = "lightgray")
+  #   abline(h = pretty(a[[avar]]),
+  #          lty = 3, col = "lightgray")
+  #
+  #   ## LOESS curve
+  #   vec <- !is.na(a[[avar]])
+  #   if (sum(vec) > 20) {
+  #     FTSE.lo3 <- loess.as(a$Date[vec], a[[avar]][vec],
+  #                          degree = 1,
+  #                          criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
+  #     FTSE.lo.predict3 <- predict(FTSE.lo3, a$Date)
+  #     lines(a$Date, FTSE.lo.predict3, col = "cyan", lwd = 1)
+  #   }
+  #
+  #   title(avar)
+  # }
+  #
+  # dev.off()
 
   ## save make info
   Rmk_store_dependencies()
