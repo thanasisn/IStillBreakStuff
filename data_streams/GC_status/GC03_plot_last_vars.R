@@ -95,7 +95,7 @@ PP |> colnames()
 ## _ Plot some data specific ---------
 #'
 #'
-#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=F, include=T, results="asis", warning=F
 
 ggplot(PP |> filter(!is.na(EPOC)),
        aes(
