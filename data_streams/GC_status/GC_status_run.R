@@ -7,8 +7,6 @@ Sys.setenv(TZ = "UTC")
 
 library(rmarkdown)
 
-
-
 #### Run all regular data process for GoldenCheetah
 
 dir.create("/dev/shm/CONKY", showWarnings = FALSE, recursive = TRUE)
@@ -29,15 +27,14 @@ try({
          output_dir    = "~/Formal/REPORTS/")
 })
 
+try({
+  render(input         = "~/CODE/data_streams/GC_status/GC04_more_plots_rides_db.R",
+         output_format = bookdown::html_document2(),
+         output_dir    = "~/Formal/REPORTS/")
+})
+
 stop("SSSS wait")
 
-try({
-  source("~/CODE/training_analysis/GC_data_proccess/GC_more_plots_rides_db.R")
-})
-
-try({
-  source("~/CODE/training_analysis/GC_data_proccess/GC_conky_plots_rides_db.R")
-})
 
 
 # todo
