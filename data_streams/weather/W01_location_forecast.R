@@ -127,7 +127,7 @@ daily <- daily |>
 #'
 #' # `r address` `r paste(round(gpx_old), "mins")`
 #'
-#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=F, include=T, results="asis", warning=F
 
 myadd[["timezone"]] <- timezone
 addr_names <- grep("full_address|source", names(myadd), invert = TRUE, value = TRUE)
@@ -233,7 +233,7 @@ daily <- daily |>
 #'
 #' # Best model plot
 #'
-#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=F, include=T, results="asis", warning=F
 
 best <- hourly %>%
   filter(grepl("best", Model, ignore.case = TRUE)) %>%
@@ -282,7 +282,7 @@ for (avar in variables) {
 #'
 #' # All model plot
 #'
-#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=F, include=T, results="asis", warning=F
 
 variables <- get_variables(hourly) %>% arrange_variables()
 for (avar in variables) {
@@ -296,6 +296,8 @@ for (avar in variables) {
 
   g <- g |> group_by(Model) |>
     filter(!all(as.numeric(Value) == 0))
+
+  if (nrow(g) <= 1) { next() }
 
   p <- ggplot()
 
@@ -354,7 +356,7 @@ for (avar in variables) {
 #'
 #' # Daily table
 #'
-#+ echo=F, include=T, fig.width=6, fig.height=6, results="asis", warning=F
+#+ echo=F, include=T, results="asis", warning=F
 
 
 pp <- daily |>
