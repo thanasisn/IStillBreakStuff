@@ -32,17 +32,16 @@ wmname LG3D
 
 kill_run  nm-tray
 kill_run  nm-applet
+kill_run  blueman-applet
 kill_run  system-config-printer-applet
-kill_run  dunst
+# kill_run  dunst
 kill_run  kdeconnect-indicator
 # kill_run  volumeicon
 # kill_run  $HOME/CODE/conky/scripts/top_ps.sh
 
 if [[ $WM_NAME = "bspwm" ]]; then
-    ## keybinds for bspwm
     skill_run sxhkd -c "$HOME/.config/sxhkd/sxhkdrc_bspwm"
 else
-    ## any other wm
     kill_run sxhkd
 fi
 

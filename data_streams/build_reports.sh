@@ -227,18 +227,26 @@ wait "${pids[@]}"; pids=()
   info "##  End  GC_status_run.R  STATUS:$?  ##"
 ) & ## don't wait
 
+
 wait "${pids[@]}"; pids=()
-
-
-exit
 
 ##  Summary  -------------------------------------------------------------------
 (
   info "##  F09_Dashboard.Rmd  ##"
-  Rscript -e "rmarkdown::render('~/CODE/fi_analysis/F09_Dashboard.Rmd',
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F09_Dashboard.Rmd',
                   output_dir    = '~/Formal/REPORTS')"
   info "##  End  F09_Dashboard.Rmd  STATUS:$?  ##"
 )
+
+##  Notification  -------------------------------------------------------------------
+
+(
+  script="$HOME/CODE/data_streams/fi_analysis/N01_fi_notifications.R"
+  info "##  $(basename $script)  ##"
+  "$script"
+  info "##  End $(basename $script) STATUS:$?  ##"
+) 
+
 
 
 info "##    END $0    ##"
