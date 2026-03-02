@@ -51,6 +51,7 @@ if (file.exists(pyenv_python)) {
 }
 
 source_python("~/CODE/data_streams/helpers/fn_get_open_meteo_forecasts.py")
+# source_python("~/CODE/data_streams/helpers/fn_get_open_meteo_forecasts_1.py")
 
 #+ include=FALSE, echo=FALSE
 ## init use of ggplot and html tables in loops
