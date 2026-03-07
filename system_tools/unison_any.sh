@@ -90,7 +90,7 @@ echo
 ## run unison with some specifications
 $TIMEOUT -k 10 "$killafter" \
     nice -n 19              \
-    $UNISON "$profile" -servercmd "$UNISON" -logfile "${applog}" "$@"
+    $UNISON "$profile" -servercmd "$UNISON" -logfile "${applog}" "$@" 
 
 ## capture and notify on exit status
 status="$?"
