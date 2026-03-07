@@ -1,4 +1,5 @@
 
+# -*- coding: utf-8 -*-
 
 # Auto install modules
 import subprocess
@@ -35,7 +36,7 @@ import requests_cache
 from retry_requests import retry
 from datetime import datetime
 
-def get_open_meteo_forecasts(latitude=0, longitude=0):
+def get_open_meteo_forecasts(latitude = 0, longitude = 0):
     """
     Fetch weather data from Open-Meteo API for given coordinates.
 
@@ -125,7 +126,7 @@ def get_open_meteo_forecasts(latitude=0, longitude=0):
         "ukmo_global_deterministic_10km",
         "ukmo_uk_deterministic_2km",
         "meteofrance_seamless",
-        "meteofrance_arpege_world",
+        # "meteofrance_arpege_world",
         "meteofrance_arpege_europe",
         "meteofrance_arome_france",
         "meteofrance_arome_france_hd",
@@ -162,7 +163,7 @@ def get_open_meteo_forecasts(latitude=0, longitude=0):
 
     # Store all long-format data
     all_hourly_data = []
-    all_daily_data = []
+    all_daily_data  = []
 
     # Process each model
     for i, response in enumerate(responses):
@@ -171,24 +172,36 @@ def get_open_meteo_forecasts(latitude=0, longitude=0):
         # Get hourly data
         hourly = response.Hourly()
 
+        if hourly is None:
+            print(f"No hourly data for model {model_name}")
+            continue
+
         # Create date range
-        hourly_dates = pd.date_range(
-            start=pd.to_datetime(hourly.Time(), unit="s", utc=True),
-            end=pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
-            freq=pd.Timedelta(seconds=hourly.Interval()),
-            inclusive="left"
+        hourly_dates  = pd.date_range(
+            start     = pd.to_datetime(hourly.Time(), unit="s", utc=True),
+            end       = pd.to_datetime(hourly.TimeEnd(), unit="s", utc=True),
+            freq      = pd.Timedelta(seconds=hourly.Interval()),
+            inclusive ="left"
         )
 
         # Process each hourly variable
         for v, var_name in enumerate(hourly_vars_names):
             values = hourly.Variables(v).ValuesAsNumpy()
 
-            # Skip empty variables (all NaN or all zero)
-            if v < len(hourly.Variables(0).ValuesAsNumpy()):  # Check if variable exists
-                if np.all(np.isnan(values)) or np.all(values == 0):
-                    # print(f"Skipping empty hourly variable: {var_name} for model: {model_name}")
-                    continue
+            # # Skip empty variables (all NaN or all zero)
+            # if v < len(hourly.Variables(0).ValuesAsNumpy()):  # Check if variable exists
+            #     if np.all(np.isnan(values)) or np.all(values == 0):
+            #         # print(f"Skipping empty hourly variable: {var_name} for model: {model_name}")
+            #         continue
 
+            var = hourly.Variables(v)
+            if var is None:
+                continue
+
+            values = var.ValuesAsNumpy()
+
+            if np.all(np.isnan(values)):
+                continue
 
             # Create long-format dataframe for this variable
             var_df = pd.DataFrame({
@@ -239,7 +252,7 @@ def get_open_meteo_forecasts(latitude=0, longitude=0):
 
     # Combine all data
     hourly_data = pd.concat(all_hourly_data, ignore_index=True)
-    daily_data = pd.concat(all_daily_data, ignore_index=True)
+    daily_data  = pd.concat(all_daily_data, ignore_index=True)
 
     # return hourly_data, daily_data
 
@@ -270,18 +283,18 @@ def get_open_meteo_forecasts(latitude=0, longitude=0):
 
 
 
-
-
-
 # Example usage:
-if __name__ == "__main__":
-    # Test the function with some coordinates
-    lat, lon = 40.52, 23.00
-    hourly_df, daily_df, su, me = get_open_meteo_forecasts(lat, lon)
-
-    print("Hourly data shape:", hourly_df.shape)
-    print("Daily data shape:", daily_df.shape)
-    print("\nHourly data sample:")
-    print(hourly_df.head())
-    print("\nDaily data sample:")
-    print(daily_df.head())
+# if __name__ == "__main__":
+#     # Test the function with some coordinates
+#     lat, lon = 40.52, 23.00
+#     data = get_open_meteo_forecasts(lat, lon)
+#
+#     print("Hourly rows:", len(data["hourly"]["date"]))
+#     print("Daily rows:", len(data["daily"]["date"]))
+#
+    # print("Hourly data shape:", hourly_df.shape)
+    # print("Daily data shape:", daily_df.shape)
+    # print("\nHourly data sample:")
+    # print(hourly_df.head())
+    # print("\nDaily data sample:")
+    # print(daily_df.head())

@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -i python "/home/athan/CODE/nixos/nix-shells/python_general_2.nix"
+#! nix-shell -i python "/home/athan/CODE/nixos/nix-shells/system_python_R.nix"
 # -*- coding: utf-8 -*-
 
 
@@ -251,6 +251,8 @@ def get_open_meteo_forecasts(latitude = 0, longitude = 0):
         'daily':   clean_df(daily_data),
         'success': True
     }
+
+
 
 
 
