@@ -97,6 +97,7 @@ folders=(
 	"$HOME/MANUSCRIPTS/02_2024_enhancement"
 	"$HOME/MANUSCRIPTS/03_thesis"
 	"$HOME/MANUSCRIPTS/presentations"
+	"$HOME/MANUSCRIPTS/proposals"
 	"$HOME/MANUSCRIPTS/reports"
 	"$HOME/OREO"
 	"$HOME/PANDOC/My_Publications"
