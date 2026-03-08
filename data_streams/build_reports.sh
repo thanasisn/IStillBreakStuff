@@ -59,12 +59,12 @@ pids=()
 (
   sleep 3
   script="$HOME/CODE/data_streams/fi_analysis/M01_get_noa_mail.R"
-  info "##  $(basename $script)  ##"
+  info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 
   script="$HOME/CODE/data_streams/fi_analysis/M02_parse_data.R"
-  info "##  $(basename $script)  ##"
+  info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 ) & pids+=($!)
@@ -73,7 +73,7 @@ pids=()
 (
   sleep 4
   script="$HOME/CODE/data_streams/fi_analysis/S01_peiraios_syn.R"
-  info "##  $(basename $script)  ##"
+  info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 ) & pids+=($!)
@@ -81,7 +81,7 @@ pids=()
 (
   sleep 5
   script="$HOME/CODE/data_streams/fi_analysis/S02_trel_gol.R"
-  info "##  $(basename $script)  ##"
+  info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 ) & pids+=($!)
@@ -89,7 +89,7 @@ pids=()
 (
   sleep 6
   script="$HOME/CODE/data_streams/fi_analysis/S03_pdma.R"
-  info "##  $(basename $script)  ##"
+  info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 ) & pids+=($!)
@@ -97,7 +97,7 @@ pids=()
 (
   sleep 7
   script="$HOME/CODE/data_streams/fi_analysis/S04_tsig.R"
-  info "##  $(basename $script)  ##"
+  info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 ) & pids+=($!)
@@ -105,17 +105,17 @@ pids=()
 (
   sleep 8
   script="$HOME/CODE/data_streams/fi_analysis/S05_get_winbank_zip_noa.py"
-  info "##  $(basename $script)  ##"
+  info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 
   script="$HOME/CODE/data_streams/fi_analysis/S06_get_winbank_zip_auth.py"
-  info "##  $(basename $script)  ##"
+  info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 
   script="$HOME/CODE/data_streams/fi_analysis/S07_parse_winbank_csv.R"
-  info "##  $(basename $script)  ##"
+  info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 
@@ -137,7 +137,7 @@ wait "${pids[@]}"; pids=()
 ##  Parse data  ----------------------------------------------------------------
 (
   script="$HOME/CODE/data_streams/fi_analysis/M04_alerts.R"
-  info "##  $(basename $script)  ##"
+  info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 ) & pids+=($!)
@@ -145,7 +145,7 @@ wait "${pids[@]}"; pids=()
 (
   sleep 0.1
   script="$HOME/CODE/data_streams/fi_analysis/M05_exports.R"
-  info "##  $(basename $script)  ##"
+  info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 ) & pids+=($!)
@@ -153,7 +153,7 @@ wait "${pids[@]}"; pids=()
 (
   sleep 0.2
   script="$HOME/CODE/data_streams/fi_analysis/M06_conky_plot.R"
-  info "##  $(basename $script)  ##"
+  info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 ) & pids+=($!)
@@ -245,7 +245,7 @@ wait "${pids[@]}"; pids=()
   info "##  $(basename $script)  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
-) 
+)
 
 
 

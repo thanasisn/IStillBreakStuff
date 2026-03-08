@@ -47,7 +47,6 @@ if (
   stop(paste("\n\n", basename(Script.Name), "Don't have to run!\n\n"))
 }
 
-
 ## Parse JSON ------------------------------------------------------------------
 cat("\nHave to parse: ", gccache, "\n")
 

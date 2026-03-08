@@ -33,7 +33,7 @@ try({
          output_dir    = "~/Formal/REPORTS/")
 })
 
-stop("SSSS wait")
+stop("GC end")
 
 
 

@@ -57,7 +57,7 @@ if (!file.exists(storagefl)) { stop("Have to parse GC data first") }
 if (
   DEBUG ||
   interactive() ||
-  !file.exists(storagefl) ||
+  !file.exists(export.file) ||
   file.mtime(storagefl) < file.mtime(export.file)
 ) {
   cat(paste("\n\n",  basename(Script.Name), "have to run!\n\n"))
@@ -87,8 +87,9 @@ PP <- DT |> select(
   -matches("_V2$"),
   -matches("Best_[0-9][0-9]m"),
   -matches("Best_[0-9][0-9][0-9]m"),
+  -matches("Best_[1-4][0-9]00m"),
   )
-PP |> colnames()
+PP |> colnames() |> sort()
 
 
 ## _ Plot some data specific ---------
