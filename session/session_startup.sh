@@ -92,6 +92,9 @@ export DISPLAY=$display; "$HOME/CODE/conky/scripts/update_background.sh" &
 ## start all conky cron scripts and truncate status logs
 "$HOME/CODE/conky/crons/run_all_crons.sh" &
 
+## reload services for when reboot
+systemctl --user daemon-reload
+
 # ## test polybar
 # killall polybar
 # xrandr --listactivemonitors | sed 's/^.* //' | sed 1d | while read screen; do
