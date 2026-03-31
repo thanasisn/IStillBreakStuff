@@ -5,7 +5,7 @@
 #### Auto commit and push all git repos
 
 
-exec 9>"/dev/shm/$(basename $0).lock"
+exec 9>"/dev/shm/$(basename "$0").lock"
 if ! flock -n 9; then
 	echo "another instance of $0 is running"
 	exit 1
@@ -22,7 +22,7 @@ info "START :: $0 :: $* ::"
 
 set +e
 
-##  COMMIT PUSH to github repos  ###############################################
+##  COMMIT PUSH to github repos  -----------------------------------------------
 
 echo "DOTFILES"
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" commit -uno -a -m "Commit $(date +'%F %R')"
@@ -30,31 +30,9 @@ git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" push -u origin master
 git --git-dir="$HOME/.dotfiles/" --work-tree="$HOME" maintenance run --auto
 
 
-# echo "---------------"
-# cd "$HOME/PANDOC/Libradtran_guide"
-# cd "./_book"
-# ln -f ./Libratran_guide.html ./index.html
-# git add -f .
-# cd ".."
-# pwd
-# git commit -uno -a -m "Commit $(date +'%F %R')"
-# git push -f -u origin main
-# git maintenance run --auto
-
-# echo "---------------"
-# cd "$HOME/PANDOC/CHP1_measurements_guide"
-# cd "./_book"
-# ln -f ./CHP1_measurements_guide.html ./index.html
-# git add -f .
-# cd ".."
-# pwd
-# git commit -uno -a -m "Commit $(date +'%F %R')"
-# git push -f -u origin main
-# git maintenance run --auto
 
 
-
-####  COMMIT and PUSH to github NO ADD  ################################
+##  COMMIT and PUSH to github NO ADD  ------------------------------------------
 
 ## use full paths
 folders=(
@@ -80,28 +58,27 @@ for i in "${folders[@]}"; do
 	git maintenance run --auto
 done
 
-####  ADD COMMIT and PUSH to github  ################################
+##  ADD COMMIT and PUSH to github  ---------------------------------------------
 
 ## use full paths
 folders=(
-	"$HOME/.dot_files"
-	"$HOME/BBand_LAP"
-	"$HOME/CODE/fi_analysis"
-	"$HOME/CODE/git_analysis"
-	"$HOME/CODE/nixos"
-	"$HOME/CODE/notes_tools"
-	"$HOME/CODE/training_location_analysis"
-	"$HOME/DUSTR"
-	"$HOME/EUMETSAT/"
-	"$HOME/MANUSCRIPTS/01_2022_sdr_trends"
-	"$HOME/MANUSCRIPTS/02_2024_enhancement"
-	"$HOME/MANUSCRIPTS/03_thesis"
-	"$HOME/MANUSCRIPTS/presentations"
-	"$HOME/MANUSCRIPTS/proposals"
-	"$HOME/MANUSCRIPTS/reports"
-	"$HOME/OREO"
-	"$HOME/PANDOC/My_Publications"
-	"$HOME/PANDOC/thanasisn.github.io"
+  "$HOME/.dot_files"
+  "$HOME/BBand_LAP"
+  "$HOME/CODE/fi_analysis"
+  "$HOME/CODE/git_analysis"
+  "$HOME/CODE/nixos"
+  "$HOME/CODE/notes_tools"
+  "$HOME/CODE/training_location_analysis"
+  "$HOME/DUSTR"
+  "$HOME/EUMETSAT/"
+  "$HOME/MANUSCRIPTS/01_2022_sdr_trends"
+  "$HOME/MANUSCRIPTS/02_2024_enhancement"
+  "$HOME/MANUSCRIPTS/03_thesis"
+  "$HOME/MANUSCRIPTS/presentations"
+  "$HOME/MANUSCRIPTS/proposals"
+  "$HOME/MANUSCRIPTS/reports"
+  "$HOME/OREO"
+  "$HOME/PANDOC/thanasisn.github.io"
   "$HOME/PANDOC/CHP1_measurements_guide"
   "$HOME/PANDOC/Libradtran_guide"
   "$HOME/PANDOC/Tracker_manual"
@@ -167,7 +144,7 @@ for i in "${folders[@]}"; do
 	) > >(tee .autogit.log) 2> >(tee .autogit.err >&2)
 done
 
-## ADD and COMMIT only for LOCAL repos ########################################
+## ADD and COMMIT only for LOCAL repos  ----------------------------------------
 
 ## use full paths
 folders=(
