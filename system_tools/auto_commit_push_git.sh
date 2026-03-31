@@ -71,6 +71,7 @@ folders=(
   "$HOME/CODE/training_location_analysis"
   "$HOME/DUSTR"
   "$HOME/EUMETSAT/"
+  "$HOME/EUMETSAT/process"
   "$HOME/MANUSCRIPTS/01_2022_sdr_trends"
   "$HOME/MANUSCRIPTS/02_2024_enhancement"
   "$HOME/MANUSCRIPTS/03_thesis"
