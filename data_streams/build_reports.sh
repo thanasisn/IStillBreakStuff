@@ -209,6 +209,15 @@ wait "${pids[@]}"; pids=()
   info "##  End  F04_zero.R  STATUS:$?  ##"
 ) & pids+=($!)
 
+(
+  sleep 0.5
+  info "##  F05_EFC30255.R  ##"
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F05_EFC30255.R',
+                  output_format = 'html_document',
+                  output_dir    = '~/Formal/REPORTS')"
+  info "##  End  F05_EFC30255.R  STATUS:$?  ##"
+) & pids+=($!)
+
 
 
 (
