@@ -8,12 +8,14 @@ file=$2
 
 filename="${file%.*}"
 
-echo "file  $file"
-echo "error $number k"
+echo "Input file:      $file"
+echo "Error tolerance: $number km"
 
+outfile="${filename}_E${number}.gpx"
 
 gpsbabel -i gpx -f - -x simplify,crosstrack,error="$number"k -o gpx -F -   <"$file"  > "${filename}_E${number}.gpx"
 
+echo "Export file:     $outfile"
 
 
 # count option
