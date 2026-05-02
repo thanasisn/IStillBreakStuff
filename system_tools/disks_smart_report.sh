@@ -38,8 +38,7 @@ for ad in /dev/nvme[0-9]; do
     serial="$(  echo "$data" | grep -i "serial number:"   | sed 's/[ ]\+//g'  | cut -d":" -f2- | sed 's/^[ ]*//g' | sed 's/[ ]\+/-/g')"
     hourson="$( echo "$data" | grep -i "Power On Hours"   | sed 's/[ ]\+/ /g' | grep -o "[0-9]\+[ ]*$")"
     minhoron="$(echo "$data" | grep -i "Power_On_Minutes" | sed 's/[ ]\+/ /g' | cut -d" " -f11 | sed 's/h.*//g')"
-    ## ouput file
-    # outfile="${LOGDIR}/${model}_${serial}_$(date +%F).smart"
+    ## output file
     outfile="${LOGDIR}/${model}_${serial}.smart"
     ## generate report
     (
@@ -47,6 +46,7 @@ for ad in /dev/nvme[0-9]; do
         date +"====  %F %R  ===="
         echo ""
         echo "Mounted on: $(hostname)"
+        echo "Device:     $(ad)"
         echo ""
         echo "Hours on:  $hourson"
         echo "Days on:   $((hourson/24))"
@@ -79,8 +79,7 @@ for ad in /dev/sd[a-z] /dev/sd[a-z][a-z]; do
     serial="$(  echo "$data" | grep -i "serial number:"   | sed 's/[ ]\+//g'  | cut -d":" -f2- | sed 's/^[ ]*//g' | sed 's/[ ]\+/-/g')"
     hourson="$( echo "$data" | grep -i "Power_On_Hours"   | sed 's/[ ]\+/ /g' | grep -o "[0-9]\+[ ]*$")"
     minhoron="$(echo "$data" | grep -i "Power_On_Minutes" | sed 's/[ ]\+/ /g' | cut -d" " -f11 | sed 's/h.*//g')"
-    ## ouput file
-    # outfile="${LOGDIR}/${model}_${serial}_$(date +%F).smart"
+    ## output file
     outfile="${LOGDIR}/${model}_${serial}.smart"
     ## generate report
     (
@@ -88,6 +87,7 @@ for ad in /dev/sd[a-z] /dev/sd[a-z][a-z]; do
         date +"====  %F %R  ===="
         echo ""
         echo "Mounted on: $(hostname)"
+        echo "Device:     $(ad)"
         echo ""
         echo "Hours on:  $hourson"
         echo "Days on:   $((hourson/24))"
