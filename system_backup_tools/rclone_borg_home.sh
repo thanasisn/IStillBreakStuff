@@ -72,8 +72,10 @@ fi
 
 ## set upload variables
 
-BORG_FOLDER="/media/free/.BORGbackup/crane_$PNAME"
-RCLONE_ROOT="/media/free/.BORGbackup"
+# BORG_FOLDER="/media/free/.BORGbackup/crane_$PNAME"
+BORG_FOLDER="/media/barel/BORG_short/crane_$PNAME"
+RCLONE_ROOT="/media/barel/BORG_short"
+
 TEMP_FOLDER="/dev/shm/borg_to_rclone_$PNAME"
 RCLONE="/home/athan/PROGRAMS/rclone"
 RCLONE_CONFIG="/home/athan/Documents/rclone.conf"
