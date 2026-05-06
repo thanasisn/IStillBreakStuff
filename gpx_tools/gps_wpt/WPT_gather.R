@@ -12,11 +12,8 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/CODE/gpx_tools/gps_wpt/WPT_gather.R"
 
-if (!interactive()) pdf(file = sub("\\.R$", ".pdf", Script.Name), width = 14)
-
 if (!interactive()) {
   dir.create("~/CODE/gpx_tools/gps_wpt/runtime/", showWarnings = F, recursive = T)
-  # pdf( file = paste0("~/CODE/gpx_tools/gps_wpt/runtime/", basename(sub("\\.R$",".pdf", Script.Name))))
   sink(file = paste0("~/CODE/gpx_tools/gps_wpt/runtime/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
 }
 

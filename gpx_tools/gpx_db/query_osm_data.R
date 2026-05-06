@@ -5,11 +5,11 @@
 ####_ Set environment _####
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic = Sys.time()
-Script.Name = funr::sys.script()
+tic <- Sys.time()
+Script.Name <- "~/CODE/gpx_tools/gpx_db/query_osm_data.R"
 if (!interactive()) pdf(file = sub("\\.R$",".pdf", Script.Name))
 sink(file=sub("\\.R$",".out",Script.Name,), split = TRUE)
-Script.Base = sub("\\.R$","",Script.Name)
+Script.Base <- sub("\\.R$","",Script.Name)
 
 
 library(osmdata)
@@ -41,21 +41,21 @@ for (ar in regions) {
   q1      <- osmdata_sf(q1)
   # q1$geometry <- sf::st_centroid(q1$geometry)
 
-  Sys.sleep(2) ## be polite to server
   q1      <- q1$osm_points
   q1$sym  <- "Green Block"
   q1$desc <- "Πυραμίδα"
   saveRDS(q1,"~/GISdata/Layers/Auto/osm/OSM_boundary_marker.Rds")
 
+  Sys.sleep(2) ## be polite to server
 
   q2      <- add_osm_feature(call, key = "man_made", value =  "survey_point")
   q2      <- osmdata_sf(q2)
-  Sys.sleep(2) ## be polite to server
   q2      <- q2$osm_points
   q2$sym  <- "Short Tower"
   q2$desc <- "Τριγωνομετρικό"
   saveRDS(q2,"~/GISdata/Layers/Auto/osm/OSM_survay_point.Rds")
 
+  Sys.sleep(2) ## be polite to server
 
 
   Q          <- unique(q1)
