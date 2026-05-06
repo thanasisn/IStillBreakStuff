@@ -107,34 +107,36 @@ if (DRINKING_WATER) {
   ## set a name for display in case of empty
   dw$name[is.na(dw$name)] <- "Nero"
   dw$link <- NA
+  if (nrow(dw) > 0) {
 
-  ## overpass web interface
-  ## parse drinking water
-  # indx <- grep("amenity=drinking_water",dw$desc)
-  # dw$desc[indx]   <- gsub("amenity=drinking_water","βρύση OSM",dw$desc[indx])
-  # dw$name[indx]   <- sub("node/[0-9]+","vris",dw$name[indx])
-  ## parse springs
-  # indx <- grep("natural=spring",dw$desc)
-  # dw$desc[indx]   <- gsub("natural=spring","Πηγή OSM",dw$desc[indx])
-  # dw$name[indx]   <- sub("node/[0-9]+","pigi",dw$name[indx])
+    ## overpass web interface
+    ## parse drinking water
+    # indx <- grep("amenity=drinking_water",dw$desc)
+    # dw$desc[indx]   <- gsub("amenity=drinking_water","βρύση OSM",dw$desc[indx])
+    # dw$name[indx]   <- sub("node/[0-9]+","vris",dw$name[indx])
+    ## parse springs
+    # indx <- grep("natural=spring",dw$desc)
+    # dw$desc[indx]   <- gsub("natural=spring","Πηγή OSM",dw$desc[indx])
+    # dw$name[indx]   <- sub("node/[0-9]+","pigi",dw$name[indx])
 
-  meta <- data.table(file     = path.expand(dw_fl),
-                     Region   = NA,
-                     Src_Type = "OSM_Water",
-                     mtime    = file.mtime(dw_fl))
-  dw   <- cbind(dw, meta)
+    meta <- data.table(file     = path.expand(dw_fl),
+                       Region   = NA,
+                       Src_Type = "OSM_Water",
+                       mtime    = file.mtime(dw_fl))
+    dw   <- cbind(dw, meta)
 
-  dw   <- st_transform(dw, EPSG_MERCA)
+    dw   <- st_transform(dw, EPSG_MERCA)
 
-  # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T)
-  # distmwt <- round(distmwt, digits = 3)
+    # distmwt <- raster::pointDistance(p1 = dw, p2 = gather_wpt, lonlat = T, allpairs = T)
+    # distmwt <- round(distmwt, digits = 3)
 
-  ## find close points
-  # dd <- which(distmwt < 5, arr.ind = T)
+    ## find close points
+    # dd <- which(distmwt < 5, arr.ind = T)
 
-  DATA <- rbind(DATA,
-                dw,
-                fill = T)
+    DATA <- rbind(DATA,
+                  dw,
+                  fill = T)
+  }
   rm(dw)
 }
 
@@ -149,7 +151,7 @@ if (WATERFALLS) {
   ## set a name for display in case of empty
   dw$name[is.na(dw$name)] <- "Waterfall"
   dw$link <- NA
-
+  if (nrow(dw) > 0) {
   meta <- data.table(file     = path.expand(dw_fl),
                      Region   = NA,
                      Src_Type = "OSM_Fall",
@@ -165,6 +167,7 @@ if (WATERFALLS) {
   DATA <- rbind(DATA,
                 dw,
                 fill = T)
+  }
   rm(dw)
 }
 
@@ -179,6 +182,7 @@ if (CAVES) {
   ## set a name for display in case of empty
   dw$name[is.na(dw$name)] <- "Cave"
   dw$link <- NA
+  if (nrow(dw) > 0) {
 
   meta <- data.table(file     = path.expand(dw_fl),
                      Region   = NA,
@@ -196,13 +200,15 @@ if (CAVES) {
   DATA <- rbind(DATA,
                 dw,
                 fill = T)
+  }
   rm(dw)
 }
 
 
 ##  Add pyramids from OSM  -----------------------------------------------------
+dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_pyramids_Gr.gpx"
+file.exists(dw_fl)
 if (PYRAMIDS) {
-  dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_pyramids_Gr.gpx"
   dw        <- read_sf(dw_fl, layer = "waypoints")
   ## clean data
   dw$desc   <- gsub("\n", " ", dw$desc)
@@ -210,7 +216,7 @@ if (PYRAMIDS) {
   ## set a name for display in case of empty
   dw$name[is.na(dw$name)] <- "Pyramid"
   dw$link <- NA
-
+  if (nrow(dw) > 0) {
   meta <- data.table(file     = path.expand(dw_fl),
                      Region   = NA,
                      Src_Type = "OSM_Pyramid",
@@ -227,6 +233,7 @@ if (PYRAMIDS) {
   DATA <- rbind(DATA,
                 dw,
                 fill = T)
+  }
   rm(dw)
 }
 

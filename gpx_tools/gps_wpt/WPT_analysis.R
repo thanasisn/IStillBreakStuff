@@ -13,11 +13,10 @@ tic <- Sys.time()
 Script.Name <- "~/CODE/gpx_tools/gps_wpt/WPT_analysis.R"
 
 
-# if (!interactive()) {
+if (!interactive()) {
   dir.create("~/CODE/gpx_tools/gps_wpt/runtime/", showWarnings = F, recursive = T)
-  # pdf( file = paste0("~/CODE/gpx_tools/gps_wpt/runtime/", basename(sub("\\.R$",".pdf", Script.Name))))
   sink(file = paste0("~/CODE/gpx_tools/gps_wpt/runtime/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
-# }
+}
 
 #+ echo=F, include=T
 suppressPackageStartupMessages({
