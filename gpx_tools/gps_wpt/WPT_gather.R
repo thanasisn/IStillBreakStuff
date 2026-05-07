@@ -19,7 +19,6 @@ if (!interactive()) {
 
 #+ echo=F, include=T
 suppressPackageStartupMessages({
-  library(arrow,      quietly = TRUE, warn.conflicts = FALSE)
   library(data.table, quietly = TRUE, warn.conflicts = FALSE)
   library(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
   library(sf,         quietly = TRUE, warn.conflicts = FALSE)
@@ -207,8 +206,7 @@ if (CAVES) {
 
 ##  Add pyramids from OSM  -----------------------------------------------------
 dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_pyramids_Gr.gpx"
-file.exists(dw_fl)
-if (PYRAMIDS) {
+if (PYRAMIDS & file.exists(dw_fl)) {
   dw        <- read_sf(dw_fl, layer = "waypoints")
   ## clean data
   dw$desc   <- gsub("\n", " ", dw$desc)
