@@ -7,8 +7,8 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/CODE/gpx_tools/gpx_db/query_osm_data.R"
-if (!interactive()) pdf(file = sub("\\.R$",".pdf", Script.Name))
-sink(file=sub("\\.R$",".out",Script.Name,), split = TRUE)
+
+if (!interactive())  sink(file=sub("\\.R$",".out",Script.Name,), split = TRUE)
 Script.Base <- sub("\\.R$","",Script.Name)
 
 
@@ -22,17 +22,39 @@ curl::has_internet()
 
 regions <- c("Gr")
 
+make_tiles <- function(bbox, nx = 3, ny = 3) {
+  xs <- seq(bbox[1], bbox[3], length.out = nx + 1)
+  ys <- seq(bbox[2], bbox[4], length.out = ny + 1)
+
+  tiles <- list()
+  k <- 1
+  for (i in 1:nx) {
+    for (j in 1:ny) {
+      tiles[[k]] <- c(xs[i], ys[j], xs[i+1], ys[j+1])
+      k <- k + 1
+    }
+  }
+  tiles
+}
+
+bbox_gr <- c(19.34, 34.79, 28.25, 41.77)
+tiles <- make_tiles(bbox_gr, nx = 3, ny = 3)  # 9 tiles
+
+
+
 for (ar in regions) {
 
   ## Region Definitions
   if ( ar == "Gr") {
     abbox <- c(19.34, 34.79, 28.25, 41.77)
-    call  <- opq(abbox,  timeout = 1000)
   } else {
     stop(paste("Unknow region",ar))
   }
 
 
+  stop("DD")
+
+  call  <- opq(abbox,  timeout = 1000)
   ## Get camp sites from OSM #################################################
   outfile <- paste0("~/GISdata/Layers/Auto/osm/OSM_pyramids_",ar,".gpx")
   cat(paste("Query for pyramids", ar, "\n"))
