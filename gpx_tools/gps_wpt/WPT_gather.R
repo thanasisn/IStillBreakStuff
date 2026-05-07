@@ -19,7 +19,6 @@ if (!interactive()) {
 
 #+ echo=F, include=T
 suppressPackageStartupMessages({
-  library(arrow,      quietly = TRUE, warn.conflicts = FALSE)
   library(data.table, quietly = TRUE, warn.conflicts = FALSE)
   library(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
   library(sf,         quietly = TRUE, warn.conflicts = FALSE)
@@ -30,9 +29,7 @@ suppressPackageStartupMessages({
 source("~/CODE/gpx_tools/gps_wpt/DEFINITIONS.R")
 source("~/CODE/R_myRtools/myRtools/R/write_.R")
 
-
 options(warn = 1)
-
 
 DRINKING_WATER <- TRUE
 WATERFALLS     <- TRUE
@@ -50,8 +47,10 @@ gpxlist   <- list.files(gpx_repo,
 gpxlist <- data.table(file  = gpxlist,
                       mtime = file.mtime(gpxlist))
 
+FORCE <- FALSE
+# FORCE <- TRUE
 
-if (file.exists(fl_waypoints)) {
+if (file.exists(fl_waypoints) & !FORCE) {
   DATA <- readRDS(fl_waypoints)
 
   ## keep existing files with not modified date
@@ -95,6 +94,7 @@ if (length(gpxlist$file) > 0) {
     }
   }
 }
+
 
 
 ##  Add drinking water from OSM  -----------------------------------------------
@@ -207,8 +207,7 @@ if (CAVES) {
 
 ##  Add pyramids from OSM  -----------------------------------------------------
 dw_fl     <- "~/GISdata/Layers/Auto/osm/OSM_pyramids_Gr.gpx"
-file.exists(dw_fl)
-if (PYRAMIDS) {
+if (PYRAMIDS & file.exists(dw_fl)) {
   dw        <- read_sf(dw_fl, layer = "waypoints")
   ## clean data
   dw$desc   <- gsub("\n", " ", dw$desc)

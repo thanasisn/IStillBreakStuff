@@ -233,10 +233,13 @@ if (TRUE) {
 
 
 ## __ Remove extra spaces  -----------------------------------------------------
-DATA_wpt$name <- gsub("^[ ]+",    "", DATA_wpt$name)
-DATA_wpt$name <- gsub("[ ]+$",    "", DATA_wpt$name)
-DATA_wpt$name <- gsub("[ ]{2,}", " ", DATA_wpt$name)
+DATA_wpt$name <- gsub("^[ ]+",       "", DATA_wpt$name)
+DATA_wpt$name <- gsub("[ ]+$",       "", DATA_wpt$name)
+DATA_wpt$name <- gsub("[ ]{2,}",    " ", DATA_wpt$name)
+DATA_wpt$name <- gsub("^No [0-9]+ ",  "", DATA_wpt$name)
+DATA_wpt$name <- gsub("^No [0-9]+ ",  "", DATA_wpt$name)
 # grep("[ ]{2,}", DATA_wpt$name)
+
 
 ## __ Translate names  ---------------------------------------------------------
 DATA_wpt$name <- gsub("Aussichtspunkt", "Viewpoint", DATA_wpt$name, ignore.case = T)
@@ -331,6 +334,7 @@ DATA_wpt <- DATA_wpt[grep("Διασταυρωση$",          DATA_wpt$name, inv
 DATA_wpt <- DATA_wpt[grep("Διασταύρωση Junction",  DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("Διασταύρωση",           DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("Κάτω δεξιά",            DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("Τόπος στάσης",          DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("Κατω δεξιά",            DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("Κατω δεξια",            DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("Λυκ?",                  DATA_wpt$name, invert = T, ignore.case = T), ]
