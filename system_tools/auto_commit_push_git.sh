@@ -80,10 +80,11 @@ folders=(
   "$HOME/MANUSCRIPTS/proposals"
   "$HOME/MANUSCRIPTS/reports"
   "$HOME/OREO"
-  "$HOME/PANDOC/thanasisn.github.io"
   "$HOME/PANDOC/CHP1_measurements_guide"
   "$HOME/PANDOC/Libradtran_guide"
   "$HOME/PANDOC/Tracker_manual"
+  "$HOME/PANDOC/radproc_oper_conf"
+  "$HOME/PANDOC/thanasisn.github.io"
 )
 
 ## go through main folder
