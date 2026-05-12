@@ -75,6 +75,7 @@ folders=(
   "$HOME/MANUSCRIPTS/01_2022_sdr_trends"
   "$HOME/MANUSCRIPTS/02_2024_enhancement"
   "$HOME/MANUSCRIPTS/03_thesis"
+  "$HOME/MANUSCRIPTS/04_DUSTR"
   "$HOME/MANUSCRIPTS/presentations"
   "$HOME/MANUSCRIPTS/proposals"
   "$HOME/MANUSCRIPTS/reports"
