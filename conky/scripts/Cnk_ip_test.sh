@@ -11,7 +11,7 @@ hosts=(
   "crane   10.12.12.1     crane.lobster-atlas.ts.net  X.X          "
   "door    10.12.12.10    X.X                         X.X          "
   "gpu-2   10.201.47.102  100.126.97.18               X.X          "
-  "haos    X.X             100.89.58.48               X.X          "
+  "haos    X.X            100.89.58.48                X.X          "
   "kostas  10.12.12.4     X.X                         X.X          "
   "mumra   X.X            100.108.41.27               X.X          "
   "sagan   10.12.12.5     100.101.191.106             155.207.9.214"
