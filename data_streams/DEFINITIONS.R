@@ -60,6 +60,9 @@ tsig_data_fl <- "~/CODE/data_streams/fi_analysis/data/tsig.Rds"
 
 fi_notify_state <- "~/CODE/data_streams/fi_analysis/data/fi_notify_state.Rds"
 
+## Store taplog data
+taplog_fl       <- "~/DATA_RAW/Other/TapLog.Rds"
+
 
 ##   Weather   #############
 
