@@ -119,6 +119,11 @@ pids=()
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
 
+  script="$HOME/CODE/data_streams/fi_analysis/S08_taplot_parse.R"
+  info "##  $(basename "$script")  ##"
+  "$script"
+  info "##  End $(basename $script) STATUS:$?  ##"
+
 ) & pids+=($!)
 
 (
