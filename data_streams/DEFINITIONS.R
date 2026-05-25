@@ -56,12 +56,15 @@ fi_data_dir     <- "~/CODE/data_streams/fi_analysis/data/"
 peir_g_prefix   <- "~/CODE/data_streams/fi_analysis/data/peiraios_gold"
 
 ## Store tsig data
-tsig_data_fl <- "~/CODE/data_streams/fi_analysis/data/tsig.Rds"
+tsig_data_fl    <- "~/CODE/data_streams/fi_analysis/data/tsig.Rds"
 
 fi_notify_state <- "~/CODE/data_streams/fi_analysis/data/fi_notify_state.Rds"
 
 ## Store taplog data
 taplog_fl       <- "~/DATA_RAW/Other/TapLog.Rds"
+
+efc30255_fl     <- "~/CODE/data_streams/fi_analysis/data/efc30155_cur.Rds"
+
 
 
 ##   Weather   #############
