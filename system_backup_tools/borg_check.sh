@@ -44,7 +44,7 @@ info "Script root $SCRIPT_ROOT"
 
 PROFILE="$1"
 PROFILE="${PROFILE%.*}"
-PROFILE_FOLDER="/home/athan/BASH/CRON/borg_profiles"
+PROFILE_FOLDER="/home/athan/Formal/KEYS/borg_profiles"
 
 CONF_FILE="${PROFILE_FOLDER}/${PROFILE}.conf"
 CONF_SECU="${PROFILE_FOLDER}/.${PROFILE}.conf"
@@ -53,7 +53,6 @@ LOCK_FILE="/dev/shm/borg_check_${PROFILE}.lock"
 # NOTIFY_SEND="notify-send"
 NOTIFY_SEND="/home/athan/BASH/TOOLS/pub_messages.py"
 LOCATION_DET="/home/athan/CODE/conky/scripts/location.R"
-
 
 if [[ -f "$CONF_FILE" ]] ; then
     echo

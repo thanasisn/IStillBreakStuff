@@ -43,7 +43,7 @@ info "Script root $SCRIPT_ROOT"
 
 PROFILE="$1"
 PROFILE="${PROFILE%.*}"
-PROFILE_FOLDER="/home/athan/BASH/CRON/borg_profiles"
+PROFILE_FOLDER="/home/athan/Formal/KEYS/borg_profiles"
 
 CONF_FILE="${PROFILE_FOLDER}/${PROFILE}.conf"
 CONF_SECU="${PROFILE_FOLDER}/.${PROFILE}.conf"

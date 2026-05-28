@@ -10,15 +10,15 @@
 BORG="$(command -v borg)"
 
 
-## requires some commands:
+## check requirements
 command -v nc    >/dev/null 2>&1 || { echo >&2 "nc NOT INSTALLED. Aborting."; exit 1; }
 command -v $BORG >/dev/null 2>&1 || { echo >&2 "borg NOT INSTALLED. Aborting."; exit 1; }
-
 
 ##-------------------------##
 ##   logging definitions   ##
 ##-------------------------##
 
+## use full path for root access
 ldir="/home/athan/LOGs/SYSTEM_LOGS/"
 mkdir -p "$ldir"
 
@@ -39,7 +39,7 @@ info "Script root $SCRIPT_ROOT"
 
 PROFILE="$1"
 PROFILE="${PROFILE%.*}"
-PROFILE_FOLDER="/home/athan/BASH/CRON/borg_profiles"
+PROFILE_FOLDER="/home/athan/Formal/KEYS/borg_profiles"
 
 CONF_FILE="${PROFILE_FOLDER}/${PROFILE}.conf"
 CONF_SECU="${PROFILE_FOLDER}/.${PROFILE}.conf"
