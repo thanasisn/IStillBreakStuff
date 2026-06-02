@@ -37,7 +37,6 @@ if (interactive() ||
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(out.width  = "100%"   )
 
-
 require(data.table, quietly = TRUE, warn.conflicts = FALSE)
 require(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
 require(RSQLite,    quietly = TRUE, warn.conflicts = FALSE)
@@ -48,58 +47,27 @@ require(htmltools,  quietly = TRUE, warn.conflicts = FALSE)
 require(DT,         quietly = TRUE, warn.conflicts = FALSE)
 require(htmltools,  quietly = TRUE, warn.conflicts = FALSE)
 
+source("~/CODE/data_streams/DEFINITIONS.R")
+
+
+taplog <- readRDS(taplog_fl)
+taplog <- remove_empty(taplog, which = "cols")
+taplog <- remove_constant(taplog)
+
+taplog$Date <- as.POSIXct(taplog$epoch_milli/1000, origin = "1970-01-01", tz = "UTC")
+taplog[, epoch_milli := NULL]
+
+## create tables
+DTRIP  <- taplog[group == "Duster trip" ]
+DGAS   <- taplog[group == "Duster gas"  ]
+DOTHER <- taplog[group == "Duster other"]
+
 
 #+ include=FALSE, echo=FALSE
 ## init use of ggplot and html tables in loops
 tagList(datatable(cars))
 tagList(ggplotly(ggplot()))
 
-## find file to read
-filelist <- data.table(filenames,
-                       mtime = file.mtime(filenames))
-setorder(filelist, mtime)
-dbfile <- filelist[nrow(filelist), filenames]
-
-
-## connect to db
-con <- dbConnect(drv = RSQLite::SQLite(), dbname = dbfile)
-dbListTables(con)
-
-points   <- tbl(con, "data_points_table")
-features <- tbl(con, "features_table"   )
-groups   <- tbl(con, "groups_table"     )
-
-
-DATA <- left_join(
-  left_join(points,
-            features,
-            by = c("feature_id" = "id")) |>
-    select(-feature_id,
-           -display_index) |>
-    rename(variable = "name"),
-  groups,
-  by = c("group_id" = "id")
-) |>
-  select(-group_id,
-         -display_index) |>
-  rename(group = "name") |>
-  collect() |>
-  data.table()
-
-DATA <- remove_empty(DATA, which = "cols")
-DATA <- remove_constant(DATA)
-
-DATA$Date <- as.POSIXct(DATA$epoch_milli/1000, origin = "1970-01-01", tz = "UTC")
-DATA[, epoch_milli := NULL]
-setorder(DATA, Date)
-
-## create tables
-
-table(DATA$group)
-
-DTRIP  <- DATA[group == "Duster trip" ]
-DGAS   <- DATA[group == "Duster gas"  ]
-DOTHER <- DATA[group == "Duster other"]
 
 dcast(DTRIP, Date ~ variable + note + label)
 
@@ -162,6 +130,7 @@ if (!isTRUE(getOption('knitr.in.progress'))) {
 if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
   ggplotly(p)
 }
+
 av <- "Consumption_Rate"
 pp <- DTRIP[variable == av]
 p <- ggplot(pp, aes(x = Date, y = value)) +
@@ -176,6 +145,7 @@ if (!isTRUE(getOption('knitr.in.progress'))) {
 if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
   ggplotly(p)
 }
+
 av <- "Fuel_Level"
 pp <- DTRIP[variable == av]
 p <- ggplot(pp, aes(x = Date, y = value)) +
@@ -190,6 +160,7 @@ if (!isTRUE(getOption('knitr.in.progress'))) {
 if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
   ggplotly(p)
 }
+
 av <- "km"
 pp <- DTRIP[variable == av]
 p <- ggplot(pp, aes(x = Date, y = value)) +
@@ -204,6 +175,7 @@ if (!isTRUE(getOption('knitr.in.progress'))) {
 if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
   ggplotly(p)
 }
+
 av <- "Range"
 pp <- DTRIP[variable == av]
 p <- ggplot(pp, aes(x = Date, y = value)) +
@@ -218,6 +190,7 @@ if (!isTRUE(getOption('knitr.in.progress'))) {
 if (interactive() | isTRUE(getOption('knitr.in.progress'))) {
   ggplotly(p)
 }
+
 av <- "trip_km"
 pp <- DTRIP[variable == av]
 p <- ggplot(pp, aes(x = Date, y = value)) +
@@ -334,9 +307,8 @@ try({
   }
 })
 
-ANT[year(Date)==2022,]
+ANT[year(Date) == 2022,]
 
-dbDisconnect(con)
 
 
 setorder(DTRIP, Date)
@@ -385,7 +357,7 @@ for (af in testf) {
     tmp  |> mutate(
       Day    = as.Date(Date),
       Source = "csv"),
-    DATA |> mutate(Day = as.Date(Date),
+    taplog |> mutate(Day = as.Date(Date),
                    Source = "DB") |>
       select(-color_index, -group),
     fill = T
@@ -407,8 +379,8 @@ print(p)
 
 
 ## get last service
-LASTSERV <- DATA |> filter(variable == "Service") |> filter(max(Date) == Date)
-LASTTRIP <- DTRIP |> filter(variable == "km") |> filter(max(value) == value)
+LASTSERV <- taplog |> filter(variable == "Service") |> filter(max(Date) == Date)
+LASTTRIP <- DTRIP  |> filter(variable == "km") |> filter(max(value) == value)
 LASTSERV$label <- as.numeric(LASTSERV$label)
 
 warn_tyres <- 5000
