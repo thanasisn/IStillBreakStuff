@@ -6,6 +6,7 @@
 ##  Name   tinc           tailscale        Static IP
 hosts=(
   "Y       10.12.14.97    X.X                         X.X          "
+  "radmon  X.X            X.X                         155.207.9.98 "
   "a34     10.12.12.9     100.120.166.39              X.X          "
   "blue    10.12.12.2     100.119.161.83              X.X          "
   "crane   10.12.12.1     crane.lobster-atlas.ts.net  X.X          "
@@ -19,7 +20,7 @@ hosts=(
   "yperos  10.12.12.101   100.64.199.88               155.207.10.70"
 )
 
-## Check all hosts ips
+## Check all hosts IPs
 (for hh in "${hosts[@]}"; do
   # get row
   list=($hh)
