@@ -40,9 +40,9 @@ while read aa; do
   host="$(  echo "$aa" | sed 's/[ ]\+/ /g' | cut -d' ' -f2)"
   status="$(echo "$aa" | sed 's/[ ]\+/ /g' | cut -d' ' -f3-)"
   if [[ $status = *'0'* ]]; then
-    printf "\${color1}%-6s " "$host"
+    printf "\${color1}%-7s " "$host"
   else
-    printf "\${color3}%-6s " "$host"
+    printf "\${color3}%-7s " "$host"
   fi
   ## color results
   echo "$aa" | sed 's/[ ]\+/ /g' | cut -d' ' -f3- |\
