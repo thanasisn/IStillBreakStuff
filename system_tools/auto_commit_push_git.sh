@@ -76,6 +76,7 @@ folders=(
   "$HOME/MANUSCRIPTS/02_2024_enhancement"
   "$HOME/MANUSCRIPTS/03_thesis"
   "$HOME/MANUSCRIPTS/04_DUSTR"
+  "$HOME/MANUSCRIPTS/ROUT_analysis"
   "$HOME/MANUSCRIPTS/presentations"
   "$HOME/MANUSCRIPTS/proposals"
   "$HOME/MANUSCRIPTS/reports"
