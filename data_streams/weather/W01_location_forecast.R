@@ -44,11 +44,11 @@ source("~/CODE/data_streams/helpers/fn_get_gpx_last_location.R")
 source("~/CODE/data_streams/helpers/fn_reverse_geocode_osm.R")
 
 
-if (file.exists(pyenv_python)) {
-  use_python(pyenv_python, required = TRUE)
-} else {
-  stop("pyenv Python not found")
-}
+# if (file.exists(pyenv_python)) {
+#   use_python(pyenv_python, required = TRUE)
+# } else {
+#   stop("pyenv Python not found")
+# }
 
 source_python("~/CODE/data_streams/helpers/fn_get_open_meteo_forecasts.py")
 # source_python("~/CODE/data_streams/helpers/fn_get_open_meteo_forecasts_1.py")
