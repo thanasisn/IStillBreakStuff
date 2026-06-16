@@ -283,7 +283,8 @@ try({
     geom_point(aes(y = Litre, color = "Litre")) +
     theme_linedraw() +
     labs(subtitle = "gas",
-         y = element_blank())
+         y = "")
+
   if (!isTRUE(getOption('knitr.in.progress'))) {
     suppressWarnings(print(p))
   }
