@@ -59,18 +59,19 @@ if type synclient >/dev/null 2>&1; then
   echo
 fi
 
-## for durden
-exec xinput set-prop "GXTP5100:00 27C6:01E0 Touchpad" "libinput Tapping Enabled" 1
 
-
-echo "Set keyboard language options"
+echo " - - - Set keyboard language options - - - "
 #  setxkbmap -option grp:switch,grp:alt_shift_toggle,grp_led:scroll us,el
 setxkbmap -option grp:switch,grp:alt_shift_toggle,grp_led:scroll us,gr
 echo
 
-echo "Swap caps and escape keys"
+echo " - - - Swap caps and escape keys - - - "
 setxkbmap -option "caps:swapescape"
 echo
+
+## for durden
+echo " - - - Enable touchpad tap - - - "
+exec xinput set-prop "GXTP5100:00 27C6:01E0 Touchpad" "libinput Tapping Enabled" 1
 
 
 exit 0
