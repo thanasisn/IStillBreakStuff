@@ -98,7 +98,7 @@ PP |> colnames() |> sort()
 #'
 #+ echo=F, include=T, results="asis", warning=F
 
-ggplot(PP |> filter(!is.na(EPOC)),
+p <- ggplot(PP |> filter(!is.na(EPOC)),
        aes(
          x      = EPOC,
          y      = Trimp_Points,
@@ -110,6 +110,17 @@ ggplot(PP |> filter(!is.na(EPOC)),
     y = "TRIMP"
   ) +
   theme_bw()
+
+if (knitr::is_latex_output()) {
+  print(p)
+} else if (interactive() | knitr::is_html_output()) {
+  ggplotly(p)
+} else {
+  print(p)
+}
+
+stop()
+
 
 ggplot(PP |> filter(!is.na(EPOC)),
        aes(
