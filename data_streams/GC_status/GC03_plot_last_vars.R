@@ -39,6 +39,8 @@ require(slider,     quietly = TRUE, warn.conflicts = FALSE)
 
 source("~/CODE/data_streams/GC_status/GC00_DEFINITIONS.R")
 
+tagList(ggplotly(ggplot()))
+
 ## choose loess criterion for span
 LOESS_CRITERIO <-  c("aicc", "gcv")[1]
 
@@ -93,116 +95,148 @@ PP <- DT |> select(
 PP |> colnames() |> sort()
 
 
+
+plot_show <- function(plot) {
+
+  if (knitr::is_latex_output()) {
+    print(plot)
+
+  } else if (interactive()) {
+    ggplotly(plot)
+
+  } else if (knitr::is_html_output()) {
+    htmltools::tagList(ggplotly(plot)) %>% print()
+
+  } else {
+    print(plot)
+  }
+}
+
 ## _ Plot some data specific ---------
 #'
+#' ## Scatter plots
 #'
 #+ echo=F, include=T, results="asis", warning=F
 
-ggplot(PP |> filter(!is.na(EPOC)),
-       aes(
-         x      = EPOC,
-         y      = Trimp_Points,
-         colour = Workout_Code,
-         alpha  = Date)) +
-  geom_point() +
-  labs(
-    x = "EPOC",
-    y = "TRIMP"
-  ) +
-  theme_bw()
+plot_show(
+  ggplot(PP |> filter(!is.na(EPOC)),
+         aes(
+           x      = EPOC,
+           y      = Trimp_Points,
+           colour = Workout_Code,
+           alpha  = Date)) +
+    geom_point() +
+    labs(
+      x = "EPOC",
+      y = "TRIMP"
+    ) +
+    theme_bw()
+)
 
-ggplot(PP |> filter(!is.na(EPOC)),
-       aes(
-         x      = EPOC,
-         y      = Trimp_Zonal_Points,
-         colour = Workout_Code,
-         alpha  = Date)) +
-  geom_point() +
-  labs(
-    x = "EPOC",
-    y = "TRIMP Zonal"
-  ) +
-  theme_bw()
+plot_show(
+  ggplot(PP |> filter(!is.na(EPOC)),
+         aes(
+           x      = EPOC,
+           y      = Trimp_Zonal_Points,
+           colour = Workout_Code,
+           alpha  = Date)) +
+    geom_point() +
+    labs(
+      x = "EPOC",
+      y = "TRIMP Zonal"
+    ) +
+    theme_bw()
+)
 
-ggplot(PP |> filter(!is.na(Trimp_Points)),
-       aes(
-         x      = Trimp_Points,
-         y      = Trimp_Zonal_Points,
-         colour = Workout_Code,
-         alpha  = Date)) +
-  geom_point() +
-  labs(
-    x = "TRIMP",
-    y = "TRIMP Zonal"
-  ) +
-  theme_bw()
+plot_show(
+  ggplot(PP |> filter(!is.na(Trimp_Points)),
+         aes(
+           x      = Trimp_Points,
+           y      = Trimp_Zonal_Points,
+           colour = Workout_Code,
+           alpha  = Date)) +
+    geom_point() +
+    labs(
+      x = "TRIMP",
+      y = "TRIMP Zonal"
+    ) +
+    theme_bw()
+)
 
-ggplot(PP |> filter(!is.na(Trimp_Points)),
-       aes(
-         x      = Trimp_Points,
-         y      = Trimp_Zonal_Points,
-         colour = Workout_Code,
-         alpha  = Date)) +
-  geom_point() +
-  labs(
-    x = "TRIMP",
-    y = "TRIMP Zonal"
-  ) +
-  theme_bw()
+plot_show(
+  ggplot(PP |> filter(!is.na(Trimp_Points)),
+         aes(
+           x      = Trimp_Points,
+           y      = Trimp_Zonal_Points,
+           colour = Workout_Code,
+           alpha  = Date)) +
+    geom_point() +
+    labs(
+      x = "TRIMP",
+      y = "TRIMP Zonal"
+    ) +
+    theme_bw()
+)
 
-ggplot(PP |> filter(!is.na(Trimp_Points)),
-       aes(
-         x      = Total_Kcalories,
-         y      = Trimp_Points,
-         colour = Workout_Code,
-         alpha  = Date)) +
-  geom_point() +
-  labs(
-    x = "Total calories",
-    y = "TRIMP"
-  ) +
-  theme_bw()
+plot_show(
+  ggplot(PP |> filter(!is.na(Trimp_Points)),
+         aes(
+           x      = Total_Kcalories,
+           y      = Trimp_Points,
+           colour = Workout_Code,
+           alpha  = Date)) +
+    geom_point() +
+    labs(
+      x = "Total calories",
+      y = "TRIMP"
+    ) +
+    theme_bw()
+)
 
-ggplot(PP |> filter(!is.na(Trimp_Zonal_Points)),
-       aes(
-         x      = Total_Kcalories,
-         y      = Trimp_Zonal_Points,
-         colour = Workout_Code,
-         alpha  = Date)) +
-  geom_point() +
-  labs(
-    x = "Total calories",
-    y = "TRIMP zonal"
-  ) +
-  theme_bw()
+plot_show(
+  ggplot(PP |> filter(!is.na(Trimp_Zonal_Points)),
+         aes(
+           x      = Total_Kcalories,
+           y      = Trimp_Zonal_Points,
+           colour = Workout_Code,
+           alpha  = Date)) +
+    geom_point() +
+    labs(
+      x = "Total calories",
+      y = "TRIMP zonal"
+    ) +
+    theme_bw()
+)
 
+plot_show(
+  ggplot(PP |> filter(!is.na(EPOC)),
+         aes(
+           x      = Total_Kcalories,
+           y      = EPOC,
+           colour = Workout_Code,
+           alpha  = Date)) +
+    geom_point() +
+    labs(
+      x = "Total calories",
+      y = "EPOC"
+    ) +
+    theme_bw()
+)
 
-ggplot(PP |> filter(!is.na(EPOC)),
-       aes(
-         x      = Total_Kcalories,
-         y      = EPOC,
-         colour = Workout_Code,
-         alpha  = Date)) +
-  geom_point() +
-  labs(
-    x = "Total calories",
-    y = "EPOC"
-  ) +
-  theme_bw()
-
-ggplot(PP |> filter(!is.na(EPOC)),
-       aes(
-         x      = Workout_Time,
-         y      = Trimp_Points / EPOC,
-         colour = Workout_Code,
-         alpha  = Date)) +
-  geom_point() +
-  labs(
-    x = "Workout Time",
-    y = "Trimp_Points / EPOC"
-  ) +
-  theme_bw()
-
+plot_show(
+  ggplot(PP |> filter(!is.na(EPOC)),
+         aes(
+           x      = Workout_Time,
+           y      = Trimp_Points / EPOC,
+           colour = Workout_Code,
+           alpha  = Date)) +
+    geom_point() +
+    labs(
+      x = "Workout Time",
+      y = "Trimp_Points / EPOC"
+    ) +
+    theme_bw()
+)
 
 
 ## __ Plot all variables ---------------------------------------------------
@@ -219,6 +253,10 @@ wecare <- PP |>
   colnames() |>
   sort()
 
+#'
+#' ## Time series plots
+#'
+#+ echo=F, include=T, results="asis", warning=F
 
 for (avar in wecare) {
 
@@ -288,13 +326,7 @@ for (avar in wecare) {
 
     theme_bw()
 
-  if (isTRUE(getOption('knitr.in.progress'))) {
-    print(htmltools::tagList(ggplotly(p)))
-  } else if (interactive()) {
-    print(ggplotly(p))
-  } else {
-    print(p)
-  }
+  plot_show(p)
 
 }
 
