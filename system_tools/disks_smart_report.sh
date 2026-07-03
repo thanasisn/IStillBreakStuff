@@ -80,6 +80,9 @@ for ad in /dev/nvme[0-9]; do
     echo "** smartctl -x **"
     sudo smartctl -x "$ad"
     echo ""
+    echo "** nvme smart-log **"
+    sudo nvme smart-log "$ad"
+    echo ""
   ) | tee "$outfile"
   chmod a+rw  "$outfile"
   echo "$outfile"
@@ -143,5 +146,7 @@ for ad in /dev/sd[a-z] /dev/sd[a-z][a-z]; do
   chmod a+rw  "$outfile"
   echo "$outfile"
 done
+
+
 
 exit 0
