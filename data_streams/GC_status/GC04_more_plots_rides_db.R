@@ -1,6 +1,6 @@
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:  "Train Model `r strftime(Sys.time(), '%F %R %Z', tz= 'Europe/Athens')`"
+#' title:  "Training Models `r strftime(Sys.time(), '%F %R %Z', tz= 'Europe/Athens')`"
 #' author: ""
 #' output:
 #'   html_document:
@@ -47,6 +47,23 @@ loadtables   <- "~/LOGs/training_status/Load_tables.md"
 lastactivit  <- "~/LOGs/training_status/Last_Activities.md"
 
 DEBUG <- FALSE
+
+plot_show <- function(plot) {
+
+  if (knitr::is_latex_output()) {
+    print(plot)
+
+  } else if (interactive()) {
+    ggplotly(plot)
+
+  } else if (knitr::is_html_output()) {
+    htmltools::tagList(ggplotly(plot)) %>% print()
+
+  } else {
+    print(plot)
+  }
+}
+
 
 #+ include=FALSE, echo=FALSE
 ## init use of ggplot and html tables in loops
@@ -198,7 +215,7 @@ for (ii in 1:length(wecare)) {
 
 
 #'
-#' ## Perf Models
+#' # Performance Models
 #'
 #+ echo=F, include=T, results="asis", warning=F
 
@@ -235,7 +252,7 @@ for (days in pdays) {
                                labels = c("EPOC",       "TRIMP ZN",   "TRIMP"))]
 
   # Create the plot
-  ggplot(plot_data, aes(x = plot_time, y = value, fill = metric, color = metric)) +
+  p <- ggplot(plot_data, aes(x = plot_time, y = value, fill = metric, color = metric)) +
     # Add bars
     geom_col(width = 3600 * 2, position = position_dodge(width = 0), alpha = 0.7) +
     # Scale and theme settings
@@ -254,6 +271,7 @@ for (days in pdays) {
       plot.margin = margin(10, 10, 10, 10)
     ) +
     guides(fill = guide_legend(nrow = 1))
+  plot_show(p)
 
 
   ####  each week metrics bar plot  ------------------------------------------
@@ -285,7 +303,7 @@ for (days in pdays) {
                                labels = c("EPOC",       "TRIMP ZN",   "TRIMP"))]
 
   # Create the plot
-  ggplot(plot_data, aes(x = plot_date, y = value, fill = metric, color = metric)) +
+  p <- ggplot(plot_data, aes(x = plot_date, y = value, fill = metric, color = metric)) +
     # Add bars
     geom_col(width = 0.7, position = position_dodge(width = 0), alpha = 0.8, linewidth = 0) +
     # Scale and theme settings
@@ -304,7 +322,7 @@ for (days in pdays) {
       plot.margin = margin(10, 10, 10, 10)
     ) +
     guides(fill = guide_legend(nrow = 1))
-
+  plot_show(p)
 
 
   #### normalize data  -------------------------------------------------------
@@ -314,7 +332,6 @@ for (days in pdays) {
                                 center = min(pppppp[[ac]]),
                                 scale  = diff(range(pppppp[[ac]])))
   }
-
 
 
   ####  Plot for each metric and model  --------------------------------------
@@ -337,9 +354,7 @@ for (days in pdays) {
 
       pp[[vval]][pp[[vval]] == 0] <- NA
 
-
-
-        # ----- Precompute values -----
+      # ----- Precompute values -----
 
       pp[[vval]][is.na(pp[[vval]])] <- 0
 
@@ -363,112 +378,6 @@ for (days in pdays) {
       mondays  <- pp %>% filter(wday(Date) == 2) %>% pull(Date)
       month_1  <- pp %>% filter(mday(Date) == 1)
 
-      # ----- Plot -----
-
-      # g <- ggplot(pp, aes(x = Date)) +
-      #
-      #   # Load bars
-      #   geom_col(aes(y = load_scaled),
-      #            fill = "#71717171",
-      #            width = 1) +
-      #
-      #   # Runmean
-      #   geom_line(aes(y = load_runmean),
-      #             color = "#71717171",
-      #             linewidth = 1.1) +
-      #
-      #   # VO2max
-      #   geom_point(aes(y = VO2max_Detected),
-      #              color = "pink",
-      #              shape = 95,
-      #              size = 6) +
-      #
-      #   # Fatigue / Fitness / Performance
-      #   geom_line(aes(y = fat, color = "Fatigue"), linewidth = 1.1) +
-      #   geom_line(aes(y = fit, color = "Fitness"), linewidth = 2.5) +
-      #   geom_line(aes(y = per, color = "Performance"), linewidth = 2.5) +
-      #
-      #   # Today vertical line
-      #   geom_vline(xintercept = as.numeric(Sys.Date()),
-      #              color = "green", linetype = 2) +
-      #
-      #   # Best prediction lines
-      #   geom_vline(xintercept = as.numeric(best$Date),
-      #              color = "yellow", linetype = 2) +
-      #   geom_hline(yintercept = best$per,
-      #              color = "yellow", linetype = 2) +
-      #
-      #   # Horizontal today lines
-      #   geom_hline(yintercept = today_val_per,
-      #              color = 6, linetype = 2) +
-      #   geom_hline(yintercept = today_val_fit,
-      #              color = 5, linetype = 2) +
-      #
-      #   # Text annotations (max values)
-      #   geom_text(
-      #     data = pp %>% slice_max(per, n = 1),
-      #     aes(y = per, label = round(per)),
-      #     color = 6, vjust = -0.7
-      #   ) +
-      #
-      #   geom_text(
-      #     data = pp %>% slice_max(fit, n = 1),
-      #     aes(y = fit, label = round(fit)),
-      #     color = 5, vjust = -0.7
-      #   ) +
-      #
-      #   geom_text(
-      #     data = pp %>% slice_max(fat, n = 1),
-      #     aes(y = fat, label = round(fat)),
-      #     color = 3, vjust = -0.7
-      #   ) +
-      #
-      #   geom_text(
-      #     aes(x = Sys.Date(), y = today_val_per,
-      #         label = round(today_val_per)),
-      #     color = 6, hjust = -0.1
-      #   ) +
-      #
-      #   geom_text(
-      #     aes(x = Sys.Date(), y = today_val_fit,
-      #         label = round(today_val_fit)),
-      #     color = 5, hjust = -0.1
-      #   ) +
-      #
-      #   geom_text(
-      #     aes(x = Sys.Date(), y = today_val_fat,
-      #         label = round(today_val_fat)),
-      #     color = 3, hjust = -0.1
-      #   ) +
-      #
-      #   scale_color_manual(
-      #     values = c("Fatigue" = 3,
-      #                "Fitness" = 5,
-      #                "Performance" = 6)
-      #   ) +
-      #
-      #   scale_x_date(
-      #     breaks = c(mondays, month_1$Date),
-      #     labels = function(x)
-      #       ifelse(day(x) == 1, format(x, "%b"), "")
-      #   ) +
-      #
-      #   labs(
-      #     title = paste(days, "d", va, mo,
-      #                   "best:", best$Date),
-      #     color = NULL,
-      #     y = NULL
-      #   ) +
-      #
-      #   theme_minimal(base_size = 10) +
-      #   theme(
-      #     legend.position = "top",
-      #     legend.direction = "horizontal",
-      #     panel.grid.minor = element_blank(),
-      #     axis.text.x = element_text(color = "black"),
-      #     axis.ticks = element_line(color = "black")
-      #   )
-      # print(g)
 
       # ---- Precompute ----
       pp <- pp %>%
@@ -596,72 +505,14 @@ for (days in pdays) {
           barmode = "overlay"
         )
 
-      if (isTRUE(getOption('knitr.in.progress'))) {
-        print(htmltools::tagList(ggplotly(p)))
-      } else if (interactive()) {
-        print(ggplotly(p))
-      } else {
-        print(p)
-      }
-
-      # stop()
-      #
-      # plot(pp$Date, pp[[vval]]/4, ylim = range(0, pp[[vval]], na.rm = T), type = "h", bty = "n", lwd = 2, col = "#71717171" )
-      # pp[[vval]][is.na(pp[[vval]])] <- 0
-      # lines(pp$Date, caTools::runmean(pp[[vval]], k = 9, align = "right")/2, col = "#71717171", lwd = 1.1)
-      # par(new = T)
-      # ylim <- range(45, 53, pp$VO2max_Detected, na.rm = T)
-      # plot( pp$Date, pp$VO2max_Detected, ylim = ylim, col = "pink", pch = "-", cex = 2 )
-      # par(new = T)
-      # ylim    <- range(pp[[vfit]], pp[[vfat]], pp[[vper]], na.rm = T)
-      # ylim[2] <- ylim[2] * 1.09
-      # plot(pp$Date, pp[[vfat]], col = 3, lwd = 1.1, "l", yaxt = "n", ylim = ylim)
-      # abline(v = Sys.Date(), col = "green", lty = 2)
-      # par(new = T)
-      # plot(pp$Date, pp[[vfit]], col = 5, lwd = 2.5, "l", yaxt = "n", ylim = ylim)
-      # par(new = T)
-      # plot(pp$Date, pp[[vper]], col = 6, lwd = 2.5, "l", yaxt = "n", ylim = ylim)
-      #
-      # legend("top", bty = "n", ncol = 3, lty = 1, inset = c(0, -0.01),
-      #        cex = 0.7, text.col = "grey",
-      #        legend = c("Fatigue", "Fitness","Performance"),
-      #        col    = c(       3 ,        5 ,           6 ) )
-      #
-      # ## decoration on plots
-      # prediction <- pp[ Date > last$Date, ]
-      # best       <- prediction[ which.max(prediction[[vper]]) ]
-      # abline(v = best$Date, col = "yellow", lty = 2)
-      # abline(h = best[[vper]], col = "yellow", lty = 2)
-      #
-      # abline(h = pp[[vper]][ pp$Date == Sys.Date() ], col = 6, lty = 2)
-      # text(pp[ which.max(pp[[vper]]), Date ], pp[[vper]][which.max(pp[[vper]])],
-      #      labels = round(pp[[vper]][which.max(pp[[vper]])]), col = 6, pos = 3 )
-      # text(Sys.Date(), pp[[vper]][pp$Date == Sys.Date()],
-      #      labels = round(pp[[vper]][pp$Date == Sys.Date()]), col = 6, pos = 4 )
-      #
-      # abline(h = pp[[vfit]][ pp$Date == Sys.Date() ], col = 5, lty = 2)
-      # text(pp[ which.max(pp[[vfit]]), Date ], pp[[vfit]][which.max(pp[[vfit]])],
-      #      labels = round(pp[[vfit]][which.max(pp[[vfit]])]), col = 5, pos = 3 )
-      # text(Sys.Date(), pp[[vfit]][pp$Date == Sys.Date()],
-      #      labels = round(pp[[vfit]][pp$Date == Sys.Date()]), col = 5, pos = 4 )
-      #
-      # # abline(h = pp[[vfat]][ pp$Date == Sys.Date() ], col = 3, lty = 2)
-      # text(pp[ which.max(pp[[vfat]]), Date ], pp[[vfat]][which.max(pp[[vfat]])],
-      #      labels = round(pp[[vfat]][which.max(pp[[vfat]])]), col = 3, pos = 3 )
-      # text(Sys.Date(), pp[[vfat]][pp$Date == Sys.Date()],
-      #      labels = round(pp[[vfat]][pp$Date == Sys.Date()]), col = 3, pos = 4 )
-      #
-      # axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "black", col.ticks = "black")
-      # axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
-      #
-      # title(paste(days,"d ", va, " ", mo, "  best:", best$Date), cex = .7)
+      plot_show(p)
 
     }
   }
 }
 
 #'
-#' ## Unified Perf Models
+#' # Unified Performance Models
 #'
 #+ echo=F, include=T, results="asis", warning=F
 
