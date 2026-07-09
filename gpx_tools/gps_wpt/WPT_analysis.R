@@ -195,6 +195,15 @@ if (TRUE) {
       hunspell_suggest(x, dict = dictionary("el_GR"))
     ), collapse = ", ")
   )
+  lld <- lapply(er_gr$words, function(x) {
+    suggestions <- hunspell_suggest(x, dict = dictionary("el_GR"))
+    if (length(suggestions) > 0 && !is.null(suggestions[[1]])) {
+      return(paste(unlist(suggestions), collapse = ", "))
+    } else {
+      return("")  # Return empty string if no suggestions
+    }
+  })
+
   er_gr$suggest <- unlist(lld)
   er_gr <- er_gr[suggest != "",]
   er_gr$correct <- NULL
