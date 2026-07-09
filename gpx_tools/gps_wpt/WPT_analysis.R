@@ -132,7 +132,6 @@ if (TRUE) {
 
   # DATA_wpt |> hunspell_check(name)
   #
-  #
   # DATA_wpt |> quanteda::tokens(name,
   #                              remove_punct = T,
   #                              remove_numbers = T,
@@ -174,11 +173,34 @@ if (TRUE) {
   )
   er_en <- er_en[ correct == F, ]
 
-  lld <- lapply(er_en$words, function(x)
-    paste(unlist(
+  # ## old
+  # lld <- lapply(er_en$words, function(x)
+  #   paste(unlist(
+  #     hunspell_suggest(x, dict = dictionary("en_US"))
+  #   ), collapse = ", ")
+  # )
+
+  # new
+  lld <- lapply(er_en$words, function(x) {
+    # Skip if word is empty or NA
+    if (is.null(x) || is.na(x) || nchar(x) == 0) {
+      return("")
+    }
+
+    suggestions <- tryCatch({
       hunspell_suggest(x, dict = dictionary("en_US"))
-    ), collapse = ", ")
-  )
+    }, error = function(e) {
+      cat("Error with word:", x, "\n")
+      return(NULL)
+    })
+
+    if (!is.null(suggestions) && length(suggestions) > 0 && !is.null(suggestions[[1]])) {
+      return(paste(unlist(suggestions), collapse = ", "))
+    } else {
+      return("")  # Return empty string if no suggestions
+    }
+  })
+
   er_en$suggest <- unlist(lld)
   er_en <- er_en[suggest != "",]
   er_en$correct <- NULL
@@ -190,14 +212,29 @@ if (TRUE) {
   )
   er_gr <- er_gr[ correct == F, ]
 
-  lld <- lapply(er_gr$words, function(x)
-    paste(unlist(
-      hunspell_suggest(x, dict = dictionary("el_GR"))
-    ), collapse = ", ")
-  )
+  # ## old
+  # lld <- lapply(er_gr$words, function(x)
+  #   paste(unlist(
+  #     hunspell_suggest(x, dict = dictionary("el_GR"))
+  #   ), collapse = ", ")
+  # )
+
+  ## new
   lld <- lapply(er_gr$words, function(x) {
-    suggestions <- hunspell_suggest(x, dict = dictionary("el_GR"))
-    if (length(suggestions) > 0 && !is.null(suggestions[[1]])) {
+    # Skip if word is empty or NA
+    if (is.null(x) || is.na(x) || nchar(x) == 0) {
+      return("")
+    }
+
+    suggestions <- tryCatch({
+      hunspell_suggest(x, dict = dictionary("el_GR"))
+    }, error = function(e) {
+      # Log the problematic word
+      cat("Error with word:", x, "\n")
+      return(NULL)
+    })
+
+    if (!is.null(suggestions) && length(suggestions) > 0 && !is.null(suggestions[[1]])) {
       return(paste(unlist(suggestions), collapse = ", "))
     } else {
       return("")  # Return empty string if no suggestions
@@ -205,14 +242,14 @@ if (TRUE) {
   })
 
   er_gr$suggest <- unlist(lld)
-  er_gr <- er_gr[suggest != "",]
+  er_gr         <- er_gr[suggest != "",]  # Keep only words with suggestions
   er_gr$correct <- NULL
+
 
   # for (aw in er_gr$words) {
   #   cat(aw, ":", paste(unlist(hunspell_suggest(aw, dict = dictionary("el_GR"))), collapse = ", "), "\n")
   # }
   #
-
 
   ## find error source
 
@@ -389,14 +426,21 @@ DATA_wpt <- DATA_wpt[grep("δυτική ράχη",                     DATA_wpt$
 DATA_wpt <- DATA_wpt[grep("επιστροφή",                       DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("η κ[oό]ψη .*",                    DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("κ[0-9]+",                         DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("ορειν[oό] π[εέ]ρασμα",            DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("παρ[αά]καμψη δασικού",            DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("πινακ[ιί]δα",                     DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("πλατε[ιί]α .*",                   DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("συν[αά]ντηση με δασικ[oό]",       DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("συνεχ[ιί]ζουμε ευθε[ιί]α",        DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("συνεχ[ιί]ζουμε μονοπ[αά]τι",      DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("βραχ[ωώ]δες μονοπ[αά]τι",         DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("Σημε[ιί]ο στο μονοπ[αά]τι",       DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("Αφ[ηή]νουμε χωματ[oό]δρομο για μονοπ[αά]τι",  DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("χωματ[oό]δρομος",                 DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("χωρ[ιί]ο",                        DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("ως εδώ",                          DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("μνπ",                             DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("χμτδρ",                           DATA_wpt$name, invert = T, ignore.case = T), ]
 
 DATA_wpt$name <- gsub("^[ ]+",        "", DATA_wpt$name)
 DATA_wpt$name <- gsub("[ ]+$",        "", DATA_wpt$name)
