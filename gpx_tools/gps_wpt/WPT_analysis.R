@@ -433,6 +433,7 @@ DATA_wpt <- DATA_wpt[grep("πλατε[ιί]α .*",                   DATA_wpt$na
 DATA_wpt <- DATA_wpt[grep("συν[αά]ντηση με δασικ[oό]",       DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("συνεχ[ιί]ζουμε ευθε[ιί]α",        DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("συνεχ[ιί]ζουμε μονοπ[αά]τι",      DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("συνεχ[ιί]ζουμε χωματ[oό]δρομο",   DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("βραχ[ωώ]δες μονοπ[αά]τι",         DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("Σημε[ιί]ο στο μονοπ[αά]τι",       DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("Αφ[ηή]νουμε χωματ[oό]δρομο για μονοπ[αά]τι",  DATA_wpt$name, invert = T, ignore.case = T), ]
