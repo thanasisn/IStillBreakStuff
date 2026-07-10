@@ -538,7 +538,7 @@ for (days in pdays) {
   }
 
 
-  cat(paste0("\n\n## ", days, " days, daily mean of models for each metric\n\n"))
+  cat(paste0("\n\n## ", days, " days mean of models for each metric\n\n"))
 
   #### unified by model  -----------------------------------------------------
   unifid <- pppppp[, .(Date, VO2max_Detected)]
@@ -714,35 +714,162 @@ for (days in pdays) {
     }
   }
 
-  plot(unifid$Date, unifid$PMC_PER,"l", col = 6, ylim = c(0,100))
-  par(new = T)
-  plot(unifid$Date, unifid$PMC_FAT,"l", col = 3, ylim = c(0,100))
-  par(new = T)
-  plot(unifid$Date, unifid$PMC_FIT,"l", col = 5, ylim = c(0,100))
-  abline(v = Sys.Date(), col = "green", lty = 2)
-  title("PMC all metrics")
-  axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "black", col.ticks = "black")
-  axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
 
-  plot(unifid$Date, unifid$BAN_PER,"l", col = 6, ylim = c(0,100))
-  par(new = T)
-  plot(unifid$Date, unifid$BAN_FAT,"l", col = 3, ylim = c(0,100))
-  par(new = T)
-  plot(unifid$Date, unifid$BAN_FIT,"l", col = 5, ylim = c(0,100))
-  abline(v = Sys.Date(), col = "green", lty = 2)
-  title("Banister all metrics")
-  axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "black", col.ticks = "black")
-  axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
+  # Prepare the data for EPOC
+  epoc_data <- unifid %>%
+    select(Date, PMC_PER, PMC_FAT, PMC_FIT) %>%
+    pivot_longer(cols = c(PMC_PER, PMC_FAT, PMC_FIT),
+                 names_to = "variable",
+                 values_to = "value")
 
-  plot(unifid$Date, unifid$BUS_PER,"l", col = 6, ylim = c(0,100))
-  par(new = T)
-  plot(unifid$Date, unifid$BUS_FAT,"l", col = 3, ylim = c(0,100))
-  par(new = T)
-  plot(unifid$Date, unifid$BUS_FIT,"l", col = 5, ylim = c(0,100))
-  abline(v = Sys.Date(), col = "green", lty = 2)
-  title("Busson all metrics")
-  axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "black", col.ticks = "black")
-  axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
+  # Create EPOC plot
+  epoc_plot <- ggplot(epoc_data, aes(x = Date, y = value, color = variable)) +
+    geom_line(size = 0.8) +
+    scale_color_manual(values = c("PMC_PER" = "cyan3",
+                                  "PMC_FAT" = "green3",
+                                  "PMC_FIT" = "purple")) +
+    scale_y_continuous(limits = c(0, 100)) +
+    labs(title = "PMC all metrics",
+         x = NULL,
+         y = NULL) +
+    theme_minimal() +
+    theme(
+      plot.margin = margin(5, 5, 5, 0),
+      legend.position = c(0.9, 0.9),
+      legend.title = element_blank(),
+      panel.grid.minor = element_blank()
+    ) +
+    # vertical line for today
+    geom_vline(xintercept = Sys.Date(), color = "green", linetype = "dashed") +
+    # Customize x-axis with monthly ticks and labels
+    scale_x_date(
+      date_breaks = "1 month",
+      date_labels = "%b",
+      minor_breaks = NULL
+    ) +
+    # weekly ticks (minor breaks)
+    annotation_logticks(sides = "b",
+                        outside = TRUE,
+                        short = unit(0.1, "cm"),
+                        mid = unit(0.2, "cm"),
+                        long = unit(0.3, "cm")) +
+    # Override to get weekly tick marks
+    geom_rug(data = subset(unifid, wday(Date) == 2),
+             aes(x = Date),
+             sides = "b",
+             length = unit(0.1, "cm"),
+             color = "black",
+             inherit.aes = FALSE)
+
+  # Display EPOC plot
+  plot_show(epoc_plot)
+
+
+
+
+  # Prepare the data for Banister
+  ban_data <- unifid %>%
+    select(Date, BAN_PER, BAN_FAT, BAN_FIT) %>%
+    pivot_longer(cols = c(BAN_PER, BAN_FAT, BAN_FIT),
+                 names_to = "variable",
+                 values_to = "value")
+
+  # Create EPOC plot
+  ban_plot <- ggplot(ban_data, aes(x = Date, y = value, color = variable)) +
+    geom_line(size = 0.8) +
+    scale_color_manual(values = c("BAN_PER" = "cyan3",
+                                  "BAN_FAT" = "green3",
+                                  "BAN_FIT" = "purple")) +
+    scale_y_continuous(limits = c(0, 100)) +
+    labs(title = "Banister all metrics",
+         x = NULL,
+         y = NULL) +
+    theme_minimal() +
+    theme(
+      plot.margin = margin(5, 5, 5, 0),
+      legend.position = c(0.9, 0.9),
+      legend.title = element_blank(),
+      panel.grid.minor = element_blank()
+    ) +
+    # vertical line for today
+    geom_vline(xintercept = Sys.Date(), color = "green", linetype = "dashed") +
+    # Customize x-axis with monthly ticks and labels
+    scale_x_date(
+      date_breaks = "1 month",
+      date_labels = "%b",
+      minor_breaks = NULL
+    ) +
+    # weekly ticks (minor breaks)
+    annotation_logticks(sides = "b",
+                        outside = TRUE,
+                        short = unit(0.1, "cm"),
+                        mid = unit(0.2, "cm"),
+                        long = unit(0.3, "cm")) +
+    # Override to get weekly tick marks
+    geom_rug(data = subset(unifid, wday(Date) == 2),
+             aes(x = Date),
+             sides = "b",
+             length = unit(0.1, "cm"),
+             color = "black",
+             inherit.aes = FALSE)
+
+  # Display EPOC plot
+  plot_show(ban_plot)
+
+
+
+
+
+
+  # Prepare the data for Busson
+  buss_data <- unifid %>%
+    select(Date, BUS_PER, BUS_FAT, BUS_FIT) %>%
+    pivot_longer(cols = c(BUS_PER, BUS_FAT, BUS_FIT),
+                 names_to = "variable",
+                 values_to = "value")
+
+  # Create EPOC plot
+  buss_plot <- ggplot(buss_data, aes(x = Date, y = value, color = variable)) +
+    geom_line(size = 0.8) +
+    scale_color_manual(values = c("BUS_PER" = "cyan3",
+                                  "BUS_FAT" = "green3",
+                                  "BUS_FIT" = "purple")) +
+    scale_y_continuous(limits = c(0, 100)) +
+    labs(title = "Busson all metrics",
+         x = NULL,
+         y = NULL) +
+    theme_minimal() +
+    theme(
+      plot.margin = margin(5, 5, 5, 0),
+      legend.position = c(0.9, 0.9),
+      legend.title = element_blank(),
+      panel.grid.minor = element_blank()
+    ) +
+    # vertical line for today
+    geom_vline(xintercept = Sys.Date(), color = "green", linetype = "dashed") +
+    # Customize x-axis with monthly ticks and labels
+    scale_x_date(
+      date_breaks = "1 month",
+      date_labels = "%b",
+      minor_breaks = NULL
+    ) +
+    # weekly ticks (minor breaks)
+    annotation_logticks(sides = "b",
+                        outside = TRUE,
+                        short = unit(0.1, "cm"),
+                        mid = unit(0.2, "cm"),
+                        long = unit(0.3, "cm")) +
+    # Override to get weekly tick marks
+    geom_rug(data = subset(unifid, wday(Date) == 2),
+             aes(x = Date),
+             sides = "b",
+             length = unit(0.1, "cm"),
+             color = "black",
+             inherit.aes = FALSE)
+
+  # Display EPOC plot
+  plot_show(buss_plot)
+
 
 }
 
@@ -750,6 +877,7 @@ for (days in pdays) {
 
 
 ##TODO Yearly
+##TODO make it an html table
 
 capture.output({
   metrics <- metrics[as.Date(Date) > Sys.Date() - 400, ]
@@ -791,24 +919,86 @@ capture.output({
 
 
 
-par("mar" = c(3,2,2,1), xpd = FALSE)
-weekly <- tail(weekly,10)
-ylim   <- range(0, weekly$TRIMP_Points, weekly$TRIMP_Zonal_Points, weekly$EPOC,
-                weekly$Load_2, weekly$TrimpModWeighed/100,
-                weekly$Calories/1000, na.rm = T)
-plot( weekly$Date,  weekly$TRIMP_Points, "l",   lwd = 2, col = 4, ylim = ylim)
-lines(weekly$Date,  weekly$TRIMP_Zonal_Points,  lwd = 2, col = 3 )
-lines(weekly$Date,  weekly$EPOC,                lwd = 2, col = 2 )
-lines(weekly$Date,  weekly$Load_2,              lwd = 2, col = 5 )
-lines(weekly$Date,  weekly$TrimpModWeighed/100, lwd = 2, col = 7 )
 
 
-lines(weekly$Date,  weekly$Calories/10,        lwd = 2, col = 6 )
-# abline(v = Sys.Date(), lty = 2, col = "green")
+# Prepare the data - take last 10 weeks
+weekly_data <- tail(weekly, 10) %>%
+  select(Date,
+         TRIMP_Points,
+         TRIMP_Zonal_Points,
+         EPOC,
+         Load_2,
+         TrimpModWeighed,
+         Calories) %>%
+  # Scale the data to match the original plot
+  mutate(
+    TrimpModWeighed_scaled = TrimpModWeighed / 100,
+    Calories_scaled = Calories / 10
+  )
 
-legend("topleft", bty = "n", lty = 1, lwd = 2, cex = .8,
-       legend = c("TRIMP", "TRIMP Zoned", "EPOC", "Load_2", "TrimpModWeighed/100", "Calories/10"),
-       col    = c(      4,             3,      2,        5,                     7,     6))
+# Check the actual scaling - if Calories/10 was used in original, use that
+# weekly_data$Calories_scaled <- weekly_data$Calories / 10  # Uncomment if /10 is correct
+
+# Reshape for ggplot
+plot_data <- weekly_data %>%
+  pivot_longer(cols = c(TRIMP_Points, TRIMP_Zonal_Points, EPOC,
+                        Load_2, TrimpModWeighed_scaled, Calories_scaled),
+               names_to = "variable",
+               values_to = "value")
+
+# Create the plot
+weekly_plot <- ggplot(plot_data, aes(x = Date, y = value, color = variable, group = variable)) +
+  geom_line(size = 1.2) +
+  scale_color_manual(
+    values = c(
+      "TRIMP_Points" = "blue",
+      "TRIMP_Zonal_Points" = "green3",
+      "EPOC" = "red",
+      "Load_2" = "purple",
+      "TrimpModWeighed_scaled" = "orange",
+      "Calories_scaled" = "cyan3"
+    ),
+    labels = c(
+      "TRIMP_Points" = "TRIMP",
+      "TRIMP_Zonal_Points" = "TRIMP Zoned",
+      "EPOC" = "EPOC",
+      "Load_2" = "Load_2",
+      "TrimpModWeighed_scaled" = "TrimpModWeighed/100",
+      "Calories_scaled" = "Calories/10"
+    )
+  ) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0.05, 0.05))
+  ) +
+  labs(
+    title = NULL,
+    x = NULL,
+    y = NULL
+  ) +
+  theme_minimal() +
+  theme(
+    plot.margin = margin(5, 5, 5, 5),
+    legend.position = "top",
+    legend.justification = "left",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 8),
+    legend.key.width = unit(0.5, "cm"),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  ) +
+  # Scale x-axis to show all dates
+  scale_x_date(
+    date_breaks = "1 week",
+    date_labels = "%b %d"
+  )
+
+# Display the plot
+plot_show(weekly_plot)
+
+
+
+
+
 
 
 if (!interactive()) dev.off()
