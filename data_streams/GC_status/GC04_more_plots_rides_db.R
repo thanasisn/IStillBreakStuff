@@ -30,14 +30,14 @@ export.file <- paste0("~/Formal/REPORTS/", sub(".R", ".html", basename(Script.Na
 
 require(caTools,    quietly = TRUE, warn.conflicts = FALSE)
 require(data.table, quietly = TRUE, warn.conflicts = FALSE)
-require(plyr,       quietly = TRUE, warn.conflicts = FALSE)
 require(dplyr,      quietly = TRUE, warn.conflicts = FALSE)
 require(ggplot2,    quietly = TRUE, warn.conflicts = FALSE)
-require(lubridate,  quietly = TRUE, warn.conflicts = FALSE)
+require(htmltools,  quietly = TRUE, warn.conflicts = FALSE)
 require(lubridate,  quietly = TRUE, warn.conflicts = FALSE)
 require(pander,     quietly = TRUE, warn.conflicts = FALSE)
 require(plotly,     quietly = TRUE, warn.conflicts = FALSE)
-require(htmltools,  quietly = TRUE, warn.conflicts = FALSE)
+require(plyr,       quietly = TRUE, warn.conflicts = FALSE)
+require(tidyr,      quietly = TRUE, warn.conflicts = FALSE)
 
 source("~/CODE/FUNCTIONS/R/data.R")
 source("~/CODE/data_streams/GC_status/GC00_DEFINITIONS.R")
@@ -222,7 +222,7 @@ for (ii in 1:length(wecare)) {
 ####  Normal plot of all vars and models  ------------------------------------
 for (days in pdays) {
 
-  cat(paste0("\n\n### ", days, " days\n\n"))
+  cat(paste0("\n\n## ", days, " days\n\n"))
 
   ## limit graphs to last days
   pppppp <- gather[ Date >= max(Date) - days - extend, ]
@@ -338,7 +338,7 @@ for (days in pdays) {
   for (va in shortn) {
     for (mo in models) {
 
-      cat(paste0("\n\n#### ", va, " ", mo, "\n\n"))
+      cat(paste0("\n\n### ", va, " ", mo, "\n\n"))
 
       wp <- c(grep(paste0(va,".",mo), names(pppppp), value = TRUE),
               "Date", "VO2max_Detected")
@@ -514,6 +514,8 @@ for (days in pdays) {
 #'
 #' # Unified Performance Models
 #'
+#' All models is the daily mean of PMC, Banister and Busson models
+#'
 #+ echo=F, include=T, results="asis", warning=F
 
 
@@ -521,7 +523,6 @@ for (days in pdays) {
 # days <- pdays[1]
 for (days in pdays) {
 
-  cat(paste0("\n\n### ", days, " days\n\n"))
 
   ## limit graph to last days
   pppppp <- gather[ Date >= max(Date) - days - extend, ]
@@ -536,6 +537,9 @@ for (days in pdays) {
                                 scale  = diff(range(pppppp[[ac]])))
   }
 
+
+  cat(paste0("\n\n## ", days, " days, daily mean of models for each metric\n\n"))
+
   #### unified by model  -----------------------------------------------------
   unifid <- pppppp[, .(Date, VO2max_Detected)]
   for (met in c("EP","TZ","TP")) {
@@ -545,37 +549,161 @@ for (days in pdays) {
     }
   }
 
-  par("mar" = c(2,2,2,0), xpd = TRUE)
 
-  plot(unifid$Date, unifid$EP_PER,"l", col = 6, ylim = c(0,100))
-  par(new = T)
-  plot(unifid$Date, unifid$EP_FAT,"l", col = 3, ylim = c(0,100))
-  par(new = T)
-  plot(unifid$Date, unifid$EP_FIT,"l", col = 5, ylim = c(0,100))
-  abline(v = Sys.Date(), col = "green", lty = 2)
-  title("EPOC all models")
-  axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "black", col.ticks = "black")
-  axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
+  # Prepare the data for ggplot
+  plot_data <- unifid %>%
+    select(Date, EP_PER, EP_FAT, EP_FIT) %>%
+    pivot_longer(cols = c(EP_PER, EP_FAT, EP_FIT),
+                 names_to = "variable",
+                 values_to = "value")
 
-  plot(unifid$Date, unifid$TZ_PER,"l", col = 6, ylim = c(0,100))
-  par(new = T)
-  plot(unifid$Date, unifid$TZ_FAT,"l", col = 3, ylim = c(0,100))
-  par(new = T)
-  plot(unifid$Date, unifid$TZ_FIT,"l", col = 5, ylim = c(0,100))
-  abline(v = Sys.Date(), col = "green", lty = 2)
-  title("TRIMP Zonal all models")
-  axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "black", col.ticks = "black")
-  axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
+  # Create the plot
+  g <- ggplot(plot_data, aes(x = Date, y = value, color = variable)) +
+    geom_line(size = 0.8) +
+    scale_color_manual(values = c("EP_PER" = "cyan3",
+                                  "EP_FAT" = "green3",
+                                  "EP_FIT" = "purple")) +
+    scale_y_continuous(limits = c(0, 100)) +
+    labs(title = "EPOC all models",
+         x = NULL,
+         y = NULL) +
+    theme_minimal() +
+    theme(
+      plot.margin = margin(5, 5, 5, 0),
+      legend.position = c(0.9, 0.9),
+      legend.title = element_blank(),
+      panel.grid.minor = element_blank()
+    ) +
+    # vertical line for today
+    geom_vline(xintercept = Sys.Date(), color = "green", linetype = "dashed") +
+    # Customize x-axis with monthly ticks and labels
+    scale_x_date(
+      date_breaks = "1 month",
+      date_labels = "%b",
+      minor_breaks = NULL
+    ) +
+    # weekly ticks (minor breaks)
+    annotation_logticks(sides = "b",
+                        outside = TRUE,
+                        short = unit(0.1, "cm"),
+                        mid = unit(0.2, "cm"),
+                        long = unit(0.3, "cm")) +
+    # Override to get weekly tick marks
+    geom_rug(data = subset(unifid, wday(Date) == 2),
+             aes(x = Date),
+             sides = "b",
+             length = unit(0.1, "cm"),
+             color = "black",
+             inherit.aes = FALSE)
 
-  plot(unifid$Date, unifid$TP_PER,"l", col = 6, ylim = c(0,100))
-  par(new = T)
-  plot(unifid$Date, unifid$TP_FAT,"l", col = 3, ylim = c(0,100))
-  par(new = T)
-  plot(unifid$Date, unifid$TP_FIT,"l", col = 5, ylim = c(0,100))
-  abline(v = Sys.Date(), col = "green", lty = 2)
-  title("TRIMP all models")
-  axis(1, at = pp[wday(Date) == 2, Date ], labels = F, col = "black", col.ticks = "black")
-  axis(1, at = pp[mday(Date) == 1, Date ], labels = format(pp[mday(Date) == 1, Date ], "%b"), col = "black", col.ticks = "black", lwd.ticks = 3)
+  plot_show(g)
+
+
+
+
+
+  # Prepare the data for ggplot
+  plot_data <- unifid %>%
+    select(Date, TZ_PER, TZ_FAT, TZ_FIT) %>%
+    pivot_longer(cols = c(TZ_PER, TZ_FAT, TZ_FIT),
+                 names_to = "variable",
+                 values_to = "value")
+
+  # Create the plot
+  g <- ggplot(plot_data, aes(x = Date, y = value, color = variable)) +
+    geom_line(size = 0.8) +
+    scale_color_manual(values = c("TZ_PER" = "cyan3",
+                                  "TZ_FAT" = "green3",
+                                  "TZ_FIT" = "purple")) +
+    scale_y_continuous(limits = c(0, 100)) +
+    labs(title = "TRIMP Zonal all models",
+         x = NULL,
+         y = NULL) +
+    theme_minimal() +
+    theme(
+      plot.margin = margin(5, 5, 5, 0),
+      legend.position = c(0.9, 0.9),
+      legend.title = element_blank(),
+      panel.grid.minor = element_blank()
+    ) +
+    # vertical line for today
+    geom_vline(xintercept = Sys.Date(), color = "green", linetype = "dashed") +
+    # Customize x-axis with monthly ticks and labels
+    scale_x_date(
+      date_breaks = "1 month",
+      date_labels = "%b",
+      minor_breaks = NULL
+    ) +
+    # weekly ticks (minor breaks)
+    annotation_logticks(sides = "b",
+                        outside = TRUE,
+                        short = unit(0.1, "cm"),
+                        mid = unit(0.2, "cm"),
+                        long = unit(0.3, "cm")) +
+    # Override to get weekly tick marks
+    geom_rug(data = subset(unifid, wday(Date) == 2),
+             aes(x = Date),
+             sides = "b",
+             length = unit(0.1, "cm"),
+             color = "black",
+             inherit.aes = FALSE)
+
+  plot_show(g)
+
+
+
+  # Prepare the data for ggplot
+  plot_data <- unifid %>%
+    select(Date, TP_PER, TP_FAT, TP_FIT) %>%
+    pivot_longer(cols = c(TP_PER, TP_FAT, TP_FIT),
+                 names_to = "variable",
+                 values_to = "value")
+
+  # Create the plot
+  g <- ggplot(plot_data, aes(x = Date, y = value, color = variable)) +
+    geom_line(size = 0.8) +
+    scale_color_manual(values = c("TP_PER" = "cyan3",
+                                  "TP_FAT" = "green3",
+                                  "TP_FIT" = "purple")) +
+    scale_y_continuous(limits = c(0, 100)) +
+    labs(title = "TRIMP all models",
+         x = NULL,
+         y = NULL) +
+    theme_minimal() +
+    theme(
+      plot.margin = margin(5, 5, 5, 0),
+      legend.position = c(0.9, 0.9),
+      legend.title = element_blank(),
+      panel.grid.minor = element_blank()
+    ) +
+    # vertical line for today
+    geom_vline(xintercept = Sys.Date(), color = "green", linetype = "dashed") +
+    # Customize x-axis with monthly ticks and labels
+    scale_x_date(
+      date_breaks = "1 month",
+      date_labels = "%b",
+      minor_breaks = NULL
+    ) +
+    # weekly ticks (minor breaks)
+    annotation_logticks(sides = "b",
+                        outside = TRUE,
+                        short = unit(0.1, "cm"),
+                        mid = unit(0.2, "cm"),
+                        long = unit(0.3, "cm")) +
+    # Override to get weekly tick marks
+    geom_rug(data = subset(unifid, wday(Date) == 2),
+             aes(x = Date),
+             sides = "b",
+             length = unit(0.1, "cm"),
+             color = "black",
+             inherit.aes = FALSE)
+
+  plot_show(g)
+
+
+
+
+  cat(paste0("\n\n## ", days, " days, daily mean of metric for each model\n\n"))
 
   #### unified by metric  ----------------------------------------------------
   unifid <- pppppp[, .(Date, VO2max_Detected)]
