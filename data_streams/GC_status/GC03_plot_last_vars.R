@@ -4,11 +4,11 @@
 #' author: ""
 #' output:
 #'   html_document:
-#'     toc:             true
-#'     number_sections: false
-#'     fig_width:       7
-#'     fig_height:      4
-#'     keep_md:         no
+#'     toc:              true
+#'     number_sections:  false
+#'     fig_width:        7
+#'     fig_height:       4
+#'     keep_md:          no
 #' date: ""
 #' ---
 
@@ -57,7 +57,7 @@ if (
   DEBUG ||
   interactive() ||
   !file.exists(export.file) ||
-  file.mtime(storagefl) < file.mtime(export.file)
+  file.mtime(storagefl) > file.mtime(export.file)
 ) {
   cat(paste("\n\n",  basename(Script.Name), "have to run!\n\n"))
 } else {

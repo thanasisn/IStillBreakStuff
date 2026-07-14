@@ -60,7 +60,6 @@ plot_show <- function(plot) {
   }
 }
 
-
 #+ include=FALSE, echo=FALSE
 ## init use of ggplot and html tables in loops
 # tagList(datatable(cars))
