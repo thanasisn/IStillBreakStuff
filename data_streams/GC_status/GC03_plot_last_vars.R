@@ -65,6 +65,18 @@ if (
 }
 
 
+plot_show <- function(plot) {
+  if (knitr::is_latex_output()) {
+    print(plot)
+  } else if (interactive()) {
+    ggplotly(plot)
+  } else if (knitr::is_html_output()) {
+    htmltools::tagList(ggplotly(plot)) %>% print()
+  } else {
+    print(plot)
+  }
+}
+
 #+ include=FALSE, echo=FALSE
 ## init use of ggplot and html tables in loops
 tagList(datatable(cars))
@@ -96,21 +108,6 @@ PP |> colnames() |> sort()
 
 
 
-plot_show <- function(plot) {
-
-  if (knitr::is_latex_output()) {
-    print(plot)
-
-  } else if (interactive()) {
-    ggplotly(plot)
-
-  } else if (knitr::is_html_output()) {
-    htmltools::tagList(ggplotly(plot)) %>% print()
-
-  } else {
-    print(plot)
-  }
-}
 
 ## _ Plot some data specific ---------
 #'
@@ -252,6 +249,7 @@ wecare <- PP |>
   ) |>
   colnames() |>
   sort()
+
 
 #'
 #' ## Time series plots

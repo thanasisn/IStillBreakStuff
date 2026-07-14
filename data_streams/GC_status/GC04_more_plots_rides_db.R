@@ -49,16 +49,12 @@ lastactivit  <- "~/LOGs/training_status/Last_Activities.md"
 DEBUG <- FALSE
 
 plot_show <- function(plot) {
-
   if (knitr::is_latex_output()) {
     print(plot)
-
   } else if (interactive()) {
     ggplotly(plot)
-
   } else if (knitr::is_html_output()) {
     htmltools::tagList(ggplotly(plot)) %>% print()
-
   } else {
     print(plot)
   }
