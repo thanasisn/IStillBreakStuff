@@ -14,7 +14,7 @@ QUAL="${4:-95}"
 BACK="${5:-#FFFFFF60}"
 FILL="${6:-#000000}"
 ## text point size
-POINT="${7:-22}"
+POINT="${7:-24}"
 
 ## max allowed output resolution
 DIMEN="${DIM}x${DIM}"
@@ -64,7 +64,7 @@ find "${FOLDER}" -type f | while read line ;do
   echo "$in_name"
   echo "$out_name"
 
-  magick convert  \( "${in_name}" -strip  -resize "$DIMEN" -quality "$QUAL" -auto-orient \) \
+  magick  \( "${in_name}" -strip  -resize "$DIMEN" -quality "$QUAL" -auto-orient \) \
       -background $BACK   \
       -pointsize  $POINT  \
       -fill       $FILL   \
