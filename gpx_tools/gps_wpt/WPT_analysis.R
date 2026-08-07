@@ -326,6 +326,7 @@ DATA_wpt <- DATA_wpt[grep("PIN[0-9]+",                       DATA_wpt$name, inve
 DATA_wpt <- DATA_wpt[grep("Parkplatz.*",                     DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("Path entry.*",                    DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("Straight .*",                     DATA_wpt$name, invert = T, ignore.case = T), ]
+DATA_wpt <- DATA_wpt[grep("asfalt-xomatodr",                 DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("Trail Head",                      DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("Turn .*",                         DATA_wpt$name, invert = T, ignore.case = T), ]
 DATA_wpt <- DATA_wpt[grep("WPT[0-9]+",                       DATA_wpt$name, invert = T, ignore.case = T), ]
