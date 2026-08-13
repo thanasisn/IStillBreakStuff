@@ -60,6 +60,11 @@ if type synclient >/dev/null 2>&1; then
 fi
 
 
+if [[ $(hostname) == "durden" ]]; then
+  exec xrandr --dpi 120
+fi
+
+
 echo " - - - Set keyboard language options - - - "
 #  setxkbmap -option grp:switch,grp:alt_shift_toggle,grp_led:scroll us,el
 setxkbmap -option grp:switch,grp:alt_shift_toggle,grp_led:scroll us,gr

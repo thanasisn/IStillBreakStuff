@@ -64,6 +64,10 @@ if [[ $(hostname) == "crane" ]]; then
     /usr/bin/xmodmap -e "keysym ISO_Level3_Shift = Menu"
 fi
 
+if [[ $(hostname) == "durden" ]]; then
+  xrandr --dpi 120
+fi
+
 ## use numbers on num keyboard
 numlockx on
 
