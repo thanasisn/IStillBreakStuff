@@ -145,7 +145,7 @@ wait "${pids[@]}"; pids=()
   info "##  $(basename "$script")  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
-) & pids+=($!)
+) & #pids+=($!)
 
 (
   sleep 0.1
