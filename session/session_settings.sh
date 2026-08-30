@@ -7,25 +7,32 @@ set +e
 
 ## screen lock option
 case "$(hostname)" in
-    "mumra")
-        echo "mumra"
-        savertime=1100
-        ;;
+  "mumra")
+    echo "mumra"
+    savertime=1100
+    ;;
 
-    "tyler")
-        echo "tyler"
-        savertime=900
-        ;;
+  "tyler")
+    echo "tyler"
+    savertime=900
+    ;;
 
-    "sagan")
-        echo "sagan"
-        savertime=500
-        ;;
+  "durden")
+    echo "tyler"
+    savertime=900
+    echo " - - - Enable touchpad tap - - - "
+    exec xinput set-prop "GXTP5100:00 27C6:01E0 Touchpad" "libinput Tapping Enabled" 1
+    ;;
 
-    *)
-        echo "any host"
-        savertime=600
-        ;;
+  "sagan")
+    echo "sagan"
+    savertime=500
+    ;;
+
+  *)
+    echo "any host"
+    savertime=600
+    ;;
 esac
 echo
 
@@ -73,10 +80,6 @@ echo
 echo " - - - Swap caps and escape keys - - - "
 setxkbmap -option "caps:swapescape"
 echo
-
-## for durden
-echo " - - - Enable touchpad tap - - - "
-exec xinput set-prop "GXTP5100:00 27C6:01E0 Touchpad" "libinput Tapping Enabled" 1
 
 
 exit 0
