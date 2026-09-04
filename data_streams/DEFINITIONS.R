@@ -63,8 +63,11 @@ fi_notify_state <- "~/CODE/data_streams/fi_analysis/data/fi_notify_state.Rds"
 ## Store taplog data
 taplog_fl       <- "~/DATA_RAW/Other/TapLog.Rds"
 
+## Export ergo
 efc30255_fl     <- "~/CODE/data_streams/fi_analysis/data/efc30155_cur.Rds"
 
+## Export BNP Paribas
+efc30255_fl     <- "~/CODE/data_streams/fi_analysis/data/BNPParibasFlexi.Rds"
 
 
 ##   Weather   #############
