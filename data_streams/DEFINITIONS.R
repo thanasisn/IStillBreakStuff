@@ -67,8 +67,8 @@ taplog_fl       <- "~/DATA_RAW/Other/TapLog.Rds"
 efc30255_fl     <- "~/CODE/data_streams/fi_analysis/data/efc30155_cur.Rds"
 
 ## Export BNP Paribas
-BNPFlexinav_fl     <- "~/CODE/data_streams/fi_analysis/data/BNPParibasFlexinav.Rds"
-BNPFlexidiv_fl     <- "~/CODE/data_streams/fi_analysis/data/BNPParibasFlexidiv.Rds"
+BNPFlexinav_fl     <- "~/CODE/data_streams/fi_analysis/data/BNPParibasFlexiNAV.Rds"
+BNPFlexidiv_fl     <- "~/CODE/data_streams/fi_analysis/data/BNPParibasFlexiDIV.Rds"
 
 
 ##   Weather   #############
