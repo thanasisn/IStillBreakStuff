@@ -223,6 +223,16 @@ wait "${pids[@]}"; pids=()
   info "##  End  F05_EFC30255.R  STATUS:$?  ##"
 ) & pids+=($!)
 
+(
+  sleep 0.6
+  info "##  F06_BNP_Flexi.R  ##"
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F06_BNP_Flexi.R',
+                  output_format = 'html_document',
+                  output_dir    = '~/Formal/REPORTS')"
+  info "##  End  F06_BNP_Flexi.R  STATUS:$?  ##"
+) & pids+=($!)
+
+
 
 
 (
