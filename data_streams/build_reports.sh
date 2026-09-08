@@ -186,14 +186,15 @@ wait "${pids[@]}"; pids=()
   info "##  End  F01_placements.R  STATUS:$?  ##"
 ) & pids+=($!)
 
-(
-  sleep 0.2
-  info "##  F02_bonds.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F02_bonds.R',
-                  output_format = 'html_document',
-                  output_dir    = '~/Formal/REPORTS')"
-  info "##  End  F02_bonds.R  STATUS:$?  ##"
-) & pids+=($!)
+## This not active any more
+# (
+#   sleep 0.2
+#   info "##  F02_bonds.R  ##"
+#   Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F02_bonds.R',
+#                   output_format = 'html_document',
+#                   output_dir    = '~/Formal/REPORTS')"
+#   info "##  End  F02_bonds.R  STATUS:$?  ##"
+# ) & pids+=($!)
 
 (
   sleep 0.3
@@ -233,8 +234,6 @@ wait "${pids[@]}"; pids=()
 ) & pids+=($!)
 
 
-
-
 (
   sleep 0.6
   info "##  C02_CarScannerParse.R  ##"
@@ -262,7 +261,7 @@ wait "${pids[@]}"; pids=()
   info "##  End  F09_Dashboard.Rmd  STATUS:$?  ##"
 )
 
-##  Notification  -------------------------------------------------------------------
+##  Notification  --------------------------------------------------------------
 
 (
   script="$HOME/CODE/data_streams/fi_analysis/N01_fi_notifications.R"
@@ -271,8 +270,8 @@ wait "${pids[@]}"; pids=()
   info "##  End $(basename $script) STATUS:$?  ##"
 )
 
-
-
+##  End of script  -------------------------------------------------------------
+wait
 info "##    END $0    ##"
 dura="$( echo "scale=6; ($SECONDS)/60" | bc)"
 printf "%s %-10s %-10s %-10s %f\n" "$(date +"%F %H:%M:%S")" "$HOSTNAME" "$USER" "$(basename $0)" "$dura"
