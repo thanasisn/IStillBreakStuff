@@ -270,8 +270,9 @@ wait "${pids[@]}"; pids=()
   info "##  End $(basename $script) STATUS:$?  ##"
 )
 
+## wait here doesn't work as expected
+
 ##  End of script  -------------------------------------------------------------
-wait
 info "##    END $0    ##"
 dura="$( echo "scale=6; ($SECONDS)/60" | bc)"
 printf "%s %-10s %-10s %-10s %f\n" "$(date +"%F %H:%M:%S")" "$HOSTNAME" "$USER" "$(basename $0)" "$dura"
