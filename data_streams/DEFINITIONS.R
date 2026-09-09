@@ -70,6 +70,8 @@ efc30255_fl     <- "~/CODE/data_streams/fi_analysis/data/efc30155_cur.Rds"
 BNPFlexinav_fl     <- "~/CODE/data_streams/fi_analysis/data/BNPParibasFlexiNAV.Rds"
 BNPFlexidiv_fl     <- "~/CODE/data_streams/fi_analysis/data/BNPParibasFlexiDIV.Rds"
 
+BNPFlexi_status    <- "~/CODE/data_streams/fi_analysis/data/BNPParibasFlexi_status.Rds"
+
 
 ##   Weather   #############
 
