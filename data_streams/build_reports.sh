@@ -163,6 +163,14 @@ wait "${pids[@]}"; pids=()
   info "##  End $(basename $script) STATUS:$?  ##"
 ) & pids+=($!)
 
+(
+  sleep 0.3
+  script="$HOME/CODE/data_streams/fi_analysis/M07_expence.R"
+  info "##  $(basename "$script")  ##"
+  "$script"
+  info "##  End $(basename $script) STATUS:$?  ##"
+) & pids+=($!)
+
 wait "${pids[@]}"; pids=()
 
 
