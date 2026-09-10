@@ -29,6 +29,7 @@ comod_fl        <- "~/CODE/data_streams/fi_analysis/data/Comod.Rds"
 
 ## Export of mmex state
 mmexfla         <- "~/CODE/data_streams/fi_analysis/data/allmmex.Rds"
+mmexflatrans    <- "~/CODE/data_streams/fi_analysis/data/allmmextrans.Rds"
 
 ## Account names form MMEX
 mmexnames       <- "~/CODE/data_streams/fi_analysis/data/MMEX_account_names.Rds"
