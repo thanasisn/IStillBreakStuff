@@ -163,14 +163,6 @@ wait "${pids[@]}"; pids=()
   info "##  End $(basename $script) STATUS:$?  ##"
 ) & pids+=($!)
 
-(
-  sleep 0.3
-  script="$HOME/CODE/data_streams/fi_analysis/M07_expence.R"
-  info "##  $(basename "$script")  ##"
-  "$script"
-  info "##  End $(basename $script) STATUS:$?  ##"
-) & pids+=($!)
-
 wait "${pids[@]}"; pids=()
 
 
@@ -178,6 +170,7 @@ wait "${pids[@]}"; pids=()
 
 ##  Data display scripts  ------------------------------------------------------
 (
+  sleep 0.2
   info "##  M3_plots.R  ##"
   Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/M03_plots.R',
                   output_format = 'html_document',
@@ -186,7 +179,17 @@ wait "${pids[@]}"; pids=()
 ) & pids+=($!)
 
 (
-  sleep 0.1
+  sleep 0.2
+  info "##  M07_expence.R  ##"
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/M07_expence.R',
+                  output_format = 'html_document',
+                  output_dir    = '~/Formal/REPORTS')"
+  info "##  End  M3_plots.R STATUS:$?  ##"
+) & pids+=($!)
+
+
+(
+  sleep 0.2
   info "##  F01_placements.R  ##"
   Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F01_placements.R',
                   output_format = 'html_document',
@@ -205,7 +208,7 @@ wait "${pids[@]}"; pids=()
 # ) & pids+=($!)
 
 (
-  sleep 0.3
+  sleep 0.2
   info "##  F03_comod.R  ##"
   Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F03_comod.R',
                   output_format = 'html_document',
@@ -215,7 +218,7 @@ wait "${pids[@]}"; pids=()
 
 
 (
-  sleep 0.4
+  sleep 0.2
   info "##  F04_zero.R  ##"
   Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F04_zero.R',
                   output_format = 'html_document',
@@ -224,7 +227,7 @@ wait "${pids[@]}"; pids=()
 ) & pids+=($!)
 
 (
-  sleep 0.5
+  sleep 0.2
   info "##  F05_EFC30255.R  ##"
   Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F05_EFC30255.R',
                   output_format = 'html_document',
@@ -233,7 +236,7 @@ wait "${pids[@]}"; pids=()
 ) & pids+=($!)
 
 (
-  sleep 0.6
+  sleep 0.2
   info "##  F06_BNP_Flexi.R  ##"
   Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F06_BNP_Flexi.R',
                   output_format = 'html_document',
@@ -243,7 +246,7 @@ wait "${pids[@]}"; pids=()
 
 
 (
-  sleep 0.6
+  sleep 0.2
   info "##  C02_CarScannerParse.R  ##"
   Rscript -e "rmarkdown::render('~/CODE/data_streams/car/C02_CarScannerParse.R',
                   output_format = 'html_document',
@@ -252,7 +255,7 @@ wait "${pids[@]}"; pids=()
 ) & ## don't wait
 
 (
-  sleep 10
+  sleep 5
   info "##  GC_status_run.R  ##"
   "$HOME/CODE/data_streams/GC_status/GC_status_run.R"
   info "##  End  GC_status_run.R  STATUS:$?  ##"
