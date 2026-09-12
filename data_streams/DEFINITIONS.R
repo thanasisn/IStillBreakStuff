@@ -76,6 +76,15 @@ BNPFlexidiv_fl     <- "~/CODE/data_streams/fi_analysis/data/BNPParibasFlexiDIV.R
 BNPFlexi_status    <- "~/CODE/data_streams/fi_analysis/data/BNPParibasFlexi_status.Rds"
 
 
+
+## Trading 212
+ETF_status    <- "~/CODE/data_streams/fi_analysis/data/ETF_status.Rds"
+
+
+
+
+
+
 ##   Weather   #############
 
 ## gpx folder
