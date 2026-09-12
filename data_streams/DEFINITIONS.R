@@ -81,6 +81,7 @@ BNPFlexi_status    <- "~/CODE/data_streams/fi_analysis/data/BNPParibasFlexi_stat
 ETF_status    <- "~/CODE/data_streams/fi_analysis/data/ETF_status.Rds"
 
 
+ASSET_status  <- "~/CODE/data_streams/fi_analysis/data/asset_status.Rds"
 
 
 

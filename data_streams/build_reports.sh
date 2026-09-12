@@ -247,6 +247,17 @@ wait "${pids[@]}"; pids=()
 
 (
   sleep 0.2
+  info "##  M10_mmex_status.R  ##"
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/M10_mmex_status.R',
+                  output_format = 'html_document',
+                  output_dir    = '~/Formal/REPORTS')"
+  info "##  End  F06_BNP_Flexi.R  STATUS:$?  ##"
+) & pids+=($!)
+
+
+
+(
+  sleep 0.2
   info "##  C02_CarScannerParse.R  ##"
   Rscript -e "rmarkdown::render('~/CODE/data_streams/car/C02_CarScannerParse.R',
                   output_format = 'html_document',
@@ -266,7 +277,7 @@ wait "${pids[@]}"; pids=()
 
 (
   info "##  M08_FIFO.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/M08_FIFO.R',
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/M11_FIFO.R',
                   output_format = 'html_document',
                   output_dir    = '~/Formal/REPORTS')"
   info "##  End  M3_plots.R STATUS:$?  ##"
