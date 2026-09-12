@@ -264,13 +264,21 @@ wait "${pids[@]}"; pids=()
 
 wait "${pids[@]}"; pids=()
 
+(
+  info "##  M08_FIFO.R  ##"
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/M08_FIFO.R',
+                  output_format = 'html_document',
+                  output_dir    = '~/Formal/REPORTS')"
+  info "##  End  M3_plots.R STATUS:$?  ##"
+) & pids+=($!)
+
 ##  Summary  -------------------------------------------------------------------
 (
   info "##  F09_Dashboard.Rmd  ##"
   Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/F09_Dashboard.Rmd',
                   output_dir    = '~/Formal/REPORTS')"
   info "##  End  F09_Dashboard.Rmd  STATUS:$?  ##"
-)
+) & pids+=($!)
 
 ##  Notification  --------------------------------------------------------------
 
@@ -279,9 +287,9 @@ wait "${pids[@]}"; pids=()
   info "##  $(basename $script)  ##"
   "$script"
   info "##  End $(basename $script) STATUS:$?  ##"
-)
+) & pids+=($!)
 
-## wait here doesn't work as expected
+wait "${pids[@]}"; pids=()
 
 ##  End of script  -------------------------------------------------------------
 info "##    END $0    ##"
