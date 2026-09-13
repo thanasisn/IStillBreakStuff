@@ -11,7 +11,7 @@ bon_fl          <- "~/CODE/data_streams/fi_analysis/data/bonBR.Rds"
 lastfl          <- "~/CODE/data_streams/fi_analysis/data/lastA.Rds"
 
 ## Accounts status from mmex
-mmexfl          <- "~/CODE/data_streams/fi_analysis/data/lastmmex.Rds"
+# mmexfl          <- "~/CODE/data_streams/fi_analysis/data/lastmmex.Rds"
 mmexdb          <- "~/MISC/a34_export/MMEX/main.mmb"
 
 ## Peiraios master file g values
