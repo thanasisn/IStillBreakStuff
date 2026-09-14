@@ -276,8 +276,8 @@ wait "${pids[@]}"; pids=()
 wait "${pids[@]}"; pids=()
 
 (
-  info "##  M08_FIFO.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/M11_FIFO.R',
+  info "##  M11_FIRE.R  ##"
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/M11_FIRE.R',
                   output_format = 'html_document',
                   output_dir    = '~/Formal/REPORTS')"
   info "##  End  M3_plots.R STATUS:$?  ##"
