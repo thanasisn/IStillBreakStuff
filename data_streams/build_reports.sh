@@ -34,9 +34,8 @@ pids=()
   info "##  End W01_location_forecast.R  STATUS:$?  ##"
 ) & pids+=($!)
 
-
 (
-  sleep 1
+  sleep 0.2
   info "##  W02_LAP_Davis.R  ##"
   Rscript -e "rmarkdown::render('~/CODE/data_streams/weather/W02_LAP_Davis.R',
                   output_format = 'html_document',
@@ -44,9 +43,8 @@ pids=()
   info "##  End W02_LAP_Davis.R  STATUS:$?  ##"
 ) & pids+=($!)
 
-
 (
-  sleep 2
+  sleep 0.4
   info "##  C01_taplog_plot.R  ##"
   Rscript -e "rmarkdown::render('~/CODE/data_streams/car/C01_taplog_plot.R',
                   output_format = 'html_document',
@@ -54,10 +52,8 @@ pids=()
   info "##  End C01_taplog_plot.R  STATUS:$?  ##"
 ) & pids+=($!)
 
-
-
 (
-  sleep 3
+  sleep 0.6
   script="$HOME/CODE/data_streams/fi_analysis/M01_get_noa_mail.R"
   info "##  $(basename "$script")  ##"
   "$script"
@@ -69,9 +65,8 @@ pids=()
   info "##  End $(basename $script) STATUS:$?  ##"
 ) & pids+=($!)
 
-
 (
-  sleep 4
+  sleep 0.8
   script="$HOME/CODE/data_streams/fi_analysis/S01_peiraios_syn.R"
   info "##  $(basename "$script")  ##"
   "$script"
@@ -79,7 +74,7 @@ pids=()
 ) & pids+=($!)
 
 (
-  sleep 5
+  sleep 1.0
   script="$HOME/CODE/data_streams/fi_analysis/S02_trel_gol.R"
   info "##  $(basename "$script")  ##"
   "$script"
@@ -87,7 +82,7 @@ pids=()
 ) & pids+=($!)
 
 (
-  sleep 6
+  sleep 1.2
   script="$HOME/CODE/data_streams/fi_analysis/S03_pdma.R"
   info "##  $(basename "$script")  ##"
   "$script"
@@ -95,7 +90,7 @@ pids=()
 ) & pids+=($!)
 
 (
-  sleep 7
+  sleep 1.4
   script="$HOME/CODE/data_streams/fi_analysis/S04_tsig.R"
   info "##  $(basename "$script")  ##"
   "$script"
@@ -103,7 +98,16 @@ pids=()
 ) & pids+=($!)
 
 (
-  sleep 8
+  sleep 1.6
+  info "##  S09_dtk.R  ##"
+  Rscript -e "rmarkdown::render('~/CODE/data_streams/fi_analysis/S09_dtk.R',
+                  output_format = 'html_document',
+                  output_dir    = '~/Formal/REPORTS')"
+  info "##  End  S09_dtk.R  STATUS:$?  ##"
+) & pids+=($!)
+
+(
+  sleep 1.8
   script="$HOME/CODE/data_streams/fi_analysis/S05_get_winbank_zip_noa.py"
   info "##  $(basename "$script")  ##"
   "$script"
@@ -127,7 +131,7 @@ pids=()
 ) & pids+=($!)
 
 (
-  sleep 9
+  sleep 2.0
   info "##  M7_utilities.R  ##"
   Rscript -e "rmarkdown::render('~/CODE/data_streams/house/H01_utilities.R',
                   output_format = 'html_document',
