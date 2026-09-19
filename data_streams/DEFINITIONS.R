@@ -3,6 +3,8 @@
 
 ## DTK values form BoG scraped and used
 dtk_fl          <- "~/CODE/data_streams/fi_analysis/data/BoG_DTK.Rds"
+dtkd_fl         <- "~/CODE/data_streams/fi_analysis/data/BoG_DTK_daily.Rds"
+
 
 ## BGF Euro Income Fixed Maturity Bond Fund 2029 over time
 bon_fl          <- "~/CODE/data_streams/fi_analysis/data/bonBR.Rds"
