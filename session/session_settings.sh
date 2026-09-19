@@ -18,10 +18,11 @@ case "$(hostname)" in
     ;;
 
   "durden")
-    echo "tyler"
+    echo "durden"
     savertime=900
     echo " - - - Enable touchpad tap - - - "
-    exec xinput set-prop "GXTP5100:00 27C6:01E0 Touchpad" "libinput Tapping Enabled" 1
+    # exec xinput set-prop "GXTP5100:00 27C6:01E0 Touchpad" "libinput Tapping Enabled" 1
+    xinput set-prop "GXTP5100:00 27C6:01E0 Touchpad" "libinput Tapping Enabled" 1
     ;;
 
   "sagan")
