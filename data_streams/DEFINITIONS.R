@@ -34,6 +34,7 @@ mmexfla         <- "~/CODE/data_streams/fi_analysis/data/allmmex.Rds"
 mmexflaDbalance <- "~/CODE/data_streams/fi_analysis/data/allmmexDbalance.Rds"
 mmexflatrans    <- "~/CODE/data_streams/fi_analysis/data/allmmextrans.Rds"
 mmexflStocks    <- "~/CODE/data_streams/fi_analysis/data/allmmexstock.Rds"
+mmexmytot       <- "~/CODE/data_streams/fi_analysis/data/mmexmytot.Rds"
 
 ## Account names form MMEX
 mmexnames       <- "~/CODE/data_streams/fi_analysis/data/MMEX_account_names.Rds"
