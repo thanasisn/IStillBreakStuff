@@ -156,6 +156,9 @@ def get_open_meteo_forecasts(latitude = 0, longitude = 0):
         "timezone":      "auto",
         "past_days":     2,
         "forecast_days": 16,
+        "wind_speed_unit":  "kmh",
+        "temperature_unit":     "celsius",  # default
+        "precipitation_unit":   "mm",       # default
     }
 
     # Get data from all models
