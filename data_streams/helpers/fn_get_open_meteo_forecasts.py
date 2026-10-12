@@ -101,64 +101,64 @@ def get_open_meteo_forecasts(latitude = 0, longitude = 0):
     # Define weather models
     model_names = [
         "best_match",
+        "bom_access_global",
+        "cma_grapes_global",
+        "dmi_harmonie_arome_europe",
+        "dmi_seamless",
+        "ecmwf_aifs025_single",
         "ecmwf_ifs",
         "ecmwf_ifs025",
-        "ecmwf_aifs025_single",
-        "cma_grapes_global",
-        "bom_access_global",
-        "gfs_seamless",
+        "gem_global",
+        "gem_hrdps_continental",
+        "gem_regional",
         "gfs_global",
-        "jma_seamless",
         "gfs_graphcast025",
+        "gfs_seamless",
+        "icon_d2",
+        "icon_eu",
+        "icon_global",
+        "icon_seamless",
+        "italia_meteo_arpae_icon_2i",
+        "jma_gsm",
+        "jma_seamless",
+        "kma_seamless",
+        "meteofrance_arpege_europe",
+        "meteoswiss_icon_ch1",
+        "meteoswiss_icon_seamless",
         "ncep_aigfs025",
         "ncep_hgefs025_ensemble_mean",
-        "kma_seamless",
-        "icon_seamless",
-        "icon_global",
-        "icon_eu",
-        "icon_d2",
-        "gem_seamless",
-        # "metno_seamless",
-        # "metno_nordic",
-        "italia_meteo_arpae_icon_2i",
-        "meteoswiss_icon_seamless",
-        "ukmo_seamless",
         "ukmo_global_deterministic_10km",
-        # "ukmo_uk_deterministic_2km",
-        # "meteofrance_seamless",
-        # "meteofrance_arpege_world",
-        "meteofrance_arpege_europe",
-        # "meteofrance_arome_france",
-        # "meteofrance_arome_france_hd",
-        "knmi_seamless",
+        "ukmo_seamless",
+        # "gem_seamless",
+        # "jma_msm",
+        # "kma_gdps",
+        # "kma_ldps",
         # "knmi_harmonie_arome_europe",
         # "knmi_harmonie_arome_netherlands",
-        "dmi_seamless",
-        "dmi_harmonie_arome_europe",
-        "meteoswiss_icon_ch1",
+        # "knmi_seamless",
+        # "meteofrance_arome_france",
+        # "meteofrance_arome_france_hd",
+        # "meteofrance_arpege_world",
+        # "meteofrance_seamless",
         # "meteoswiss_icon_ch2",
-        # "kma_ldps",
-        "kma_gdps",
-        "jma_msm",
-        "jma_gsm",
-        "gem_global",
-        "gem_regional",
-        "gem_hrdps_continental",
+        # "metno_nordic",
+        # "metno_seamless",
+        # "ukmo_uk_deterministic_2km",
         "gem_hrdps_west"
     ]
 
     params = {
-        "latitude":      latitude,
-        "longitude":     longitude,
-        "daily":         daily_vars_names,
-        "hourly":        hourly_vars_names,
-        "models":        model_names,
-        "timezone":      "auto",
-        "past_days":     2,
-        "forecast_days": 16,
-        "wind_speed_unit":  "kmh",
-        "temperature_unit":     "celsius",  # default
-        "precipitation_unit":   "mm",       # default
+        "latitude":            latitude,
+        "longitude":           longitude,
+        "daily":               daily_vars_names,
+        "hourly":              hourly_vars_names,
+        "models":              model_names,
+        "timezone":            "auto",
+        "past_days":           2,
+        "forecast_days":       16,
+        "wind_speed_unit":    "kmh",
+        "temperature_unit":   "celsius",  # default
+        "precipitation_unit": "mm",       # default
     }
 
     # Get data from all models
@@ -255,7 +255,7 @@ def get_open_meteo_forecasts(latitude = 0, longitude = 0):
 
     # Combine all data
     hourly_data = pd.concat(all_hourly_data, ignore_index=True)
-    daily_data  = pd.concat(all_daily_data, ignore_index=True)
+    daily_data  = pd.concat(all_daily_data,  ignore_index=True)
 
     # return hourly_data, daily_data
 

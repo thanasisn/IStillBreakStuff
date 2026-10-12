@@ -26,13 +26,13 @@ set +e
 pids=()
 
 
-(
-  info "##  W01_location_forecast.R  ##"
-  Rscript -e "rmarkdown::render('~/CODE/data_streams/weather/W01_location_forecast.R',
-                  output_format = 'html_document',
-                  output_dir    = '~/Formal/REPORTS')"
-  info "##  End W01_location_forecast.R  STATUS:$?  ##"
-) & pids+=($!)
+# (
+#   info "##  W01_location_forecast.R  ##"
+#   Rscript -e "rmarkdown::render('~/CODE/data_streams/weather/W01_location_forecast.R',
+#                   output_format = 'html_document',
+#                   output_dir    = '~/Formal/REPORTS')"
+#   info "##  End W01_location_forecast.R  STATUS:$?  ##"
+# ) & pids+=($!)
 
 (
   sleep 0.2
