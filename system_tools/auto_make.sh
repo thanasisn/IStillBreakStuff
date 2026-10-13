@@ -20,6 +20,32 @@ exec 2> >(tee -i "${ERR_FILE}" >&2)
 trap 'echo $( date +%F_%T ) ${SECONDS}s :: $0 interrupted ::  >&2;' INT TERM
 info "START :: $0 :: $* ::"
 
+## FORCE Build
+
+## list folders containing a makefile
+folders=(
+  "$HOME/MANUSCRIPTS/ROUT_analysis"
+)
+
+for af in "${folders[@]}"; do
+  info "$af"
+  if [ -d "$af" ]; then
+    info "Doing: $af"
+  else
+    info "$af don't exist SKIP!!"
+    continue
+  fi
+
+  cd "$af" || continue
+  (
+    ## run make with default rule
+    nice -n 19 ionice -c2 -n7 make -B -f ./*[Mm]akefile -C "$af"
+  ) > >(tee .automake.log) 2> >(tee .automake.err >&2)
+  echo "================================="
+done
+
+
+
 ## list folders containing a makefile
 folders=(
   "$HOME/BBand_LAP/JOURNAL"
@@ -54,5 +80,19 @@ for af in "${folders[@]}"; do
   ) > >(tee .automake.log) 2> >(tee .automake.err >&2)
   echo "================================="
 done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 exit 0
