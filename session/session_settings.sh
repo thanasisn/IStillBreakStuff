@@ -59,11 +59,11 @@ echo
 
 if type synclient >/dev/null 2>&1; then
   echo " - - - Set touchpad options - - - "
-  synclient  VertEdgeScroll=1
-  synclient  TapButton1=1
-  synclient  TapButton2=1      # why on tyler
-  synclient  LBCornerButton=1
-  synclient  RBCornerButton=1
+  synclient VertEdgeScroll=1
+  synclient TapButton1=1
+  synclient TapButton2=1      # why on tyler
+  synclient LBCornerButton=1
+  synclient RBCornerButton=1
   echo
 fi
 
@@ -72,14 +72,19 @@ if [[ $(hostname) == "durden" ]]; then
   exec xrandr --dpi 120
 fi
 
-
-echo " - - - Set keyboard language options - - - "
-#  setxkbmap -option grp:switch,grp:alt_shift_toggle,grp_led:scroll us,el
-setxkbmap -option grp:switch,grp:alt_shift_toggle,grp_led:scroll us,gr
-echo
+# echo " - - - Set keyboard language options - - - "
+# #  setxkbmap -option grp:switch,grp:alt_shift_toggle,grp_led:scroll us,el
+# setxkbmap -option grp:switch,grp:alt_shift_toggle,grp_led:scroll us,gr
+# echo
+#
+# echo " - - - Swap caps and escape keys - - - "
+# setxkbmap -option "caps:swapescape"
+# echo
 
 echo " - - - Swap caps and escape keys - - - "
-setxkbmap -option "caps:swapescape"
+setxkbmap -layout us,gr \
+  -option grp:switch,grp:alt_shift_toggle,grp_led:scroll \
+  -option caps:swapescape
 echo
 
 
