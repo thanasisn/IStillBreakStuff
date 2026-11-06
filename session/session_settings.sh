@@ -37,7 +37,7 @@ case "$(hostname)" in
 esac
 echo
 
-echo "-- screen saver and locking --"
+echo "- - - screen saver and locking - - -"
 xset s $savertime $savertime
 echo xset s $savertime $savertime
 echo
@@ -69,7 +69,7 @@ fi
 
 
 if [[ $(hostname) == "durden" ]]; then
-  exec xrandr --dpi 120
+  xrandr --dpi 120
 fi
 
 # echo " - - - Set keyboard language options - - - "
@@ -81,7 +81,7 @@ fi
 # setxkbmap -option "caps:swapescape"
 # echo
 
-echo " - - - Swap caps and escape keys - - - "
+echo " - - - Swap caps and escape keys - - -"
 setxkbmap -layout us,gr \
   -option grp:switch,grp:alt_shift_toggle,grp_led:scroll \
   -option caps:swapescape
